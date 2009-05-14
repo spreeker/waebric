@@ -23,8 +23,9 @@ public class WaebricLexer {
 	}
 	
 	/**
-	 * Separate words from input string.
+	 * Separate string into words.
 	 * 
+	 * @see java.util.StringTokenizer
 	 * @param input
 	 * @return words
 	 */
@@ -39,7 +40,7 @@ public class WaebricLexer {
 	}
 	
 	/**
-	 * Translate input stream in a string of data, using UTF-8 encoding.
+	 * Translate input stream into a string, using UTF-8 encoding.
 	 * 
 	 * @param stream
 	 * @return input
