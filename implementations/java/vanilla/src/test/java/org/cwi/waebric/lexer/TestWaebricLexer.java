@@ -1,4 +1,4 @@
-package org.cwi.waebric;
+package org.cwi.waebric.lexer;
 
 import static org.junit.Assert.*;
 
@@ -56,9 +56,11 @@ public class TestWaebricLexer {
 	@Test
 	public void testTokenizeStream() {
 		try {
-			Object[] data = lexer.tokenizeStream(is);
-			assertNotNull(data);
-			assertTrue(data.length > 0);
+			WaebricToken[] tokens = lexer.tokenizeStream(is);
+			assertNotNull(tokens);
+			assertTrue(tokens.length > 0);
+			assertTrue(tokens[0] == WaebricToken.MODULE);
+			assertTrue(tokens[tokens.length-1] == WaebricToken.END);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

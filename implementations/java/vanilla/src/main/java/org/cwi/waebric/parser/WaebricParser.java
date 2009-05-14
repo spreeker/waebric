@@ -1,4 +1,4 @@
-package org.cwi.waebric;
+package org.cwi.waebric.parser;
 
 public class WaebricParser {
 

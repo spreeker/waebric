@@ -1,4 +1,4 @@
-package org.cwi.waebric;
+package org.cwi.waebric.lexer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +13,12 @@ import java.util.StringTokenizer;
  * @date 14-05-2009 10:25AM
  */
 public class WaebricLexer {
-
-	public Object[] tokenizeStream(InputStream is) throws IOException {
+	
+	public WaebricToken[] tokenizeStream(InputStream is) throws IOException {
 		String input = parseStream(is);
-		String[] words = separateWords(input);
-		
-		// TODO: Convert words to tokens
-		return new Object[0];
+		String[] data = separateWords(input);
+		WaebricTokenizer tokenizer = new WaebricTokenizer();
+		return tokenizer.tokenizeInput(data, 0);
 	}
 	
 	/**
@@ -54,8 +53,8 @@ public class WaebricLexer {
 		do {
 			final char[] buffer = new char[0x10000];
 			read = in.read(buffer, 0, buffer.length);
-			if (read>0) { out.append(buffer, 0, read); } 
-		} while (read>=0);
+			if (read > 0) { out.append(buffer, 0, read); } 
+		} while (read >= 0);
 
 		return out.toString();
 	}
