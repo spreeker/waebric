@@ -2,17 +2,18 @@ package org.cwi.waebric.lexer.actions;
 
 import static org.junit.Assert.*;
 
+import org.cwi.waebric.lexer.preprocess.AttachSeperatorsProcess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestAttachSeperatorsAction {
 	
-	private AttachSeperatorsAction action;
+	private AttachSeperatorsProcess action;
 	
 	@Before
 	public void setUp() throws Exception {
-		action = new AttachSeperatorsAction();
+		action = new AttachSeperatorsProcess();
 	}
 	
 	@After

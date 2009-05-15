@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileInputStream;
 
 import org.cwi.waebric.lexer.WaebricLexer;
+import org.cwi.waebric.lexer.preprocess.FilterCommentsProcess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,12 +14,12 @@ public class TestFilterCommentsAction {
 
 	private final String PROGRAM_PATH = "src/test/waebric/hellocomments.waebric";
 	
-	private FilterCommentsAction action;
+	private FilterCommentsProcess action;
 	private String data;
 	
 	@Before
 	public void setUp() throws Exception {
-		action = new FilterCommentsAction();
+		action = new FilterCommentsProcess();
 		data = new WaebricLexer().parseStream(new FileInputStream(PROGRAM_PATH));
 	}
 

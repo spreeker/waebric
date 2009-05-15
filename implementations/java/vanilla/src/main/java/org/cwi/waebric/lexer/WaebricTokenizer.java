@@ -2,6 +2,9 @@ package org.cwi.waebric.lexer;
 
 import java.util.StringTokenizer;
 
+import org.cwi.waebric.lexer.token.WaebricToken;
+import org.cwi.waebric.lexer.token.WaebricTokenType;
+
 public class WaebricTokenizer {
 	
 	/**

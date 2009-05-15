@@ -1,4 +1,4 @@
-package org.cwi.waebric.lexer;
+package org.cwi.waebric.lexer.token;
 
 public class WaebricToken {
 

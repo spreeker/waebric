@@ -38,19 +38,5 @@ public class TestWaebricLexer {
 			e.printStackTrace();
 		}
 	}
-	
-	@Test
-	public void testTokenizeStream() {
-		try {
-			String input = lexer.parseStream(is);
-			WaebricToken[] tokens = lexer.tokenizeStream(input);			
-			assertNotNull(tokens);
-			assertTrue(tokens.length > 0);
-			assertTrue(tokens[0].getToken() == WaebricTokenType.MODULE);
-			assertTrue(tokens[tokens.length-1].getToken() == WaebricTokenType.END);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 }

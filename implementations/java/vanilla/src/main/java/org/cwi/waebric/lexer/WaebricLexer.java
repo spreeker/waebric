@@ -7,9 +7,10 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.lexer.actions.AttachSeperatorsAction;
-import org.cwi.waebric.lexer.actions.FilterCommentsAction;
-import org.cwi.waebric.lexer.actions.ILexerAction;
+import org.cwi.waebric.lexer.preprocess.AttachSeperatorsProcess;
+import org.cwi.waebric.lexer.preprocess.FilterCommentsProcess;
+import org.cwi.waebric.lexer.preprocess.ILexerPreprocess;
+import org.cwi.waebric.lexer.token.WaebricToken;
 
 /**
  * Convert input stream in tokens.
@@ -19,27 +20,27 @@ import org.cwi.waebric.lexer.actions.ILexerAction;
  */
 public class WaebricLexer {
 	
-	private List<ILexerAction> actions;
+	private final WaebricTokenizer tokenizer;
+	private List<ILexerPreprocess> actions;
 	
 	public WaebricLexer() {
-		actions = new ArrayList<ILexerAction>();
-		actions.add(new FilterCommentsAction());
-		actions.add(new AttachSeperatorsAction());
+		tokenizer = new WaebricTokenizer();
+		actions = new ArrayList<ILexerPreprocess>();
+		actions.add(new FilterCommentsProcess());
+		actions.add(new AttachSeperatorsProcess());
 	}
 	
 	public WaebricToken[] tokenizeStream(String input) throws IOException {
 		String data = input;
 		
-		// Pre-process character stream
-		for(ILexerAction action : actions) {
+		// Preprocess character stream
+		for(ILexerPreprocess action : actions) {
 			data = action.execute(data);
 		}
 		
-		// Change to tokens
-		return new WaebricTokenizer().tokenizeInput(data, 0);
+		// Tokenize data
+		return tokenizer.tokenizeInput(data, 0);
 	}
-	
-
 	
 	/**
 	 * Translate input stream into a string, using UTF-8 encoding.
