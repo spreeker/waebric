@@ -50,17 +50,19 @@ public class FilterCommentsAction implements ILexerAction {
 	 * @return Text without substring
 	 */
 	public String removeStringAt(String text, int beginIndex, int endIndex) {
-		String subString = "";
+		String resultString = "";
 		
 		if(beginIndex > 0) {
-			subString += text.substring(0, beginIndex-1);
+			String left = text.substring(0, beginIndex-1);
+			resultString += left;
 		}
 		
-		if(endIndex < text.length()) {
-			subString += text.substring(endIndex+1, text.length());
+		if(endIndex < text.length()-1) {
+			String right = text.substring(endIndex+1, text.length());
+			resultString += right;
 		}
 		
-		return subString;
+		return resultString;
 	}
 	
 }
