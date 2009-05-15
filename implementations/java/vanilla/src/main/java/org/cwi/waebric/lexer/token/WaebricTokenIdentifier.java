@@ -1,0 +1,7 @@
+package org.cwi.waebric.lexer.token;
+
+public enum WaebricTokenIdentifier {
+	IDCON, NATCON, SYMBOLCON, TEXT, LBRACKET, RBRACKET, LCBRACKET, COMMENT, 
+	RCBRACKET, MODULE, IMPORT, SITE, END, DEF, HTML, HEAD, BODY, TITLE, P, 
+	SEMICOLON, EQUAL;
+}

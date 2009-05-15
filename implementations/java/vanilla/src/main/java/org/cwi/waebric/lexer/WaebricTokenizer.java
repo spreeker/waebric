@@ -3,7 +3,7 @@ package org.cwi.waebric.lexer;
 import java.util.StringTokenizer;
 
 import org.cwi.waebric.lexer.token.WaebricToken;
-import org.cwi.waebric.lexer.token.WaebricTokenType;
+import org.cwi.waebric.lexer.token.WaebricTokenIdentifier;
 
 public class WaebricTokenizer {
 	
@@ -44,71 +44,71 @@ public class WaebricTokenizer {
 		String word = data[index];
 		
 		if(word.equals("{")) { 
-			return new WaebricToken(WaebricTokenType.LBRACKET, word);
+			return new WaebricToken(WaebricTokenIdentifier.LBRACKET, word);
 		}
 		
 		else if(word.equals("}")) { 
-			return new WaebricToken(WaebricTokenType.RCBRACKET, word);
+			return new WaebricToken(WaebricTokenIdentifier.RCBRACKET, word);
 		}
 		
 		else if(word.equals("(")) { 
-			return new WaebricToken(WaebricTokenType.LBRACKET, word);
+			return new WaebricToken(WaebricTokenIdentifier.LBRACKET, word);
 		}
 		
 		else if(word.equals(")")) { 
-			return new WaebricToken(WaebricTokenType.RBRACKET, word);
+			return new WaebricToken(WaebricTokenIdentifier.RBRACKET, word);
 		}
 		
 		else if(word.equals(";")) { 
-			return new WaebricToken(WaebricTokenType.SEMICOLON, word);
+			return new WaebricToken(WaebricTokenIdentifier.SEMICOLON, word);
 		}
 		
 		else if(word.equals("module") && isIdentifier(data[index+1])) { 
-			return new WaebricToken(WaebricTokenType.MODULE, word);
+			return new WaebricToken(WaebricTokenIdentifier.MODULE, word);
 		}
 		
 		else if(word.equals("end")) { 
-			return new WaebricToken(WaebricTokenType.END, word);
+			return new WaebricToken(WaebricTokenIdentifier.END, word);
 		}
 		
 		else if(word.equals("def")) { 
-			return new WaebricToken(WaebricTokenType.DEF, word);
+			return new WaebricToken(WaebricTokenIdentifier.DEF, word);
 		}
 		
 		else if(word.equals("html")) { 
-			return new WaebricToken(WaebricTokenType.HTML, word);
+			return new WaebricToken(WaebricTokenIdentifier.HTML, word);
 		}
 		
 		else if(word.equals("head")) { 
-			return new WaebricToken(WaebricTokenType.HEAD, word);
+			return new WaebricToken(WaebricTokenIdentifier.HEAD, word);
 		}
 		
 		else if(word.equals("body")) { 
-			return new WaebricToken(WaebricTokenType.BODY, word);
+			return new WaebricToken(WaebricTokenIdentifier.BODY, word);
 		}
 		
 		else if(word.equals("title")) { 
-			return new WaebricToken(WaebricTokenType.TITLE, word);
+			return new WaebricToken(WaebricTokenIdentifier.TITLE, word);
 		}
 		
 		else if(word.equals("p")) { 
-			return new WaebricToken(WaebricTokenType.P, word);
+			return new WaebricToken(WaebricTokenIdentifier.P, word);
 		}
 		
 		else if(isNumber(word)) { 
-			return new WaebricToken(WaebricTokenType.NATCON, word);
+			return new WaebricToken(WaebricTokenIdentifier.NATCON, word);
 		}
 		
 		else if(isText(word)) { 
-			return new WaebricToken(WaebricTokenType.TEXT, word);
+			return new WaebricToken(WaebricTokenIdentifier.TEXT, word);
 		}
 		
 		else if(isIdentifier(word)) { 
 			if(index > 0) {
-				WaebricTokenType precessor = getToken(data, index-1).getToken();
+				WaebricTokenIdentifier precessor = getToken(data, index-1).getToken();
 				
-				if(precessor.equals(WaebricTokenType.MODULE) || precessor.equals(WaebricTokenType.DEF)) { 
-					return new WaebricToken(WaebricTokenType.IDCON, word);
+				if(precessor.equals(WaebricTokenIdentifier.MODULE) || precessor.equals(WaebricTokenIdentifier.DEF)) { 
+					return new WaebricToken(WaebricTokenIdentifier.IDCON, word);
 				}
 			}
 		}

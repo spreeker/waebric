@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.cwi.waebric.lexer.token.WaebricToken;
-import org.cwi.waebric.lexer.token.WaebricTokenType;
+import org.cwi.waebric.lexer.token.WaebricTokenIdentifier;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +42,8 @@ public class TestWaebricTokenizer {
 			WaebricToken[] token = lexer.tokenizeStream(input);			
 			assertNotNull(token);
 			assertTrue(token.length > 0);
-			assertTrue(token[0].getToken() == WaebricTokenType.MODULE);
-			assertTrue(token[token.length-1].getToken() == WaebricTokenType.END);
+			assertTrue(token[0].getToken() == WaebricTokenIdentifier.MODULE);
+			assertTrue(token[token.length-1].getToken() == WaebricTokenIdentifier.END);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
