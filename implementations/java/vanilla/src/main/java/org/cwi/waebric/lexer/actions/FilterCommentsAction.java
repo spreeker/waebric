@@ -1,4 +1,4 @@
-package org.cwi.waebric.lexer.filter;
+package org.cwi.waebric.lexer.actions;
 
 public class FilterCommentsAction implements ILexerAction {
 
