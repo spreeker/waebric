@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.StringTokenizer;
 
 /**
  * Convert input stream in tokens.
@@ -14,28 +13,9 @@ import java.util.StringTokenizer;
  */
 public class WaebricLexer {
 	
-	public WaebricToken[] tokenizeStream(InputStream is) throws IOException {
-		String input = parseStream(is);
-		String[] data = separateWords(input);
+	public WaebricToken[] tokenizeStream(String data) throws IOException {
 		WaebricTokenizer tokenizer = new WaebricTokenizer();
 		return tokenizer.tokenizeInput(data, 0);
-	}
-	
-	/**
-	 * Separate string into words.
-	 * 
-	 * @see java.util.StringTokenizer
-	 * @param input
-	 * @return words
-	 */
-	public String[] separateWords(String input) {
-		StringTokenizer separator = new StringTokenizer(input);
-		String[] tokens =  new String[separator.countTokens()];
-		for(int i = 0; separator.hasMoreElements(); i++) {
-			tokens[i] = separator.nextToken();
-		}
-		
-		return tokens;
 	}
 	
 	/**

@@ -40,23 +40,10 @@ public class TestWaebricLexer {
 	}
 	
 	@Test
-	public void testSeparateWords() {
-		try {
-			String input = lexer.parseStream(is);
-			String[] data = lexer.separateWords(input);
-			assertNotNull(data);
-			assertTrue(data.length > 0);
-			assertTrue(data[0].equals("module"));
-			assertTrue(data[data.length-1].equals("end"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
 	public void testTokenizeStream() {
 		try {
-			WaebricToken[] tokens = lexer.tokenizeStream(is);
+			String input = lexer.parseStream(is);
+			WaebricToken[] tokens = lexer.tokenizeStream(input);
 			assertNotNull(tokens);
 			assertTrue(tokens.length > 0);
 			assertTrue(tokens[0] == WaebricToken.MODULE);
