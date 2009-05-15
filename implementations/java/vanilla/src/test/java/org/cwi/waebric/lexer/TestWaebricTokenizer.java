@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class TestWaebricTokenizer {
 
-	final String PROGRAM_PATH = "src/test/waebric/helloworld.waebric";
+	private final String PROGRAM_PATH = "src/test/waebric/helloworld.waebric";
 	
 	private WaebricTokenizer tokenizer;
 	private String data;
@@ -24,8 +24,7 @@ public class TestWaebricTokenizer {
 
 	@After
 	public void tearDown() throws Exception {
-		tokenizer = null;
-		data = null;
+		data = "";
 	}
 	
 	@Test

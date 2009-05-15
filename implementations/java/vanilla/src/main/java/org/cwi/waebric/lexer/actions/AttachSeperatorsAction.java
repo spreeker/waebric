@@ -3,10 +3,10 @@ package org.cwi.waebric.lexer.actions;
 public class AttachSeperatorsAction implements ILexerAction {
 
 	// Special symbols
-	private final char SEMICOLON = ';';
-	private final char EQUAL = '=';
-	private final char SEPERATOR = ' ';
+	public final char SEMICOLON = ';';
+	public final char EQUAL = '=';
 	
+	private final char SEPERATOR = ' ';
 	private final int FINISHED = -1;
 
 	public String execute(String text) {
