@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.cwi.waebric.lexer.actions.AttachSeperatorsAction;
+import org.cwi.waebric.lexer.actions.FilterCommentsAction;
+import org.cwi.waebric.lexer.actions.ILexerAction;
 
 /**
  * Convert input stream in tokens.
@@ -13,10 +19,27 @@ import java.io.Reader;
  */
 public class WaebricLexer {
 	
-	public WaebricToken[] tokenizeStream(String data) throws IOException {
-		WaebricTokenizer tokenizer = new WaebricTokenizer();
-		return tokenizer.tokenizeInput(data, 0);
+	private List<ILexerAction> actions;
+	
+	public WaebricLexer() {
+		actions = new ArrayList<ILexerAction>();
+		actions.add(new FilterCommentsAction());
+		actions.add(new AttachSeperatorsAction());
 	}
+	
+	public WaebricToken[] tokenizeStream(String input) throws IOException {
+		String data = input;
+		
+		// Pre-process character stream
+		for(ILexerAction action : actions) {
+			data = action.execute(data);
+		}
+		
+		// Change to tokens
+		return new WaebricTokenizer().tokenizeInput(data, 0);
+	}
+	
+
 	
 	/**
 	 * Translate input stream into a string, using UTF-8 encoding.

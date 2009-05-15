@@ -1,44 +1,49 @@
 package org.cwi.waebric.lexer;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestWaebricTokenizer {
 
-	private final String PROGRAM_PATH = "src/test/waebric/helloworld.waebric";
+	private final String PROGRAM_HW_PATH = "src/test/waebric/helloworld.waebric";
+	private final String PROGRAM_IS_PATH = "src/test/waebric/invalidsymbol.waebric";
 	
+	private WaebricLexer lexer;
 	private WaebricTokenizer tokenizer;
-	private String data;
 	
 	@Before
 	public void setUp() throws Exception {
+		lexer = new WaebricLexer();
 		tokenizer = new WaebricTokenizer();
-		data = new WaebricLexer().parseStream(new FileInputStream(PROGRAM_PATH));
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		data = "";
 	}
 	
 	@Test
-	public void testTokenizeInput() {
-		
-	}
-	
-	@Test
-	public void testSeparateWords() {
-		String[] words = tokenizer.separateWords(data);
+	public void testSeparateWords() throws IOException {
+		String input = lexer.parseStream(new FileInputStream(PROGRAM_HW_PATH));
+		String[] words = tokenizer.separateWords(input);
 		assertNotNull(words);
 		assertTrue(words.length > 0);
 		assertTrue(words[0].equals("module"));
 		assertTrue(words[words.length-1].equals("end"));
+	}
+	
+	@Test
+	public void testInvalidInput() {
+		try {
+			String data = lexer.parseStream(new FileInputStream(PROGRAM_IS_PATH));
+			WaebricToken[] token = lexer.tokenizeStream(data);
+			assertNull(token[4]);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

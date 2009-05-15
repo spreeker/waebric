@@ -4,27 +4,6 @@ import java.util.StringTokenizer;
 
 public class WaebricTokenizer {
 	
-	public WaebricToken[] tokenizeInput(String input, int offset) {
-		String[] data = separateWords(input);
-		WaebricToken[] tokens = new WaebricToken[data.length - offset];
-		
-		for(int i = offset; i < data.length; i++) {
-			String word = data[i];
-			if(word.equals("{")) tokens[i] = WaebricToken.LCBRACKET;
-			else if(word.equals("}")) tokens[i] = WaebricToken.RCBRACKET;
-			else if(word.equals("(")) tokens[i] = WaebricToken.LBRACKET;
-			else if(word.equals(")")) tokens[i] = WaebricToken.RBRACKET;
-			else if(word.equals("module") && isIdentifier(data[i+1])) tokens[i] = WaebricToken.MODULE;
-			else if(word.equals("end")) tokens[i] = WaebricToken.END;
-			else if(isIdentifier(word)) tokens[i] = WaebricToken.IDCON;
-			else if(isNumber(word)) tokens[i] = WaebricToken.NATCON;
-			else if(isText(word)) tokens[i] = WaebricToken.TEXT;
-			else tokens[i] = WaebricToken.UNKNOWN;
-		}
-		
-		return tokens;
-	}
-	
 	/**
 	 * Separate string into words.
 	 * 
@@ -40,6 +19,99 @@ public class WaebricTokenizer {
 		}
 		
 		return tokens;
+	}
+	
+	public WaebricToken[] tokenizeInput(String input, int offset) {
+		String[] data = separateWords(input);
+		WaebricToken[] token = new WaebricToken[data.length - offset];
+		
+		for(int i = offset; i < data.length; i++) {
+			try {
+				token[i] = getToken(data, i);
+				System.out.println("[" + i + "]" + token[i].toString());
+			} catch (LexerException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return token;
+	}
+	
+	public WaebricToken getToken(String[] data, int index) throws LexerException {
+		String word = data[index];
+		
+		if(word.equals("{")) { 
+			return new WaebricToken(WaebricTokenType.LBRACKET, word);
+		}
+		
+		else if(word.equals("}")) { 
+			return new WaebricToken(WaebricTokenType.RCBRACKET, word);
+		}
+		
+		else if(word.equals("(")) { 
+			return new WaebricToken(WaebricTokenType.LBRACKET, word);
+		}
+		
+		else if(word.equals(")")) { 
+			return new WaebricToken(WaebricTokenType.RBRACKET, word);
+		}
+		
+		else if(word.equals(";")) { 
+			return new WaebricToken(WaebricTokenType.SEMICOLON, word);
+		}
+		
+		else if(word.equals("module") && isIdentifier(data[index+1])) { 
+			return new WaebricToken(WaebricTokenType.MODULE, word);
+		}
+		
+		else if(word.equals("end")) { 
+			return new WaebricToken(WaebricTokenType.END, word);
+		}
+		
+		else if(word.equals("def")) { 
+			return new WaebricToken(WaebricTokenType.DEF, word);
+		}
+		
+		else if(word.equals("html")) { 
+			return new WaebricToken(WaebricTokenType.HTML, word);
+		}
+		
+		else if(word.equals("head")) { 
+			return new WaebricToken(WaebricTokenType.HEAD, word);
+		}
+		
+		else if(word.equals("body")) { 
+			return new WaebricToken(WaebricTokenType.BODY, word);
+		}
+		
+		else if(word.equals("title")) { 
+			return new WaebricToken(WaebricTokenType.TITLE, word);
+		}
+		
+		else if(word.equals("p")) { 
+			return new WaebricToken(WaebricTokenType.P, word);
+		}
+		
+		else if(isNumber(word)) { 
+			return new WaebricToken(WaebricTokenType.NATCON, word);
+		}
+		
+		else if(isText(word)) { 
+			return new WaebricToken(WaebricTokenType.TEXT, word);
+		}
+		
+		else if(isIdentifier(word)) { 
+			if(index > 0) {
+				WaebricTokenType precessor = getToken(data, index-1).getToken();
+				
+				if(precessor.equals(WaebricTokenType.MODULE) || precessor.equals(WaebricTokenType.DEF)) { 
+					return new WaebricToken(WaebricTokenType.IDCON, word);
+				}
+			}
+		}
+		
+		// Unprocessed
+		throw new LexerException(word, index);
 	}
 	
 	public boolean isText(String text) {
