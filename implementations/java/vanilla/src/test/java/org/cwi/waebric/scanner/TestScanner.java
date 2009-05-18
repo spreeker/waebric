@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricLiteral;
 import org.junit.Test;
 
@@ -26,8 +27,20 @@ public class TestScanner {
 			List<Token> tokens = scanner.getTokens();
 			assertNotNull(tokens);
 			assertTrue(tokens.size() > 0);
+			
+			// Assert literals
+			assertTrue(tokens.get(0).getSort().equals(TokenSort.LITERAL));
 			assertTrue(tokens.get(0).getData().equals(WaebricLiteral.MODULE));
+			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.LITERAL));
 			assertTrue(tokens.get(tokens.size()-1).getData().equals(WaebricLiteral.END));
+			
+			// Assert identifiers
+			assertTrue(tokens.get(1).getSort().equals(TokenSort.IDCON));
+			assertTrue(tokens.get(1).getData().equals("test"));
+
+			// Assert text
+			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
+			assertTrue(tokens.get(8).getData().equals("Hello"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
