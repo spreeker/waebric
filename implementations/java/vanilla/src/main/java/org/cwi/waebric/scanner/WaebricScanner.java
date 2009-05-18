@@ -57,7 +57,14 @@ public class WaebricScanner {
 				// Literals
 				case StreamTokenizer.TT_WORD:
 					try {
-						tokens.add(new Token(tokenizer.sval, TokenSort.LITERAL, tokenizer.lineno()));
+						if(isLiteral(tokenizer.sval)) {
+							WaebricLiteral literal = WaebricLiteral.valueOf(tokenizer.sval.toUpperCase());
+							tokens.add(new Token(literal, TokenSort.LITERAL, tokenizer.lineno()));
+						} else if(isIdentifier(tokenizer.sval)) {
+							tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
+						} else {
+							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), null));
+						}
 					} catch(Exception e) {
 						exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
 					} break;
