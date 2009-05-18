@@ -40,7 +40,7 @@ public class TestScanner {
 
 			// Assert text
 			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
-			assertTrue(tokens.get(8).getData().equals("Hello"));
+			assertTrue(tokens.get(8).getData().equals("Hello world"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
