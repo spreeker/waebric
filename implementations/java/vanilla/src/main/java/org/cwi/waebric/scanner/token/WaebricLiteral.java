@@ -1,5 +1,5 @@
 package org.cwi.waebric.scanner.token;
 
 public enum WaebricLiteral {
-	MODULE, IMPORT, SITE, DEF, HTML, TITLE, P, H
+	MODULE, IMPORT, SITE, DEF, END, HTML, TITLE, P, H
 }

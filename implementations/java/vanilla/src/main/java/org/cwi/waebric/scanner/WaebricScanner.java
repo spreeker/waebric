@@ -84,6 +84,14 @@ public class WaebricScanner {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public List<Token> getTokens() {
+		return tokens;
+	}
+	
+	/**
+	 * 
 	 * @param data
 	 * @return
 	 */
@@ -113,7 +121,7 @@ public class WaebricScanner {
 		
 		// All characters in an identifier should be letters or digits
 		for(char c : chars) {
-			if(!(isLetter(c) || !isDigit(c))) { return false; }
+			if(!(isLetter(c) || isDigit(c))) { return false; }
 		}
 		
 		return true;
