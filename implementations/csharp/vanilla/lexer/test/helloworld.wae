@@ -1,0 +1,12 @@
+module homepage
+
+site
+	index.html: home("Hello World!")
+end
+
+def home(msg)
+	html {
+		head title msg;
+		body echo msg;
+	}
+end
