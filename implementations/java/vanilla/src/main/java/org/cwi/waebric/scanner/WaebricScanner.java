@@ -47,16 +47,15 @@ public class WaebricScanner {
 		int curr = tokenizer.nextToken();
 		while(curr != StreamTokenizer.TT_EOF) {
 			switch(curr) {
-				// Numerals
 				case StreamTokenizer.TT_NUMBER:
 					try {
 						tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
 					} catch(Exception e) {
 						exceptions.add(new ScannerException(tokenizer.nval, tokenizer.lineno(), e.getCause()));
 					} break;
-				// Literals
 				case StreamTokenizer.TT_WORD:
 					try {
+						// Separate literals from identifiers
 						if(isLiteral(tokenizer.sval)) {
 							WaebricLiteral literal = WaebricLiteral.valueOf(tokenizer.sval.toUpperCase());
 							tokens.add(new Token(literal, TokenSort.LITERAL, tokenizer.lineno()));
@@ -72,11 +71,19 @@ public class WaebricScanner {
 				case StreamTokenizer.TT_EOL: break;
 				default:
 					// Separate text from symbols
-					TokenSort sort = (char) curr == WaebricSymbol.DQUOTE ? TokenSort.TEXT : TokenSort.LITERAL;
-					try {
-						tokens.add(new Token(tokenizer.sval, sort, tokenizer.lineno()));
-					} catch(Exception e) {
-						exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
+					if((char) curr == WaebricSymbol.DQUOTE) {
+						try {
+							tokens.add(new Token(tokenizer.sval, TokenSort.TEXT, tokenizer.lineno()));
+						} catch(Exception e) {
+							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
+						}	
+					} else {
+						String symbol = "" + (char) curr;
+						try {
+							tokens.add(new Token(symbol, TokenSort.LITERAL, tokenizer.lineno()));
+						} catch(Exception e) {
+							exceptions.add(new ScannerException(symbol, tokenizer.lineno(), e.getCause()));
+						}
 					}
 				break;
 			}

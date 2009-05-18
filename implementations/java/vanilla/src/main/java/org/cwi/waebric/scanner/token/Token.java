@@ -48,4 +48,9 @@ public class Token {
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return "\"" + data.toString() + "\" " + sort.name() + " (line: " + line + ")";
+	}
+	
 }
