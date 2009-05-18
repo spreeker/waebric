@@ -13,9 +13,12 @@ import org.cwi.waebric.scanner.token.WaebricLiteral;
 import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
+ * The lexical analyzer, also known as a scanner, reads an input character stream
+ * from which it generates a stream of tokens. During this "tokenization" process
+ * layout and comments characters are removed to simplify and optimize parsing.
  * 
- * @author schagen
- *
+ * @author Jeroen van Schagen
+ * @date 18-05-2009
  */
 public class WaebricScanner {
 
@@ -23,8 +26,9 @@ public class WaebricScanner {
 	private List<Token> tokens;
 	
 	/**
+	 * Initialize scanner
 	 * 
-	 * @param reader
+	 * @param reader Input character stream
 	 */
 	public WaebricScanner(Reader reader) {
 		tokenizer = new StreamTokenizer(reader);
@@ -32,11 +36,12 @@ public class WaebricScanner {
 	}
 	
 	/**
+	 * Convert character stream in token stream
 	 * 
-	 * @return
+	 * @return List of scanner exceptions
 	 * @throws IOException
 	 */
-	public List<ScannerException> scanStream() throws IOException {
+	public List<ScannerException> tokenizeStream() throws IOException {
 		List<ScannerException> exceptions = new ArrayList<ScannerException>();
 		
 		tokenizer.whitespaceChars(WaebricLayout.NEW_LINE, WaebricLayout.NEW_LINE);
@@ -97,17 +102,19 @@ public class WaebricScanner {
 	}
 	
 	/**
+	 * Retrieve token stream
 	 * 
-	 * @return
+	 * @return tokens
 	 */
 	public List<Token> getTokens() {
 		return tokens;
 	}
 	
 	/**
+	 * Determine whether a certain text fragment is a literal.
 	 * 
-	 * @param data
-	 * @return
+	 * @param data Text fragment
+	 * @return literal?
 	 */
 	public static boolean isLiteral(String data) {
 		try {
@@ -121,9 +128,10 @@ public class WaebricScanner {
 	}
 	
 	/**
+	 * Determine whether a certain text fragment is an identifier.
 	 * 
-	 * @param data
-	 * @return
+	 * @param data Text fragment
+	 * @return identifier?
 	 */
 	public static boolean isIdentifier(String data) {
 		// Identifiers should have a size of 1+
@@ -142,18 +150,20 @@ public class WaebricScanner {
 	}
 	
 	/**
+	 * Determine whether a certain character is a letter.
 	 * 
-	 * @param c
-	 * @return
+	 * @param c Character
+	 * @return letter?
 	 */
 	public static boolean isLetter(char c) {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 	}
 	
 	/**
+	 * Determine whether a certain character is a digit.
 	 * 
-	 * @param c
-	 * @return
+	 * @param c Character
+	 * @return digit?
 	 */
 	public static boolean isDigit(char c) {
 		return c >= '0' && c <= '9';

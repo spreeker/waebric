@@ -21,7 +21,7 @@ public class TestScanner {
 		try {
 			FileReader reader = new FileReader(PROGRAM_PATH);
 			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.scanStream();
+			scanner.tokenizeStream();
 			
 			// Retrieve tokens
 			List<Token> tokens = scanner.getTokens();
@@ -30,17 +30,17 @@ public class TestScanner {
 			
 			// Assert literals
 			assertTrue(tokens.get(0).getSort().equals(TokenSort.LITERAL));
-			assertTrue(tokens.get(0).getData().equals(WaebricLiteral.MODULE));
+			assertTrue(tokens.get(0).getLexeme().equals(WaebricLiteral.MODULE));
 			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.LITERAL));
-			assertTrue(tokens.get(tokens.size()-1).getData().equals(WaebricLiteral.END));
+			assertTrue(tokens.get(tokens.size()-1).getLexeme().equals(WaebricLiteral.END));
 			
 			// Assert identifiers
 			assertTrue(tokens.get(1).getSort().equals(TokenSort.IDCON));
-			assertTrue(tokens.get(1).getData().equals("test"));
+			assertTrue(tokens.get(1).getLexeme().equals("test"));
 
 			// Assert text
 			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
-			assertTrue(tokens.get(8).getData().equals("Hello world"));
+			assertTrue(tokens.get(8).getLexeme().equals("Hello world"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

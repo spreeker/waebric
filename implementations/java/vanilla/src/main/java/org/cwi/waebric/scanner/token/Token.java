@@ -1,39 +1,55 @@
 package org.cwi.waebric.scanner.token;
 
+/**
+ * A token is a categorized block of text. This block of text, corresponding to the 
+ * token is known as a lexeme.
+ * 
+ * @see http://en.wikipedia.org/wiki/Token_(parser)
+ * 
+ * @author Jeroen van Schagen
+ * @date 18-05-2009
+ */
 public class Token {
 
-	private Object data;
+	private Object lexeme;
 	private TokenSort sort;
 	private int line;
 	
-	public Token(Object data, TokenSort sort, int line) {
-		this.data = data;
+	/**
+	 * Initialize token
+	 * 
+	 * @param lexeme Block of text
+	 * @param sort Token type
+	 * @param line Line number
+	 */
+	public Token(Object lexeme, TokenSort sort, int line) {
+		this.lexeme = lexeme;
 		this.sort = sort;
 		this.line = line;
 	}
 
-	public Object getData() {
-		return data;
+	/**
+	 * Retrieve lexeme
+	 * @return
+	 */
+	public Object getLexeme() {
+		return lexeme;
 	}
 
-	public void setData(Object data) {
-		this.data = data;
-	}
-
+	/**
+	 * Retrieve token sort
+	 * @return
+	 */
 	public TokenSort getSort() {
 		return sort;
 	}
 
-	public void setSort(TokenSort sort) {
-		this.sort = sort;
-	}
-
+	/**
+	 * Retrieve line number
+	 * @return
+	 */
 	public int getLine() {
 		return line;
-	}
-
-	public void setLine(int line) {
-		this.line = line;
 	}
 	
 	@Override
@@ -42,7 +58,7 @@ public class Token {
 			Token token = (Token) obj;
 			if(token.getSort() != this.sort) { return false; }
 			if(token.getLine() != this.line) { return false; }
-			return token.getData().equals(this.data);
+			return token.getLexeme().equals(this.lexeme);
 		}
 		
 		return false;
@@ -50,7 +66,7 @@ public class Token {
 	
 	@Override
 	public String toString() {
-		return "\"" + data.toString() + "\" " + sort.name() + " (line: " + line + ")";
+		return "\"" + lexeme.toString() + "\" " + sort.name() + " (line: " + line + ")";
 	}
 	
 }

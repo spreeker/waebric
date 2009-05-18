@@ -1,5 +1,11 @@
 package org.cwi.waebric.scanner.token;
 
+/**
+ * Waebric symbol constants
+ * 
+ * @author Jeroen van Schagen
+ * @date 18-05-2009
+ */
 public class WaebricSymbol {
 
 	public static final char NUMBER_SIGN = '#';

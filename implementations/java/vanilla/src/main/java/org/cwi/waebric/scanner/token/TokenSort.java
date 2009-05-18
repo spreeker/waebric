@@ -1,9 +1,10 @@
 package org.cwi.waebric.scanner.token;
 
 /**
+ * Sorts of available tokens
  * 
- * @author schagen
- *
+ * @author Jeroen van Schagen
+ * @date 18-05-2009
  */
 public enum TokenSort {
 	
