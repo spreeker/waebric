@@ -39,7 +39,8 @@ public class WaebricScanner {
 	 * Convert character stream in token stream
 	 * 
 	 * @return List of scanner exceptions
-	 * @throws IOException
+	 * @throws IOException Fired by next token procedure in stream tokenizer.
+	 * @see java.io.StreamTokenizer
 	 */
 	public List<ScannerException> tokenizeStream() throws IOException {
 		List<ScannerException> exceptions = new ArrayList<ScannerException>();
