@@ -20,7 +20,7 @@ public class WaebricParser {
 		this.tokens = tokens;
 	}
 	
-	public List<Exception> parseTokens() {
+	public List<ParserException> parseTokens() {
 		for(Token token : tokens) {
 			System.out.println(token.toString());
 		}
