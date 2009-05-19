@@ -1,8 +1,10 @@
 package org.cwi.waebric.parser;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.SyntaxTree;
+import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 
 /**
@@ -13,19 +15,30 @@ import org.cwi.waebric.scanner.token.Token;
  */
 public class WaebricParser {
 
-	private final List<Token> tokens;
+	private final Iterator<Token> tokens;
 	private SyntaxTree tree;
-	
-	public WaebricParser(List<Token> tokens) {
-		this.tokens = tokens;
+
+	public WaebricParser(WaebricScanner scanner) {
+		this.tokens = scanner.iterator();
+		Token curr = tokens.next();
+		while(tokens.hasNext()) {
+			System.out.println(curr.toString());
+			curr = tokens.next();
+		}
 	}
 	
 	public List<ParserException> parseTokens() {
-		for(Token token : tokens) {
-			System.out.println(token.toString());
-		}
+
 		
 		return null;
+	}
+	
+	private void program() {
+		
+	}
+	
+	private void module() {
+		
 	}
 	
 	public SyntaxTree getTree() {

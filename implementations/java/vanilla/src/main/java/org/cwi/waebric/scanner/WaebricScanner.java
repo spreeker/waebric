@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.scanner.token.Token;
@@ -20,7 +21,7 @@ import org.cwi.waebric.scanner.token.WaebricSymbol;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class WaebricScanner {
+public class WaebricScanner implements Iterable<Token> {
 
 	private StreamTokenizer tokenizer;
 	private List<Token> tokens;
@@ -103,12 +104,31 @@ public class WaebricScanner {
 	}
 	
 	/**
-	 * Retrieve token stream
+	 * Retrieve token
 	 * 
-	 * @return tokens
+	 * @param index Token index in structured text
+	 * @return token
 	 */
-	public List<Token> getTokens() {
-		return tokens;
+	public Token getToken(int index) {
+		return tokens.get(index);
+	}
+	
+	/**
+	 * Retrieve amount of tokens
+	 * 
+	 * @return size
+	 */
+	public int getSize() {
+		return tokens.size();
+	}
+	
+	/**
+	 * Retrieve token iterator
+	 * 
+	 * @return iterator
+	 */
+	public Iterator<Token> iterator() {
+		return tokens.iterator();
 	}
 	
 	/**

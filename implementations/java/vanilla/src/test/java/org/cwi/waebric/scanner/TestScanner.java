@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
 
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -24,31 +24,31 @@ public class TestScanner {
 			scanner.tokenizeStream();
 			
 			// Retrieve tokens
-			List<Token> tokens = scanner.getTokens();
+			Iterator<Token> tokens = scanner.iterator();
 			assertNotNull(tokens);
-			assertTrue(tokens.size() > 0);
+			assertTrue(tokens.hasNext());
 			
 			// Assert Waebric keywords
-			assertTrue(tokens.get(0).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(tokens.get(0).getLexeme().equals(WaebricKeyword.MODULE));
-			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(tokens.get(tokens.size()-1).getLexeme().equals(WaebricKeyword.END));
+			assertTrue(scanner.getToken(0).getSort().equals(TokenSort.KEYWORD));
+			assertTrue(scanner.getToken(0).getLexeme().equals(WaebricKeyword.MODULE));
+			assertTrue(scanner.getToken(scanner.getSize()-1).getSort().equals(TokenSort.KEYWORD));
+			assertTrue(scanner.getToken(scanner.getSize()-1).getLexeme().equals(WaebricKeyword.END));
 			
 			// Assert HTML keywords
-			assertTrue(tokens.get(4).getSort().equals(TokenSort.IDCON));
-			assertTrue(tokens.get(4).getLexeme().equals("html"));
+			assertTrue(scanner.getToken(4).getSort().equals(TokenSort.IDCON));
+			assertTrue(scanner.getToken(4).getLexeme().equals("html"));
 			
 			// Assert identifiers
-			assertTrue(tokens.get(1).getSort().equals(TokenSort.IDCON));
-			assertTrue(tokens.get(1).getLexeme().equals("test"));
+			assertTrue(scanner.getToken(1).getSort().equals(TokenSort.IDCON));
+			assertTrue(scanner.getToken(1).getLexeme().equals("test"));
 			
 			// Assert symbols
-			assertTrue(tokens.get(5).getSort().equals(TokenSort.SYMBOL));
-			assertTrue(tokens.get(5).getLexeme().equals('{'));
+			assertTrue(scanner.getToken(5).getSort().equals(TokenSort.SYMBOL));
+			assertTrue(scanner.getToken(5).getLexeme().equals('{'));
 
 			// Assert text
-			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
-			assertTrue(tokens.get(8).getLexeme().equals("Hello world"));
+			assertTrue(scanner.getToken(8).getSort().equals(TokenSort.TEXT));
+			assertTrue(scanner.getToken(8).getLexeme().equals("Hello world"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

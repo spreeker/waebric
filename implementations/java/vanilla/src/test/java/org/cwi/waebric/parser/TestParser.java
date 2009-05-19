@@ -18,7 +18,7 @@ public class TestParser {
 			WaebricScanner scanner = new WaebricScanner(reader);
 			scanner.tokenizeStream();
 
-			WaebricParser parser = new WaebricParser(scanner.getTokens());
+			WaebricParser parser = new WaebricParser(scanner);
 			parser.parseTokens();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
