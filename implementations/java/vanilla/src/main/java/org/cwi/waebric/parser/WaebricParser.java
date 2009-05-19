@@ -5,12 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.SyntaxTree;
+import org.cwi.waebric.parser.ast.functions.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.ast.module.functions.FunctionDef;
-import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.ast.site.Mapping;
+import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -146,7 +147,7 @@ public class WaebricParser {
 			}
 		}
 		
-		if(isKeyword(current, WaebricKeyword.END)) {
+		if(!isKeyword(current, WaebricKeyword.END)) {
 			exceptions.add(new ParserException(start.toString() + " is never closed, use \"end\"."));
 			return;
 		}
@@ -155,8 +156,24 @@ public class WaebricParser {
 	}
 	
 	private void mapping(Site site) {
+		Mapping mapping = new Mapping();
+		path(mapping);
+		
+		// Retrieve separator ":"
 		current = tokens.next();
-		System.out.println("LEET MAPPING: " + current.toString());
+		if(! current.getLexeme().equals(WaebricSymbol.COLON)) {
+			
+		}
+		
+		markup(mapping);
+	}
+	
+	private void path(Mapping mapping) {
+		
+	}
+	
+	private void markup(Mapping mapping) {
+		
 	}
 	
 	private void functionDef(Module module) {
