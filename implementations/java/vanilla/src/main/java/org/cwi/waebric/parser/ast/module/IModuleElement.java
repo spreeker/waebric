@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.model.module;
+package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 

@@ -1,7 +1,7 @@
-package org.cwi.waebric.parser.model.module;
+package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.model.basic.IdCon;
+import org.cwi.waebric.parser.ast.basic.IdCon;
 
 public class ModuleId implements ISyntaxNode {
 

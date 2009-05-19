@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.model.module;
+package org.cwi.waebric.parser.ast.module;
 
 import java.util.ArrayList;
 
