@@ -3,11 +3,11 @@ package org.cwi.waebric.parser.ast.module.site;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
-public class PathElement implements ISyntaxNode {
+public class FileExt implements ISyntaxNode {
 
 	private StringLiteral literal;
 	
-	public PathElement(String literal) {
+	public FileExt(String literal) {
 		this.literal = new StringLiteral(literal);
 	}
 

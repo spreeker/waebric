@@ -76,7 +76,8 @@ public class WaebricParser {
 			module.setIdentifier(identifier);
 		} else {
 			exceptions.add(new ParserException(current.toString() + " is not a module identifier."));
-			return;
+			return;		// Attach module to parse tree after all conditions have been checked
+
 		}
 		
 		// Parse module elements
@@ -103,11 +104,10 @@ public class WaebricParser {
 			}
 		}
 		
-		// Attach module to parse tree after all conditions have been checked
 		modules.add(module);
 	}
 	
-	public void imprt(Module module) {
+	private void imprt(Module module) {
 		Import imprt = new Import();
 		
 		// Parse module identifier
@@ -128,11 +128,28 @@ public class WaebricParser {
 		module.addElement(imprt);
 	}
 	
-	public void site(Module module) {
+	private void site(Module module) {
 		Site site = new Site();
+		
+		Token start = current;
+		while(tokens.hasNext()) {
+			if(!current.getLexeme().equals(';')) {
+				
+			}
+			
+			// Look for terminator keyword
+			if(isKeyword(current, WaebricKeyword.END)) {
+				module.addElement(site);
+				return;
+			}
+			
+			current = tokens.next();
+		}
+		
+		exceptions.add(new ParserException(start.toString() + " is never end."));
 	}
 	
-	public void functionDef(Module module) {
+	private void functionDef(Module module) {
 		FunctionDef functionDef = new FunctionDef();
 	}
 

@@ -45,9 +45,6 @@ public class TestParser {
 		assertTrue(exceptions.size() == 0);
 		
 		tree = parser.getAbstractSyntaxTree();
-		assertNotNull(tree);
-		assertTrue(tree.getRoot() instanceof Modules);
-		assertTrue(tree.getRoot().getChildren()[0] instanceof Module);
 		module = (Module) tree.getRoot().getChildren()[0];
 		
 		Import imprt = (Import) module.getElements()[0];
