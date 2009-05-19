@@ -84,7 +84,7 @@ public class WaebricScanner {
 							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
 						}	
 					} else {
-						String symbol = "" + (char) curr;
+						char symbol = (char) curr;
 						try {
 							tokens.add(new Token(symbol, TokenSort.SYMBOL, tokenizer.lineno()));
 						} catch(Exception e) {
