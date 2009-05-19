@@ -9,14 +9,14 @@ package org.cwi.waebric.parser.ast;
  */
 public class SyntaxTree {
 
-	private final SyntaxNode start;
+	private final ISyntaxNode start;
 	
 	/**
 	 * Initialize tree.
 	 * 
 	 * @param start Start node
 	 */
-	public SyntaxTree(SyntaxNode start) {
+	public SyntaxTree(ISyntaxNode start) {
 		this.start = start;
 	}
 	
@@ -25,7 +25,7 @@ public class SyntaxTree {
 	 * 
 	 * @return
 	 */
-	public final SyntaxNode getStart() {
+	public final ISyntaxNode getStart() {
 		return start;
 	}
 	

@@ -12,12 +12,15 @@ public class TestParser {
 	private final String PROGRAM_PATH = "src/test/waebric/helloworld.waebric";
 
 	@Test
-	public void testScanner() {
+	public void testParser() {
 		try {
 			FileReader reader = new FileReader(PROGRAM_PATH);
+			
+			// Scan input stream
 			WaebricScanner scanner = new WaebricScanner(reader);
 			scanner.tokenizeStream();
 
+			// Start parsing
 			WaebricParser parser = new WaebricParser(scanner);
 			parser.parseTokens();
 		} catch (FileNotFoundException e) {
