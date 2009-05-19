@@ -9,14 +9,13 @@ package org.cwi.waebric.scanner.token;
 public enum TokenSort {
 	
 	/**
-	 * Identifier tokens are words found directly after specific literals. An
-	 * identifier needs to start with a letter, but can also include digits in its body.
+	 * Identifier tokens are non-keyword words in a structured text.
 	 * 
 	 * For example, in the below text:<br>
 	 * 	<code>module helloworld</code><br>
-	 * helloworld is the identifier, of a module.
+	 * helloworld is the identifier
 	 */
-	IDCON, 
+	IDCON,
 	
 	/**
 	 * Number tokens include all characters that represents numbers, these
@@ -40,15 +39,6 @@ public enum TokenSort {
 	 * 	<code>module helloworld</code><br>
 	 * module is the keyword.
 	 */
-	KEYWORD,
-	
-	/**
-	 * Symbol tokens represent ASCII symbols<br><br>
-	 * 
-	 * For example, in the below text:<br>
-	 * 	<code>$99</code><br>
-	 * $ is the symbol.
-	 */
-	SYMBOL;
+	KEYWORD;
 	
 }

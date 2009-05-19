@@ -6,7 +6,6 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.scanner.token.HTMLKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricLayout;
@@ -63,11 +62,8 @@ public class WaebricScanner {
 				case StreamTokenizer.TT_WORD:
 					try {
 						// Separate keywords from identifiers
-						if(isWaebricKeyword(tokenizer.sval)) {
+						if(isKeyword(tokenizer.sval)) {
 							WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
-							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
-						} else if(isHTMLKeyword(tokenizer.sval)) {
-							HTMLKeyword literal = HTMLKeyword.valueOf(tokenizer.sval.toUpperCase());
 							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 						} else if(isIdentifier(tokenizer.sval)) {
 							tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
@@ -88,9 +84,9 @@ public class WaebricScanner {
 							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
 						}	
 					} else {
-						char symbol = (char) curr;
+						String symbol = "" + (char) curr;
 						try {
-							tokens.add(new Token(symbol, TokenSort.SYMBOL, tokenizer.lineno()));
+							tokens.add(new Token(symbol, TokenSort.IDCON, tokenizer.lineno()));
 						} catch(Exception e) {
 							exceptions.add(new ScannerException(symbol, tokenizer.lineno(), e.getCause()));
 						}
@@ -121,27 +117,10 @@ public class WaebricScanner {
 	 * @param data Text fragment
 	 * @return literal?
 	 */
-	public static boolean isWaebricKeyword(String data) {
+	public static boolean isKeyword(String data) {
 		try {
 			// Literal should be in enumeration
 			WaebricKeyword literal = WaebricKeyword.valueOf(data.toUpperCase());
-			return literal != null;
-		} catch(IllegalArgumentException e) {
-			// Enumeration does not exists
-			return false;
-		}
-	}
-	
-	/**
-	 * Determine whether a certain text fragment is a literal.
-	 * 
-	 * @param data Text fragment
-	 * @return literal?
-	 */
-	public static boolean isHTMLKeyword(String data) {
-		try {
-			// Literal should be in enumeration
-			HTMLKeyword literal = HTMLKeyword.valueOf(data.toUpperCase());
 			return literal != null;
 		} catch(IllegalArgumentException e) {
 			// Enumeration does not exists
@@ -156,19 +135,31 @@ public class WaebricScanner {
 	 * @return identifier?
 	 */
 	public static boolean isIdentifier(String data) {
-		// Identifiers should have a size of 1+
 		if(data == null || data.equals("")) { return false; }
 		char[] chars = data.toCharArray();
 		
-		// The first char of an identifier should be a letter
-		if(!isLetter(chars[0])) { return false; }
+		// The first char of an identifier should be a letter or symbol
+		if(isSymbol(data)) { return true; }
+		if(!isLetter(chars[0])) { return false; } 
 		
-		// All characters in an identifier should be letters or digits
+		// All characters in a non-symbol identifier body should be letters or digits
 		for(char c : chars) {
 			if(!(isLetter(c) || isDigit(c))) { return false; }
 		}
 		
 		return true;
+	}
+	
+	public static boolean isSymbol(String data) {
+		if(data == null || data.equals("")) { return false; }
+		char[] chars = data.toCharArray();
+		
+		// Symbols are always only one character long
+		if(chars.length != 1) { return false; }
+		
+		// Only symbols between decimal 32 and 126 are valid
+		int deci = (int) chars[0];
+		return deci >= 32 && deci <= 126;
 	}
 	
 	/**
