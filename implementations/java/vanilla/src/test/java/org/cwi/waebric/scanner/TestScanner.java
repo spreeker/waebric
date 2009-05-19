@@ -43,8 +43,8 @@ public class TestScanner {
 			assertTrue(tokens.get(1).getLexeme().equals("test"));
 			
 			// Assert symbols
-			assertTrue(tokens.get(5).getSort().equals(TokenSort.IDCON));
-			assertTrue(tokens.get(5).getLexeme().equals("{"));
+			assertTrue(tokens.get(5).getSort().equals(TokenSort.SYMBOL));
+			assertTrue(tokens.get(5).getLexeme().equals('{'));
 
 			// Assert text
 			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
@@ -67,7 +67,6 @@ public class TestScanner {
 		assertTrue(WaebricScanner.isIdentifier("identifier"));
 		assertTrue(WaebricScanner.isIdentifier("identifier1"));
 		assertTrue(WaebricScanner.isIdentifier("html"));
-		assertTrue(WaebricScanner.isIdentifier("}"));
 		assertFalse(WaebricScanner.isIdentifier("identifier@"));
 		assertFalse(WaebricScanner.isIdentifier("1identifier"));
 		assertFalse(WaebricScanner.isIdentifier("@identifier"));

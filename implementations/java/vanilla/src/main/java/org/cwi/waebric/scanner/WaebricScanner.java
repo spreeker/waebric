@@ -84,9 +84,9 @@ public class WaebricScanner {
 							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
 						}	
 					} else {
-						String symbol = "" + (char) curr;
+						char symbol = (char) curr;
 						try {
-							tokens.add(new Token(symbol, TokenSort.IDCON, tokenizer.lineno()));
+							tokens.add(new Token(symbol, TokenSort.SYMBOL, tokenizer.lineno()));
 						} catch(Exception e) {
 							exceptions.add(new ScannerException(symbol, tokenizer.lineno(), e.getCause()));
 						}
@@ -138,11 +138,10 @@ public class WaebricScanner {
 		if(data == null || data.equals("")) { return false; }
 		char[] chars = data.toCharArray();
 		
-		// The first char of an identifier should be a letter or symbol
-		if(isSymbol(data)) { return true; }
+		// The character head should be a letter
 		if(!isLetter(chars[0])) { return false; } 
 		
-		// All characters in a non-symbol identifier body should be letters or digits
+		// All characters in the body should be letters or digits
 		for(char c : chars) {
 			if(!(isLetter(c) || isDigit(c))) { return false; }
 		}

@@ -39,6 +39,11 @@ public enum TokenSort {
 	 * 	<code>module helloworld</code><br>
 	 * module is the keyword.
 	 */
-	KEYWORD;
+	KEYWORD,
+	
+	/**
+	 * Symbols tokens are symbols.
+	 */
+	SYMBOL;
 	
 }
