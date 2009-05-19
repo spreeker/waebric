@@ -1,6 +1,7 @@
-package org.cwi.waebric.parser.ast.module;
+package org.cwi.waebric.parser.ast.module.functions;
 
 import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.module.IModuleElement;
 
 public class FunctionDef implements IModuleElement {
 

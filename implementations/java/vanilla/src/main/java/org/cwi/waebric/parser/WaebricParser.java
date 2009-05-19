@@ -5,12 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.SyntaxTree;
-import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.ast.module.Site;
+import org.cwi.waebric.parser.ast.module.functions.FunctionDef;
+import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
