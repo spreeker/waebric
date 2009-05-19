@@ -11,6 +11,7 @@ import org.cwi.waebric.parser.ast.SyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.Test;
 

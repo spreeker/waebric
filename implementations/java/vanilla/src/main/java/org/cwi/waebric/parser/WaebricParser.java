@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.SyntaxTree;
 import org.cwi.waebric.parser.ast.functions.FunctionDef;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.site.Mapping;
+import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.Site;
+import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -43,10 +46,22 @@ public class WaebricParser {
 		return exceptions;
 	}
 	
+	public SyntaxTree getAbstractSyntaxTree() {
+		return tree;
+	}
+	
 	private boolean isKeyword(Token token, WaebricKeyword keyword) {
 		return token.getSort() == TokenSort.KEYWORD && token.getLexeme() == keyword;
 	}
+
+	/**
+	 * !! Below the recursive descent parser is (partially) implemented !!
+	 * TODO: Re factor parsing in separate source files
+	 */
 	
+	/**
+	 * Modules
+	 */
 	private void modules() {
 		Modules modules = new Modules();
 		tree = new SyntaxTree(modules);
@@ -63,6 +78,10 @@ public class WaebricParser {
 		}
 	}
 	
+	/**
+	 * Module
+	 * @param modules
+	 */
 	private void module(Modules modules) {
 		Module module = new Module();
 		
@@ -108,6 +127,10 @@ public class WaebricParser {
 		modules.add(module);
 	}
 	
+	/**
+	 * Import
+	 * @param module
+	 */
 	private void imprt(Module module) {
 		Import imprt = new Import();
 		
@@ -129,9 +152,13 @@ public class WaebricParser {
 		module.addElement(imprt);
 	}
 	
+	/**
+	 * Site
+	 * @param module
+	 */
 	private void site(Module module) {
-		Token start = current; // Store site token for error reporting
 		Site site = new Site();
+		Token start = current; // Store site token for error reporting
 		
 		// Parse mappings
 		while(tokens.hasNext()) {
@@ -155,6 +182,10 @@ public class WaebricParser {
 		module.addElement(site);
 	}
 	
+	/**
+	 * Mapping
+	 * @param site
+	 */
 	private void mapping(Site site) {
 		Mapping mapping = new Mapping();
 		path(mapping);
@@ -162,26 +193,40 @@ public class WaebricParser {
 		// Retrieve separator ":"
 		current = tokens.next();
 		if(! current.getLexeme().equals(WaebricSymbol.COLON)) {
-			
+			exceptions.add(new ParserException(current.toString() + " is not a valid mapping " +
+					"syntax, use: path \":\" markup."));
+			return;
 		}
 		
 		markup(mapping);
+		site.addMapping(mapping);
 	}
 	
+	/**
+	 * Path
+	 * @param mapping
+	 */
 	private void path(Mapping mapping) {
-		
+		Path path = new Path();
+		System.out.println(path.toString());
 	}
 	
+	/**
+	 * Markup
+	 * @param mapping
+	 */
 	private void markup(Mapping mapping) {
-		
+		Markup markup = new Markup();
+		System.out.println(markup.toString());
 	}
 	
+	/**
+	 * Function definition
+	 * @param module
+	 */
 	private void functionDef(Module module) {
 		FunctionDef functionDef = new FunctionDef();
-	}
-
-	public SyntaxTree getAbstractSyntaxTree() {
-		return tree;
+		System.out.println(functionDef.toString());
 	}
 	
 }
