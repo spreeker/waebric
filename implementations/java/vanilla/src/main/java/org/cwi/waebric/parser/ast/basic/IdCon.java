@@ -7,6 +7,10 @@ public class IdCon implements ISyntaxNode {
 
 	private StringLiteral identifier;
 	
+	public IdCon(String identifier) {
+		this.identifier = new StringLiteral(identifier);
+	}
+	
 	public StringLiteral getIdentifier() {
 		return identifier;
 	}

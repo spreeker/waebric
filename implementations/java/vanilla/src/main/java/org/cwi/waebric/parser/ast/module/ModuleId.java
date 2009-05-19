@@ -7,6 +7,10 @@ public class ModuleId implements ISyntaxNode {
 
 	private IdCon identifier;
 	
+	public ModuleId(String identifier) {
+		this.identifier = new IdCon(identifier);
+	}
+	
 	public IdCon getIdentifier() {
 		return identifier;
 	}

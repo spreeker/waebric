@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.SyntaxTree;
+import org.cwi.waebric.parser.ast.module.Module;
+import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -31,19 +34,20 @@ public class WaebricParser {
 	
 	public List<ParserException> parseTokens() {
 		exceptions.clear();
-		tree = null;
-
-		program();
+		modules();
 		
 		// TODO: Error processing
-		return null;
+		return exceptions;
 	}
 	
-	private void program() {
+	private void modules() {
+		Modules modules = new Modules();
+		tree = new SyntaxTree(modules);
+		
 		while(tokens.hasNext()) {
 			current = tokens.next();
 			if(current.getLexeme() == WaebricKeyword.MODULE) {
-				module();
+				module(modules);
 			} else {
 				exceptions.add(new ParserException(
 						current.toString() + " is placed outside module."));
@@ -51,20 +55,28 @@ public class WaebricParser {
 		}
 	}
 	
-	private void module() {
-		System.out.println(current.toString()); // TODO: Store current as module keyword!
+	private void module(Modules modules) {
+		Module module = new Module();
 		
-		// Retrieve identifier
+		// Module identifier
+		if(! tokens.hasNext()) {
+			exceptions.add(new ParserException(current.toString() + " has no module identifier."));
+			return;
+		}
+		
 		current = tokens.next();
 		if(current.getSort() == TokenSort.IDCON) {
-			System.out.println(current.toString()); // TODO: Store current as module identifier!
+			ModuleId identifier = new ModuleId(current.getLexeme().toString());
+			module.setIdentifier(identifier);
 		} else {
-			exceptions.add(new ParserException(
-					current.toString() + " is not a module identifier."));
+			exceptions.add(new ParserException(current.toString() + " is not a module identifier."));
+			return;
 		}
+		
+		// TODO: Module elements
 	}
 	
-	public SyntaxTree getTree() {
+	public SyntaxTree getAbstractSyntaxTree() {
 		return tree;
 	}
 	
