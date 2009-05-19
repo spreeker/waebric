@@ -16,7 +16,6 @@ public class IntegerLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return null;
 	}

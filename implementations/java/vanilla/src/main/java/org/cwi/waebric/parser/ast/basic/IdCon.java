@@ -19,7 +19,6 @@ public class IdCon implements ISyntaxNode {
 		this.identifier = identifier;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new StringLiteral[] { identifier };
 	}

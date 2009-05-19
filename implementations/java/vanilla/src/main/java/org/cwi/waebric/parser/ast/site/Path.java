@@ -25,7 +25,6 @@ public class Path implements ISyntaxNode {
 		this.file = file;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		if(dir == null) { return new ISyntaxNode[] { file }; }
 		return new ISyntaxNode[] { dir, new StringLiteral("" + WaebricSymbol.SLASH), file };

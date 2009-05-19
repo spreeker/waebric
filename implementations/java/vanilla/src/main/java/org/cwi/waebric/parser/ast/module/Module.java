@@ -32,7 +32,6 @@ public class Module implements ISyntaxNode {
 		return elements.toArray(new IModuleElement[0]);
 	}
 	
-	@Override
 	public ISyntaxNode[] getChildren() {
 		List<ISyntaxNode> children = new ArrayList<ISyntaxNode>();
 		children.add(new StringLiteral(WaebricKeyword.MODULE.name().toLowerCase()));

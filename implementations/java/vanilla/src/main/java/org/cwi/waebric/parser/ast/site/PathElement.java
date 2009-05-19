@@ -11,7 +11,6 @@ public class PathElement implements ISyntaxNode {
 		this.literal = new StringLiteral(literal);
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { literal };
 	}

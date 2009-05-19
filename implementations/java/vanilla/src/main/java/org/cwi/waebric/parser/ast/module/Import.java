@@ -16,7 +16,6 @@ public class Import implements IModuleElement {
 		this.identifier = identifier;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
 				new StringLiteral(WaebricKeyword.IMPORT.name().toLowerCase()), 

@@ -15,7 +15,6 @@ public class NatCon implements ISyntaxNode {
 		this.identifier = identifier;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new IntegerLiteral[] { identifier };
 	}

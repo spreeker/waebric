@@ -11,7 +11,6 @@ public class Mappings extends ArrayList<Mapping> implements ISyntaxNode {
 	 */
 	private static final long serialVersionUID = -6962647667939837646L;
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return toArray(new Mapping[0]);
 	}

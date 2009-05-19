@@ -14,7 +14,6 @@ public class DirName implements ISyntaxNode {
 		this.directory = directory;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { directory };
 	}

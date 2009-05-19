@@ -19,7 +19,6 @@ public class Site implements IModuleElement {
 		return mappings.add(mapping);
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return mappings.toArray(new Mapping[0]);
 	}

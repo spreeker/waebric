@@ -11,7 +11,6 @@ public class Modules extends ArrayList<Module> implements ISyntaxNode {
 	 */
 	private static final long serialVersionUID = 2499166908490038058L;
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return toArray(new Module[0]);
 	}

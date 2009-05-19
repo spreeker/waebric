@@ -3,6 +3,15 @@ package org.cwi.waebric.scanner.token;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Token iterator which allows k lookahead, besides regular iterator
+ * functionality.
+ * 
+ * TODO: Determine which way of storing collections is most efficient.
+ * 
+ * @author Jeroen van Schagen
+ * @date 19-05-2009
+ */
 public class TokenIterator implements Iterator<Token> {
 
 	private List<Token> collection;
@@ -12,27 +21,27 @@ public class TokenIterator implements Iterator<Token> {
 		this.collection = collection;
 	}
 	
-	@Override
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Token next() {
-		// TODO Auto-generated method stub
-		return null;
+		return curr < collection.size();
 	}
 	
-	public Token peek() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean hasNext(int k) {
+		return curr+k < collection.size();
 	}
 
-	@Override
+	public Token next() {
+		curr++;
+		return collection.get(curr);
+	}
+	
+	public Token peek(int k) {
+		if(! hasNext(k)) { return null; }
+		return collection.get(curr+k);
+	}
+
 	public void remove() {
-		// TODO Auto-generated method stub
-		
+		collection.remove(curr);
+		curr--;
 	}
 
 }

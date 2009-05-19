@@ -19,7 +19,6 @@ public class ModuleId implements ISyntaxNode {
 		this.identifier = identifier;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new IdCon[] { identifier };
 	}

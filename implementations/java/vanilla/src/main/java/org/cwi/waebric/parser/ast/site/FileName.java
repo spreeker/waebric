@@ -25,9 +25,12 @@ public class FileName implements ISyntaxNode {
 		this.ext = ext;
 	}
 	
-	@Override
 	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { name, new StringLiteral("" + WaebricSymbol.PERIOD), ext };
+		return new ISyntaxNode[] {
+				name,
+				new StringLiteral("" + WaebricSymbol.PERIOD),
+				ext
+			};
 	}
 
 }

@@ -26,9 +26,12 @@ public class Mapping implements ISyntaxNode {
 		this.markup = markup;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { path, new StringLiteral("" + WaebricSymbol.COLON), markup };
+		return new ISyntaxNode[] { 
+				path, 
+				new StringLiteral("" + WaebricSymbol.COLON), 
+				markup
+			};
 	}
 
 }

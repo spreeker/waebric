@@ -13,13 +13,14 @@ public class Directory extends ArrayList<PathElement> implements ISyntaxNode {
 	 */
 	private static final long serialVersionUID = -7141207970011776899L;
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		ArrayList<ISyntaxNode> clone = new ArrayList<ISyntaxNode>();
 
 		for(int i = 0; i < this.size(); i++) {
 			clone.add(this.get(i));
-			if(i != this.size()-1) { clone.add(new StringLiteral("" + WaebricSymbol.SLASH)); }
+			if(i != this.size()-1) { 
+				clone.add(new StringLiteral("" + WaebricSymbol.SLASH));
+			}
 		}
 		
 		return clone.toArray(new ISyntaxNode[0]);
