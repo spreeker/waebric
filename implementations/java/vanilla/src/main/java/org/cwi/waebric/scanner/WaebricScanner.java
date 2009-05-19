@@ -6,10 +6,11 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.scanner.token.HTMLKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricLayout;
-import org.cwi.waebric.scanner.token.WaebricLiteral;
+import org.cwi.waebric.scanner.token.WaebricKeyword;
 import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
@@ -62,8 +63,11 @@ public class WaebricScanner {
 				case StreamTokenizer.TT_WORD:
 					try {
 						// Separate keywords from identifiers
-						if(isKeyword(tokenizer.sval)) {
-							WaebricLiteral literal = WaebricLiteral.valueOf(tokenizer.sval.toUpperCase());
+						if(isWaebricKeyword(tokenizer.sval)) {
+							WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
+							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
+						} else if(isHTMLKeyword(tokenizer.sval)) {
+							HTMLKeyword literal = HTMLKeyword.valueOf(tokenizer.sval.toUpperCase());
 							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 						} else if(isIdentifier(tokenizer.sval)) {
 							tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
@@ -117,10 +121,27 @@ public class WaebricScanner {
 	 * @param data Text fragment
 	 * @return literal?
 	 */
-	public static boolean isKeyword(String data) {
+	public static boolean isWaebricKeyword(String data) {
 		try {
 			// Literal should be in enumeration
-			WaebricLiteral literal = WaebricLiteral.valueOf(data.toUpperCase());
+			WaebricKeyword literal = WaebricKeyword.valueOf(data.toUpperCase());
+			return literal != null;
+		} catch(IllegalArgumentException e) {
+			// Enumeration does not exists
+			return false;
+		}
+	}
+	
+	/**
+	 * Determine whether a certain text fragment is a literal.
+	 * 
+	 * @param data Text fragment
+	 * @return literal?
+	 */
+	public static boolean isHTMLKeyword(String data) {
+		try {
+			// Literal should be in enumeration
+			HTMLKeyword literal = HTMLKeyword.valueOf(data.toUpperCase());
 			return literal != null;
 		} catch(IllegalArgumentException e) {
 			// Enumeration does not exists

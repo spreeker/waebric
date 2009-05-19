@@ -8,20 +8,20 @@ public class TestToken {
 
 	@Test
 	public void testConstructorAndAccessors() {
-		Token token = new Token(WaebricLiteral.MODULE, TokenSort.KEYWORD, 123);
+		Token token = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 123);
 		assertNotNull(token);
-		assertTrue(token.getLexeme() == WaebricLiteral.MODULE);
+		assertTrue(token.getLexeme() == WaebricKeyword.MODULE);
 		assertTrue(token.getSort() == TokenSort.KEYWORD);
 		assertTrue(token.getLine() == 123);
 	}
 	
 	@Test
 	public void testEquals() {
-		Token module = new Token(WaebricLiteral.MODULE, TokenSort.KEYWORD, 123);
-		Token similar = new Token(WaebricLiteral.MODULE, TokenSort.KEYWORD, 123);
-		Token difflit = new Token(WaebricLiteral.END, TokenSort.KEYWORD, 123);
-		Token diffsort = new Token(WaebricLiteral.MODULE, TokenSort.IDCON, 123);
-		Token diffline = new Token(WaebricLiteral.MODULE, TokenSort.KEYWORD, 124);
+		Token module = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 123);
+		Token similar = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 123);
+		Token difflit = new Token(WaebricKeyword.END, TokenSort.KEYWORD, 123);
+		Token diffsort = new Token(WaebricKeyword.MODULE, TokenSort.IDCON, 123);
+		Token diffline = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 124);
 		
 		assertTrue(module.equals(module));
 		assertTrue(module.equals(similar));

@@ -7,9 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import org.cwi.waebric.scanner.token.HTMLKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
-import org.cwi.waebric.scanner.token.WaebricLiteral;
+import org.cwi.waebric.scanner.token.WaebricKeyword;
 import org.junit.Test;
 
 public class TestScanner {
@@ -28,11 +29,15 @@ public class TestScanner {
 			assertNotNull(tokens);
 			assertTrue(tokens.size() > 0);
 			
-			// Assert keywords
+			// Assert Waebric keywords
 			assertTrue(tokens.get(0).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(tokens.get(0).getLexeme().equals(WaebricLiteral.MODULE));
+			assertTrue(tokens.get(0).getLexeme().equals(WaebricKeyword.MODULE));
 			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(tokens.get(tokens.size()-1).getLexeme().equals(WaebricLiteral.END));
+			assertTrue(tokens.get(tokens.size()-1).getLexeme().equals(WaebricKeyword.END));
+			
+			// Assert HTML keywords
+			assertTrue(tokens.get(4).getSort().equals(TokenSort.KEYWORD));
+			assertTrue(tokens.get(4).getLexeme().equals(HTMLKeyword.HTML));
 			
 			// Assert identifiers
 			assertTrue(tokens.get(1).getSort().equals(TokenSort.IDCON));
@@ -53,9 +58,15 @@ public class TestScanner {
 	}
 	
 	@Test
-	public void testIsKeyword() {
-		assertTrue(WaebricScanner.isKeyword("module"));
-		assertFalse(WaebricScanner.isKeyword("rofl"));
+	public void testIsWaebricKeyword() {
+		assertTrue(WaebricScanner.isWaebricKeyword("module"));
+		assertFalse(WaebricScanner.isWaebricKeyword("rofl"));
+	}
+	
+	@Test
+	public void testIsHTMLKeyword() {
+		assertTrue(WaebricScanner.isHTMLKeyword("html"));
+		assertFalse(WaebricScanner.isHTMLKeyword("rofl"));
 	}
 	
 	@Test
