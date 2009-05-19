@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.SyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
@@ -51,8 +50,11 @@ public class TestParser {
 		assertNotNull(imprt);
 		assertTrue(imprt.getIdentifier().equals("idcon"));
 		
-		// TODO: Site
-		
+		// Site
+		parser = getParser(new StringReader("module test \n site index.html: home(\"Hello World!\") index2.html: home2(\"Hello World2!\") \n end"));
+		exceptions = parser.parseTokens();
+		assertNotNull(exceptions);
+		assertTrue(exceptions.size() == 0);
 		
 		// TODO: Function
 		

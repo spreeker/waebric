@@ -15,6 +15,7 @@ import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricKeyword;
+import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
  * The parser attempts to reconstruct the derivation of a structured text.
@@ -76,7 +77,7 @@ public class WaebricParser {
 			module.setIdentifier(identifier);
 		} else {
 			exceptions.add(new ParserException(current.toString() + " is not a module identifier."));
-			return;		// Attach module to parse tree after all conditions have been checked
+			return;	// Attach module to parse tree after all conditions have been checked
 
 		}
 		
@@ -100,7 +101,6 @@ public class WaebricParser {
 			} else {
 				exceptions.add(new ParserException(current.toString() + " is not a valid module keyword, " +
 						"expected \"import\", \"site\" or \"def\"."));
-				return;
 			}
 		}
 		
@@ -129,24 +129,34 @@ public class WaebricParser {
 	}
 	
 	private void site(Module module) {
+		Token start = current; // Store site token for error reporting
 		Site site = new Site();
 		
-		Token start = current;
+		// Parse mappings
 		while(tokens.hasNext()) {
-			if(!current.getLexeme().equals(';')) {
-				
-			}
+			mapping(site);
 			
-			// Look for terminator keyword
-			if(isKeyword(current, WaebricKeyword.END)) {
-				module.addElement(site);
-				return;
-			}
-			
+			// Retrieve separator
 			current = tokens.next();
+			if(isKeyword(current, WaebricKeyword.END)) {
+				break; // End token reached, stop parsing mappings
+			} else if(! current.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+				exceptions.add(new ParserException(current.toString() + " is not a valid " +
+						"mapping separator, use \";\""));
+			}
 		}
 		
-		exceptions.add(new ParserException(start.toString() + " is never end."));
+		if(isKeyword(current, WaebricKeyword.END)) {
+			exceptions.add(new ParserException(start.toString() + " is never closed, use \"end\"."));
+			return;
+		}
+		
+		module.addElement(site);
+	}
+	
+	private void mapping(Site site) {
+		current = tokens.next();
+		System.out.println("LEET MAPPING: " + current.toString());
 	}
 	
 	private void functionDef(Module module) {
