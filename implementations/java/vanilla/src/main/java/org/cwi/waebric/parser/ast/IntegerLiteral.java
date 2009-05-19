@@ -25,5 +25,15 @@ public class IntegerLiteral implements ISyntaxNode {
 	public String toString() {
 		return "" + literal;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			int value = Integer.parseInt(obj.toString());
+			return value == literal;
+		} catch(NumberFormatException e) {
+			return false;
+		}
+	}
 
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.scanner.token.WaebricKeyword;
 
 public class Module implements ISyntaxNode {
 
@@ -32,7 +34,11 @@ public class Module implements ISyntaxNode {
 	
 	@Override
 	public ISyntaxNode[] getChildren() {
-		return null;
+		List<ISyntaxNode> children = new ArrayList<ISyntaxNode>();
+		children.add(new StringLiteral(WaebricKeyword.MODULE.name().toLowerCase()));
+		children.add(identifier);
+		children.addAll(elements);
+		return children.toArray(new ISyntaxNode[0]);
 	}
 
 }

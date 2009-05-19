@@ -7,7 +7,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.SyntaxTree;
+import org.cwi.waebric.parser.ast.module.Import;
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.Test;
@@ -18,6 +21,8 @@ public class TestParser {
 	public void testModules() throws IOException {
 		WaebricParser parser;
 		List<ParserException> exceptions;
+		SyntaxTree tree;
+		Module module;
 		
 		/**
 		 * Correct scenarios
@@ -27,12 +32,27 @@ public class TestParser {
 		assertNotNull(exceptions);
 		assertTrue(exceptions.size() == 0);
 		
-		SyntaxTree tree = parser.getAbstractSyntaxTree();
+		tree = parser.getAbstractSyntaxTree();
 		assertNotNull(tree);
 		assertTrue(tree.getRoot() instanceof Modules);
+		assertTrue(tree.getRoot().getChildren()[0] instanceof Module);
+		module = (Module) tree.getRoot().getChildren()[0];
 		
-		// TODO: Import
+		// Import
+		parser = getParser(new StringReader("module test\nimport idcon"));
+		exceptions = parser.parseTokens();
+		assertNotNull(exceptions);
+		assertTrue(exceptions.size() == 0);
 		
+		tree = parser.getAbstractSyntaxTree();
+		assertNotNull(tree);
+		assertTrue(tree.getRoot() instanceof Modules);
+		assertTrue(tree.getRoot().getChildren()[0] instanceof Module);
+		module = (Module) tree.getRoot().getChildren()[0];
+		
+		Import imprt = (Import) module.getElements()[0];
+		assertNotNull(imprt);
+		assertTrue(imprt.getIdentifier().equals("idcon"));
 		
 		// TODO: Site
 		

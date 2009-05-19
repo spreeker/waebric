@@ -29,4 +29,9 @@ public class IdCon implements ISyntaxNode {
 		return identifier.toString();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return identifier.equals(obj);
+	}
+	
 }

@@ -28,5 +28,10 @@ public class ModuleId implements ISyntaxNode {
 	public String toString() {
 		return identifier.toString();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return identifier.equals(obj);
+	}
 
 }
