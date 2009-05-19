@@ -20,5 +20,10 @@ public class IntegerLiteral implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "" + literal;
+	}
 
 }

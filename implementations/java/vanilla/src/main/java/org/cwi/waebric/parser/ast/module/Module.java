@@ -34,5 +34,5 @@ public class Module implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return null;
 	}
-	
+
 }

@@ -74,6 +74,8 @@ public class WaebricParser {
 		}
 		
 		// TODO: Module elements
+		
+		modules.add(module);
 	}
 	
 	public SyntaxTree getAbstractSyntaxTree() {

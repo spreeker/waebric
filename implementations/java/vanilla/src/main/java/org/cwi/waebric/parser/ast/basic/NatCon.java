@@ -20,5 +20,10 @@ public class NatCon implements ISyntaxNode {
 		return new IntegerLiteral[] { identifier };
 	}
 	
+	@Override
+	public String toString() {
+		return identifier.toString();
+	}
+	
 }
 

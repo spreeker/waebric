@@ -23,5 +23,10 @@ public class ModuleId implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return new IdCon[] { identifier };
 	}
+	
+	@Override
+	public String toString() {
+		return identifier.toString();
+	}
 
 }

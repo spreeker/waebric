@@ -24,4 +24,9 @@ public class IdCon implements ISyntaxNode {
 		return new StringLiteral[] { identifier };
 	}
 	
+	@Override
+	public String toString() {
+		return identifier.toString();
+	}
+	
 }
