@@ -53,6 +53,16 @@ public class WaebricParser {
 	private boolean isKeyword(Token token, WaebricKeyword keyword) {
 		return token.getSort() == TokenSort.KEYWORD && token.getLexeme() == keyword;
 	}
+	
+	private Token next() {
+		current = tokens.next();
+		return current;
+	}
+	
+	private Token peek(int k) {
+		// TODO: Lookahead without changing current, perhaps stop using iterator
+		return null;
+	}
 
 	/**
 	 * !! Below the recursive descent parser is (partially) implemented !!
@@ -192,7 +202,7 @@ public class WaebricParser {
 		
 		// Retrieve separator ":"
 		current = tokens.next();
-		if(! current.getLexeme().equals(WaebricSymbol.COLON)) {
+		if(!current.getLexeme().equals(WaebricSymbol.COLON)) {
 			exceptions.add(new ParserException(current.toString() + " is not a valid mapping " +
 					"syntax, use: path \":\" markup."));
 			return;
@@ -208,6 +218,10 @@ public class WaebricParser {
 	 */
 	private void path(Mapping mapping) {
 		Path path = new Path();
+		
+		current = tokens.next();
+		Token start = current;
+		
 		System.out.println(path.toString());
 	}
 	
