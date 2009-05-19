@@ -55,16 +55,16 @@ public class WaebricScanner {
 			switch(curr) {
 				case StreamTokenizer.TT_NUMBER:
 					try {
-						tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
+						tokens.add(new Token(tokenizer.nval, TokenSort.NATCON, tokenizer.lineno()));
 					} catch(Exception e) {
 						exceptions.add(new ScannerException(tokenizer.nval, tokenizer.lineno(), e.getCause()));
 					} break;
 				case StreamTokenizer.TT_WORD:
 					try {
-						// Separate literals from identifiers
-						if(isLiteral(tokenizer.sval)) {
+						// Separate keywords from identifiers
+						if(isKeyword(tokenizer.sval)) {
 							WaebricLiteral literal = WaebricLiteral.valueOf(tokenizer.sval.toUpperCase());
-							tokens.add(new Token(literal, TokenSort.LITERAL, tokenizer.lineno()));
+							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 						} else if(isIdentifier(tokenizer.sval)) {
 							tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
 						} else {
@@ -86,7 +86,7 @@ public class WaebricScanner {
 					} else {
 						String symbol = "" + (char) curr;
 						try {
-							tokens.add(new Token(symbol, TokenSort.LITERAL, tokenizer.lineno()));
+							tokens.add(new Token(symbol, TokenSort.SYMBOL, tokenizer.lineno()));
 						} catch(Exception e) {
 							exceptions.add(new ScannerException(symbol, tokenizer.lineno(), e.getCause()));
 						}
@@ -117,7 +117,7 @@ public class WaebricScanner {
 	 * @param data Text fragment
 	 * @return literal?
 	 */
-	public static boolean isLiteral(String data) {
+	public static boolean isKeyword(String data) {
 		try {
 			// Literal should be in enumeration
 			WaebricLiteral literal = WaebricLiteral.valueOf(data.toUpperCase());

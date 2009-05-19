@@ -28,15 +28,19 @@ public class TestScanner {
 			assertNotNull(tokens);
 			assertTrue(tokens.size() > 0);
 			
-			// Assert literals
-			assertTrue(tokens.get(0).getSort().equals(TokenSort.LITERAL));
+			// Assert keywords
+			assertTrue(tokens.get(0).getSort().equals(TokenSort.KEYWORD));
 			assertTrue(tokens.get(0).getLexeme().equals(WaebricLiteral.MODULE));
-			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.LITERAL));
+			assertTrue(tokens.get(tokens.size()-1).getSort().equals(TokenSort.KEYWORD));
 			assertTrue(tokens.get(tokens.size()-1).getLexeme().equals(WaebricLiteral.END));
 			
 			// Assert identifiers
 			assertTrue(tokens.get(1).getSort().equals(TokenSort.IDCON));
 			assertTrue(tokens.get(1).getLexeme().equals("test"));
+			
+			// Assert symbols
+			assertTrue(tokens.get(5).getSort().equals(TokenSort.SYMBOL));
+			assertTrue(tokens.get(5).getLexeme().equals("{"));			
 
 			// Assert text
 			assertTrue(tokens.get(8).getSort().equals(TokenSort.TEXT));
@@ -49,9 +53,9 @@ public class TestScanner {
 	}
 	
 	@Test
-	public void testIsLiteral() {
-		assertTrue(WaebricScanner.isLiteral("module"));
-		assertFalse(WaebricScanner.isLiteral("rofl"));
+	public void testIsKeyword() {
+		assertTrue(WaebricScanner.isKeyword("module"));
+		assertFalse(WaebricScanner.isKeyword("rofl"));
 	}
 	
 	@Test

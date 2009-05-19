@@ -23,7 +23,7 @@ public enum TokenSort {
 	 * include all variants available within the integer range.
 	 * @see java.lang.Integer
 	 */
-	NUMBER, 
+	NATCON, 
 	
 	/**
 	 * Text tokens represent all characters stored between double quotes.<br><br>
@@ -34,12 +34,21 @@ public enum TokenSort {
 	TEXT, 
 	
 	/**
-	 * Literal tokens are words that are literally part of the language grammar.<br><br>
+	 * Keyword tokens are words that are literally part of the language grammar.<br><br>
 	 * 
 	 * For example, in the below text:<br>
 	 * 	<code>module helloworld</code><br>
-	 * module is the literal.
+	 * module is the keyword.
 	 */
-	LITERAL;
+	KEYWORD,
+	
+	/**
+	 * Symbol tokens represent ASCII symbols<br><br>
+	 * 
+	 * For example, in the below text:<br>
+	 * 	<code>$99</code><br>
+	 * $ is the symbol.
+	 */
+	SYMBOL;
 	
 }
