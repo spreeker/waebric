@@ -293,8 +293,7 @@ public class WaebricParser {
 	 * @param mapping
 	 */
 	private void markup(Mapping mapping) {
-		Markup markup = new Markup();
-		System.out.println(markup.toString());
+		Markup markup;
 	}
 	
 	/**

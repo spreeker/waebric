@@ -1,8 +1,5 @@
 package org.cwi.waebric.parser.ast.module;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.scanner.token.WaebricKeyword;
@@ -10,10 +7,10 @@ import org.cwi.waebric.scanner.token.WaebricKeyword;
 public class Module implements ISyntaxNode {
 
 	private ModuleId identifier;
-	private List<IModuleElement> elements;
+	private ModuleElements elements;
 	
 	public Module() {
-		elements = new ArrayList<IModuleElement>();
+		elements = new ModuleElements();
 	}
 	
 	public ModuleId getIdentifier() {
@@ -33,11 +30,11 @@ public class Module implements ISyntaxNode {
 	}
 	
 	public ISyntaxNode[] getChildren() {
-		List<ISyntaxNode> children = new ArrayList<ISyntaxNode>();
-		children.add(new StringLiteral(WaebricKeyword.MODULE.name().toLowerCase()));
-		children.add(identifier);
-		children.addAll(elements);
-		return children.toArray(new ISyntaxNode[0]);
+		return new ISyntaxNode[] {
+				new StringLiteral(WaebricKeyword.MODULE.name().toLowerCase()),
+				identifier,
+				elements
+		};
 	}
 
 }

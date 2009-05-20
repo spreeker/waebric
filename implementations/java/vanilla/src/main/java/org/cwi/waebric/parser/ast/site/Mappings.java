@@ -1,18 +1,18 @@
 package org.cwi.waebric.parser.ast.site;
 
-import java.util.ArrayList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 
-import org.cwi.waebric.parser.ast.ISyntaxNode;
-
-public class Mappings extends ArrayList<Mapping> implements ISyntaxNode {
-
+/**
+ * Collection of Mapping objects.
+ * 
+ * @author Jeroen van Schagen
+ * @date 19-05-2009
+ */
+public class Mappings extends SyntaxNodeList<Mapping> {
+	
 	/**
 	 * Serial ID
 	 */
 	private static final long serialVersionUID = -6962647667939837646L;
-
-	public ISyntaxNode[] getChildren() {
-		return toArray(new Mapping[0]);
-	}
 
 }
