@@ -118,10 +118,18 @@ public class ModuleParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * @see org.cwi.waebric.parser.SiteParser
+	 * @param site
+	 */
 	public void visit(Site site) {
 		siteParser.visit(site);
 	}
 	
+	/**
+	 * org.cwi.waebric.parser.FunctionParser
+	 * @param def
+	 */
 	public void visit(FunctionDef def) {
 		functionParser.visit(def);
 	}

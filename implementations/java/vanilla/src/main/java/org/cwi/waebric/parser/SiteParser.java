@@ -26,8 +26,13 @@ import org.cwi.waebric.scanner.token.WaebricSymbol;
  */
 public class SiteParser extends AbstractParser {
 
+	private final MarkupParser markupParser;
+	
 	public SiteParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
+		
+		// Initialise sub parser
+		markupParser = new MarkupParser(tokens, exceptions);
 	}
 
 	public void visit(Site site) {
@@ -139,8 +144,12 @@ public class SiteParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * @see org.cwi.waebric.parser.MarkupParser
+	 * @param markup
+	 */
 	public void visit(Markup markup) {
-		System.out.println(markup.toString());
+		markupParser.visit(markup);
 	}
 
 }
