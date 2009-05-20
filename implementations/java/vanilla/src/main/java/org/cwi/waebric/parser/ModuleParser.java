@@ -2,6 +2,8 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.functions.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
@@ -13,8 +15,6 @@ import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
  * Module parser

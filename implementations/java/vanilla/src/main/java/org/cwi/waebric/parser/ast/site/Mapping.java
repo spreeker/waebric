@@ -1,9 +1,9 @@
 package org.cwi.waebric.parser.ast.site;
 
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 public class Mapping implements ISyntaxNode {
 

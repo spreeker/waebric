@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.After;
 import org.junit.Before;

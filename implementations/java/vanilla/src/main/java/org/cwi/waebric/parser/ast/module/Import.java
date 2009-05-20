@@ -1,8 +1,8 @@
 package org.cwi.waebric.parser.ast.module;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
 
 public class Import implements IModuleElement {
 	

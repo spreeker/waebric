@@ -2,6 +2,7 @@ package org.cwi.waebric.scanner.token;
 
 import static org.junit.Assert.*;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.junit.Test;
 
 public class TestToken {

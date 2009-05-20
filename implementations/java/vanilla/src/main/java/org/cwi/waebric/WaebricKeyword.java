@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner.token;
+package org.cwi.waebric;
 
 /**
  * Waebric literal constants

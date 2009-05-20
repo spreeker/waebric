@@ -3,6 +3,7 @@ package org.cwi.waebric.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.SyntaxTree;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.ParserException;
@@ -10,7 +11,6 @@ import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
 
 /**
  * The parser attempts to reconstruct the derivation of a structured text.

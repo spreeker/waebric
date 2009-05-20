@@ -2,6 +2,8 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.site.DirName;
 import org.cwi.waebric.parser.ast.site.Directory;
@@ -15,8 +17,6 @@ import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
  * Site parser
@@ -34,7 +34,7 @@ public class SiteParser extends AbstractParser {
 		// Initialise sub parser
 		markupParser = new MarkupParser(tokens, exceptions);
 	}
-
+	
 	public void visit(Site site) {
 		Token start = current; // Store site token for error reporting
 		visit(site.getMappings());
@@ -82,7 +82,8 @@ public class SiteParser extends AbstractParser {
 	
 	public void visit(Path path) {
 		if(path == null) { // Initialise path when null
-			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
+			if(tokens.hasNext(2) && tokens.peek(1).getLexeme().
+					equals(WaebricSymbol.SLASH)) {
 				path = new Path.PathWithDir();
 			} else {
 				path = new Path.PathWithoutDir();
@@ -113,7 +114,7 @@ public class SiteParser extends AbstractParser {
 		while(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
 			String element = current.getLexeme().toString();
 			
-			if(element.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")) {
+			if(isPathElement(element)) {
 				exceptions.add(new ParserException(current.toString() + " is an invalid path element," +
 						"refrain from using white spaces, layout symbols, periods and backward slashes."));
 				return;
@@ -123,6 +124,10 @@ public class SiteParser extends AbstractParser {
 			directory.add(new PathElement(element));
 			tokens.next(); // Jump to next element
 		}
+	}
+	
+	public static boolean isPathElement(String lexeme) {
+		return ! lexeme.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)");
 	}
 	
 	public void visit(FileName name) {

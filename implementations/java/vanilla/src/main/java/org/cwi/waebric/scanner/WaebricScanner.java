@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricLayout;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
-import org.cwi.waebric.scanner.token.WaebricLayout;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
  * The lexical analyzer, also known as a scanner, reads an input character stream

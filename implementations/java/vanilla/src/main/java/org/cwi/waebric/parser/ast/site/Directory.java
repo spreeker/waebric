@@ -2,9 +2,9 @@ package org.cwi.waebric.parser.ast.site;
 
 import java.util.ArrayList;
 
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 public class Directory extends ArrayList<PathElement> implements ISyntaxNode {
 

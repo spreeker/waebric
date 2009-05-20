@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.markup;
 
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
-import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 /**
  * Collection of Argument objects.

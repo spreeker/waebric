@@ -7,9 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenSort;
-import org.cwi.waebric.scanner.token.WaebricKeyword;
 import org.junit.Test;
 
 public class TestScanner {
