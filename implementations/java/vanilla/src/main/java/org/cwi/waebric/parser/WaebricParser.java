@@ -214,7 +214,6 @@ public class WaebricParser {
 	private void path(Mapping mapping) {
 		Path path;
 
-		current = tokens.next();
 		if(tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
 			path = new Path.PathWithDir();
 			dirname(path);
@@ -236,7 +235,7 @@ public class WaebricParser {
 		
 		current = tokens.next();
 		if(current.getLexeme().toString().indexOf(WaebricSymbol.PERIOD) != -1) {
-			String[] elements = current.getLexeme().toString().split("" + WaebricSymbol.PERIOD);
+			String[] elements = current.getLexeme().toString().split("\\.");
 			if(elements.length == 2) {
 				filename.setName(new PathElement(elements[0]));
 				filename.setExt(new FileExt(elements[1]));
@@ -272,11 +271,18 @@ public class WaebricParser {
 		Directory directory = new Directory();
 		
 		current = tokens.next();
-		while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
+		while(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
 			String element = current.getLexeme().toString();
-			if(element.compareTo(" \t\n\r./\\") <= 0) {
-				directory.add(new PathElement(element));
-			} 
+			
+			if(element.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")) {
+				exceptions.add(new ParserException(current.toString() + " is an invalid path element," +
+						"refrain from using white spaces, layout symbols, periods and backward slashes."));
+				return;
+			}
+			
+			tokens.next(); // Skip slash separator
+			directory.add(new PathElement(element));
+			tokens.next(); // Jump to next element
 		}
 		
 		dirName.setDirectory(directory);

@@ -52,10 +52,10 @@ public class TestParser {
 		assertTrue(imprt.getIdentifier().equals("idcon"));
 		
 		// Site
-//		parser = getParser(new StringReader("module test \n site index.html: home(\"Hello World!\") index2.html: home2(\"Hello World2!\") \n end"));
-//		exceptions = parser.parseTokens();
-//		assertNotNull(exceptions);
-//		assertTrue(exceptions.size() == 0);
+		parser = getParser(new StringReader("module test \n site index.html: home(\"Hello World!\") index2.html: home2(\"Hello World2!\") \n end"));
+		exceptions = parser.parseTokens();
+		assertNotNull(exceptions);
+		assertTrue(exceptions.size() == 0);
 		
 		// TODO: Function
 		

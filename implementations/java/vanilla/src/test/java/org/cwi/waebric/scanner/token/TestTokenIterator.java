@@ -29,6 +29,20 @@ public class TestTokenIterator {
 	}
 	
 	@Test
+	public void testRegex() {
+		String regex = "(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)"; // TODO: \\ and .
+
+		assertFalse(new String("gotlolmofo").matches(regex));
+		assertTrue(new String("got lolmofo").matches(regex));
+		assertTrue(new String("got \t lolmofo").matches(regex));
+		assertTrue(new String("got\nlolmofo").matches(regex));
+		assertTrue(new String("got\rlolmofo").matches(regex));
+		assertTrue(new String("got.lolmofo").matches(regex));
+		assertTrue(new String("got/lolmofo").matches(regex));
+		assertTrue(new String("got\\\\lolmofo").matches(regex));
+	}
+	
+	@Test
 	public void testPeek() {
 		assertTrue(iterator.peek(1).getLexeme().equals(WaebricKeyword.MODULE));
 		assertTrue(iterator.peek(2).getLexeme().equals("homepage"));

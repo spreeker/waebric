@@ -17,5 +17,15 @@ public class DirName implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { directory };
 	}
+	
+	@Override
+	public String toString() {
+		return directory.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return directory.equals(obj);
+	}
 
 }
