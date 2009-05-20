@@ -24,8 +24,15 @@ import org.cwi.waebric.scanner.token.WaebricSymbol;
  */
 public class ModuleParser extends AbstractParser {
 
+	private final SiteParser siteParser;
+	private final FunctionParser functionParser;
+	
 	public ModuleParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
+		
+		// Initialise sub parsers
+		siteParser = new SiteParser(tokens, exceptions);
+		functionParser = new FunctionParser(tokens, exceptions);
 	}
 	
 	public void visit(Modules modules) {
@@ -112,11 +119,11 @@ public class ModuleParser extends AbstractParser {
 	}
 	
 	public void visit(Site site) {
-		new SiteParser(tokens, exceptions).visit(site);
+		siteParser.visit(site);
 	}
 	
 	public void visit(FunctionDef def) {
-		new FunctionParser(tokens, exceptions).visit(def);
+		functionParser.visit(def);
 	}
 
 }

@@ -20,6 +20,7 @@ import org.cwi.waebric.scanner.token.WaebricKeyword;
  */
 public class WaebricParser extends AbstractParser {
 
+	private final ModuleParser moduleParser;
 	private SyntaxTree tree;
 
 	public WaebricParser(WaebricScanner scanner) {
@@ -28,6 +29,9 @@ public class WaebricParser extends AbstractParser {
 	
 	public WaebricParser(TokenIterator iterator) {
 		super(iterator, new ArrayList<ParserException>());
+		
+		// Initialise sub parser
+		moduleParser = new ModuleParser(tokens, exceptions);
 	}
 	
 	public List<ParserException> parseTokens() {
@@ -35,7 +39,7 @@ public class WaebricParser extends AbstractParser {
 		
 		Modules modules = new Modules();
 		tree = new SyntaxTree(modules);
-		new ModuleParser(tokens, exceptions).visit(modules); // Start parsing
+		moduleParser.visit(modules); // Start parsing
 		
 		return exceptions;
 	}
