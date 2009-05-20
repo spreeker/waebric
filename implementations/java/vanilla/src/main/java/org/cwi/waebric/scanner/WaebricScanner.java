@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricLayout;
 import org.cwi.waebric.scanner.token.WaebricKeyword;
@@ -127,8 +128,8 @@ public class WaebricScanner implements Iterable<Token> {
 	 * 
 	 * @return iterator
 	 */
-	public Iterator<Token> iterator() {
-		return tokens.iterator();
+	public TokenIterator iterator() {
+		return new TokenIterator(tokens);
 	}
 	
 	/**

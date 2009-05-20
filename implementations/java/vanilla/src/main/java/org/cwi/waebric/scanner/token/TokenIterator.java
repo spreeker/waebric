@@ -22,11 +22,11 @@ public class TokenIterator implements Iterator<Token> {
 	}
 	
 	public boolean hasNext() {
-		return curr < collection.size();
+		return hasNext(1);
 	}
 	
 	public boolean hasNext(int k) {
-		return curr+k < collection.size();
+		return curr+k >= 0 && curr+k < collection.size();
 	}
 
 	public Token next() {
