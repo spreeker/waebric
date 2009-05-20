@@ -20,26 +20,24 @@ public class TestMarkupParser {
 
 	@Test
 	public void testIsAttribute() {
-		assertTrue(MarkupParser.isAttribute(""));
-		
 		assertTrue(MarkupParser.isAttribute("#Hello"));
 		assertTrue(MarkupParser.isAttribute("#Hello123"));
-		assertFalse(MarkupParser.isAttribute("#123"));
+		assertTrue(MarkupParser.isAttribute("#123"));
 		assertFalse(MarkupParser.isAttribute("#"));
 		
 		assertTrue(MarkupParser.isAttribute(".Hello"));
 		assertTrue(MarkupParser.isAttribute(".Hello123"));
-		assertFalse(MarkupParser.isAttribute(".123"));
+		assertTrue(MarkupParser.isAttribute(".123"));
 		assertFalse(MarkupParser.isAttribute("."));
 		
 		assertTrue(MarkupParser.isAttribute("$Hello"));
 		assertTrue(MarkupParser.isAttribute("$Hello123"));
-		assertFalse(MarkupParser.isAttribute("$123"));
+		assertTrue(MarkupParser.isAttribute("$123"));
 		assertFalse(MarkupParser.isAttribute("$"));
 		
 		assertTrue(MarkupParser.isAttribute(":Hello"));
 		assertTrue(MarkupParser.isAttribute(":Hello123"));
-		assertFalse(MarkupParser.isAttribute(":123"));
+		assertTrue(MarkupParser.isAttribute(":123"));
 		assertFalse(MarkupParser.isAttribute(":"));
 		
 		assertTrue(MarkupParser.isAttribute("@123"));

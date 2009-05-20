@@ -57,7 +57,7 @@ public class MarkupParser extends AbstractParser {
 	}
 	
 	public static boolean isAttribute(String lexeme) {
-		return lexeme.matches("(#.*)|(\\..*)|($.*)|(:.*)|(@\\d%\\d)|(@\\d)");
+		return lexeme.matches("(#\\w+)|(\\.\\w+)|(\\$\\w+)|(:\\w+)|(@\\d+%\\d+)|(@\\d+)");
 	}
 	
 	public void visit(Attribute attribute) {

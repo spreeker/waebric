@@ -23,6 +23,7 @@ public class TestSiteParser {
 		assertTrue(SiteParser.isPathElement("directory"));
 		assertTrue(SiteParser.isPathElement("directory123"));
 		assertTrue(SiteParser.isPathElement("directory%20%123"));
+		assertTrue(SiteParser.isPathElement("directory\123"));
 		assertFalse(SiteParser.isPathElement("directory 123"));
 		assertFalse(SiteParser.isPathElement("directory\t123"));
 		assertFalse(SiteParser.isPathElement("directory\n123"));
