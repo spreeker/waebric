@@ -35,7 +35,7 @@ public class TokenIterator implements Iterator<Token> {
 	}
 	
 	public Token peek(int k) {
-		if(! hasNext(k)) { return null; }
+		if(!hasNext(k)) { return null; }
 		return collection.get(curr+k);
 	}
 

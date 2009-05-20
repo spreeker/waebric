@@ -4,30 +4,70 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.scanner.token.WaebricSymbol;
 
-public class Path implements ISyntaxNode {
+/**
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
+public abstract class Path implements ISyntaxNode {
 
-	private DirName dir;
-	private FileName file;
+	protected FileName fileName;
+	protected DirName dirName;
+
+	public FileName getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(FileName file) {
+		this.fileName = file;
+	}
+
+	public DirName getDirName() {
+		return dirName;
+	}
+
+	public void setDirName(DirName dir) {
+		this.dirName = dir;
+	}
+
+	/**
+	 * Path implementation, consisting of a directory name and file name
+	 * 
+	 * <code>
+	 * 	Dirname "/" FileName -> Path
+	 * </code>
+	 * 
+	 * @author Jeroen van Schagen
+	 * @date 20-05-2009
+	 */
+	public static class PathWithDir extends Path {
+		
+		public ISyntaxNode[] getChildren() {
+			return new ISyntaxNode[] {
+					dirName,
+					new StringLiteral("" + WaebricSymbol.SLASH),
+					fileName
+				};
+		}
+		
+	}
 	
-	public DirName getDir() {
-		return dir;
-	}
+	/**
+	 * Path implementation consisting of stricly a filename.
+	 * 
+	 * <code>
+	 * 	Filename -> Path
+	 * </code>
+	 * 
+	 * @author Jeroen van Schagen
+	 * @date 20-05-2009
+	 */
+	public static class PathWithoutDir extends Path {
 
-	public void setDir(DirName dir) {
-		this.dir = dir;
-	}
-
-	public FileName getFile() {
-		return file;
-	}
-
-	public void setFile(FileName file) {
-		this.file = file;
-	}
-
-	public ISyntaxNode[] getChildren() {
-		if(dir == null) { return new ISyntaxNode[] { file }; }
-		return new ISyntaxNode[] { dir, new StringLiteral("" + WaebricSymbol.SLASH), file };
+		public ISyntaxNode[] getChildren() {
+			return new ISyntaxNode[] { fileName };
+		}
+		
 	}
 	
 }

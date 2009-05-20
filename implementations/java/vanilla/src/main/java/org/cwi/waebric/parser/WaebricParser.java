@@ -11,12 +11,18 @@ import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.site.DirName;
+import org.cwi.waebric.parser.ast.site.Directory;
+import org.cwi.waebric.parser.ast.site.FileExt;
+import org.cwi.waebric.parser.ast.site.FileName;
 import org.cwi.waebric.parser.ast.site.Mapping;
 import org.cwi.waebric.parser.ast.site.Path;
+import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.cwi.waebric.scanner.token.WaebricKeyword;
 import org.cwi.waebric.scanner.token.WaebricSymbol;
@@ -29,7 +35,7 @@ import org.cwi.waebric.scanner.token.WaebricSymbol;
  */
 public class WaebricParser {
 
-	private final Iterator<Token> tokens;
+	private final TokenIterator tokens;
 	
 	private List<ParserException> exceptions;
 	private SyntaxTree tree;
@@ -52,16 +58,6 @@ public class WaebricParser {
 	
 	private boolean isKeyword(Token token, WaebricKeyword keyword) {
 		return token.getSort() == TokenSort.KEYWORD && token.getLexeme() == keyword;
-	}
-	
-	private Token next() {
-		current = tokens.next();
-		return current;
-	}
-	
-	private Token peek(int k) {
-		// TODO: Lookahead without changing current, perhaps stop using iterator
-		return null;
 	}
 
 	/**
@@ -96,7 +92,7 @@ public class WaebricParser {
 		Module module = new Module();
 		
 		// Parse module identifier
-		if(! tokens.hasNext()) {
+		if(!tokens.hasNext()) {
 			exceptions.add(new ParserException(current.toString() + " has no module identifier."));
 			return;
 		}
@@ -107,8 +103,7 @@ public class WaebricParser {
 			module.setIdentifier(identifier);
 		} else {
 			exceptions.add(new ParserException(current.toString() + " is not a module identifier."));
-			return;	// Attach module to parse tree after all conditions have been checked
-
+			return;
 		}
 		
 		// Parse module elements
@@ -217,14 +212,76 @@ public class WaebricParser {
 	 * @param mapping
 	 */
 	private void path(Mapping mapping) {
-		Path path = new Path();
-		
+		Path path;
+
 		current = tokens.next();
-		Token start = current;
+		if(tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
+			path = new Path.PathWithDir();
+			dirname(path);
+			current = tokens.next(); // Skip slash symbol
+		} else {
+			path = new Path.PathWithoutDir();
+		}
 		
-		System.out.println(path.toString());
+		filename(path);
+		mapping.setPath(path);
 	}
 	
+	/**
+	 * File name
+	 * @param path
+	 */
+	private void filename(Path path) {
+		FileName filename = new FileName();
+		
+		current = tokens.next();
+		if(current.getLexeme().toString().indexOf(WaebricSymbol.PERIOD) != -1) {
+			String[] elements = current.getLexeme().toString().split("" + WaebricSymbol.PERIOD);
+			if(elements.length == 2) {
+				filename.setName(new PathElement(elements[0]));
+				filename.setExt(new FileExt(elements[1]));
+			} else {
+				exceptions.add(new ParserException(current.toString() + " has too many elements" +
+						"to be a valid filename, use name \".\" extension"));
+				return;
+			}
+		} else {
+			exceptions.add(new ParserException(current.toString() + " is an invalid filename, " +
+				"use name \".\" extension"));
+			return;
+		}
+		
+		path.setFileName(filename);
+	}
+
+	/** 
+	 * Dir name
+	 * @param path
+	 */
+	private void dirname(Path path) {
+		DirName dirName = new DirName();
+		directory(dirName);
+		path.setDirName(dirName);
+	}
+	
+	/**
+	 * Directory
+	 * @param dirName
+	 */
+	private void directory(DirName dirName) {
+		Directory directory = new Directory();
+		
+		current = tokens.next();
+		while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
+			String element = current.getLexeme().toString();
+			if(element.compareTo(" \t\n\r./\\") <= 0) {
+				directory.add(new PathElement(element));
+			} 
+		}
+		
+		dirName.setDirectory(directory);
+	}
+
 	/**
 	 * Markup
 	 * @param mapping
