@@ -1,12 +1,8 @@
-module homepage
+module test
 
-site
-	index.html: home("Hello World!")
-end
-
-def home(msg)
-	html {
-		head title msg;
-		body echo msg;
-	}
+ def main 
+  html { 
+   head title "Hello";
+    body p "Hello";
+  }
 end
