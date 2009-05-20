@@ -13,7 +13,10 @@ import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
- * The parser attempts to reconstruct the derivation of a structured text.
+ * Parser attempts to reconstruct the derivation of a Waebric program,
+ * this returns a collection of error messages. The parsing process was 
+ * successful when zero errors are returned. After a successful parsing 
+ * attempt the Abstract Syntax Tree (AST) can be retrieved.
  * 
  * @author Jeroen van Schagen
  * @date 18-05-2009
@@ -37,8 +40,8 @@ public class WaebricParser extends AbstractParser {
 	public List<ParserException> parseTokens() {
 		exceptions.clear();
 		
-		Modules modules = new Modules();
-		tree = new SyntaxTree(modules);
+		Modules modules = new Modules(); // Initialise root node
+		tree = new SyntaxTree(modules); // Initialise AST
 		moduleParser.visit(modules); // Start parsing
 		
 		return exceptions;

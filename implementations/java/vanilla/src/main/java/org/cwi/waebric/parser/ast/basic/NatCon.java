@@ -7,6 +7,10 @@ public class NatCon implements ISyntaxNode {
 
 	private IntegerLiteral identifier;
 	
+	public NatCon(int identifier) {
+		this.identifier = new IntegerLiteral(identifier);
+	}
+	
 	public IntegerLiteral getIdentifier() {
 		return identifier;
 	}
