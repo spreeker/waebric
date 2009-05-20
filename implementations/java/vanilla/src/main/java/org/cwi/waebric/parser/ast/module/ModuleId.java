@@ -1,36 +1,38 @@
 package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 public class ModuleId implements ISyntaxNode {
 
-	private IdCon identifier;
+	private SyntaxNodeListWithSeparator<IdCon> identifiers;
 	
-	public ModuleId(String identifier) {
-		this.identifier = new IdCon(identifier);
+	public ModuleId() {
+		identifiers = new SyntaxNodeListWithSeparator<IdCon>("" + WaebricSymbol.PERIOD);
 	}
 	
-	public IdCon getIdentifier() {
-		return identifier;
+	public IdCon[] getIdentifiers() {
+		return (IdCon[]) identifiers.getElements();
 	}
 
-	public void setIdentifier(IdCon identifier) {
-		this.identifier = identifier;
+	public boolean addIdentifier(IdCon identifier) {
+		return identifiers.add(identifier);
 	}
 
 	public ISyntaxNode[] getChildren() {
-		return new IdCon[] { identifier };
+		return identifiers.getChildren();
 	}
 	
 	@Override
 	public String toString() {
-		return identifier.toString();
+		return identifiers.toString();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return identifier.equals(obj);
+		return identifiers.equals(obj);
 	}
 
 }

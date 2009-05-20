@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public abstract class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implements ISyntaxNode {
+public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implements ISyntaxNode {
 
 	/**
 	 * Serial ID
@@ -32,7 +32,7 @@ public abstract class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E>
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
-	public static abstract class SyntaxNodeListWithSeparator<E extends ISyntaxNode> extends SyntaxNodeList<E> {
+	public static class SyntaxNodeListWithSeparator<E extends ISyntaxNode> extends SyntaxNodeList<E> {
 
 		/**
 		 * Serial ID
@@ -42,6 +42,10 @@ public abstract class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E>
 		
 		public SyntaxNodeListWithSeparator(String separator) {
 			this.separator = separator;
+		}
+		
+		public ISyntaxNode[] getElements() {
+			return super.getChildren();
 		}
 		
 		@Override

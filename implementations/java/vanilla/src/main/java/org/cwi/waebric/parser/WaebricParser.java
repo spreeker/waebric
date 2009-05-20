@@ -132,6 +132,12 @@ public class WaebricParser {
 		modules.add(module);
 	}
 	
+	private void moduleId(ModuleId module) {
+		current = tokens.next();
+		
+		
+	}
+	
 	/**
 	 * Import
 	 * @param module
@@ -145,12 +151,12 @@ public class WaebricParser {
 			return;
 		}
 		
-		current = tokens.next();
-		if(current.getSort() == TokenSort.IDCON) {
-			ModuleId identifier = new ModuleId(current.getLexeme().toString());
+		Token peek = tokens.peek(1);
+		if(peek.getSort() == TokenSort.IDCON) {
+			ModuleId identifier = new ModuleId();
 			imprt.setIdentifier(identifier);
 		} else {
-			exceptions.add(new ParserException(current.toString() + " is not a module identifier."));
+			exceptions.add(new ParserException(peek.toString() + " is not a module identifier."));
 			return;
 		}
 		
