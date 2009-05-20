@@ -7,32 +7,32 @@ import org.cwi.waebric.scanner.token.WaebricSymbol;
 
 public class ModuleId implements ISyntaxNode {
 
-	private SyntaxNodeListWithSeparator<IdCon> identifiers;
+	private SyntaxNodeListWithSeparator<IdCon> identifier;
 	
 	public ModuleId() {
-		identifiers = new SyntaxNodeListWithSeparator<IdCon>("" + WaebricSymbol.PERIOD);
+		identifier = new SyntaxNodeListWithSeparator<IdCon>("" + WaebricSymbol.PERIOD);
 	}
 	
-	public IdCon[] getIdentifiers() {
-		return (IdCon[]) identifiers.getElements();
+	public ISyntaxNode[] getIdentifierElements() {
+		return identifier.getElements();
 	}
 
-	public boolean addIdentifier(IdCon identifier) {
-		return identifiers.add(identifier);
+	public boolean addIdentifierElement(IdCon element) {
+		return identifier.add(element);
 	}
 
 	public ISyntaxNode[] getChildren() {
-		return identifiers.getChildren();
+		return identifier.getChildren();
 	}
 	
 	@Override
 	public String toString() {
-		return identifiers.toString();
+		return identifier.toString();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return identifiers.equals(obj);
+		return identifier.equals(obj);
 	}
 
 }

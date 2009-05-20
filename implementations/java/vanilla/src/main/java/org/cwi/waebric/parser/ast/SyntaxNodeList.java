@@ -45,7 +45,7 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implemen
 		}
 		
 		public ISyntaxNode[] getElements() {
-			return super.getChildren();
+			return this.toArray(new ISyntaxNode[0]);
 		}
 		
 		@Override
