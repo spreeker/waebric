@@ -83,7 +83,7 @@ public class ModuleParser extends AbstractParser {
 	}
 	
 	public void visit(ModuleId moduleId) {
-		if(!tokens.hasNext()) {
+		if(! tokens.hasNext()) {
 			exceptions.add(new ParserException(current.toString() + " has no module identifier."));
 			return;
 		}
