@@ -1,4 +1,5 @@
-package org.cwi.waebric.scanner;
+package org.cwi.waebric.scanner.exception;
+
 
 public class UnknownTokenException extends ScannerException {
 

@@ -60,7 +60,7 @@ public class MarkupParser extends AbstractParser {
 	public void visit(Designator designator) {
 		// Parse identifier
 		current = tokens.next();
-		if(current.getSort() == TokenSort.IDCON) {
+		if(current.getSort() == TokenSort.IDENTIFIER) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
 		} else {

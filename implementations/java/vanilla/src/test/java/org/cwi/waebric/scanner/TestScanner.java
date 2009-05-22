@@ -1,58 +1,103 @@
 package org.cwi.waebric.scanner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
 
-import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
+import org.junit.After;
 import org.junit.Test;
 
 public class TestScanner {
 
-	private final String PROGRAM_PATH = "src/test/waebric/helloworld.waebric";
-
-	@Test
-	public void testScanner() {
+	private TokenIterator iterator;
+	private Token current;
+	
+	@After
+	public void tearDown() {
+		// Clean global attribute, so tests cannot affect each other
+		iterator = null;
+		current = null;
+	}
+	
+	/**
+	 * Quickly perform scan based on raw string data,
+	 * use this method to make tests smaller and easier
+	 * to understand.
+	 * 
+	 * During the scan multiple assertions are done,
+	 * assuring that zero exceptions are caught.
+	 * 
+	 * @param data
+	 * @return iterator
+	 * @throws IOException
+	 */
+	private TokenIterator quickScan(String data) {
+		Reader reader = new StringReader(data);
+		WaebricScanner scanner = new WaebricScanner(reader);
+		
 		try {
-			FileReader reader = new FileReader(PROGRAM_PATH);
-			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.tokenizeStream();
-			
-			// Retrieve tokens
-			Iterator<Token> tokens = scanner.iterator();
-			assertNotNull(tokens);
-			assertTrue(tokens.hasNext());
-			
-			// Assert Waebric keywords
-			assertTrue(scanner.getToken(0).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(scanner.getToken(0).getLexeme().equals(WaebricKeyword.MODULE));
-			assertTrue(scanner.getToken(scanner.getSize()-1).getSort().equals(TokenSort.KEYWORD));
-			assertTrue(scanner.getToken(scanner.getSize()-1).getLexeme().equals(WaebricKeyword.END));
-			
-			// Assert HTML keywords
-			assertTrue(scanner.getToken(4).getSort().equals(TokenSort.IDCON));
-			assertTrue(scanner.getToken(4).getLexeme().equals("html"));
-			
-			// Assert identifiers
-			assertTrue(scanner.getToken(1).getSort().equals(TokenSort.IDCON));
-			assertTrue(scanner.getToken(1).getLexeme().equals("test"));
-			
-			// Assert symbols
-			assertTrue(scanner.getToken(5).getSort().equals(TokenSort.SYMBOL));
-			assertTrue(scanner.getToken(5).getLexeme().equals('{'));
-
-			// Assert text
-			assertTrue(scanner.getToken(8).getSort().equals(TokenSort.TEXT));
-			assertTrue(scanner.getToken(8).getLexeme().equals("Hello world"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			List<ScannerException> exceptions = scanner.tokenizeStream();
+			assertNotNull(exceptions);
+			assertTrue(exceptions.size() == 0);
+		} catch(IOException e) {
+			fail(e.getMessage());
+		}
+		
+		return scanner.iterator();
+	}
+	
+	@Test
+	public void testScanIdentifier() {
+		iterator = quickScan("identifier1 html module1.identifier identifier2");
+		while(iterator.hasNext()) {
+			current = iterator.next();
+			assertTrue(current.getSort().equals(TokenSort.IDENTIFIER));
+		}
+	}
+	
+	@Test
+	public void testScanNumber() {
+		iterator = quickScan("1 2 3 99 9999 123.456 0 -1 -99");
+		while(iterator.hasNext()) {
+			current = iterator.next();
+			assertTrue(current.getSort().equals(TokenSort.NUMBER));
+		}
+	}
+	
+	@Test
+	public void testScanTest() {
+		iterator = quickScan("\"text1\" \"text2\" \"text3\"");
+		while(iterator.hasNext()) {
+			current = iterator.next();
+			assertTrue(current.getSort().equals(TokenSort.TEXT));
+		}
+	}
+	
+	@Test
+	public void testScanKeyword() {
+		iterator = quickScan("module site import def end");
+		while(iterator.hasNext()) {
+			current = iterator.next();
+			assertTrue(current.getSort().equals(TokenSort.KEYWORD));
+		}
+	}
+	
+	@Test
+	public void testScanSymbol() {
+		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? /");
+		while(iterator.hasNext()) {
+			current = iterator.next();
+			assertTrue(current.getSort().equals(TokenSort.SYMBOL));
 		}
 	}
 	

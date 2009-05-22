@@ -15,14 +15,14 @@ public enum TokenSort {
 	 * 	<code>module helloworld</code><br>
 	 * helloworld is the identifier
 	 */
-	IDCON,
+	IDENTIFIER,
 	
 	/**
 	 * Number tokens include all characters that represents numbers, these
-	 * include all variants available within the integer range.
+	 * include naturals and digits.
 	 * @see java.lang.Integer
 	 */
-	NATCON, 
+	NUMBER, 
 	
 	/**
 	 * Text tokens represent all characters stored between double quotes.<br><br>
@@ -42,7 +42,8 @@ public enum TokenSort {
 	KEYWORD,
 	
 	/**
-	 * Symbols tokens are symbols.
+	 * Symbols tokens are all regular ASCII symbols between the decimal range
+	 * of 32..126
 	 */
 	SYMBOL;
 	

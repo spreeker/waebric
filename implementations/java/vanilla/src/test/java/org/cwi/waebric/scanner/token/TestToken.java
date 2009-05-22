@@ -21,7 +21,7 @@ public class TestToken {
 		Token module = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 123);
 		Token similar = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 123);
 		Token difflit = new Token(WaebricKeyword.END, TokenSort.KEYWORD, 123);
-		Token diffsort = new Token(WaebricKeyword.MODULE, TokenSort.IDCON, 123);
+		Token diffsort = new Token(WaebricKeyword.MODULE, TokenSort.IDENTIFIER, 123);
 		Token diffline = new Token(WaebricKeyword.MODULE, TokenSort.KEYWORD, 124);
 		
 		assertTrue(module.equals(module));

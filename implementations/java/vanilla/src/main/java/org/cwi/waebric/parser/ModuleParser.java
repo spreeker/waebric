@@ -89,7 +89,7 @@ public class ModuleParser extends AbstractParser {
 		}
 		
 		current = tokens.next();
-		if(current.getSort() == TokenSort.IDCON) {
+		if(current.getSort() == TokenSort.IDENTIFIER) {
 			String[] identifiers = current.getLexeme().toString().split("\\" + WaebricSymbol.PERIOD);
 			for(String identifier: identifiers) {
 				moduleId.addIdentifierElement(new IdCon(identifier));
@@ -108,7 +108,7 @@ public class ModuleParser extends AbstractParser {
 		}
 		
 		Token peek = tokens.peek(1);
-		if(peek.getSort() == TokenSort.IDCON) {
+		if(peek.getSort() == TokenSort.IDENTIFIER) {
 			ModuleId identifier = new ModuleId();
 			visit(identifier);
 			imprt.setIdentifier(identifier);

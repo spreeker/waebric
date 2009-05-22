@@ -52,7 +52,6 @@ public abstract class Markup implements ISyntaxNode {
 
 	public static class MarkupWithArguments extends Markup {
 
-		@Override
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { arguments, designator };
 		}
@@ -61,7 +60,6 @@ public abstract class Markup implements ISyntaxNode {
 	
 	public static class MarkupWithoutArguments extends Markup {
 
-		@Override
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { designator };
 		}

@@ -9,6 +9,7 @@ import java.util.List;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricLayout;
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -56,7 +57,7 @@ public class WaebricScanner implements Iterable<Token> {
 			switch(curr) {
 				case StreamTokenizer.TT_NUMBER:
 					try {
-						tokens.add(new Token(tokenizer.nval, TokenSort.NATCON, tokenizer.lineno()));
+						tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
 					} catch(Exception e) {
 						exceptions.add(new ScannerException(tokenizer.nval, tokenizer.lineno(), e.getCause()));
 					} break;
@@ -67,7 +68,7 @@ public class WaebricScanner implements Iterable<Token> {
 							WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
 							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 						} else if(isIdentifier(tokenizer.sval)) {
-							tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
+							tokens.add(new Token(tokenizer.sval, TokenSort.IDENTIFIER, tokenizer.lineno()));
 						} else {
 							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), null));
 						}

@@ -24,7 +24,6 @@ public class Designator implements ISyntaxNode {
 		return attributes.add(attribute);
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { identifier, attributes };
 	}
