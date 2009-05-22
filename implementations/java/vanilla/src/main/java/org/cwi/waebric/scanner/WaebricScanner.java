@@ -10,6 +10,7 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricLayout;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.exception.ScannerException;
+import org.cwi.waebric.scanner.exception.UnknownTokenException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -78,20 +79,22 @@ public class WaebricScanner implements Iterable<Token> {
 				case StreamTokenizer.TT_EOF: break;
 				case StreamTokenizer.TT_EOL: break;
 				default:
+					char c = (char) curr;
 					// Separate text from symbols
-					if((char) curr == WaebricSymbol.DQUOTE) {
+					if(c == WaebricSymbol.DQUOTE) {
 						try {
 							tokens.add(new Token(tokenizer.sval, TokenSort.TEXT, tokenizer.lineno()));
 						} catch(Exception e) {
 							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
 						}	
-					} else {
-						char symbol = (char) curr;
+					} else if(isSymbol(c)) {
 						try {
-							tokens.add(new Token(symbol, TokenSort.SYMBOL, tokenizer.lineno()));
+							tokens.add(new Token(c, TokenSort.SYMBOL, tokenizer.lineno()));
 						} catch(Exception e) {
-							exceptions.add(new ScannerException(symbol, tokenizer.lineno(), e.getCause()));
+							exceptions.add(new ScannerException(c, tokenizer.lineno(), e.getCause()));
 						}
+					} else { // Character cannot be tokenized
+						exceptions.add(new UnknownTokenException(c, tokenizer.lineno()));
 					}
 				break;
 			}
@@ -178,8 +181,12 @@ public class WaebricScanner implements Iterable<Token> {
 		if(chars.length != 1) { return false; }
 		
 		// Only symbols between decimal 32 and 126 are valid
-		int deci = (int) chars[0];
-		return deci >= 32 && deci <= 126;
+		return isSymbol(chars[0]);
+	}
+	
+	public static boolean isSymbol(char c) {
+		int decimal = (int) c;
+		return decimal >= 32 && decimal <= 126;
 	}
 	
 	/**

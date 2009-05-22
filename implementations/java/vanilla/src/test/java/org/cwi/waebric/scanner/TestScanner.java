@@ -99,6 +99,15 @@ public class TestScanner {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(TokenSort.SYMBOL));
 		}
+		
+		// Symbols as separator
+		iterator = quickScan("@attribute");
+		current = iterator.next(); // Dot symbol
+		assertTrue(current.getLexeme().equals('@'));
+		assertTrue(current.getSort().equals(TokenSort.SYMBOL));
+		current = iterator.next(); // Identifier
+		assertTrue(current.getLexeme().equals("attribute"));
+		assertTrue(current.getSort().equals(TokenSort.IDENTIFIER));
 	}
 	
 	@Test
