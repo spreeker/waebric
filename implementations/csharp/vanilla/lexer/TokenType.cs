@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Lexer.Waebric
+namespace Lexer.Tokenizer
 {
-    public enum TokenType
+    public enum TokenType : int
     {
-        /* IDENTIFIER: Everything that identifies something:
-         * module modulename, where modulename is the identifier
+        /* KEYWORD:
+         * In module modulename, module is a keyword
+         */ 
+        KEYWORD,
+
+        /* IDENTIFIER
          */
         IDENTIFIER,
 
@@ -17,29 +21,13 @@ namespace Lexer.Waebric
          */
         NUMBER,
 
-        /* STRING: Everything that is between double quotes:
+        /* TEXT: Everything that is between double quotes:
          * "this is a string" 
          */
-        STRING,
+        TEXT,
 
-        /* SYMBOL: Everything that is directly after a single ':
-         * 'symbol
+        /* SYMBOL: All other characters that can appear
          */
-        SYMBOL,
-
-        /* LIST: A list of Numbers, Strings, Symbols and Lists:
-         * [123, "abc", ' sym] 
-         */
-        LIST,
-
-        /* RECORD: 
-         * { name : "John Smith", age: 30 } //a record
-         */ 
-        RECORD,
-
-        /* LITERAL:
-         * In module modulename, the keyword module is a literal
-         */ 
-        LITERAL
+        SYMBOL        
     };
 }
