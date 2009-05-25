@@ -5,6 +5,11 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
+/**
+ * IdCon ":" Expression -> Expression
+ * @author schagen
+ *
+ */
 public class KeyValuePair implements ISyntaxNode {
 
 	private IdCon identifier;
@@ -29,7 +34,7 @@ public class KeyValuePair implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
 				identifier,
-				new StringLiteral("" + WaebricSymbol.PERIOD),
+				new StringLiteral("" + WaebricSymbol.COLON),
 				expression
 			};
 	}

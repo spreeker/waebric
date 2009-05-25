@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
 public abstract class Expression implements ISyntaxNode {
 
 	/**
-	 * text -> expression
+	 * Text -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -33,7 +33,7 @@ public abstract class Expression implements ISyntaxNode {
 	}
 	
 	/**
-	 * var -> expression
+	 * Var -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -56,7 +56,7 @@ public abstract class Expression implements ISyntaxNode {
 	}
 	
 	/**
-	 * symbolcon -> expression
+	 * Symbolcon -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -79,7 +79,7 @@ public abstract class Expression implements ISyntaxNode {
 	}
 	
 	/**
-	 * natcon -> expression
+	 * NatCon -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -102,7 +102,7 @@ public abstract class Expression implements ISyntaxNode {
 	}
 	
 	/**
-	 * expression "." idcon -> expression
+	 * Expression "." IdCon -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -137,6 +137,11 @@ public abstract class Expression implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * "[" { Expression "," }* "]" -> Expression
+	 * @author schagen
+	 *
+	 */
 	public static class BracedExpressions extends Expression {
 
 		private SyntaxNodeListWithSeparator<Expression> expressions;
@@ -147,6 +152,10 @@ public abstract class Expression implements ISyntaxNode {
 		
 		public boolean addExpression(Expression expression) {
 			return expressions.add(expression);
+		}
+		
+		public ISyntaxNode[] getElements() {
+			return expressions.getElements();
 		}
 		
 		public ISyntaxNode[] getChildren() {
@@ -165,11 +174,39 @@ public abstract class Expression implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * "{" { KeyValuePair "," }* "}" -> Expression
+	 * @author schagen
+	 *
+	 */
 	public static class BracedKeyValuePairs extends Expression {
 
+		private SyntaxNodeListWithSeparator<KeyValuePair> keyvaluepairs;
+		
+		public BracedKeyValuePairs() {
+			keyvaluepairs = new SyntaxNodeListWithSeparator<KeyValuePair>("" + WaebricSymbol.COMMA);
+		}
+		
+		public boolean addKeyValuePair(KeyValuePair keyvaluepair) {
+			return keyvaluepairs.add(keyvaluepair);
+		}
+		
+		public ISyntaxNode[] getElements() {
+			return keyvaluepairs.getElements();
+		}
+		
 		public ISyntaxNode[] getChildren() {
-			// TODO Auto-generated method stub
-			return null;
+			final ISyntaxNode[] elements = keyvaluepairs.getElements();
+			
+			ISyntaxNode[] children = new ISyntaxNode[elements.length + 2];
+			children[0] = new StringLiteral("" + WaebricSymbol.LCBRACKET);
+			children[children.length-1] = new StringLiteral("" + WaebricSymbol.RCBRACKET);
+			
+			for(int i = 1; i < elements.length; i++) {
+				children[i] = elements[i-1]; // Transfer expressions to children array
+			}
+			
+			return children;
 		}
 		
 	}

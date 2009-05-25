@@ -3,6 +3,11 @@ package org.cwi.waebric.parser.ast.expressions;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
+/**
+ * IdCon -> Var { category("MetaVariables") }
+ * @author schagen
+ *
+ */
 public class Var implements ISyntaxNode {
 
 	private IdCon identifier;
