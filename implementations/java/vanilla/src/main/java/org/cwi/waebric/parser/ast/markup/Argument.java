@@ -1,7 +1,10 @@
 package org.cwi.waebric.parser.ast.markup;
 
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
+import org.cwi.waebric.parser.ast.expressions.Var;
 
 public abstract class Argument implements ISyntaxNode {
 
@@ -17,17 +20,28 @@ public abstract class Argument implements ISyntaxNode {
 
 	public static class ArgumentWithVar extends Argument {
 
-		@Override
+		private Var var;
+
+		public Var getVar() {
+			return var;
+		}
+
+		public void setVar(Var var) {
+			this.var = var;
+		}
+
 		public ISyntaxNode[] getChildren() {
-			// TODO Auto-generated method stub
-			return null;
+			return new ISyntaxNode[] { 
+					var,
+					new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
+					expression
+				};
 		}
 		
 	}
 	
 	public static class ArgumentWithoutVar extends Argument {
 
-		@Override
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { expression };
 		}
