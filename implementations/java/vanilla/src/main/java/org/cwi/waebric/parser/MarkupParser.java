@@ -61,59 +61,54 @@ public class MarkupParser extends AbstractParser {
 	
 	public void visit(Attributes attributes) {
 		while(tokens.hasNext()) {
-			String lexeme = tokens.peek(1).getLexeme().toString();
-			
-			// Parse attribute
-			if(isAttribute(lexeme)) {
-				Attribute attribute = null;
-				if(lexeme.charAt(0) == WaebricSymbol.AT_SIGN) {
-					int index = lexeme.indexOf(WaebricSymbol.PERCENT_SIGN);
-					if(index != -1) {
+			String peek = tokens.peek(1).getLexeme().toString();
+			if(peek.length() == 1) { // Symbols can only be one character long
+				Attribute attribute = null; // Determine attribute type
+				char symbol = peek.charAt(0);
+				
+				if(symbol == WaebricSymbol.AT_SIGN) {
+					if(tokens.hasNext(3) && tokens.peek(3).equals(WaebricSymbol.PERCENT_SIGN)) {
 						attribute = new Attribute.AttributeDoubleNatCon();
 					} else {
 						attribute = new Attribute.AttributeNatCon();
 					}
+				} else if(symbol == '$' || symbol == '.' || symbol == '$' || symbol == ':') {
+					attribute = new Attribute.AttributeIdCon(symbol);
 				} else {
-					// Initiate regular attribute based on first character
-					attribute = new Attribute.AttributeIdCon(lexeme.charAt(0));
+					break; // Non attribute symbol found, break while
 				}
-				visit(attribute);
+				
+				visit(attribute); // Parse attribute
 				attributes.add(attribute);
 			} else {
-				break; // Out of attributes, break while
+				break; // Non attribute symbol found, break while
 			}
 		}
 	}
 	
-	public static boolean isAttribute(String lexeme) {
-		return lexeme.matches("(#\\w+)|(\\.\\w+)|(\\$\\w+)|(:\\w+)|(@\\d+%\\d+)|(@\\d+)");
-	}
-	
 	public void visit(Attribute attribute) {
-		current = tokens.next(); // Retrieve attribute
-		String lexeme = current.getLexeme().toString();
+		tokens.next(); // Skip attribute symbol
 		
+		current = tokens.next(); // Retrieve value
 		if(attribute instanceof AttributeIdCon) {
-			IdCon identifier = new IdCon(lexeme.substring(1));
+			IdCon identifier = new IdCon(current.getLexeme().toString());
 			((AttributeIdCon) attribute).setIdentifier(identifier);
 		} else if(attribute instanceof AttributeNatCon) {
 			try {
-				int number = Integer.parseInt(lexeme.substring(1));
+				int number = (int) Double.parseDouble(current.getLexeme().toString());
 				((AttributeNatCon) attribute).setNumber(new NatCon(number));
 			} catch(NumberFormatException e) {
 				exceptions.add(new ParserException(current.toString() + " is not a valid " +
 						"numeral attribute, use @number"));
 			}
-		} else if(attribute instanceof AttributeDoubleNatCon) {
-			try {
-				int index = lexeme.indexOf(WaebricSymbol.PERCENT_SIGN);
-				
-				// Parse first number
-				int first = Integer.parseInt(lexeme.substring(1, index-1));
-				((AttributeDoubleNatCon) attribute).setNumber(new NatCon(first));
-				
-				// Parse second number
-				int second = Integer.parseInt(lexeme.substring(index+1, lexeme.length()-1));
+		}
+		
+		if(attribute instanceof AttributeDoubleNatCon) {
+			tokens.next(); // Skip % symbol
+			
+			try { // Parse optional second value
+				current = tokens.next();
+				int second = (int) Double.parseDouble(current.getLexeme().toString());
 				((AttributeDoubleNatCon) attribute).setSecondNumber(new NatCon(second));
 			} catch(NumberFormatException e) {
 				exceptions.add(new ParserException(current.toString() + " is not a valid " +
@@ -161,8 +156,7 @@ public class MarkupParser extends AbstractParser {
 			tokens.next(); // Skip equals sign
 		}
 		
-		// Parse expression
-		try {
+		try { // Parse expression
 			Expression expression = ExpressionParser.getExpressionType(tokens.peek(1)).newInstance();
 			visit(expression);
 			argument.setExpression(expression);

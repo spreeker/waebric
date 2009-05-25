@@ -5,7 +5,13 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.markup.Attribute;
+import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
+import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
+import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -42,64 +48,65 @@ public class TestMarkupParser {
 	}
 	
 	@Test
+	public void testAttributes() {
+		// TODO
+	}
+	
+	@Test
+	public void testAttribute() {
+		// Identifier attribute
+		iterator = TestScanner.quickScan("#myattribute");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		AttributeIdCon attributei = new Attribute.AttributeIdCon('#');
+		parser.visit(attributei);
+		
+		assertTrue(exceptions.size() == 0);
+		assertTrue(attributei.getIdentifier().equals("myattribute"));
+		
+		// Regular natural attribute
+		iterator = TestScanner.quickScan("@99");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		AttributeNatCon attributen = new Attribute.AttributeNatCon();
+		parser.visit(attributen);
+		
+		assertTrue(exceptions.size() == 0);
+		assertTrue(attributen.getNumber().equals(99));
+		
+		// Double natural attribute
+		iterator = TestScanner.quickScan("@99%12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		AttributeDoubleNatCon attributedn = new Attribute.AttributeDoubleNatCon();
+		parser.visit(attributedn);
+		
+		assertTrue(exceptions.size() == 0);
+		assertTrue(attributedn.getNumber().equals(99));
+		assertTrue(attributedn.getSecondNumber().equals(12));
+	}
+	
+	@Test
 	public void testArguments() {
 		// TODO
 	}
 	
 	@Test
 	public void testArgument() {
-		// TODO
-	}
-	
-	@Test
-	public void testAttribute() {
-		// TODO
-	}
-	
-	@Test
-	public void testAttributes() {
-		// TODO
+		// TODO		
 	}
 	
 	@Test
 	public void testVar() {
-		// TODO
-	}
-
-	@Test
-	public void testIsAttribute() {
-		assertTrue(MarkupParser.isAttribute("#Hello"));
-		assertTrue(MarkupParser.isAttribute("#Hello123"));
-		assertTrue(MarkupParser.isAttribute("#123"));
-		assertFalse(MarkupParser.isAttribute("#"));
+		iterator = TestScanner.quickScan("var1");
+		parser = new MarkupParser(iterator, exceptions);
 		
-		assertTrue(MarkupParser.isAttribute(".Hello"));
-		assertTrue(MarkupParser.isAttribute(".Hello123"));
-		assertTrue(MarkupParser.isAttribute(".123"));
-		assertFalse(MarkupParser.isAttribute("."));
+		Var var = new Var();
+		parser.visit(var);
 		
-		assertTrue(MarkupParser.isAttribute("$Hello"));
-		assertTrue(MarkupParser.isAttribute("$Hello123"));
-		assertTrue(MarkupParser.isAttribute("$123"));
-		assertFalse(MarkupParser.isAttribute("$"));
-		
-		assertTrue(MarkupParser.isAttribute(":Hello"));
-		assertTrue(MarkupParser.isAttribute(":Hello123"));
-		assertTrue(MarkupParser.isAttribute(":123"));
-		assertFalse(MarkupParser.isAttribute(":"));
-		
-		assertTrue(MarkupParser.isAttribute("@123"));
-		assertFalse(MarkupParser.isAttribute("@Hello"));
-		assertFalse(MarkupParser.isAttribute("@Hello123"));
-		assertFalse(MarkupParser.isAttribute("@"));
-		
-		assertTrue(MarkupParser.isAttribute("@123%123"));
-		assertFalse(MarkupParser.isAttribute("@Hello%Hello"));
-		assertFalse(MarkupParser.isAttribute("@Hello123%Hello123"));
-		assertFalse(MarkupParser.isAttribute("@%"));
-		assertFalse(MarkupParser.isAttribute("@%123"));
-		assertFalse(MarkupParser.isAttribute("@%Hello"));
-		assertFalse(MarkupParser.isAttribute("@%Hello123"));
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(var.getIdentifier().equals("var1"));
 	}
 
 }
