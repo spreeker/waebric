@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.ast.markup.Attribute;
+import org.cwi.waebric.parser.ast.markup.Attributes;
+import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
@@ -44,12 +46,32 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testDesignator() {
-		// TODO
+		iterator = TestScanner.quickScan("designator1 @99,#myattribute,@99%12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Designator designator = new Designator();
+		parser.visit(designator);
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(designator.getIdentifier().equals("designator1"));
+		assertTrue(designator.getAttributes().size() == 3);
 	}
 	
 	@Test
 	public void testAttributes() {
-		// TODO
+		iterator = TestScanner.quickScan("@99,#myattribute,@99%12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Attributes attributes = new Attributes();
+		parser.visit(attributes);
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(attributes.size() == 3);
+		assertTrue(attributes.get(0) instanceof Attribute.AttributeNatCon);
+		assertTrue(attributes.get(1) instanceof Attribute.AttributeIdCon);
+		assertTrue(attributes.get(2) instanceof Attribute.AttributeDoubleNatCon);
 	}
 	
 	@Test

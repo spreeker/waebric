@@ -8,6 +8,10 @@ public class Designator implements ISyntaxNode {
 	protected IdCon identifier;
 	protected Attributes attributes;
 
+	public Designator() {
+		this.attributes = new Attributes();
+	}
+	
 	public IdCon getIdentifier() {
 		return identifier;
 	}

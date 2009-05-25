@@ -62,28 +62,36 @@ public class MarkupParser extends AbstractParser {
 	public void visit(Attributes attributes) {
 		while(tokens.hasNext()) {
 			String peek = tokens.peek(1).getLexeme().toString();
-			if(peek.length() == 1) { // Symbols can only be one character long
-				Attribute attribute = null; // Determine attribute type
-				char symbol = peek.charAt(0);
-				
-				if(symbol == WaebricSymbol.AT_SIGN) {
-					if(tokens.hasNext(3) && tokens.peek(3).equals(WaebricSymbol.PERCENT_SIGN)) {
-						attribute = new Attribute.AttributeDoubleNatCon();
-					} else {
-						attribute = new Attribute.AttributeNatCon();
-					}
-				} else if(symbol == '$' || symbol == '.' || symbol == '$' || symbol == ':') {
-					attribute = new Attribute.AttributeIdCon(symbol);
+			if(peek.length() != 1) { break; }
+			char symbol = peek.charAt(0);
+			
+			// Determine attribute type
+			Attribute attribute = null; 
+			if(symbol == WaebricSymbol.AT_SIGN) {
+				if(tokens.hasNext(3) && tokens.peek(3).getLexeme().equals(WaebricSymbol.PERCENT_SIGN)) {
+					attribute = new Attribute.AttributeDoubleNatCon();
 				} else {
-					break; // Non attribute symbol found, break while
+					attribute = new Attribute.AttributeNatCon();
 				}
-				
-				visit(attribute); // Parse attribute
-				attributes.add(attribute);
-			} else {
+			} else if(symbol == '#' || symbol == '.' || symbol == '$' || symbol == ':') {
+				attribute = new Attribute.AttributeIdCon(symbol);
+			}  else {
 				break; // Non attribute symbol found, break while
 			}
+				
+			visit(attribute); // Parse attribute
+			attributes.add(attribute);
+			
+			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
+				break; // No more separator, thus end of attributes
+			}
+			
+			tokens.next(); // Skip comma symbol
 		}
+	}
+	
+	public static boolean isAttributeSign(char c) {
+		return c == '#' || c == '.' || c == '$' || c == ':' || c == '@';
 	}
 	
 	public void visit(Attribute attribute) {
