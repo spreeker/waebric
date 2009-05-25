@@ -155,10 +155,6 @@ namespace Lexer.Tokenizer
                 TextValue = buffer.ToString();
                 return '\"';
             }
-            if (peek == ';')
-            {
-
-            }
             if(IsSymbol(peek)) //other symbol
             {
                 TextValue = peek.ToString();

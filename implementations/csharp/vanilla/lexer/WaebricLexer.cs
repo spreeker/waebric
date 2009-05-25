@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using Lexer.Tokenizer;
-using System.Collections;
 
 namespace Lexer
 {
@@ -64,9 +61,19 @@ namespace Lexer
                     case StreamTokenizer.ST_NUMBER: // numeric value
                         TokenStream.Add(new Token(tokenizer.GetNumericValue(), TokenType.NUMBER, tokenizer.GetScannedLines()));
                         break;
-                    default:
-                        //System.Console.WriteLine(tokenizer.GetTextValue()); //DEBUG only
-
+                    default: //other token types need to be handled
+                        if (token == '\"')
+                        {   //quote, so text
+                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.TEXT, tokenizer.GetScannedLines()));
+                        }
+                        else if (IsSymbol((char)token))
+                        {
+                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.SYMBOL, tokenizer.GetScannedLines()));
+                        }
+                        else
+                        {
+                            //Exception Handling
+                        }
                         break;
                 }
                 token = tokenizer.NextToken();
@@ -125,6 +132,16 @@ namespace Lexer
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Checks if character is a symbol
+        /// </summary>
+        /// <param name="c">Character to check</param>
+        /// <returns>True if character is symbol, otherwise false</returns>
+        private bool IsSymbol(char c)
+        {
+            return c > (int)32 && c < (int)126;
         }
 
         #endregion
