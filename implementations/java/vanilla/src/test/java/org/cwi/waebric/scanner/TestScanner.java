@@ -41,7 +41,7 @@ public class TestScanner {
 	 * @return iterator
 	 * @throws IOException
 	 */
-	private TokenIterator quickScan(String data) {
+	public static TokenIterator quickScan(String data) {
 		Reader reader = new StringReader(data);
 		WaebricScanner scanner = new WaebricScanner(reader);
 		

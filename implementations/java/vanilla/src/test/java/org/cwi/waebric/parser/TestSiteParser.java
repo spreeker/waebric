@@ -2,21 +2,42 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestSiteParser {
 
+	private SiteParser parser;
+	
+	private List<ParserException> exceptions;
+	private TokenIterator iterator;
+	
 	@Before
-	public void setUp() throws Exception {
-		// Currently not needed as only static method is tested
+	public void setUp() {
+		exceptions = new ArrayList<ParserException>();
 	}
-
+	
 	@After
-	public void tearDown() throws Exception {
-		// Currently not needed as only static method is tested
+	public void tearDown() {
+		exceptions.clear();
+		exceptions = null;
+		parser = null;
+		iterator = null;
 	}
+	
+	@Test
+	public void testSite() {
+		//iterator = TestScanner.quickScan("index.html: home(\"Hello World!\") end");
+	}
+	
+	
 
 	@Test
 	public void testIsPathElement() {
