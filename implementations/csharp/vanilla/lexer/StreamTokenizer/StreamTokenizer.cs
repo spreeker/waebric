@@ -3,9 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Waebric;
 
-namespace Lexer.StreamTokenizer
+namespace Lexer.Tokenizer
 {
    
 
@@ -54,9 +53,7 @@ namespace Lexer.StreamTokenizer
         {
             this.WhitespaceCharacters = WhitespaceChars;
         }
-        
-        
-        
+
 
         /// <summary>
         /// Retrieves NextToken from stream
@@ -167,8 +164,7 @@ namespace Lexer.StreamTokenizer
                 TextValue = peek.ToString();
                 return peek;
             }
-
-            return 0;
+            return ST_OTHER; //Exception should be handled here
         }
 
         /// <summary>
