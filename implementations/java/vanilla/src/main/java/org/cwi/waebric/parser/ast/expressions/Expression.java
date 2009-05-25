@@ -3,10 +3,10 @@ package org.cwi.waebric.parser.ast.expressions;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.IntegerLiteral;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.basic.NatCon;
 
 public abstract class Expression implements ISyntaxNode {
 
@@ -86,13 +86,13 @@ public abstract class Expression implements ISyntaxNode {
 	 */
 	public static class NatExpression extends Expression {
 
-		private IntegerLiteral natural;
+		private NatCon natural;
 		
-		public IntegerLiteral getNatural() {
+		public NatCon getNatural() {
 			return natural;
 		}
 
-		public void setNatural(IntegerLiteral natural) {
+		public void setNatural(NatCon natural) {
 			this.natural = natural;
 		}
 

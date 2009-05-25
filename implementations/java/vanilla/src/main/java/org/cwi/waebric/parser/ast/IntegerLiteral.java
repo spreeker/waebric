@@ -8,6 +8,10 @@ public class IntegerLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 	
+	public IntegerLiteral(String identifier) throws NumberFormatException {
+		this.literal = (int) Double.parseDouble(identifier);
+	}
+
 	public int getLiteral() {
 		return literal;
 	}

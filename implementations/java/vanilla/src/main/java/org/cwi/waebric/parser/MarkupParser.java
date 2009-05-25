@@ -45,8 +45,9 @@ public class MarkupParser extends AbstractParser {
 	}
 	
 	public void visit(Designator designator) {
+		current = tokens.next(); // Retrieve identifier
+		
 		// Parse identifier
-		current = tokens.next();
 		if(current.getSort() == TokenSort.IDENTIFIER) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
@@ -61,6 +62,7 @@ public class MarkupParser extends AbstractParser {
 	
 	public void visit(Attributes attributes) {
 		while(tokens.hasNext()) {
+			// Retrieve lookahead on next symbol
 			String peek = tokens.peek(1).getLexeme().toString();
 			if(peek.length() != 1) { break; }
 			char symbol = peek.charAt(0);
@@ -86,7 +88,7 @@ public class MarkupParser extends AbstractParser {
 				break; // No more separator, thus end of attributes
 			}
 			
-			tokens.next(); // Skip comma symbol
+			tokens.next(); // Skip comma
 		}
 	}
 	
@@ -103,21 +105,21 @@ public class MarkupParser extends AbstractParser {
 			((AttributeIdCon) attribute).setIdentifier(identifier);
 		} else if(attribute instanceof AttributeNatCon) {
 			try {
-				int number = (int) Double.parseDouble(current.getLexeme().toString());
-				((AttributeNatCon) attribute).setNumber(new NatCon(number));
+				NatCon number = new NatCon(current.getLexeme().toString());
+				((AttributeNatCon) attribute).setNumber(number);
 			} catch(NumberFormatException e) {
 				exceptions.add(new ParserException(current.toString() + " is not a valid " +
 						"numeral attribute, use @number"));
 			}
 		}
 		
+		// Double natural attribute
 		if(attribute instanceof AttributeDoubleNatCon) {
-			tokens.next(); // Skip % symbol
-			
-			try { // Parse optional second value
+			tokens.next(); // Skip percentage symbol
+			try {
 				current = tokens.next();
-				int second = (int) Double.parseDouble(current.getLexeme().toString());
-				((AttributeDoubleNatCon) attribute).setSecondNumber(new NatCon(second));
+				NatCon second = new NatCon(current.getLexeme().toString());
+				((AttributeDoubleNatCon) attribute).setSecondNumber(second);
 			} catch(NumberFormatException e) {
 				exceptions.add(new ParserException(current.toString() + " is not a valid " +
 				"numeral attribute, use @number%number"));
@@ -175,16 +177,12 @@ public class MarkupParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * @see org.cwi.waebric.parser.ExpressionParser
+	 * @param var
+	 */
 	public void visit(Var var) {
-		current = tokens.next();
-		
-		if(! current.getSort().equals(TokenSort.IDENTIFIER)) {
-			exceptions.add(new ParserException(current.toString() + " is not a valid variable, " +
-					"variables need to start with a letter and contain no layout symbols."));
-			return; // Stop function from filling variable with invalid data
-		}
-		
-		var.setIdentifier(new IdCon(current.getLexeme().toString()));
+		expressionParser.visit(var);
 	}
 	
 	/**
