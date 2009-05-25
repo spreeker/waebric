@@ -6,6 +6,8 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class Import implements IModuleElement {
 	
+	private static final String IMPORT_KEYWORD = WaebricKeyword.IMPORT.name().toLowerCase();
+	
 	private ModuleId identifier;
 
 	public ModuleId getIdentifier() {
@@ -18,7 +20,7 @@ public class Import implements IModuleElement {
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
-				new StringLiteral(WaebricKeyword.IMPORT.name().toLowerCase()), 
+				new StringLiteral(IMPORT_KEYWORD), 
 				identifier
 			};
 	}

@@ -6,6 +6,8 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class Module implements ISyntaxNode {
 
+	private static final String MODULE_KEYWORD = WaebricKeyword.MODULE.name().toLowerCase();
+	
 	private ModuleId identifier;
 	private ModuleElements elements;
 	
@@ -31,7 +33,7 @@ public class Module implements ISyntaxNode {
 	
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
-				new StringLiteral(WaebricKeyword.MODULE.name().toLowerCase()),
+				new StringLiteral(MODULE_KEYWORD),
 				identifier,
 				elements
 		};

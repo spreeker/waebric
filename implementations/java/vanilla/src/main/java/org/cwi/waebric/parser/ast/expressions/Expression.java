@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.expressions;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.IntegerLiteral;
 import org.cwi.waebric.parser.ast.StringLiteral;
@@ -62,13 +63,13 @@ public abstract class Expression implements ISyntaxNode {
 	 */
 	public static class SymbolExpression extends Expression {
 
-		private StringLiteral symbol;
+		private SymbolCon symbol;
 		
-		public StringLiteral getSymbol() {
+		public SymbolCon getSymbol() {
 			return symbol;
 		}
 
-		public void setSymbol(StringLiteral symbol) {
+		public void setSymbol(SymbolCon symbol) {
 			this.symbol = symbol;
 		}
 
@@ -130,7 +131,7 @@ public abstract class Expression implements ISyntaxNode {
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] {
 					expression,
-					new StringLiteral("" + WaebricSymbol.PERIOD),
+					new CharacterLiteral(WaebricSymbol.PERIOD),
 					identifier
 			};
 		}
@@ -162,11 +163,11 @@ public abstract class Expression implements ISyntaxNode {
 			final ISyntaxNode[] elements = expressions.getElements();
 			
 			ISyntaxNode[] children = new ISyntaxNode[elements.length + 2];
-			children[0] = new StringLiteral("" + WaebricSymbol.LBRACKET);
-			children[children.length-1] = new StringLiteral("" + WaebricSymbol.RBRACKET);
+			children[0] = new CharacterLiteral(WaebricSymbol.LBRACKET);
+			children[children.length-1] = new CharacterLiteral(WaebricSymbol.RBRACKET);
 			
-			for(int i = 1; i < elements.length; i++) {
-				children[i] = elements[i-1]; // Transfer expressions to children array
+			for(int i = 0; i < elements.length; i++) {
+				children[i+1] = elements[i]; // Transfer expressions to children array
 			}
 			
 			return children;
@@ -199,11 +200,11 @@ public abstract class Expression implements ISyntaxNode {
 			final ISyntaxNode[] elements = keyvaluepairs.getElements();
 			
 			ISyntaxNode[] children = new ISyntaxNode[elements.length + 2];
-			children[0] = new StringLiteral("" + WaebricSymbol.LCBRACKET);
-			children[children.length-1] = new StringLiteral("" + WaebricSymbol.RCBRACKET);
+			children[0] = new CharacterLiteral(WaebricSymbol.LCBRACKET);
+			children[children.length-1] = new CharacterLiteral(WaebricSymbol.RCBRACKET);
 			
-			for(int i = 1; i < elements.length; i++) {
-				children[i] = elements[i-1]; // Transfer expressions to children array
+			for(int i = 0; i < elements.length; i++) {
+				children[i+1] = elements[i]; // Transfer expressions to children array
 			}
 			
 			return children;

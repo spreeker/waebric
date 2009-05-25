@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
 
 /**
  * File path
@@ -63,7 +63,7 @@ public abstract class Path implements ISyntaxNode {
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] {
 					dirName,
-					new StringLiteral("" + WaebricSymbol.SLASH),
+					new CharacterLiteral(WaebricSymbol.SLASH),
 					fileName
 				};
 		}

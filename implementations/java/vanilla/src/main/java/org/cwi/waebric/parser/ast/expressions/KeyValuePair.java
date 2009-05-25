@@ -1,8 +1,8 @@
 package org.cwi.waebric.parser.ast.expressions;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -34,7 +34,7 @@ public class KeyValuePair implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
 				identifier,
-				new StringLiteral("" + WaebricSymbol.COLON),
+				new CharacterLiteral(WaebricSymbol.COLON),
 				expression
 			};
 	}

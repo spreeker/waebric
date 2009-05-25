@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
 public class Mapping implements ISyntaxNode {
@@ -29,7 +29,7 @@ public class Mapping implements ISyntaxNode {
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
 				path, 
-				new StringLiteral("" + WaebricSymbol.COLON), 
+				new CharacterLiteral(WaebricSymbol.COLON), 
 				markup
 			};
 	}

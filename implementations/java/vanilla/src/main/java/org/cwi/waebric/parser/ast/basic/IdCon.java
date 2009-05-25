@@ -15,10 +15,6 @@ public class IdCon implements ISyntaxNode {
 		return identifier;
 	}
 
-	public void setIdentifier(StringLiteral identifier) {
-		this.identifier = identifier;
-	}
-
 	public ISyntaxNode[] getChildren() {
 		return new StringLiteral[] { identifier };
 	}
