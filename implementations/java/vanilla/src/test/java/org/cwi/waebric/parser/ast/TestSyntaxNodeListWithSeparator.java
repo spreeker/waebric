@@ -4,52 +4,52 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
-import org.cwi.waebric.parser.ast.markup.Argument;
+import org.cwi.waebric.parser.ast.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestSyntaxNodeListWithSeparator {
 
-	private SyntaxNodeListWithSeparator<Argument> arguments;
+	private SyntaxNodeListWithSeparator<Mapping> mappings;
 	
 	@Before
 	public void setUp() {
-		arguments = new SyntaxNodeListWithSeparator<Argument>(".");
-		arguments.add(new Argument());
-		arguments.add(new Argument());
+		mappings = new SyntaxNodeListWithSeparator<Mapping>(";");
+		mappings.add(new Mapping());
+		mappings.add(new Mapping());
 	}
 	
 	@After
 	public void tearDown() {
-		arguments.clear();
-		arguments = null;
+		mappings.clear();
+		mappings = null;
 	}
 	
 	@Test
 	public void testGetChildren() {
-		assertNotNull(arguments.getChildren());
-		assertTrue(arguments.getChildren().length == 3);
+		assertNotNull(mappings.getChildren());
+		assertTrue(mappings.getChildren().length == 3);
 		
 		int expected = 3;
 		while(expected < 25) {
-			arguments.add(new Argument());
+			mappings.add(new Mapping());
 			expected += 2; // When an element is added, a separator is automatically applied
-			assertTrue(arguments.getChildren().length == expected);
+			assertTrue(mappings.getChildren().length == expected);
 		}
 	}
 	
 	@Test
 	public void testRemove() {
-		assertTrue(arguments.getChildren().length == 3);
+		assertTrue(mappings.getChildren().length == 3);
 		
-		Argument argument = new Argument();
-		arguments.add(argument);
-		assertTrue(arguments.getChildren().length == 5);
-		assertTrue(arguments.getChildren()[4].equals(argument));
+		Mapping mapping = new Mapping();
+		mappings.add(mapping);
+		assertTrue(mappings.getChildren().length == 5);
+		assertTrue(mappings.getChildren()[4].equals(mapping));
 		
-		arguments.remove(2);
-		assertTrue(arguments.getChildren().length == 3);
+		mappings.remove(2);
+		assertTrue(mappings.getChildren().length == 3);
 	}
 	
 }

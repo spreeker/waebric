@@ -2,48 +2,48 @@ package org.cwi.waebric.parser.ast;
 
 import static org.junit.Assert.*;
 
-import org.cwi.waebric.parser.ast.markup.Argument;
+import org.cwi.waebric.parser.ast.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestSyntaxNodeList {
 
-	private SyntaxNodeList<Argument> arguments;
+	private SyntaxNodeList<Mapping> mappings;
 	
 	@Before
 	public void setUp() {
-		arguments = new SyntaxNodeList<Argument>();
-		arguments.add(new Argument());
-		arguments.add(new Argument());
+		mappings = new SyntaxNodeList<Mapping>();
+		mappings.add(new Mapping());
+		mappings.add(new Mapping());
 	}
 	
 	@After
 	public void tearDown() {
-		arguments.clear();
-		arguments = null;
+		mappings.clear();
+		mappings = null;
 	}
 	
 	@Test
 	public void testGetChildren() {
-		assertNotNull(arguments.getChildren());
-		assertTrue(arguments.getChildren().length == 2);
+		assertNotNull(mappings.getChildren());
+		assertTrue(mappings.getChildren().length == 2);
 		
-		arguments.add(new Argument());
-		assertTrue(arguments.getChildren().length == 3);
+		mappings.add(new Mapping());
+		assertTrue(mappings.getChildren().length == 3);
 	}
 	
 	@Test
 	public void testRemove() {
-		assertTrue(arguments.getChildren().length == 2);
+		assertTrue(mappings.getChildren().length == 2);
 		
-		Argument argument = new Argument();
-		arguments.add(argument);
-		assertTrue(arguments.getChildren().length == 3);
-		assertTrue(arguments.getChildren()[2].equals(argument));
+		Mapping argument = new Mapping();
+		mappings.add(argument);
+		assertTrue(mappings.getChildren().length == 3);
+		assertTrue(mappings.getChildren()[2].equals(argument));
 		
-		arguments.remove(2);
-		assertTrue(arguments.getChildren().length == 2);
+		mappings.remove(2);
+		assertTrue(mappings.getChildren().length == 2);
 	}
 
 }

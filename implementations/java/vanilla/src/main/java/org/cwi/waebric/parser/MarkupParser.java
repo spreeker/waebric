@@ -120,26 +120,27 @@ public class MarkupParser extends AbstractParser {
 		current = tokens.next(); // Skip left parenthesis
 		
 		while(tokens.hasNext()) {
-			Token peek = tokens.peek(1);
-			if(current.getLexeme().equals("" + WaebricSymbol.RPARANTHESIS)) {
+			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				current = tokens.next(); // Skip right parenthesis
 				break; // End of arguments reached, break while
-			} else if(! peek.getLexeme().equals("" + WaebricSymbol.COMMA)) {
-				Argument argument = new Argument();
-				visit(argument);
-				arguments.add(argument);
 			}
 			
-			current = tokens.next(); // Jump to next token
+			Argument argument = null; // TODO: Determine which argument type
+			visit(argument);
+			arguments.add(argument);
+			
+			current = tokens.next(); // Skip comma separator
 		}
 		
-		if(! current.getLexeme().equals("" + WaebricSymbol.RPARANTHESIS)) {
+		if(! current.getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 			exceptions.add(new ParserException(current.toString() + " missing arguments " +
-					"closure token, use \"}\""));
+					"closure token, use \")\""));
 		}
 	}
 	
 	public void visit(Argument argument) {
+		current = tokens.next(); // Retrieve argument
+		
 		
 	}
 	
