@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.site.Directory;
+import org.cwi.waebric.parser.ast.site.FileName;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -61,7 +62,16 @@ public class TestSiteParser {
 
 	@Test
 	public void testFileName() {
-		// TODO
+		iterator = TestScanner.quickScan("myfile.wae");
+		parser = new SiteParser(iterator, exceptions);
+		
+		FileName name = new FileName();
+		parser.visit(name); // Parse filename
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(name.getName().equals("myfile"));
+		assertTrue(name.getExt().equals("wae"));
 	}
 	
 	@Test

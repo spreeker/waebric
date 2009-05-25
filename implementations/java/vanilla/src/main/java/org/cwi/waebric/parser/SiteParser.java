@@ -31,7 +31,7 @@ public class SiteParser extends AbstractParser {
 	public SiteParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Initialise sub parser
+		// Initialize sub parser
 		markupParser = new MarkupParser(tokens, exceptions);
 	}
 	
@@ -115,9 +115,12 @@ public class SiteParser extends AbstractParser {
 		
 		while(tokens.hasNext()) {
 			current = tokens.next(); // Retrieve token
-			String element = current.getLexeme().toString(); // Store path element
 			
-			if(! isPathElement(element)) {
+			// Attempt parsing and storing path element
+			String element = current.getLexeme().toString();
+			if(isPathElement(element)) {
+				directory.add(new PathElement(element));
+			} else {
 				exceptions.add(new ParserException(current.toString() + " is an invalid path element," +
 						"refrain from using white spaces, layout symbols, periods and backward slashes."));
 				return;
@@ -128,7 +131,6 @@ public class SiteParser extends AbstractParser {
 			}
 			
 			tokens.next(); // Skip slash separator
-			directory.add(new PathElement(element));
 		}
 	}
 	
@@ -136,18 +138,23 @@ public class SiteParser extends AbstractParser {
 		return ! lexeme.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)");
 	}
 	
-	public void visit(FileName name) {
+	public void visit(FileName fileName) {
 		current = tokens.next();
-		if(current.getLexeme().toString().indexOf(WaebricSymbol.PERIOD) != -1) {
-			String[] elements = current.getLexeme().toString().split("\\.");
-			if(elements.length == 2) {
-				name.setName(new PathElement(elements[0]));
-				name.setExt(new FileExt(elements[1]));
-			} else {
-				exceptions.add(new ParserException(current.toString() + " has too many elements" +
-						"to be a valid filename, use name \".\" extension"));
+		
+		String lexeme = current.getLexeme().toString();
+		int index = lexeme.lastIndexOf(WaebricSymbol.PERIOD); // Retrieve latest slash index
+		if(index != -1) {
+			String name = lexeme.substring(0, index);
+			fileName.setName(new PathElement(name));
+			
+			if(index+1 == lexeme.length()) { // Filter empty file extensions
+				exceptions.add(new ParserException(current.toString() + " has an empty file extension, " +
+				"use name \".\" extension"));
 				return;
 			}
+			
+			String ext = lexeme.substring(index+1, lexeme.length());
+			fileName.setExt(new FileExt(ext));
 		} else {
 			exceptions.add(new ParserException(current.toString() + " is an invalid filename, " +
 				"use name \".\" extension"));
