@@ -30,7 +30,7 @@ public class ModuleParser extends AbstractParser {
 	public ModuleParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Initialise sub parsers
+		// Initialize sub parsers
 		siteParser = new SiteParser(tokens, exceptions);
 		functionParser = new FunctionParser(tokens, exceptions);
 	}

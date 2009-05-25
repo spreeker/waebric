@@ -69,7 +69,7 @@ public class SiteParser extends AbstractParser {
 		
 		// Retrieve colon separator
 		current = tokens.next();
-		if(!current.getLexeme().equals(WaebricSymbol.COLON)) {
+		if(! current.getLexeme().equals(WaebricSymbol.COLON)) {
 			exceptions.add(new ParserException(current.toString() + " is not a valid mapping " +
 					"syntax, use: path \":\" markup."));
 			return;
@@ -81,9 +81,8 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(Path path) {
-		if(path == null) { // Initialise path when null
-			if(tokens.hasNext(2) && tokens.peek(1).getLexeme().
-					equals(WaebricSymbol.SLASH)) {
+		if(path == null) { // Determine path type based on look-ahead
+			if(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
 				path = new Path.PathWithDir();
 			} else {
 				path = new Path.PathWithoutDir();
@@ -105,24 +104,31 @@ public class SiteParser extends AbstractParser {
 	
 	public void visit(DirName name) {
 		Directory directory = new Directory();
-		visit(directory);
+		visit(directory); // Delegate to directory visit
 		name.setDirectory(directory);
 	}
 	
 	public void visit(Directory directory) {
-		current = tokens.next();
-		while(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
-			String element = current.getLexeme().toString();
+		if(! tokens.hasNext()) {
+			return; // Empty directory
+		}
+		
+		while(tokens.hasNext()) {
+			current = tokens.next(); // Retrieve token
+			String element = current.getLexeme().toString(); // Store path element
 			
-			if(isPathElement(element)) {
+			if(! isPathElement(element)) {
 				exceptions.add(new ParserException(current.toString() + " is an invalid path element," +
 						"refrain from using white spaces, layout symbols, periods and backward slashes."));
 				return;
 			}
 			
+			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
+				return; // No more separator found, quit parsing directory
+			}
+			
 			tokens.next(); // Skip slash separator
 			directory.add(new PathElement(element));
-			tokens.next(); // Jump to next element
 		}
 	}
 	
