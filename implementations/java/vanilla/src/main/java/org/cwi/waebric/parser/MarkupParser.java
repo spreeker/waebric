@@ -40,15 +40,6 @@ public class MarkupParser extends AbstractParser {
 		// Parse designator
 		Designator designator = new Designator();
 		visit(designator);
-		
-		if(markup == null) { // Determine mark up type
-			if(tokens.hasNext(1) && tokens.peek(1).getLexeme().
-					equals("" + WaebricSymbol.LPARANTHESIS)) {
-				markup = new Markup.MarkupWithArguments();
-			} else {
-				markup = new Markup.MarkupWithoutArguments();
-			}
-		}
 		markup.setDesignator(designator);
 		
 		// Parse arguments
@@ -143,7 +134,7 @@ public class MarkupParser extends AbstractParser {
 		}
 		
 		if(! current.getLexeme().equals("" + WaebricSymbol.RPARANTHESIS)) {
-			exceptions.add(new ParserException(current.toString() + " missing arguments" +
+			exceptions.add(new ParserException(current.toString() + " missing arguments " +
 					"closure token, use \"}\""));
 		}
 	}

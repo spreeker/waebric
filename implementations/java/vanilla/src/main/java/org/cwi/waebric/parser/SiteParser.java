@@ -31,7 +31,7 @@ public class SiteParser extends AbstractParser {
 	public SiteParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Initialize sub parser
+		// Construct sub parser
 		markupParser = new MarkupParser(tokens, exceptions);
 	}
 	
@@ -64,12 +64,11 @@ public class SiteParser extends AbstractParser {
 	
 	public void visit(Mapping mapping) {
 		Path path = null;
-		if(path == null) { // Determine path type based on look-ahead
-			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
-				path = new Path.PathWithDir();
-			} else {
-				path = new Path.PathWithoutDir();
-			}
+		// Determine path type based on look-ahead
+		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
+			path = new Path.PathWithDir();
+		} else {
+			path = new Path.PathWithoutDir();
 		}
 		visit(path);
 		mapping.setPath(path);
@@ -82,8 +81,14 @@ public class SiteParser extends AbstractParser {
 			return;
 		}
 		
-		Markup markup = null; // Initialised later as multiple alternatives are possible
-		visit(mapping);
+		Markup markup = null;
+		// Determine mark-up type based on look-ahead
+		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
+			markup = new Markup.MarkupWithArguments();
+		} else {
+			markup = new Markup.MarkupWithoutArguments();
+		}
+		visit(markup);
 		mapping.setMarkup(markup);
 	}
 	
@@ -126,7 +131,7 @@ public class SiteParser extends AbstractParser {
 			}
 			
 			if(! tokens.hasNext(2) || isFileName(tokens.peek(2).getLexeme().toString())) {
-				return; // No more path element
+				return; // File name is next, thus directory has ended
 			}
 			
 			tokens.next(); // Skip slash separator

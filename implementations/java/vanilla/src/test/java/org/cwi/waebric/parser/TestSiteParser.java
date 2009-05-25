@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,21 +39,45 @@ public class TestSiteParser {
 		iterator = null;
 	}
 	
-	@Test
-	public void testSite() {
-		// TODO: Test this last
-		//iterator = TestScanner.quickScan("index.html: home(\"Hello World!\") end");
-	}
-	
-	@Test
-	public void testMappings() {
-		// TODO
-	}
-	
-	@Test
-	public void testMapping() {
-		// TODO
-	}
+//	@Test
+//	public void testSite() {
+//		// TODO: Test this last
+//		//iterator = TestScanner.quickScan("index.html: home(\"Hello World!\") end");
+//	}
+//	
+//	@Test
+//	public void testMappings() {
+//		// TODO
+//	}
+//	
+//	@Test
+//	public void testMapping() {
+//		Mapping mapping = null;
+//		
+//		// Path with directory, mapping with arguments
+//		iterator = TestScanner.quickScan("home/index.html: home(\"Hello world!\")");
+//		parser = new SiteParser(iterator, exceptions);
+//		
+//		mapping = new Mapping();
+//		parser.visit(mapping);
+//		
+//		// Assertions
+//		assertTrue(exceptions.size() == 0);
+//		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
+//		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithArguments);
+//		
+//		// Path without directory, mapping without arguments
+//		iterator = TestScanner.quickScan("index.html: home");
+//		parser = new SiteParser(iterator, exceptions);
+//		
+//		mapping = new Mapping();
+//		parser.visit(mapping);
+//		
+//		// Assertions
+//		assertTrue(exceptions.size() == 0);
+//		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
+//		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithoutArguments);
+//	}
 	
 	@Test
 	public void testPath() {
