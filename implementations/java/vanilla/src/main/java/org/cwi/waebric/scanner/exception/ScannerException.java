@@ -1,6 +1,6 @@
 package org.cwi.waebric.scanner.exception;
 
-public class ScannerException extends Exception {
+public abstract class ScannerException extends Exception {
 
 	/**
 	 * Serial ID
@@ -13,16 +13,6 @@ public class ScannerException extends Exception {
 	 */
 	public ScannerException(String message) {
 		super(message);
-	}
-	
-	/**
-	 * 
-	 * @param symbol
-	 * @param line
-	 * @param t
-	 */
-	public ScannerException(Object symbol, int line, Throwable t) {
-		super("A problem occured while scanning '" + symbol.toString() + "', line " + line+ ".", t);
 	}
 	
 }

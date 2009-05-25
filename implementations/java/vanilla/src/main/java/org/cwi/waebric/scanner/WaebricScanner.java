@@ -57,43 +57,27 @@ public class WaebricScanner implements Iterable<Token> {
 		while(curr != StreamTokenizer.TT_EOF) {
 			switch(curr) {
 				case StreamTokenizer.TT_NUMBER:
-					try {
-						tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
-					} catch(Exception e) {
-						exceptions.add(new ScannerException(tokenizer.nval, tokenizer.lineno(), e.getCause()));
-					} break;
+					tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
+				break;
 				case StreamTokenizer.TT_WORD:
-					try {
-						// Separate keywords from identifiers
-						if(isKeyword(tokenizer.sval)) {
-							WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
-							tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
-						} else if(isIdentifier(tokenizer.sval)) {
-							tokens.add(new Token(tokenizer.sval, TokenSort.IDENTIFIER, tokenizer.lineno()));
-						} else {
-							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), null));
-						}
-					} catch(Exception e) {
-						exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
-					} break;
+					if(isKeyword(tokenizer.sval)) { // Waebric keyword
+						WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
+						tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
+					} else if(isIdentifier(tokenizer.sval)) { // Identifier
+						tokens.add(new Token(tokenizer.sval, TokenSort.IDENTIFIER, tokenizer.lineno()));
+					} else { // Unknown word
+						exceptions.add(new UnknownTokenException(tokenizer.sval, tokenizer.lineno()));
+					}
+				break;
 				case StreamTokenizer.TT_EOF: break;
 				case StreamTokenizer.TT_EOL: break;
 				default:
 					char c = (char) curr;
-					// Separate text from symbols
-					if(c == WaebricSymbol.DQUOTE) {
-						try {
-							tokens.add(new Token(tokenizer.sval, TokenSort.TEXT, tokenizer.lineno()));
-						} catch(Exception e) {
-							exceptions.add(new ScannerException(tokenizer.sval, tokenizer.lineno(), e.getCause()));
-						}	
-					} else if(isSymbol(c)) {
-						try {
-							tokens.add(new Token(c, TokenSort.SYMBOL, tokenizer.lineno()));
-						} catch(Exception e) {
-							exceptions.add(new ScannerException(c, tokenizer.lineno(), e.getCause()));
-						}
-					} else { // Character cannot be tokenized
+					if(c == WaebricSymbol.DQUOTE) { // Text
+						tokens.add(new Token(tokenizer.sval, TokenSort.TEXT, tokenizer.lineno()));
+					} else if(isSymbol(c)) { // Symbol
+						tokens.add(new Token(c, TokenSort.SYMBOL, tokenizer.lineno()));
+					} else { // Unknown character
 						exceptions.add(new UnknownTokenException(c, tokenizer.lineno()));
 					}
 				break;
