@@ -17,23 +17,19 @@ import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.MarkupWithArguments;
-import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
 public class MarkupParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
-	private final StatementParser statementParser;
 	
 	public MarkupParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Initialise sub parsers
+		// Initialize sub parsers
 		expressionParser = new ExpressionParser(tokens, exceptions);
-		statementParser = new StatementParser(tokens, exceptions);
 	}
 	
 	public void visit(Markup markup) {
@@ -65,11 +61,22 @@ public class MarkupParser extends AbstractParser {
 	
 	public void visit(Attributes attributes) {
 		while(tokens.hasNext()) {
-			Token peek = tokens.peek(1);
+			String lexeme = tokens.peek(1).getLexeme().toString();
 			
 			// Parse attribute
-			if(isAttribute(peek.getLexeme().toString())) {
-				Attribute attribute = null; // Initialise later
+			if(isAttribute(lexeme)) {
+				Attribute attribute = null;
+				if(lexeme.charAt(0) == WaebricSymbol.AT_SIGN) {
+					int index = lexeme.indexOf(WaebricSymbol.PERCENT_SIGN);
+					if(index != -1) {
+						attribute = new Attribute.AttributeDoubleNatCon();
+					} else {
+						attribute = new Attribute.AttributeNatCon();
+					}
+				} else {
+					// Initiate regular attribute based on first character
+					attribute = new Attribute.AttributeIdCon(lexeme.charAt(0));
+				}
 				visit(attribute);
 				attributes.add(attribute);
 			} else {
@@ -83,36 +90,35 @@ public class MarkupParser extends AbstractParser {
 	}
 	
 	public void visit(Attribute attribute) {
-		current = tokens.next();
+		current = tokens.next(); // Retrieve attribute
 		String lexeme = current.getLexeme().toString();
-		int second = -1; // Storing "%" char index
-		
-		if(attribute == null) { // Determine attribute type
-			if(lexeme.charAt(0) == WaebricSymbol.AT_SIGN) {
-				second = lexeme.indexOf("" + WaebricSymbol.PERCENT_SIGN);
-				if(second != -1) {
-					attribute = new Attribute.AttributeDoubleNatCon();
-				} else {
-					attribute = new Attribute.AttributeNatCon();
-				}
-			} else {
-				attribute = new Attribute.AttributeIdCon(lexeme.charAt(0));
-			}
-		}
 		
 		if(attribute instanceof AttributeIdCon) {
 			IdCon identifier = new IdCon(lexeme.substring(1));
 			((AttributeIdCon) attribute).setIdentifier(identifier);
 		} else if(attribute instanceof AttributeNatCon) {
-			NatCon number = new NatCon(Integer.parseInt(lexeme.substring(1)));
-			((AttributeNatCon) attribute).setNumber(number);
+			try {
+				int number = Integer.parseInt(lexeme.substring(1));
+				((AttributeNatCon) attribute).setNumber(new NatCon(number));
+			} catch(NumberFormatException e) {
+				exceptions.add(new ParserException(current.toString() + " is not a valid " +
+						"numeral attribute, use @number"));
+			}
 		} else if(attribute instanceof AttributeDoubleNatCon) {
-			NatCon number = new NatCon(Integer.parseInt(
-					lexeme.substring(1, second-1)));
-			((AttributeDoubleNatCon) attribute).setNumber(number);
-			NatCon secondNumber = new NatCon(Integer.parseInt(
-					lexeme.substring(second+1, lexeme.length()-1)));
-			((AttributeDoubleNatCon) attribute).setSecondNumber(secondNumber);
+			try {
+				int index = lexeme.indexOf(WaebricSymbol.PERCENT_SIGN);
+				
+				// Parse first number
+				int first = Integer.parseInt(lexeme.substring(1, index-1));
+				((AttributeDoubleNatCon) attribute).setNumber(new NatCon(first));
+				
+				// Parse second number
+				int second = Integer.parseInt(lexeme.substring(index+1, lexeme.length()-1));
+				((AttributeDoubleNatCon) attribute).setSecondNumber(new NatCon(second));
+			} catch(NumberFormatException e) {
+				exceptions.add(new ParserException(current.toString() + " is not a valid " +
+				"numeral attribute, use @number%number"));
+			}
 		}
 	}
 	
@@ -125,7 +131,13 @@ public class MarkupParser extends AbstractParser {
 				break; // End of arguments reached, break while
 			}
 			
-			Argument argument = null; // TODO: Determine which argument type
+			// Parse argument
+			Argument argument = null;
+			if(tokens.hasNext(2) && tokens.peek(2).equals(WaebricSymbol.EQUAL_SIGN)) {
+				argument = new Argument.ArgumentWithVar();
+			} else {
+				argument = new Argument.ArgumentWithoutVar();
+			}
 			visit(argument);
 			arguments.add(argument);
 			
@@ -141,11 +153,36 @@ public class MarkupParser extends AbstractParser {
 	public void visit(Argument argument) {
 		current = tokens.next(); // Retrieve argument
 		
+		if(argument instanceof Argument.ArgumentWithVar) {
+			Var var = new Var();
+			visit(var); // Parse variable
+			((Argument.ArgumentWithVar) argument).setVar(var);
+			
+			tokens.next(); // Skip equals sign
+		}
 		
+		// Parse expression
+		try {
+			Expression expression = ExpressionParser.getExpressionType(tokens.peek(1)).newInstance();
+			visit(expression);
+			argument.setExpression(expression);
+		} catch (InstantiationException e) {
+			e.printStackTrace(); // Should never occur
+		} catch (IllegalAccessException e) {
+			e.printStackTrace(); // Should never occur
+		}
 	}
 	
 	public void visit(Var var) {
+		current = tokens.next();
 		
+		if(! current.getSort().equals(TokenSort.IDENTIFIER)) {
+			exceptions.add(new ParserException(current.toString() + " is not a valid variable, " +
+					"variables need to start with a letter and contain no layout symbols."));
+			return; // Stop function from filling variable with invalid data
+		}
+		
+		var.setIdentifier(new IdCon(current.getLexeme().toString()));
 	}
 	
 	/**
@@ -154,14 +191,6 @@ public class MarkupParser extends AbstractParser {
 	 */
 	public void visit(Expression expression) {
 		expressionParser.visit(expression);
-	}
-	
-	/**
-	 * @see org.cwi.waebric.parser.StatementParser
-	 * @param statement
-	 */
-	public void visit(Statement statement) {
-		statementParser.visit(statement);
 	}
 
 }

@@ -18,6 +18,11 @@ public abstract class Argument implements ISyntaxNode {
 		this.expression = expression;
 	}
 
+	/**
+	 * Var "=" Expression -> Var
+	 * @author schagen
+	 *
+	 */
 	public static class ArgumentWithVar extends Argument {
 
 		private Var var;
@@ -40,6 +45,11 @@ public abstract class Argument implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * Expression -> Var
+	 * @author schagen
+	 *
+	 */
 	public static class ArgumentWithoutVar extends Argument {
 
 		public ISyntaxNode[] getChildren() {

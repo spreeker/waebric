@@ -57,7 +57,7 @@ public abstract class Expression implements ISyntaxNode {
 	}
 	
 	/**
-	 * Symbolcon -> Expression
+	 * SymbolCon -> Expression
 	 * @author schagen
 	 *
 	 */
@@ -143,11 +143,11 @@ public abstract class Expression implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class BracedExpressions extends Expression {
+	public static class ExpressionCollection extends Expression {
 
 		private SyntaxNodeListWithSeparator<Expression> expressions;
 		
-		public BracedExpressions() {
+		public ExpressionCollection() {
 			expressions = new SyntaxNodeListWithSeparator<Expression>("" + WaebricSymbol.COMMA);
 		}
 		
@@ -180,11 +180,11 @@ public abstract class Expression implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class BracedKeyValuePairs extends Expression {
+	public static class KeyValuePairCollection extends Expression {
 
 		private SyntaxNodeListWithSeparator<KeyValuePair> keyvaluepairs;
 		
-		public BracedKeyValuePairs() {
+		public KeyValuePairCollection() {
 			keyvaluepairs = new SyntaxNodeListWithSeparator<KeyValuePair>("" + WaebricSymbol.COMMA);
 		}
 		
