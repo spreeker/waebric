@@ -63,7 +63,14 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(Mapping mapping) {
-		Path path = null; // Initialised later as multiple alternatives are possible
+		Path path = null;
+		if(path == null) { // Determine path type based on look-ahead
+			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
+				path = new Path.PathWithDir();
+			} else {
+				path = new Path.PathWithoutDir();
+			}
+		}
 		visit(path);
 		mapping.setPath(path);
 		
@@ -81,14 +88,6 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(Path path) {
-		if(path == null) { // Determine path type based on look-ahead
-			if(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
-				path = new Path.PathWithDir();
-			} else {
-				path = new Path.PathWithoutDir();
-			}
-		}
-		
 		if(path instanceof Path.PathWithDir) {
 			DirName dir = new DirName();
 			visit(dir);
@@ -126,8 +125,8 @@ public class SiteParser extends AbstractParser {
 				return;
 			}
 			
-			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.SLASH)) {
-				return; // No more separator found, quit parsing directory
+			if(! tokens.hasNext(2) || isFileName(tokens.peek(2).getLexeme().toString())) {
+				return; // No more path element
 			}
 			
 			tokens.next(); // Skip slash separator
@@ -136,6 +135,10 @@ public class SiteParser extends AbstractParser {
 	
 	public static boolean isPathElement(String lexeme) {
 		return ! lexeme.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)");
+	}
+	
+	public static boolean isFileName(String lexeme) {
+		return lexeme.matches("(.*\\..*)");
 	}
 	
 	public void visit(FileName fileName) {
