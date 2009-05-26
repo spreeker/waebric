@@ -3,6 +3,7 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.expressions.Expression;
@@ -51,13 +52,16 @@ public class ExpressionParser extends AbstractParser {
 	}
 	
 	private void visit(Expression.NatExpression expression) {
-		current = tokens.next(); // Retrieve current value
-		NatCon natural = new NatCon(current.getLexeme().toString());
-		expression.setNatural(natural);
+		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
+			NatCon natural = new NatCon(current.getLexeme().toString());
+			expression.setNatural(natural);
+		}
 	}
 	
 	private void visit(Expression.TextExpression expression) {
-		// TODO
+		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
+			expression.setText(new StringLiteral(current.getLexeme().toString()));
+		}
 	}
 	
 	private void visit(Expression.SymbolExpression expression) {

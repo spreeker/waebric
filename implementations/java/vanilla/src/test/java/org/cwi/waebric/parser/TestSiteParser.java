@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.site.DirName;
 import org.cwi.waebric.parser.ast.site.Directory;
 import org.cwi.waebric.parser.ast.site.FileName;
 import org.cwi.waebric.parser.ast.site.Mapping;
@@ -52,34 +51,34 @@ public class TestSiteParser {
 		// TODO
 	}
 	
-//	@Test
-//	public void testMapping() {
-//		Mapping mapping = null;
-//		
-//		// Path with directory, mapping with arguments
-//		iterator = TestScanner.quickScan("home/index.html: home(\"Hello world!\")");
-//		parser = new SiteParser(iterator, exceptions);
-//		
-//		mapping = new Mapping();
-//		parser.visit(mapping);
-//		
-//		// Assertions
-//		assertTrue(exceptions.size() == 0);
-//		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
-//		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithArguments);
-//		
-//		// Path without directory, mapping without arguments
-//		iterator = TestScanner.quickScan("index.html: home");
-//		parser = new SiteParser(iterator, exceptions);
-//		
-//		mapping = new Mapping();
-//		parser.visit(mapping);
-//		
-//		// Assertions
-//		assertTrue(exceptions.size() == 0);
-//		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
-//		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithoutArguments);
-//	}
+	@Test
+	public void testMapping() {
+		Mapping mapping = null;
+		
+		// Path with directory, mapping with arguments
+		iterator = TestScanner.quickScan("home/index.html: home(\"Hello world!\")");
+		parser = new SiteParser(iterator, exceptions);
+		
+		mapping = new Mapping();
+		parser.visit(mapping);
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
+		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithArguments);
+		
+		// Path without directory, mapping without arguments
+		iterator = TestScanner.quickScan("index.html: home");
+		parser = new SiteParser(iterator, exceptions);
+		
+		mapping = new Mapping();
+		parser.visit(mapping);
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
+		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithoutArguments);
+	}
 	
 	@Test
 	public void testPath() {

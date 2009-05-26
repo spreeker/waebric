@@ -11,11 +11,6 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 public abstract class Markup implements ISyntaxNode {
 
 	protected Designator designator;
-	protected Arguments arguments;
-	
-	public Markup() {
-		arguments = new Arguments();
-	}
 	
 	/**
 	 * Retrieve designator
@@ -33,25 +28,31 @@ public abstract class Markup implements ISyntaxNode {
 		this.designator = designator;
 	}
 
-	/**
-	 * Retrieve arguments
-	 * @return
-	 */
-	public Arguments getArguments() {
-		return arguments;
-	}
-
-	/**
-	 * Add argument
-	 * @param argument
-	 * @return success
-	 */
-	public boolean addArgument(Argument argument) {
-		return arguments.add(argument);
-	}
-
 	public static class MarkupWithArguments extends Markup {
 
+		protected Arguments arguments;
+
+		public MarkupWithArguments() {
+			arguments = new Arguments();
+		}
+		
+		/**
+		 * Retrieve arguments
+		 * @return
+		 */
+		public Arguments getArguments() {
+			return arguments;
+		}
+
+		/**
+		 * Add argument
+		 * @param argument
+		 * @return success
+		 */
+		public boolean addArgument(Argument argument) {
+			return arguments.add(argument);
+		}
+		
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { arguments, designator };
 		}

@@ -40,7 +40,7 @@ public class MarkupParser extends AbstractParser {
 		
 		// Parse arguments
 		if(markup instanceof MarkupWithArguments) {
-			visit(markup.getArguments());
+			visit(((MarkupWithArguments) markup).getArguments());
 		}
 	}
 	
@@ -128,11 +128,10 @@ public class MarkupParser extends AbstractParser {
 	}
 	
 	public void visit(Arguments arguments) {
-		current = tokens.next(); // Skip left parenthesis
+		next("arguments opening paranthesis", "\"(\" arguments", "" + WaebricSymbol.LPARANTHESIS);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-				current = tokens.next(); // Skip right parenthesis
 				break; // End of arguments reached, break while
 			}
 			
@@ -143,21 +142,20 @@ public class MarkupParser extends AbstractParser {
 			} else {
 				argument = new Argument.ArgumentWithoutVar();
 			}
+			
 			visit(argument);
 			arguments.add(argument);
 			
-			current = tokens.next(); // Skip comma separator
+			// If not end of arguments, comma is expected
+			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+				next("arguments separator", "argument \",\" argument", "" + WaebricSymbol.COMMA);
+			}
 		}
 		
-		if(! current.getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-			exceptions.add(new ParserException(current.toString() + " missing arguments " +
-					"closure token, use \")\""));
-		}
+		next("arguments closing paranthesis", "arguments \")\"", "" + WaebricSymbol.RPARANTHESIS);
 	}
 	
 	public void visit(Argument argument) {
-		current = tokens.next(); // Retrieve argument
-		
 		if(argument instanceof Argument.ArgumentWithVar) {
 			Var var = new Var();
 			visit(var); // Parse variable
