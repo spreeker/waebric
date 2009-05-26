@@ -12,7 +12,6 @@ import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -98,20 +97,9 @@ public class ModuleParser extends AbstractParser {
 	}
 	
 	public void visit(Import imprt) {
-		if(! tokens.hasNext()) {
-			exceptions.add(new ParserException(current.toString() + " has no module identifier."));
-			return;
-		}
-		
-		Token peek = tokens.peek(1);
-		if(peek.getSort() == TokenSort.IDENTIFIER) {
-			ModuleId identifier = new ModuleId();
-			visit(identifier);
-			imprt.setIdentifier(identifier);
-		} else {
-			exceptions.add(new ParserException(peek.toString() + " is not a module identifier."));
-			return;
-		}
+		ModuleId identifier = new ModuleId();
+		visit(identifier);
+		imprt.setIdentifier(identifier);
 	}
 	
 	/**
