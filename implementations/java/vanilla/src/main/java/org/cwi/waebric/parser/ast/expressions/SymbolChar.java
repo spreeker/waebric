@@ -30,7 +30,6 @@ public class SymbolChar implements ISyntaxNode {
 		return literal.toString();
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { literal };
 	}
