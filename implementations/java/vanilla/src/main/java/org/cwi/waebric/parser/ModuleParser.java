@@ -12,6 +12,7 @@ import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -42,8 +43,7 @@ public class ModuleParser extends AbstractParser {
 				visit(module);
 				modules.add(module);
 			} else {
-				exceptions.add(new ParserException(
-						current.toString() + " is placed outside module."));
+				exceptions.add(new UnexpectedTokenException(current, "module", "module identifier"));
 			}
 		}
 	}
@@ -75,8 +75,8 @@ public class ModuleParser extends AbstractParser {
 				visit(def);
 				module.addElement(def);
 			} else {
-				exceptions.add(new ParserException(current.toString() + " is not a valid module keyword, " +
-						"expected \"import\", \"site\" or \"def\"."));
+				exceptions.add(new UnexpectedTokenException(
+						current, "module keyword", "\"import\", \"site\" or \"def\""));
 			}
 		}	
 	}

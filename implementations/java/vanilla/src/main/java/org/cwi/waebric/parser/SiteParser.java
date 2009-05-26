@@ -15,6 +15,7 @@ import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -51,8 +52,7 @@ public class SiteParser extends AbstractParser {
 			if(WaebricParser.isKeyword(current, WaebricKeyword.END)) {
 				break; // End token reached, stop parsing mappings
 			} else if(! current.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				exceptions.add(new ParserException(current.toString() + " is not a valid " +
-						"mapping separator, use \";\""));
+				exceptions.add(new UnexpectedTokenException(current, "mapping separator", ";"));
 			}
 		}
 	}
@@ -117,8 +117,8 @@ public class SiteParser extends AbstractParser {
 			if(isPathElement(element)) {
 				directory.add(new PathElement(element));
 			} else {
-				exceptions.add(new ParserException(current.toString() + " is an invalid path element," +
-						"refrain from using white spaces, layout symbols, periods and backward slashes."));
+				exceptions.add(new UnexpectedTokenException(current, " path element,", 
+						"identifier without white spaces, layout symbols, periods and backward slashes"));
 				return;
 			}
 		}

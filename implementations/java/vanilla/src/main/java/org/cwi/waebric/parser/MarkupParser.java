@@ -18,6 +18,7 @@ import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.MarkupWithArguments;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -32,6 +33,10 @@ public class MarkupParser extends AbstractParser {
 		expressionParser = new ExpressionParser(tokens, exceptions);
 	}
 	
+	/**
+	 * 
+	 * @param markup
+	 */
 	public void visit(Markup markup) {
 		// Parse designator
 		Designator designator = new Designator();
@@ -44,6 +49,10 @@ public class MarkupParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param designator
+	 */
 	public void visit(Designator designator) {
 		current = tokens.next(); // Retrieve identifier
 		
@@ -52,22 +61,26 @@ public class MarkupParser extends AbstractParser {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
 		} else {
-			exceptions.add(new ParserException(current.toString() + " is not " +
-					"a valid designator identifier."));
+			exceptions.add(new UnexpectedTokenException(
+					current, "designator identifier", "identifier"));
 		}
 		
 		// Parse attributes
 		visit(designator.getAttributes());
 	}
 	
+	/**
+	 * 
+	 * @param attributes
+	 */
 	public void visit(Attributes attributes) {
 		while(tokens.hasNext()) {
-			// Retrieve lookahead on next symbol
+			// Look-ahead for attribute symbol
 			String peek = tokens.peek(1).getLexeme().toString();
 			if(peek.length() != 1) { break; }
 			char symbol = peek.charAt(0);
 			
-			// Determine attribute type
+			// Determine attribute type based on retrieved symbol
 			Attribute attribute = null; 
 			if(symbol == WaebricSymbol.AT_SIGN) {
 				if(tokens.hasNext(3) && tokens.peek(3).getLexeme().equals(WaebricSymbol.PERCENT_SIGN)) {
@@ -80,15 +93,16 @@ public class MarkupParser extends AbstractParser {
 			}  else {
 				break; // Non attribute symbol found, break while
 			}
-				
-			visit(attribute); // Parse attribute
+			
+			// Parse attribute
+			visit(attribute);
 			attributes.add(attribute);
 			
 			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
-				break; // No more separator, thus end of attributes
+				break; // Out of comma separators, thus end of attributes
+			} else {
+				tokens.next(); // Skip comma
 			}
-			
-			tokens.next(); // Skip comma
 		}
 	}
 	
@@ -97,37 +111,43 @@ public class MarkupParser extends AbstractParser {
 	}
 	
 	public void visit(Attribute attribute) {
-		tokens.next(); // Skip attribute symbol
+		next("attribute symbol", "# . $ @", TokenSort.SYMBOL); // Process first separator
 		
 		current = tokens.next(); // Retrieve value
 		if(attribute instanceof AttributeIdCon) {
+			// Identifier attribute
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			((AttributeIdCon) attribute).setIdentifier(identifier);
 		} else if(attribute instanceof AttributeNatCon) {
 			try {
+				// Natural attribute
 				NatCon number = new NatCon(current.getLexeme().toString());
 				((AttributeNatCon) attribute).setNumber(number);
 			} catch(NumberFormatException e) {
-				exceptions.add(new ParserException(current.toString() + " is not a valid " +
-						"numeral attribute, use @number"));
+				exceptions.add(new UnexpectedTokenException(
+						current, "numeral attribute", "\"@\" number"));
 			}
 		}
 		
 		// Double natural attribute
 		if(attribute instanceof AttributeDoubleNatCon) {
-			tokens.next(); // Skip percentage symbol
+			// Process second separator "%"
+			next("double natural attribute separator", "%", "" + WaebricSymbol.PERCENT_SIGN);
+			
 			try {
+				// Parse second value
 				current = tokens.next();
 				NatCon second = new NatCon(current.getLexeme().toString());
 				((AttributeDoubleNatCon) attribute).setSecondNumber(second);
 			} catch(NumberFormatException e) {
-				exceptions.add(new ParserException(current.toString() + " is not a valid " +
-				"numeral attribute, use @number%number"));
+				exceptions.add(new UnexpectedTokenException(
+						current, "numeral attribute", "\"@\" number \"%\" number"));
 			}
 		}
 	}
 	
 	public void visit(Arguments arguments) {
+		// Parse arguments opening token "("
 		next("arguments opening paranthesis", "\"(\" arguments", "" + WaebricSymbol.LPARANTHESIS);
 		
 		while(tokens.hasNext()) {
@@ -135,44 +155,43 @@ public class MarkupParser extends AbstractParser {
 				break; // End of arguments reached, break while
 			}
 			
-			// Parse argument
 			Argument argument = null;
+			
+			// Determine argument type based on lookahead
 			if(tokens.hasNext(2) && tokens.peek(2).equals(WaebricSymbol.EQUAL_SIGN)) {
 				argument = new Argument.ArgumentWithVar();
 			} else {
 				argument = new Argument.ArgumentWithoutVar();
 			}
 			
+			// Parse argument
 			visit(argument);
 			arguments.add(argument);
 			
-			// If not end of arguments, comma is expected
+			// While not end of arguments, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				next("arguments separator", "argument \",\" argument", "" + WaebricSymbol.COMMA);
 			}
 		}
 		
+		// Parse arguments closing token ")"
 		next("arguments closing paranthesis", "arguments \")\"", "" + WaebricSymbol.RPARANTHESIS);
 	}
 	
 	public void visit(Argument argument) {
 		if(argument instanceof Argument.ArgumentWithVar) {
+			// Parse variable
 			Var var = new Var();
-			visit(var); // Parse variable
+			visit(var); 
 			((Argument.ArgumentWithVar) argument).setVar(var);
 			
 			tokens.next(); // Skip equals sign
 		}
 		
-		try { // Parse expression
-			Expression expression = ExpressionParser.getExpressionType(tokens.peek(1)).newInstance();
-			visit(expression);
-			argument.setExpression(expression);
-		} catch (InstantiationException e) {
-			e.printStackTrace(); // Should never occur
-		} catch (IllegalAccessException e) {
-			e.printStackTrace(); // Should never occur
-		}
+		// Parse expression
+		Expression expression = ExpressionParser.newExpression(tokens.peek(1));
+		visit(expression);
+		argument.setExpression(expression);
 	}
 	
 	/**

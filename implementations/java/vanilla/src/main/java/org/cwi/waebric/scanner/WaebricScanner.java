@@ -153,7 +153,7 @@ public class WaebricScanner implements Iterable<Token> {
 		
 		// All characters in the body should be letters or digits
 		for(char c : chars) {
-			if(!(isLetter(c) || isDigit(c) || c == '.')) { return false; }
+			if(!(isLetter(c) || isDigit(c))) { return false; }
 		}
 		
 		return true;

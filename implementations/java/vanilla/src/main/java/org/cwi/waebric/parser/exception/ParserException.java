@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.exception;
 
-public class ParserException extends Exception {
+public abstract class ParserException extends Exception {
 
 	/**
 	 * Serial ID
