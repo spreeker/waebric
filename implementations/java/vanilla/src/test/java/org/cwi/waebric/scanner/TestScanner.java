@@ -58,7 +58,7 @@ public class TestScanner {
 	
 	@Test
 	public void testScanIdentifier() {
-		iterator = quickScan("identifier1 html module1.identifier identifier2");
+		iterator = quickScan("identifier1 html identifier2");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(TokenSort.IDENTIFIER));
@@ -94,7 +94,7 @@ public class TestScanner {
 	
 	@Test
 	public void testScanSymbol() {
-		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? /");
+		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? / .");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(TokenSort.SYMBOL));

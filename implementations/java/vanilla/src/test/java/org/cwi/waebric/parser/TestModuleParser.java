@@ -37,6 +37,23 @@ public class TestModuleParser {
 	}
 	
 	@Test
+	public void testModuleId() {
+		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
+		parser = new ModuleParser(iterator, exceptions);
+		
+		ModuleId moduleId = new ModuleId();
+		parser.visit(moduleId);
+		
+		// Assertions
+		assertTrue(exceptions.size() == 0);
+		assertTrue(moduleId.getChildren().length == 7); // Four elements and three period separators
+		assertTrue(moduleId.getIdentifierElements()[0].equals("org"));
+		assertTrue(moduleId.getIdentifierElements()[1].equals("cwi"));
+		assertTrue(moduleId.getIdentifierElements()[2].equals("waebric"));
+		assertTrue(moduleId.getIdentifierElements()[3].equals("mymodule"));
+	}
+	
+	@Test
 	public void testModules() {
 		iterator = TestScanner.quickScan("module mymodule1\nmodule mymodule2");
 		parser = new ModuleParser(iterator, exceptions);
@@ -66,13 +83,6 @@ public class TestModuleParser {
 		assertTrue(module.getChildren()[0].equals("module"));
 		assertTrue(module.getChildren()[1] instanceof ModuleId);
 		
-		ModuleId identifier = (ModuleId) module.getChildren()[1];
-		assertTrue(identifier.getChildren().length == 7); // Four elements and three period separators
-		assertTrue(identifier.getIdentifierElements()[0].equals("org"));
-		assertTrue(identifier.getIdentifierElements()[1].equals("cwi"));
-		assertTrue(identifier.getIdentifierElements()[2].equals("waebric"));
-		assertTrue(identifier.getIdentifierElements()[3].equals("mymodule"));
-		
 		// TODO: Invalid identifier
 		// TODO: Invalid keyword
 	}
@@ -89,13 +99,6 @@ public class TestModuleParser {
 		assertTrue(exceptions.size() == 0);
 		assertTrue(imprt.getChildren()[0].equals("import"));
 		assertTrue(imprt.getChildren()[1] instanceof ModuleId);
-		
-		ModuleId identifier = (ModuleId) imprt.getChildren()[1];
-		assertTrue(identifier.getChildren().length == 7); // Four elements and three period separators
-		assertTrue(identifier.getIdentifierElements()[0].equals("org"));
-		assertTrue(identifier.getIdentifierElements()[1].equals("cwi"));
-		assertTrue(identifier.getIdentifierElements()[2].equals("waebric"));
-		assertTrue(identifier.getIdentifierElements()[3].equals("mymodule"));
 		
 		// TODO: Invalid identifier
 	}

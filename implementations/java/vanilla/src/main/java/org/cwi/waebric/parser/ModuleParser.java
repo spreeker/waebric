@@ -58,7 +58,7 @@ public class ModuleParser extends AbstractParser {
 		// Module elements
 		while(tokens.hasNext()) {
 			if(WaebricParser.isKeyword(tokens.peek(1), WaebricKeyword.MODULE)) { 
-				break; // Break back to modules visit, so no exceptions are thrown
+				break; // Break current module parse, as new module is recognized
 			}
 			
 			// Delegate to element visitors
@@ -83,21 +83,17 @@ public class ModuleParser extends AbstractParser {
 	}
 	
 	public void visit(ModuleId moduleId) {
-		if(! tokens.hasNext()) {
-			exceptions.add(new ParserException(current.toString() + " has no module identifier."));
-			return;
-		}
-		
-		current = tokens.next();
-		if(current.getSort() == TokenSort.IDENTIFIER) {
-			String[] identifiers = current.getLexeme().toString().split("\\" + WaebricSymbol.PERIOD);
-			for(String identifier: identifiers) {
-				moduleId.addIdentifierElement(new IdCon(identifier));
+		while(tokens.hasNext()) {
+			if(next("module identifier", TokenSort.IDENTIFIER)) {
+				moduleId.addIdentifierElement(new IdCon(current.getLexeme().toString()));
 			}
-		} else {
-			exceptions.add(new ParserException(current.toString() + " is not a module identifier," +
-					"use words separated by periods."));
-			return;
+			
+			// Parse period separator
+			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				tokens.next(); // Skip comma separator
+			} else {
+				break; // No more separator, quit parsing
+			}
 		}
 	}
 	
