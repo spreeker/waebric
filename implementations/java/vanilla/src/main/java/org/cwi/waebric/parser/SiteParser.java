@@ -14,7 +14,6 @@ import org.cwi.waebric.parser.ast.site.Mappings;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
-import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -88,8 +87,6 @@ public class SiteParser extends AbstractParser {
 			DirName dir = new DirName();
 			visit(dir);
 			path.setDirName(dir);
-			
-			current = tokens.next(); // Skip slash symbol
 		}
 		
 		FileName file = new FileName();
@@ -104,14 +101,18 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(Directory directory) {
-		if(! tokens.hasNext()) {
-			return; // Empty directory
-		}
-		
 		while(tokens.hasNext()) {
-			current = tokens.next(); // Retrieve token
+			// Parse path separator (slash)
+			if(directory.getElements().length != 0) {
+				next("directory separator", "slash", "" + WaebricSymbol.SLASH);
+			}
 			
-			// Attempt parsing and storing path element
+			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				break; // File name identified, stop parsing directory
+			}
+			
+			// Parse path element
+			current = tokens.next();
 			String element = current.getLexeme().toString();
 			if(isPathElement(element)) {
 				directory.add(new PathElement(element));
@@ -120,12 +121,6 @@ public class SiteParser extends AbstractParser {
 						"refrain from using white spaces, layout symbols, periods and backward slashes."));
 				return;
 			}
-			
-			if(! tokens.hasNext(2) || isFileName(tokens.peek(2).getLexeme().toString())) {
-				return; // File name is next, thus directory has ended
-			}
-			
-			tokens.next(); // Skip slash separator
 		}
 	}
 	
@@ -133,25 +128,11 @@ public class SiteParser extends AbstractParser {
 		return ! lexeme.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)");
 	}
 	
-	public static boolean isFileName(String lexeme) {
-		return lexeme.matches("(.*\\..*)");
-	}
-	
 	public void visit(FileName fileName) {
-		if(! tokens.hasNext()) {
-			exceptions.add(new MissingTokenException(current, "file name", "name \".\" extension"));
+		// Parse name
+		if(next("file name", "name \".\" extension", TokenSort.IDENTIFIER)) {
+			fileName.setName(new PathElement(current.getLexeme().toString()));
 		}
-		
-		// Build file name
-		String name = "";
-		while(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.PERIOD)) {
-			current = tokens.next();
-			if(! name.equals("")) { name += WaebricSymbol.PERIOD; }
-			name += current.getLexeme().toString();
-		}
-		
-		// Parse file name
-		fileName.setName(new PathElement(current.getLexeme().toString()));
 		
 		// Parse period separator
 		next("period", "name \".\" extension", "" + WaebricSymbol.PERIOD);

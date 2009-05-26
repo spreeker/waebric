@@ -6,9 +6,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.site.DirName;
 import org.cwi.waebric.parser.ast.site.Directory;
 import org.cwi.waebric.parser.ast.site.FileName;
+import org.cwi.waebric.parser.ast.site.Mapping;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.Path.PathWithDir;
 import org.cwi.waebric.parser.ast.site.Path.PathWithoutDir;
@@ -39,17 +41,17 @@ public class TestSiteParser {
 		iterator = null;
 	}
 	
-//	@Test
-//	public void testSite() {
-//		// TODO: Test this last
-//		//iterator = TestScanner.quickScan("index.html: home(\"Hello World!\") end");
-//	}
-//	
-//	@Test
-//	public void testMappings() {
-//		// TODO
-//	}
-//	
+	@Test
+	public void testSite() {
+		// TODO: Test this last
+		//iterator = TestScanner.quickScan("index.html: home(\"Hello World!\") end");
+	}
+	
+	@Test
+	public void testMappings() {
+		// TODO
+	}
+	
 //	@Test
 //	public void testMapping() {
 //		Mapping mapping = null;
@@ -112,18 +114,18 @@ public class TestSiteParser {
 		assertTrue(pathf.getFileName().getExt().equals("wae"));
 	}
 	
-	@Test
-	public void testDirName() {
-		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
-		parser = new SiteParser(iterator, exceptions);
-		
-		DirName name = new DirName();
-		parser.visit(name); // Parse directory name
-		
-		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(name.getDirectory() instanceof Directory);
-	}
+//	@Test
+//	public void testDirName() {
+//		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
+//		parser = new SiteParser(iterator, exceptions);
+//		
+//		DirName name = new DirName();
+//		parser.visit(name); // Parse directory name
+//		
+//		// Assertions
+//		assertTrue(exceptions.size() == 0);
+//		assertTrue(name.getDirectory() instanceof Directory);
+//	}
 
 	@Test
 	public void testFileName() {
@@ -155,12 +157,6 @@ public class TestSiteParser {
 		assertTrue(directory.getElements()[2].equals("waebric"));
 		assertTrue(directory.getElements()[3].equals("java"));
 		assertTrue(directory.getElements()[4].equals("vanilla"));
-	}
-	
-	@Test
-	public void testIsFileName() {
-		assertTrue(SiteParser.isFileName("myfile.wae"));
-		assertFalse(SiteParser.isFileName("myfile"));
 	}
 	
 	@Test
