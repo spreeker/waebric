@@ -10,7 +10,6 @@ import org.cwi.waebric.parser.ast.expressions.KeyValuePair;
 import org.cwi.waebric.parser.ast.expressions.SymbolCon;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.parser.exception.UnclosedCollectionException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -74,17 +73,17 @@ public class ExpressionParser extends AbstractParser {
 		expression.setExpression(subExpression);
 
 		// Parse period separator
-		next("period", "" + WaebricSymbol.PERIOD);
+		next("period", "expression \".\" identifier","" + WaebricSymbol.PERIOD);
 
 		// Parse identifier
-		if(next("period", TokenSort.IDENTIFIER)) {
+		if(next("period", "expression \".\" identifier", TokenSort.IDENTIFIER)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			expression.setIdentifier(identifier); // Store identifier
 		}
 	}
 	
 	private void visit(Expression.ExpressionCollection expression) {
-		next("expression collection opening bracket", "" + WaebricSymbol.LBRACKET);
+		next("expression collection opening", "\"[\" expressions","" + WaebricSymbol.LBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
@@ -92,7 +91,7 @@ public class ExpressionParser extends AbstractParser {
 			}
 			
 			// Parse sub expression
-			Expression subExpression = newExpression(current);
+			Expression subExpression = newExpression(tokens.peek(1));
 			visit(subExpression);
 			expression.addExpression(subExpression);
 			
@@ -104,13 +103,11 @@ public class ExpressionParser extends AbstractParser {
 			}
 		}
 		
-		if(! current.getLexeme().equals(WaebricSymbol.COMMA)) {
-			exceptions.add(new UnclosedCollectionException(current, "expression", "}"));
-		}
+		next("expression collection closure", "expressions \"]\"", "" + WaebricSymbol.RBRACKET);
 	}
 	
 	private void visit(Expression.KeyValuePairCollection expression) {
-		next("key value pair collection opening bracket", "" + WaebricSymbol.LCBRACKET);
+		next("key value pair collection opening", "\"{\" pairs", "" + WaebricSymbol.LCBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -130,20 +127,18 @@ public class ExpressionParser extends AbstractParser {
 			}
 		}
 		
-		if(! current.getLexeme().equals(WaebricSymbol.COMMA)) {
-			exceptions.add(new UnclosedCollectionException(current, "key value pair", "}"));
-		}
+		next("key value pair collection closure", "pairs \"}\"", "" + WaebricSymbol.RCBRACKET);
 	}
 	
 	private void visit(KeyValuePair pair) {
 		// Parse identifier
-		if(next("identifier", TokenSort.IDENTIFIER)) {
+		if(next("identifier", "identifier \":\" expression", TokenSort.IDENTIFIER)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			pair.setIdentifier(identifier);
 		}
 		
 		// Parse separator
-		next("colon", "" + WaebricSymbol.COLON);
+		next("colon", "identifier \":\" expression", "" + WaebricSymbol.COLON);
 		
 		// Parse expression
 		Expression expression = newExpression(tokens.peek(1));
@@ -152,12 +147,12 @@ public class ExpressionParser extends AbstractParser {
 	}
 
 	private void visit(SymbolCon symbol) {
-		next("symbol opening quote", "" + WaebricSymbol.SQUOTE);
+		next("symbol opening quote", "\"'\" characters","" + WaebricSymbol.SQUOTE);
 		// TODO: Figure out how to stop loop
 	}
 
 	public void visit(Var var) {
-		if(next("identifier", TokenSort.IDENTIFIER)) {
+		if(next("identifier", "identifier",TokenSort.IDENTIFIER)) {
 			var.setIdentifier(new IdCon(current.getLexeme().toString()));
 		}
 	}

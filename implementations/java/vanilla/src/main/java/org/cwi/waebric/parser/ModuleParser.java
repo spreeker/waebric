@@ -83,7 +83,7 @@ public class ModuleParser extends AbstractParser {
 	
 	public void visit(ModuleId moduleId) {
 		while(tokens.hasNext()) {
-			if(next("module identifier", TokenSort.IDENTIFIER)) {
+			if(next("module identifier", "identifier", TokenSort.IDENTIFIER)) {
 				moduleId.addIdentifierElement(new IdCon(current.getLexeme().toString()));
 			}
 			

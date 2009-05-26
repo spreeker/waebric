@@ -27,24 +27,32 @@ public abstract class AbstractParser {
 		this.tokens = tokens;
 	}
 	
+	protected boolean next(String name, String expected) {
+		if(tokens.hasNext()) {
+			current = tokens.next();
+			return true;
+		} else {
+			exceptions.add(new MissingTokenException(current, name, expected));
+			return false;
+		}
+	}
+	
 	/**
 	 * Created to prevent code overflows in parse functionality
 	 * @param name
 	 * @param sort
 	 * @return
 	 */
-	protected boolean next(String name, TokenSort sort) {
-		final String EXPECTED = sort.name().toLowerCase();
-		
+	protected boolean next(String name, String expected, TokenSort sort) {
 		if(tokens.hasNext()) {
 			current = tokens.next();
 			if(current.getSort() == sort) {
 				return true; // Successfully recognized token
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, name, EXPECTED));
+				exceptions.add(new UnexpectedTokenException(current, name, expected));
 			}
 		} else {
-			exceptions.add(new MissingTokenException(current, name, EXPECTED));
+			exceptions.add(new MissingTokenException(current, name, expected));
 		}
 		
 		return false;
@@ -56,16 +64,16 @@ public abstract class AbstractParser {
 	 * @param lexeme
 	 * @return
 	 */
-	protected boolean next(String name, String lexeme) {
+	protected boolean next(String name, String expected, String lexeme) {
 		if(tokens.hasNext()) {
 			current = tokens.next();
 			if(current.getLexeme().toString().equals(lexeme)) {
 				return true; // Successfully recognized token
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, name, lexeme));
+				exceptions.add(new UnexpectedTokenException(current, name, expected));
 			}
 		} else {
-			exceptions.add(new MissingTokenException(current, name, lexeme));
+			exceptions.add(new MissingTokenException(current, name, expected));
 		}
 		
 		return false;

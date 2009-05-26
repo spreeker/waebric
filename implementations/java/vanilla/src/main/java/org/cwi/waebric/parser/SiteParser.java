@@ -14,9 +14,10 @@ import org.cwi.waebric.parser.ast.site.Mappings;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
+import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
  * Site parser
@@ -36,13 +37,8 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(Site site) {
-		Token start = current; // Store site token for error reporting
-		visit(site.getMappings());
-		
-		if(! WaebricParser.isKeyword(current, WaebricKeyword.END)) {
-			exceptions.add(new ParserException(start.toString() + " is never closed, use \"end\"."));
-			return;
-		}
+		visit(site.getMappings()); // Parse mappings
+		next("site end", "site mappings end", "" + WaebricKeyword.END);
 	}
 	
 	public void visit(Mappings mappings) {
@@ -74,12 +70,7 @@ public class SiteParser extends AbstractParser {
 		mapping.setPath(path);
 		
 		// Retrieve colon separator
-		current = tokens.next();
-		if(! current.getLexeme().equals(WaebricSymbol.COLON)) {
-			exceptions.add(new ParserException(current.toString() + " is not a valid mapping " +
-					"syntax, use: path \":\" markup."));
-			return;
-		}
+		next("mapping separator", "path \":\" markup", "" + WaebricSymbol.COLON);
 		
 		Markup markup = null;
 		// Determine mark-up type based on look-ahead
@@ -147,26 +138,27 @@ public class SiteParser extends AbstractParser {
 	}
 	
 	public void visit(FileName fileName) {
-		current = tokens.next();
+		if(! tokens.hasNext()) {
+			exceptions.add(new MissingTokenException(current, "file name", "name \".\" extension"));
+		}
 		
-		String lexeme = current.getLexeme().toString();
-		int index = lexeme.lastIndexOf(WaebricSymbol.PERIOD); // Retrieve latest slash index
-		if(index != -1) {
-			String name = lexeme.substring(0, index);
-			fileName.setName(new PathElement(name));
-			
-			if(index+1 == lexeme.length()) { // Filter empty file extensions
-				exceptions.add(new ParserException(current.toString() + " has an empty file extension, " +
-				"use name \".\" extension"));
-				return;
-			}
-			
-			String ext = lexeme.substring(index+1, lexeme.length());
-			fileName.setExt(new FileExt(ext));
-		} else {
-			exceptions.add(new ParserException(current.toString() + " is an invalid filename, " +
-				"use name \".\" extension"));
-			return;
+		// Build file name
+		String name = "";
+		while(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.PERIOD)) {
+			current = tokens.next();
+			if(! name.equals("")) { name += WaebricSymbol.PERIOD; }
+			name += current.getLexeme().toString();
+		}
+		
+		// Parse file name
+		fileName.setName(new PathElement(current.getLexeme().toString()));
+		
+		// Parse period separator
+		next("period", "name \".\" extension", "" + WaebricSymbol.PERIOD);
+		
+		// Parse extension
+		if(next("file extension", "name \".\" extension", TokenSort.IDENTIFIER)) {
+			fileName.setExt(new FileExt(current.getLexeme().toString()));
 		}
 	}
 	

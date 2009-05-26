@@ -10,8 +10,8 @@ public class UnexpectedTokenException extends ParserException {
 	private static final long serialVersionUID = -3943077437342399851L;
 
 	public UnexpectedTokenException(Token found, String name,String expected) {
-		super(found.getLexeme() + " at line " + found.getLine() + " is not a valid " + 
-				name + ", " + expected + " was expected.");
+		super("Unexpected token " + found.toString() + " is not a valid " + name +
+				", use the expected: " + expected); 
 	}
 	
 }

@@ -10,8 +10,7 @@ public class MissingTokenException extends ParserException {
 	private static final long serialVersionUID = 8718366239518956356L;
 
 	public MissingTokenException(Token previous, String name, String expected) {
-		super(previous.getLexeme() + " at line " + previous.getLine() + " misses " +
-				"required " + name + " token, use: " + expected +".");
+		super(name + " is missing after " + previous.toString() + ", attach the expected: " + expected);
 	}
 	
 }

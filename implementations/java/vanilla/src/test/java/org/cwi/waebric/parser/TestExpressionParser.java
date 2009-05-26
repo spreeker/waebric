@@ -63,7 +63,7 @@ public class TestExpressionParser {
 	
 	@Test
 	public void testExpressionCollection() {
-		iterator = TestScanner.quickScan("[variable1,variabl2]");
+		iterator = TestScanner.quickScan("[variable1,variable2]");
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.ExpressionCollection expression = new Expression.ExpressionCollection();
