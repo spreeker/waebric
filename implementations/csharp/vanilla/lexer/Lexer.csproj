@@ -8,7 +8,7 @@
     <ProjectGuid>{E9AB8C47-6F18-444E-81CD-9A932E751CE4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>lexer</RootNamespace>
+    <RootNamespace>Lexer</RootNamespace>
     <AssemblyName>lexer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Tokenizer\StreamTokenizer.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="Tokenizer\StreamTokenizerException.cs" />
     <Compile Include="WaebricLexer.cs" />
     <Compile Include="TestLexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

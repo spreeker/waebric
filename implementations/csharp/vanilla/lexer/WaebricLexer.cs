@@ -32,9 +32,11 @@ namespace Lexer
         public void LexicalizeStream()
         {
             StreamTokenizer tokenizer = new StreamTokenizer(Stream);
+
+            TokenStream.Clear(); //Clean stream before inserting items
             
-            //start with building tokenstream
-            int[] whitespaces = {'\t', ' '};
+            // TODO: Fix whitespace hard coding on this way
+            int[] whitespaces = { '\t', ' ' };
             tokenizer.WhitespaceChars(whitespaces);
             int token;
             token = tokenizer.NextToken();
@@ -43,19 +45,19 @@ namespace Lexer
                 switch (token)
                 {
                     case StreamTokenizer.ST_EOL: // ignore EOL
-                        break; 
+                        break;
                     case StreamTokenizer.ST_WORD: // check word to determine type
                         if (IsKeyword(tokenizer.GetTextValue())) // Is keyword
                         {
                             TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.KEYWORD, tokenizer.GetScannedLines()));
                         }
-                        else if(IsIdentifier(tokenizer.GetTextValue()))
+                        else if (IsIdentifier(tokenizer.GetTextValue()))
                         {
                             TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.IDENTIFIER, tokenizer.GetScannedLines()));
                         }
                         else
                         {
-                            //exception handling
+                            throw new StreamTokenizerException("Invalid token: " + token, tokenizer.GetScannedLines());
                         }
                         break;
                     case StreamTokenizer.ST_NUMBER: // numeric value
@@ -72,34 +74,33 @@ namespace Lexer
                         }
                         else
                         {
-                            //Exception Handling
+                            throw new StreamTokenizerException("Invalid token: " + token, tokenizer.GetScannedLines());
                         }
                         break;
                 }
                 token = tokenizer.NextToken();
             }
-            System.Console.WriteLine("Lines readed: " + tokenizer.GetScannedLines());
-            //return "";
         }
 
-        public bool IsDigit(char c)
+        /// <summary>
+        /// Get the tokenized TokenStream as a list of tokens
+        /// </summary>
+        /// <returns>TokenStream when filled, otherwise null</returns>
+        public List<Token> GetTokenStream()
         {
-            return c >= '0' && c <= '9';
-        }
-
-        public bool IsLetter(char c)
-        {
-            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+            if (TokenStream.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return TokenStream;
+            }
         }
 
         #endregion
 
         #region Private Methods
-
-        private bool IsLetterOrDigit(char c)
-        {
-            return IsDigit(c) || IsLetter(c);
-        }
 
         /// <summary>
         /// Checks if token is a keyword

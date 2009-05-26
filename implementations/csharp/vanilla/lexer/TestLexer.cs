@@ -9,7 +9,7 @@ namespace Waebric
 {
     class TestLexer
     {
-        public const string TEST_PATH = "../../test/helloworld.wae";
+        public const string TEST_PATH = "../../test/menus.wae";
 
         /**
          * Method to test Lexer
