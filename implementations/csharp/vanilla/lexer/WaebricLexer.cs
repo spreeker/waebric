@@ -10,7 +10,6 @@ namespace Lexer
         #region Private Members
 
         private StreamReader Stream; // Stream to read from
-        private int Line = 1; // Holds current line number
         private List<Token> TokenStream = new List<Token>();
 
         #endregion
@@ -83,10 +82,10 @@ namespace Lexer
         }
 
         /// <summary>
-        /// Get the tokenized TokenStream as a list of tokens
+        /// Returns an TokenIterator to provide a mechanism to handle the stream
         /// </summary>
-        /// <returns>TokenStream when filled, otherwise null</returns>
-        public List<Token> GetTokenStream()
+        /// <returns>TokenIterator if stream is filled, otherwise null</returns>
+        public TokenIterator GetTokenIterator()
         {
             if (TokenStream.Count == 0)
             {
@@ -94,7 +93,7 @@ namespace Lexer
             }
             else
             {
-                return TokenStream;
+                return new TokenIterator(TokenStream);
             }
         }
 

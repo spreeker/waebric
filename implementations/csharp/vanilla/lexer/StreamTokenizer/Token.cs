@@ -6,7 +6,7 @@ namespace Lexer.Tokenizer
     /// This class represents an token with an typeindication and a linenumber 
     /// from the original stream
     /// </summary>
-    class Token
+    public class Token
     {
         private Object Value;
         private TokenType Type;
