@@ -130,9 +130,9 @@ public abstract class Expression implements ISyntaxNode {
 
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] {
-					expression,
-					new CharacterLiteral(WaebricSymbol.PERIOD),
-					identifier
+				expression,
+				new CharacterLiteral(WaebricSymbol.PERIOD),
+				identifier
 			};
 		}
 		
@@ -160,17 +160,11 @@ public abstract class Expression implements ISyntaxNode {
 		}
 		
 		public ISyntaxNode[] getChildren() {
-			final ISyntaxNode[] elements = expressions.getElements();
-			
-			ISyntaxNode[] children = new ISyntaxNode[elements.length + 2];
-			children[0] = new CharacterLiteral(WaebricSymbol.LBRACKET);
-			children[children.length-1] = new CharacterLiteral(WaebricSymbol.RBRACKET);
-			
-			for(int i = 0; i < elements.length; i++) {
-				children[i+1] = elements[i]; // Transfer expressions to children array
-			}
-			
-			return children;
+			return new ISyntaxNode[] { 
+				new CharacterLiteral(WaebricSymbol.LBRACKET),
+				expressions,
+				new CharacterLiteral(WaebricSymbol.RBRACKET)
+			};
 		}
 		
 	}
@@ -182,32 +176,26 @@ public abstract class Expression implements ISyntaxNode {
 	 */
 	public static class KeyValuePairCollection extends Expression {
 
-		private SyntaxNodeListWithSeparator<KeyValuePair> keyvaluepairs;
+		private SyntaxNodeListWithSeparator<KeyValuePair> pairs;
 		
 		public KeyValuePairCollection() {
-			keyvaluepairs = new SyntaxNodeListWithSeparator<KeyValuePair>("" + WaebricSymbol.COMMA);
+			pairs = new SyntaxNodeListWithSeparator<KeyValuePair>("" + WaebricSymbol.COMMA);
 		}
 		
-		public boolean addKeyValuePair(KeyValuePair keyvaluepair) {
-			return keyvaluepairs.add(keyvaluepair);
+		public boolean addKeyValuePair(KeyValuePair pair) {
+			return pairs.add(pair);
 		}
 		
 		public ISyntaxNode[] getElements() {
-			return keyvaluepairs.getElements();
+			return pairs.getElements();
 		}
 		
 		public ISyntaxNode[] getChildren() {
-			final ISyntaxNode[] elements = keyvaluepairs.getElements();
-			
-			ISyntaxNode[] children = new ISyntaxNode[elements.length + 2];
-			children[0] = new CharacterLiteral(WaebricSymbol.LCBRACKET);
-			children[children.length-1] = new CharacterLiteral(WaebricSymbol.RCBRACKET);
-			
-			for(int i = 0; i < elements.length; i++) {
-				children[i+1] = elements[i]; // Transfer expressions to children array
-			}
-			
-			return children;
+			return new ISyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.LCBRACKET),
+					pairs,
+					new CharacterLiteral(WaebricSymbol.RCBRACKET)
+				};
 		}
 		
 	}

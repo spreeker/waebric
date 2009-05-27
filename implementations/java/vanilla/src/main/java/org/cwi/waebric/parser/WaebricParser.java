@@ -30,15 +30,15 @@ public class WaebricParser extends AbstractParser {
 	public WaebricParser(TokenIterator iterator) {
 		super(iterator, new ArrayList<ParserException>());
 		
-		// Initialise sub parser
+		// Construct sub parser
 		moduleParser = new ModuleParser(tokens, exceptions);
 	}
 	
 	public List<ParserException> parseTokens() {
 		exceptions.clear();
 		
-		Modules modules = new Modules(); // Initialise root node
-		tree = new SyntaxTree(modules); // Initialise AST
+		Modules modules = new Modules(); // Construct root node
+		tree = new SyntaxTree(modules); // Construct AST
 		moduleParser.visit(modules); // Start parsing
 		
 		return exceptions;

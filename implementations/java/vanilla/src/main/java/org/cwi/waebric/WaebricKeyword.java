@@ -17,4 +17,14 @@ public enum WaebricKeyword {
 	// Predicates
 	LIST, RECORD, STRING;
 	
+	/**
+	 * Retrieve keyword literal
+	 * 
+	 * @param keyword
+	 * @return
+	 */
+	public static String getLiteral(WaebricKeyword keyword) {
+		return keyword.name().toLowerCase();
+	}
+	
 }

@@ -7,8 +7,9 @@ import org.cwi.waebric.parser.ast.module.IModuleElement;
 
 public class Site implements IModuleElement {
 	
-	private static final String SITE_KEYWORD = WaebricKeyword.SITE.name().toLowerCase();
-	private static final String END_KEYWORD = WaebricKeyword.END.name().toLowerCase();
+	// Keyword literals
+	private static final String SITE_LITERAL = WaebricKeyword.SITE.name().toLowerCase();
+	private static final String END_LITERAL = WaebricKeyword.END.name().toLowerCase();
 	
 	private Mappings mappings;
 	
@@ -25,17 +26,11 @@ public class Site implements IModuleElement {
 	}
 
 	public ISyntaxNode[] getChildren() {
-		final ISyntaxNode[] maps = mappings.getChildren();
-		
-		ISyntaxNode[] children = new ISyntaxNode[maps.length+2];
-		children[0] = new StringLiteral(SITE_KEYWORD);
-		children[children.length-1] = new StringLiteral(END_KEYWORD);
-		
-		for(int i = 0; i < maps.length; i++) {
-			children[i+1] = maps[i];
-		}
-		
-		return children;
+		return new ISyntaxNode[] { 
+			new StringLiteral(SITE_LITERAL),
+			mappings,
+			new StringLiteral(END_LITERAL)
+		};
 	}
 
 }
