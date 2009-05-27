@@ -32,8 +32,13 @@ class StatementParser extends AbstractParser {
 	}
 	
 	/**
+	 * Recognise and construct statement sort based on look-ahead information.
 	 * 
-	 * @return
+	 * @param previous Previous token
+	 * @param expected Expected syntax
+	 * @return Statement
+	 * 
+	 * TODO
 	 */
 	public Statement parseStatement() {
 		if(! tokens.hasNext()) { return null; }

@@ -26,6 +26,15 @@ class ExpressionParser extends AbstractParser {
 		super(tokens, exceptions);
 	}
 	
+	/**
+	 * Recognise and construct expression sort based on look-ahead information.
+	 * 
+	 * @param previous Previous token
+	 * @param expected Expected syntax
+	 * @return Expression
+	 * 
+	 * TODO
+	 */
 	public Expression parseExpression() {
 		if(! tokens.hasNext()) { return null; }
 
