@@ -22,7 +22,12 @@ import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
-public class MarkupParser extends AbstractParser {
+/**
+ * moduke languages/waebric/syntax/Markup
+ * @author schagen
+ *
+ */
+class MarkupParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
@@ -37,15 +42,15 @@ public class MarkupParser extends AbstractParser {
 	 * 
 	 * @param markup
 	 */
-	public void visit(Markup markup) {
+	public void parse(Markup markup) {
 		// Parse designator
 		Designator designator = new Designator();
-		visit(designator);
+		parse(designator);
 		markup.setDesignator(designator);
 		
 		// Parse arguments
 		if(markup instanceof MarkupWithArguments) {
-			visit(((MarkupWithArguments) markup).getArguments());
+			parse(((MarkupWithArguments) markup).getArguments());
 		}
 	}
 	
@@ -53,7 +58,7 @@ public class MarkupParser extends AbstractParser {
 	 * 
 	 * @param designator
 	 */
-	public void visit(Designator designator) {
+	public void parse(Designator designator) {
 		if(next("designator identifier", "identifier", TokenSort.IDENTIFIER)) {
 			// Parse identifier
 			IdCon identifier = new IdCon(current.getLexeme().toString());
@@ -61,14 +66,14 @@ public class MarkupParser extends AbstractParser {
 		}
 		
 		// Parse potential attributes
-		visit(designator.getAttributes());
+		parse(designator.getAttributes());
 	}
 	
 	/**
 	 * 
 	 * @param attributes
 	 */
-	public void visit(Attributes attributes) {
+	public void parse(Attributes attributes) {
 		while(tokens.hasNext()) {
 			// Look-ahead for attribute symbol
 			String peek = tokens.peek(1).getLexeme().toString();
@@ -90,7 +95,7 @@ public class MarkupParser extends AbstractParser {
 			}
 			
 			// Parse attribute
-			visit(attribute);
+			parse(attribute);
 			attributes.add(attribute);
 			
 			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
@@ -114,7 +119,7 @@ public class MarkupParser extends AbstractParser {
 	 * 
 	 * @param attribute
 	 */
-	public void visit(Attribute attribute) {
+	public void parse(Attribute attribute) {
 		// Parse attribute symbol
 		if(next("attribute symbol", "symbol", TokenSort.SYMBOL)) {
 			if(! isAttributeSign(current.getLexeme().toString().charAt(0))) {
@@ -161,7 +166,7 @@ public class MarkupParser extends AbstractParser {
 	 * 
 	 * @param arguments
 	 */
-	public void visit(Arguments arguments) {
+	public void parse(Arguments arguments) {
 		// Parse arguments opening token "("
 		next("arguments opening paranthesis", "\"(\" arguments", "" + WaebricSymbol.LPARANTHESIS);
 		
@@ -178,7 +183,7 @@ public class MarkupParser extends AbstractParser {
 			}
 			
 			// Parse argument
-			visit(argument);
+			parse(argument);
 			arguments.add(argument);
 			
 			// While not end of arguments, comma separator is expected
@@ -191,11 +196,11 @@ public class MarkupParser extends AbstractParser {
 		next("arguments closing paranthesis", "arguments \")\"", "" + WaebricSymbol.RPARANTHESIS);
 	}
 	
-	public void visit(Argument argument) {
+	public void parse(Argument argument) {
 		if(argument instanceof Argument.ArgumentWithVar) {
 			// Parse variable
 			Var var = new Var();
-			visit(var); 
+			parse(var); 
 			((Argument.ArgumentWithVar) argument).setVar(var);
 			
 			tokens.next(); // Skip equals sign
@@ -203,7 +208,7 @@ public class MarkupParser extends AbstractParser {
 		
 		// Parse expression
 		Expression expression = ExpressionParser.newExpression(tokens.peek(1));
-		visit(expression);
+		parse(expression);
 		argument.setExpression(expression);
 	}
 	
@@ -211,16 +216,16 @@ public class MarkupParser extends AbstractParser {
 	 * @see org.cwi.waebric.parser.ExpressionParser
 	 * @param var
 	 */
-	public void visit(Var var) {
-		expressionParser.visit(var);
+	public void parse(Var var) {
+		expressionParser.parse(var);
 	}
 	
 	/**
 	 * @see org.cwi.waebric.parser.ExpressionParser
 	 * @param expression
 	 */
-	public void visit(Expression expression) {
-		expressionParser.visit(expression);
+	public void parse(Expression expression) {
+		expressionParser.parse(expression);
 	}
 
 }

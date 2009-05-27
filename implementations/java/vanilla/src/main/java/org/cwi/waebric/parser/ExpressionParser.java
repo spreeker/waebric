@@ -20,7 +20,7 @@ import org.cwi.waebric.scanner.token.TokenSort;
  * @author schagen
  *
  */
-public class ExpressionParser extends AbstractParser {
+class ExpressionParser extends AbstractParser {
 
 	public ExpressionParser(TokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
@@ -30,22 +30,22 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	public void visit(Expression expression) {
+	public void parse(Expression expression) {
 		// Delegate parse to sub function
 		if(expression instanceof Expression.VarExpression) {
-			visit((Expression.VarExpression) expression);
+			parse((Expression.VarExpression) expression);
 		} else if(expression instanceof Expression.NatExpression) {
-			visit((Expression.NatExpression) expression);
+			parse((Expression.NatExpression) expression);
 		} else if(expression instanceof Expression.TextExpression) {
-			visit((Expression.TextExpression) expression);
+			parse((Expression.TextExpression) expression);
 		} else if(expression instanceof Expression.SymbolExpression) {
-			visit((Expression.SymbolExpression) expression);
+			parse((Expression.SymbolExpression) expression);
 		} else if(expression instanceof Expression.ExpressionWithIdCon) {
-			visit((Expression.ExpressionWithIdCon) expression);
+			parse((Expression.ExpressionWithIdCon) expression);
 		} else if(expression instanceof Expression.ExpressionCollection) {
-			visit((Expression.ExpressionCollection) expression);
+			parse((Expression.ExpressionCollection) expression);
 		} else if(expression instanceof Expression.KeyValuePairCollection) {
-			visit((Expression.KeyValuePairCollection) expression);
+			parse((Expression.KeyValuePairCollection) expression);
 		}
 	}
 	
@@ -53,9 +53,9 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.VarExpression expression) {
+	private void parse(Expression.VarExpression expression) {
 		Var var = new Var();
-		visit(var);
+		parse(var);
 		expression.setVar(var);
 	}
 	
@@ -63,7 +63,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.NatExpression expression) {
+	private void parse(Expression.NatExpression expression) {
 		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
 			NatCon natural = new NatCon(current.getLexeme().toString());
 			expression.setNatural(natural);
@@ -74,7 +74,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.TextExpression expression) {
+	private void parse(Expression.TextExpression expression) {
 		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
 			expression.setText(new StringLiteral(current.getLexeme().toString()));
 		}
@@ -84,9 +84,9 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.SymbolExpression expression) {
+	private void parse(Expression.SymbolExpression expression) {
 		SymbolCon symbol = new SymbolCon();
-		visit(symbol);
+		parse(symbol);
 		expression.setSymbol(symbol);
 	}
 	
@@ -94,10 +94,10 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.ExpressionWithIdCon expression) {
+	private void parse(Expression.ExpressionWithIdCon expression) {
 		// Parse sub expression
 		Expression subExpression = newExpression(tokens.peek(1));
-		visit(subExpression);
+		parse(subExpression);
 		expression.setExpression(subExpression);
 
 		// Parse period separator
@@ -114,7 +114,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.ExpressionCollection expression) {
+	private void parse(Expression.ExpressionCollection expression) {
 		next("expression collection opening", "\"[\" expressions","" + WaebricSymbol.LBRACKET);
 		
 		while(tokens.hasNext()) {
@@ -124,7 +124,7 @@ public class ExpressionParser extends AbstractParser {
 			
 			// Parse sub expression
 			Expression subExpression = newExpression(tokens.peek(1));
-			visit(subExpression);
+			parse(subExpression);
 			expression.addExpression(subExpression);
 			
 			// While not end of expressions, comma separator is expected
@@ -140,7 +140,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void visit(Expression.KeyValuePairCollection expression) {
+	private void parse(Expression.KeyValuePairCollection expression) {
 		next("key value pair collection opening", "\"{\" pairs", "" + WaebricSymbol.LCBRACKET);
 		
 		while(tokens.hasNext()) {
@@ -150,7 +150,7 @@ public class ExpressionParser extends AbstractParser {
 			
 			// Parse key value pair
 			KeyValuePair pair = new KeyValuePair();
-			visit(pair);
+			parse(pair);
 			expression.addKeyValuePair(pair);
 			
 			// While not end of pairs, comma separator is expected
@@ -166,7 +166,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param pair
 	 */
-	private void visit(KeyValuePair pair) {
+	private void parse(KeyValuePair pair) {
 		// Parse identifier
 		if(next("identifier", "identifier \":\" expression", TokenSort.IDENTIFIER)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
@@ -178,7 +178,7 @@ public class ExpressionParser extends AbstractParser {
 		
 		// Parse expression
 		Expression expression = newExpression(tokens.peek(1));
-		visit(expression);
+		parse(expression);
 		pair.setExpression(expression);
 	}
 
@@ -186,7 +186,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param symbol
 	 */
-	private void visit(SymbolCon symbol) {
+	private void parse(SymbolCon symbol) {
 		next("symbol opening quote", "\"'\" characters","" + WaebricSymbol.SQUOTE);
 		// TODO: Figure out how to stop loop
 	}
@@ -195,7 +195,7 @@ public class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param var
 	 */
-	public void visit(Var var) {
+	public void parse(Var var) {
 		if(next("identifier", "identifier",TokenSort.IDENTIFIER)) {
 			var.setIdentifier(new IdCon(current.getLexeme().toString()));
 		}

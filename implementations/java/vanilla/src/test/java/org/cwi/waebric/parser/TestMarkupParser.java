@@ -50,7 +50,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.MarkupWithArguments markupa = new Markup.MarkupWithArguments();
-		parser.visit(markupa);
+		parser.parse(markupa);
 		
 		assertEquals(0, exceptions.size());
 		assertNotNull(markupa.getDesignator());
@@ -61,7 +61,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.MarkupWithoutArguments markup = new Markup.MarkupWithoutArguments();
-		parser.visit(markup);
+		parser.parse(markup);
 		
 		assertEquals(0, exceptions.size());
 		assertNotNull(markup.getDesignator());
@@ -73,7 +73,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Designator designator = new Designator();
-		parser.visit(designator);
+		parser.parse(designator);
 		
 		// Assertions
 		assertEquals(0, exceptions.size());
@@ -87,7 +87,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attributes attributes = new Attributes();
-		parser.visit(attributes);
+		parser.parse(attributes);
 		
 		// Assertions
 		assertEquals(0, exceptions.size());
@@ -104,7 +104,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		AttributeIdCon attributei = new Attribute.AttributeIdCon('#');
-		parser.visit(attributei);
+		parser.parse(attributei);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals("myattribute", attributei.getIdentifier().toString());
@@ -114,7 +114,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		AttributeNatCon attributen = new Attribute.AttributeNatCon();
-		parser.visit(attributen);
+		parser.parse(attributen);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals(99, attributen.getNumber().getIdentifier().getLiteral());
@@ -124,7 +124,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		AttributeDoubleNatCon attributedn = new Attribute.AttributeDoubleNatCon();
-		parser.visit(attributedn);
+		parser.parse(attributedn);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals(99, attributedn.getNumber().getIdentifier().getLiteral());
@@ -137,7 +137,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Arguments arguments = new Arguments();
-		parser.visit(arguments);
+		parser.parse(arguments);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals(Argument.ArgumentWithVar.class, arguments.get(0).getClass());
@@ -151,7 +151,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Argument.ArgumentWithVar argumentv = new Argument.ArgumentWithVar();
-		parser.visit(argumentv);
+		parser.parse(argumentv);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals("var1", argumentv.getVar().getIdentifier().toString());
@@ -162,7 +162,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Argument.ArgumentWithoutVar argument = new Argument.ArgumentWithoutVar();
-		parser.visit(argument);
+		parser.parse(argument);
 		
 		assertEquals(0, exceptions.size());
 		assertEquals(Expression.NatExpression.class, argument.getExpression().getClass());
@@ -174,7 +174,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Var var = new Var();
-		parser.visit(var);
+		parser.parse(var);
 		
 		// Assertions
 		assertEquals(0, exceptions.size());

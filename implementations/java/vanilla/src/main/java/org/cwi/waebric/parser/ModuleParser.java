@@ -19,10 +19,12 @@ import org.cwi.waebric.scanner.token.TokenSort;
 /**
  * Module parser
  * 
+ * module languages/waebric/syntax/Modules
+ * 
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class ModuleParser extends AbstractParser {
+class ModuleParser extends AbstractParser {
 
 	private final SiteParser siteParser;
 	private final FunctionParser functionParser;
@@ -39,12 +41,12 @@ public class ModuleParser extends AbstractParser {
 	 * 
 	 * @param modules
 	 */
-	public void visit(Modules modules) {
+	public void parse(Modules modules) {
 		while(tokens.hasNext()) {
 			current = tokens.next();
 			if(current.getLexeme().equals(WaebricKeyword.MODULE)) {
 				Module module = new Module();
-				visit(module);
+				parse(module);
 				modules.add(module);
 			} else {
 				exceptions.add(new UnexpectedTokenException(current, "module", "module identifier"));
@@ -56,10 +58,10 @@ public class ModuleParser extends AbstractParser {
 	 * 
 	 * @param module
 	 */
-	public void visit(Module module) {
+	public void parse(Module module) {
 		// Module identifier
 		ModuleId identifier = new ModuleId();
-		visit(identifier);
+		parse(identifier);
 		module.setIdentifier(identifier);
 		
 		// Module elements
@@ -72,15 +74,15 @@ public class ModuleParser extends AbstractParser {
 			current = tokens.next();
 			if(current.getLexeme() == WaebricKeyword.IMPORT) {
 				Import imprt = new Import();
-				visit(imprt);
+				parse(imprt);
 				module.addElement(imprt);
 			} else if(current.getLexeme() == WaebricKeyword.SITE) {
 				Site site = new Site();
-				visit(site);
+				parse(site);
 				module.addElement(site);
 			} else if(current.getLexeme() == WaebricKeyword.DEF) {
 				FunctionDef def = new FunctionDef();
-				visit(def);
+				parse(def);
 				module.addElement(def);
 			} else {
 				exceptions.add(new UnexpectedTokenException(
@@ -93,7 +95,7 @@ public class ModuleParser extends AbstractParser {
 	 * 
 	 * @param moduleId
 	 */
-	public void visit(ModuleId moduleId) {
+	public void parse(ModuleId moduleId) {
 		while(tokens.hasNext()) {
 			// Parse identifier
 			if(next("module identifier", "identifier", TokenSort.IDENTIFIER)) {
@@ -113,9 +115,9 @@ public class ModuleParser extends AbstractParser {
 	 * 
 	 * @param imprt
 	 */
-	public void visit(Import imprt) {
+	public void parse(Import imprt) {
 		ModuleId identifier = new ModuleId();
-		visit(identifier);
+		parse(identifier);
 		imprt.setIdentifier(identifier);
 	}
 	
@@ -123,16 +125,16 @@ public class ModuleParser extends AbstractParser {
 	 * @see org.cwi.waebric.parser.SiteParser
 	 * @param site
 	 */
-	public void visit(Site site) {
-		siteParser.visit(site);
+	public void parse(Site site) {
+		siteParser.parse(site);
 	}
 	
 	/**
 	 * org.cwi.waebric.parser.FunctionParser
 	 * @param def
 	 */
-	public void visit(FunctionDef def) {
-		functionParser.visit(def);
+	public void parse(FunctionDef def) {
+		functionParser.parse(def);
 	}
 
 }

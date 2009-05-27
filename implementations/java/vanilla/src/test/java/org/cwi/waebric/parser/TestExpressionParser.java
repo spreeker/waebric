@@ -40,7 +40,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.VarExpression expression = new Expression.VarExpression();
-		parser.visit(expression);
+		parser.parse(expression);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -53,7 +53,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.ExpressionWithIdCon expression = new Expression.ExpressionWithIdCon();
-		parser.visit(expression);
+		parser.parse(expression);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -67,7 +67,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.ExpressionCollection expression = new Expression.ExpressionCollection();
-		parser.visit(expression);
+		parser.parse(expression);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -82,7 +82,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.KeyValuePairCollection expression = new Expression.KeyValuePairCollection();
-		parser.visit(expression);
+		parser.parse(expression);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);

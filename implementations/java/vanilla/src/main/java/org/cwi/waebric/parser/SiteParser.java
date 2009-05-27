@@ -22,10 +22,12 @@ import org.cwi.waebric.scanner.token.TokenSort;
 /**
  * Site parser
  * 
+ * module languages/waebric/syntax/Site
+ * 
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class SiteParser extends AbstractParser {
+class SiteParser extends AbstractParser {
 
 	private final MarkupParser markupParser;
 	
@@ -40,8 +42,8 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param site
 	 */
-	public void visit(Site site) {
-		visit(site.getMappings()); // Delegate mappings
+	public void parse(Site site) {
+		parse(site.getMappings()); // Delegate mappings
 		next("site end", "site mappings end", "" + WaebricKeyword.END); // Parse end keyword
 	}
 	
@@ -49,10 +51,10 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param mappings
 	 */
-	public void visit(Mappings mappings) {
+	public void parse(Mappings mappings) {
 		while(tokens.hasNext()) {
 			Mapping mapping = new Mapping();
-			visit(mapping);
+			parse(mapping);
 			mappings.add(mapping);
 			
 			// Retrieve separator
@@ -69,7 +71,7 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param mapping
 	 */
-	public void visit(Mapping mapping) {
+	public void parse(Mapping mapping) {
 		Path path = null; // Determine path type based on look-ahead
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
 			path = new Path.PathWithDir();
@@ -77,7 +79,7 @@ public class SiteParser extends AbstractParser {
 			path = new Path.PathWithoutDir();
 		}
 		
-		visit(path); // Parse path
+		parse(path); // Parse path
 		mapping.setPath(path);
 		
 		// Parse colon separator
@@ -90,7 +92,7 @@ public class SiteParser extends AbstractParser {
 			markup = new Markup.MarkupWithoutArguments();
 		}
 		
-		visit(markup); // Parse mark up
+		parse(markup); // Parse mark up
 		mapping.setMarkup(markup);
 	}
 	
@@ -98,17 +100,17 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param path
 	 */
-	public void visit(Path path) {
+	public void parse(Path path) {
 		if(path instanceof Path.PathWithDir) {
 			// Parse directory
 			DirName dir = new DirName();
-			visit(dir);
+			parse(dir);
 			path.setDirName(dir);
 		}
 		
 		// Parse filename
 		FileName file = new FileName();
-		visit(file);
+		parse(file);
 		path.setFileName(file);
 	}
 	
@@ -116,9 +118,9 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param dirName
 	 */
-	public void visit(DirName dirName) {
+	public void parse(DirName dirName) {
 		Directory directory = new Directory();
-		visit(directory); // Delegate to directory
+		parse(directory); // Delegate to directory
 		dirName.setDirectory(directory);
 	}
 	
@@ -126,7 +128,7 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param directory
 	 */
-	public void visit(Directory directory) {
+	public void parse(Directory directory) {
 		while(tokens.hasNext()) {
 			if(directory.getElements().length != 0) {
 				// Between each path element a slash is expected
@@ -162,7 +164,7 @@ public class SiteParser extends AbstractParser {
 	 * 
 	 * @param fileName
 	 */
-	public void visit(FileName fileName) {
+	public void parse(FileName fileName) {
 		// Parse file name
 		if(next("file name", "name \".\" extension", TokenSort.IDENTIFIER)) {
 			fileName.setName(new PathElement(current.getLexeme().toString()));
@@ -181,8 +183,8 @@ public class SiteParser extends AbstractParser {
 	 * @see org.cwi.waebric.parser.MarkupParser
 	 * @param markup
 	 */
-	public void visit(Markup markup) {
-		markupParser.visit(markup);
+	public void parse(Markup markup) {
+		markupParser.parse(markup);
 	}
 
 }

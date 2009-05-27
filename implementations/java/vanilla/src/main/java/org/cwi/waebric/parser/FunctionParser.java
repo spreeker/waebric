@@ -11,7 +11,12 @@ import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
-public class FunctionParser extends AbstractParser {
+/**
+ * module languages/waebric/syntax/Functions
+ * @author schagen
+ *
+ */
+class FunctionParser extends AbstractParser {
 
 	private final StatementParser statementParser;
 	
@@ -26,7 +31,7 @@ public class FunctionParser extends AbstractParser {
 	 * 
 	 * @param def
 	 */
-	public void visit(FunctionDef def) {
+	public void parse(FunctionDef def) {
 		if(next("function identifier", "identifier", TokenSort.IDENTIFIER)) {
 			// Parse function definition identifier
 			IdCon identifier = new IdCon(current.getLexeme().toString());
@@ -44,7 +49,7 @@ public class FunctionParser extends AbstractParser {
 	 * 
 	 * @param formals
 	 */
-	public void visit(Formals formals) {
+	public void parse(Formals formals) {
 		// TODO: LOLOL
 	}
 	
@@ -52,8 +57,8 @@ public class FunctionParser extends AbstractParser {
 	 * 
 	 * @param statement
 	 */
-	public void visit(Statement statement) {
-		statementParser.visit(statement);
+	public void parse(Statement statement) {
+		statementParser.parse(statement);
 	}
 
 }

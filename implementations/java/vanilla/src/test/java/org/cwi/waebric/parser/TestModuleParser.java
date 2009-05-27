@@ -42,7 +42,7 @@ public class TestModuleParser {
 		parser = new ModuleParser(iterator, exceptions);
 		
 		ModuleId moduleId = new ModuleId();
-		parser.visit(moduleId);
+		parser.parse(moduleId);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -59,7 +59,7 @@ public class TestModuleParser {
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Modules modules = new Modules();
-		parser.visit(modules);
+		parser.parse(modules);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -76,7 +76,7 @@ public class TestModuleParser {
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Module module = new Module();
-		parser.visit(module);
+		parser.parse(module);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -93,7 +93,7 @@ public class TestModuleParser {
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Import imprt = new Import();
-		parser.visit(imprt); // Fill import object
+		parser.parse(imprt); // Fill import object
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);

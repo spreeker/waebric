@@ -39,7 +39,7 @@ public class WaebricParser extends AbstractParser {
 		
 		Modules modules = new Modules(); // Construct root node
 		tree = new SyntaxTree(modules); // Construct AST
-		moduleParser.visit(modules); // Start parsing
+		moduleParser.parse(modules); // Start parsing
 		
 		return exceptions;
 	}

@@ -60,7 +60,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = new Mapping();
-		parser.visit(mapping);
+		parser.parse(mapping);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -72,7 +72,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = new Mapping();
-		parser.visit(mapping);
+		parser.parse(mapping);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -87,7 +87,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		PathWithDir pathdf = new Path.PathWithDir();
-		parser.visit(pathdf);
+		parser.parse(pathdf);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -105,7 +105,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		PathWithoutDir pathf = new Path.PathWithoutDir();
-		parser.visit(pathf);
+		parser.parse(pathf);
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -132,7 +132,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		FileName name = new FileName();
-		parser.visit(name); // Parse filename
+		parser.parse(name); // Parse filename
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
@@ -146,7 +146,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		Directory directory = new Directory();
-		parser.visit(directory); // Parse directory
+		parser.parse(directory); // Parse directory
 		
 		// Assertions
 		assertTrue(exceptions.size() == 0);
