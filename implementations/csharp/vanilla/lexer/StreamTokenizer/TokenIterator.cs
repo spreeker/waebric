@@ -32,7 +32,7 @@ namespace Lexer.Tokenizer
         /// <returns>Token if available, otherwise null value</returns>
         public Token NextToken()
         {
-            if (Index >= (TokenArray.Length - 1))
+            if (Index > (TokenArray.Length - 1))
             {
                 return null; //Index out of bound, end of array reached
             }
