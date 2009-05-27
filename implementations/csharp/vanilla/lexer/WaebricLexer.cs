@@ -9,7 +9,7 @@ namespace Lexer
     {
         #region Private Members
 
-        private StreamReader Stream; // Stream to read from
+        private TextReader Stream; // Stream to read from
         private List<Token> TokenStream = new List<Token>();
 
         #endregion
@@ -20,7 +20,7 @@ namespace Lexer
         /// Creates a new WaebricLexer which tokenizes a given stream
         /// </summary>
         /// <param name="inputStream">StreamReader to read from</param>
-        public WaebricLexer(StreamReader inputStream)
+        public WaebricLexer(TextReader inputStream)
         {
             this.Stream = inputStream;
         }

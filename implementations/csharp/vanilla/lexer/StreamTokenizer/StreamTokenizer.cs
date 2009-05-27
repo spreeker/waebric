@@ -28,7 +28,7 @@ namespace Lexer.Tokenizer
 
         private double NumValue = 0.0; // Numeric value of token
         private String TextValue = ""; // Text value of token
-        private StreamReader InputStream;
+        private TextReader InputStream;
         private int LineNumber = 1; // Linenumber of stream
         private int[] WhitespaceCharacters; // Array of Whitespace characters
 
@@ -40,7 +40,7 @@ namespace Lexer.Tokenizer
         /// Initialize StreamTokenizer with inputstream to tokenize
         /// </summary>
         /// <param name="inputStream">InputStream to tokenize</param>
-        public StreamTokenizer(StreamReader inputStream)
+        public StreamTokenizer(TextReader inputStream)
         {
             this.InputStream = inputStream;
         }
@@ -64,11 +64,10 @@ namespace Lexer.Tokenizer
             //Reset all values
             NumValue = 0.0;
             TextValue = "";
-            char peek = ' ';
-            while (!InputStream.EndOfStream) //Read tokens until end of stream has reached
+            char peek = (char)InputStream.Peek();
+            int status = InputStream.Read();
+            while (status != -1) //Read tokens until end of stream has reached
             {
-                peek = (char)InputStream.Peek();
-                InputStream.Read();
                 if (IsWhitespace(peek)) //Ignore whitespace
                 {
                     continue;
@@ -82,8 +81,10 @@ namespace Lexer.Tokenizer
                 {
                     break; //We found something interesting so analyze it
                 }
+                peek = (char)InputStream.Peek();
+                status = InputStream.Read();
             }
-            if (InputStream.EndOfStream)
+            if (status == -1)
             {
                 return ST_EOF; //End of stream reached
             }
@@ -160,7 +161,7 @@ namespace Lexer.Tokenizer
                 TextValue = peek.ToString();
                 return peek;
             }
-            return ST_OTHER; //Exception should be handled here
+            throw new StreamTokenizerException("Token cannot being matched: " + peek, LineNumber);
         }
 
         /// <summary>
@@ -201,6 +202,10 @@ namespace Lexer.Tokenizer
         /// <returns>True if character is a whitespace character, otherwise false</returns>
         private bool IsWhitespace(char c)
         {
+            if (WhitespaceCharacters == null)
+            {
+                return false;
+            }
             for(int i = 0; i < WhitespaceCharacters.Length; i++)
             {
                 if (c == (char)WhitespaceCharacters[i])
