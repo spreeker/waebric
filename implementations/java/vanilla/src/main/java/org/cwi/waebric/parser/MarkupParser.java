@@ -207,8 +207,7 @@ class MarkupParser extends AbstractParser {
 		}
 		
 		// Parse expression
-		Expression expression = ExpressionParser.newExpression(tokens.peek(1));
-		parse(expression);
+		Expression expression = parseExpression();
 		argument.setExpression(expression);
 	}
 	
@@ -222,10 +221,10 @@ class MarkupParser extends AbstractParser {
 	
 	/**
 	 * @see org.cwi.waebric.parser.ExpressionParser
-	 * @param expression
+	 * @return expression
 	 */
-	public void parse(Expression expression) {
-		expressionParser.parse(expression);
+	public Expression parseExpression() {
+		return expressionParser.parseExpression();
 	}
 
 }

@@ -26,34 +26,42 @@ class ExpressionParser extends AbstractParser {
 		super(tokens, exceptions);
 	}
 	
-	/**
-	 * 
-	 * @param expression
-	 */
-	public void parse(Expression expression) {
-		// Delegate parse to sub function
-		if(expression instanceof Expression.VarExpression) {
+	public Expression parseExpression() {
+		Token peek = tokens.peek(1);
+		
+		Expression expression = null;
+		Class<? extends Expression> type = getExpressionClass(peek);
+		if(type == Expression.VarExpression.class) {
+			expression = new Expression.VarExpression();
 			parse((Expression.VarExpression) expression);
-		} else if(expression instanceof Expression.NatExpression) {
+		} else if(type == Expression.NatExpression.class) {
+			expression = new Expression.NatExpression();
 			parse((Expression.NatExpression) expression);
-		} else if(expression instanceof Expression.TextExpression) {
-			parse((Expression.TextExpression) expression);
-		} else if(expression instanceof Expression.SymbolExpression) {
-			parse((Expression.SymbolExpression) expression);
-		} else if(expression instanceof Expression.ExpressionWithIdCon) {
-			parse((Expression.ExpressionWithIdCon) expression);
-		} else if(expression instanceof Expression.ExpressionCollection) {
+		} else if(type == Expression.ExpressionCollection.class) {
+			expression = new Expression.ExpressionCollection();
 			parse((Expression.ExpressionCollection) expression);
-		} else if(expression instanceof Expression.KeyValuePairCollection) {
+		} else if(type == Expression.ExpressionWithIdCon.class) {
+			expression = new Expression.ExpressionWithIdCon();
+			parse((Expression.ExpressionWithIdCon) expression);
+		} else if(type == Expression.KeyValuePairCollection.class) {
+			expression = new Expression.KeyValuePairCollection();
 			parse((Expression.KeyValuePairCollection) expression);
+		} else if(type == Expression.SymbolExpression.class) {
+			expression = new Expression.SymbolExpression();
+			parse((Expression.SymbolExpression) expression);
+		} else if(type == Expression.TextExpression.class) {
+			expression = new Expression.TextExpression();
+			parse((Expression.TextExpression) expression);
 		}
+		
+		return expression;
 	}
 	
 	/**
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.VarExpression expression) {
+	public void parse(Expression.VarExpression expression) {
 		Var var = new Var();
 		parse(var);
 		expression.setVar(var);
@@ -63,7 +71,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.NatExpression expression) {
+	public void parse(Expression.NatExpression expression) {
 		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
 			NatCon natural = new NatCon(current.getLexeme().toString());
 			expression.setNatural(natural);
@@ -74,7 +82,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.TextExpression expression) {
+	public void parse(Expression.TextExpression expression) {
 		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
 			expression.setText(new StringLiteral(current.getLexeme().toString()));
 		}
@@ -84,7 +92,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.SymbolExpression expression) {
+	public void parse(Expression.SymbolExpression expression) {
 		SymbolCon symbol = new SymbolCon();
 		parse(symbol);
 		expression.setSymbol(symbol);
@@ -94,10 +102,9 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.ExpressionWithIdCon expression) {
+	public void parse(Expression.ExpressionWithIdCon expression) {
 		// Parse sub expression
-		Expression subExpression = newExpression(tokens.peek(1));
-		parse(subExpression);
+		Expression subExpression = parseExpression();
 		expression.setExpression(subExpression);
 
 		// Parse period separator
@@ -114,7 +121,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.ExpressionCollection expression) {
+	public void parse(Expression.ExpressionCollection expression) {
 		next("expression collection opening", "\"[\" expressions", WaebricSymbol.LBRACKET);
 		
 		while(tokens.hasNext()) {
@@ -123,8 +130,7 @@ class ExpressionParser extends AbstractParser {
 			}
 			
 			// Parse sub expression
-			Expression subExpression = newExpression(tokens.peek(1));
-			parse(subExpression);
+			Expression subExpression = parseExpression();
 			expression.addExpression(subExpression);
 			
 			// While not end of expressions, comma separator is expected
@@ -140,7 +146,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	private void parse(Expression.KeyValuePairCollection expression) {
+	public void parse(Expression.KeyValuePairCollection expression) {
 		next("key value pair collection opening", "\"{\" pairs", WaebricSymbol.LCBRACKET);
 		
 		while(tokens.hasNext()) {
@@ -177,8 +183,7 @@ class ExpressionParser extends AbstractParser {
 		next("colon", "identifier \":\" expression", WaebricSymbol.COLON);
 		
 		// Parse expression
-		Expression expression = newExpression(tokens.peek(1));
-		parse(expression);
+		Expression expression = parseExpression();
 		pair.setExpression(expression);
 	}
 
@@ -207,7 +212,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param token
 	 * @return
 	 */
-	public static Class<? extends Expression> getExpressionType(Token token) {
+	public static Class<? extends Expression> getExpressionClass(Token token) {
 		if(token.getLexeme().equals(WaebricSymbol.LBRACKET)) {
 			// Expression collections start with a [
 			return Expression.ExpressionCollection.class;
@@ -229,25 +234,6 @@ class ExpressionParser extends AbstractParser {
 		} else { // Only remaining alternative: Expression "." IdCon -> Expression
 			return Expression.ExpressionWithIdCon.class;
 		}
-	}
-	
-	/**
-	 * 
-	 * @param token
-	 * @return
-	 */
-	public static Expression newExpression(Token token) {
-		try {
-			return getExpressionType(token).newInstance();
-		} catch (InstantiationException e) {
-			System.err.println("Critical error retrieving expression from " + token.toString());
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			System.err.println("Critical error retrieving expression from " + token.toString());
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 
 }

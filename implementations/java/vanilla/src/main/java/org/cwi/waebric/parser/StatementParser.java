@@ -2,12 +2,15 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
  * Statement parser
@@ -30,12 +33,62 @@ class StatementParser extends AbstractParser {
 	
 	/**
 	 * 
-	 * @param statement
+	 * @return
 	 */
-	public void parse(Statement statement) {
+	public Statement parseStatement() {
+		if(! next("statement", "statement symbol { if, each, let, \"{\", comment, echo, cdata, yield }")) {
+			return null; // No statement symbol found, quit parsing
+		}
+		
+		if(current.getLexeme().equals(WaebricKeyword.IF)) {
+			next("predicate opening parenthesis", "\"if\" \"(\" predicate", WaebricSymbol.LPARANTHESIS);
+			
+			//  TODO: Predicate
+		}
+		
+		return null;
+	}
+	
+	private void parse(Statement.IfStatement statement) {
 		
 	}
 
+	private void parse(Statement.IfElseStatement statement) {
+		
+	}
+	
+	private void parse(Statement.EachStatement statement) {
+		
+	}
+	
+	private void parse(Statement.LetStatement statement) {
+		
+	}
+	
+	private void parse(Statement.StatementCollection statement) {
+		
+	}
+	
+	private void parse(Statement.CommentStatement statement) {
+		
+	}
+	
+	private void parse(Statement.EchoEmbeddingStatement statement) {
+		
+	}
+	
+	private void parse(Statement.EchoExpressionStatement statement) {
+		
+	}
+	
+	private void parse(Statement.CDataStatement statement) {
+		
+	}
+	
+	private void parse(Statement.YieldStatement statement) {
+		
+	}
+	
 	/**
 	 * 
 	 * @param formals

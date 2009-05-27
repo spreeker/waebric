@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -35,6 +36,18 @@ public class TestExpressionParser {
 	}
 	
 	@Test
+	public void testParseExpression() {
+		iterator = TestScanner.quickScan("variable1");
+		parser = new ExpressionParser(iterator, exceptions);
+		
+		Expression expression = parser.parseExpression();
+		
+		// Assertions
+		assertEquals(0, exceptions.size());
+		assertEquals(Expression.VarExpression.class, expression.getClass());
+	}
+	
+	@Test
 	public void testVarExpression() {
 		iterator = TestScanner.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
@@ -43,8 +56,8 @@ public class TestExpressionParser {
 		parser.parse(expression);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(expression.getVar().equals("variable1"));
+		assertEquals(0, exceptions.size());
+		assertEquals("variable1", expression.getVar().toString());
 	}
 	
 	@Test

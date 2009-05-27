@@ -21,8 +21,8 @@ public abstract class Statement implements ISyntaxNode {
 	 */
 	public static class IfStatement extends Statement {
 		
-		private Predicate predicate;
-		private Statement statement;
+		protected Predicate predicate;
+		protected Statement statement;
 		
 		public Predicate getPredicate() {
 			return predicate;
@@ -57,34 +57,16 @@ public abstract class Statement implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class IfElseStatement extends Statement {
+	public static class IfElseStatement extends IfStatement {
 		
-		private Predicate predicate;
-		private Statement trueStatement;
-		private Statement falseStatement;
+		private Statement secondStatement;
 		
-		public Predicate getPredicate() {
-			return predicate;
+		public Statement getSecondStatement() {
+			return secondStatement;
 		}
 		
-		public void setPredicate(Predicate predicate) {
-			this.predicate = predicate;
-		}
-		
-		public Statement getTrueStatement() {
-			return trueStatement;
-		}
-		
-		public void setTrueStatement(Statement trueStatement) {
-			this.trueStatement = trueStatement;
-		}
-		
-		public Statement getFalseStatement() {
-			return falseStatement;
-		}
-		
-		public void setFalseStatement(Statement falseStatement) {
-			this.falseStatement = falseStatement;
+		public void setSecondStatement(Statement secondStatement) {
+			this.secondStatement = secondStatement;
 		}
 
 		public ISyntaxNode[] getChildren() {
@@ -93,9 +75,9 @@ public abstract class Statement implements ISyntaxNode {
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				predicate,
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
-				trueStatement,
+				statement,
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
-				falseStatement
+				secondStatement
 			};
 		}
 		

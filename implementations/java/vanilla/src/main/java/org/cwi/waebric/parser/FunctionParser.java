@@ -57,8 +57,8 @@ class FunctionParser extends AbstractParser {
 	 * 
 	 * @param statement
 	 */
-	public void parse(Statement statement) {
-		statementParser.parse(statement);
+	public Statement parseStatement() {
+		return statementParser.parseStatement();
 	}
 
 }
