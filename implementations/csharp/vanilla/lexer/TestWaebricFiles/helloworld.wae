@@ -1,0 +1,8 @@
+module test
+
+ def main 
+  html { 
+   head title "Hello";
+    body p "Hello";
+  }
+end
