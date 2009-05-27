@@ -36,56 +36,89 @@ class StatementParser extends AbstractParser {
 	 * @return
 	 */
 	public Statement parseStatement() {
-		if(! next("statement", "statement symbol { if, each, let, \"{\", comment, echo, cdata, yield }")) {
-			return null; // No statement symbol found, quit parsing
-		}
+		if(! tokens.hasNext()) { return null; }
 		
-		if(current.getLexeme().equals(WaebricKeyword.IF)) {
-			next("predicate opening parenthesis", "\"if\" \"(\" predicate", WaebricSymbol.LPARANTHESIS);
-			
-			//  TODO: Predicate
-		}
+		Statement statement = null;
+		Token peek = tokens.peek(1); // Determine statement type based on look-ahead
+		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
+			statement = new Statement.IfStatement();
+			parse((Statement.IfStatement) statement);
+		} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
+			statement = new Statement.EachStatement();
+			parse((Statement.EachStatement) statement);
+		} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
+			statement = new Statement.LetStatement();
+			parse((Statement.LetStatement) statement);
+		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
+			statement = new Statement.StatementCollection();
+			parse((Statement.StatementCollection) statement);
+		} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
+			statement = new Statement.CommentStatement();
+			parse((Statement.CommentStatement) statement);
+		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
+			Token echoPeek = tokens.peek(2);
+			if(echoPeek.getSort().equals(TokenSort.TEXT)) {
+				// Embedding start with text
+				statement = new Statement.EchoEmbeddingStatement();
+				parse((Statement.EchoEmbeddingStatement) statement);
+			} else {
+				// Only remaining echo alternative uses expressions
+				statement = new Statement.EchoExpressionStatement();
+				parse((Statement.EchoExpressionStatement) statement);
+			}
+		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
+			statement = new Statement.CDataStatement();
+			parse((Statement.CDataStatement) statement);
+		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
+			statement = new Statement.YieldStatement();
+			parse((Statement.YieldStatement) statement);
+		} 
 		
-		return null;
+		return statement;
 	}
 	
-	private void parse(Statement.IfStatement statement) {
+	public void parse(Statement.IfStatement statement) {
+		next("if keyword", "\"if\" \"(\"", WaebricKeyword.IF);
+		next("predicate opening", "\"if\" \"(\" predicate", WaebricSymbol.LPARANTHESIS);
 		
+		// TODO: Parse predicate
+		
+		next("predicate closure", "\"(\" predicate \")\"", WaebricSymbol.RPARANTHESIS);
+		
+		// Parse sub statement
+		Statement subStatement = parseStatement();
+		statement.setStatement(subStatement);
 	}
-
-	private void parse(Statement.IfElseStatement statement) {
+	
+	public void parse(Statement.EachStatement statement) {
 		
 	}
 	
-	private void parse(Statement.EachStatement statement) {
+	public void parse(Statement.LetStatement statement) {
 		
 	}
 	
-	private void parse(Statement.LetStatement statement) {
+	public void parse(Statement.StatementCollection statement) {
 		
 	}
 	
-	private void parse(Statement.StatementCollection statement) {
+	public void parse(Statement.CommentStatement statement) {
 		
 	}
 	
-	private void parse(Statement.CommentStatement statement) {
+	public void parse(Statement.EchoEmbeddingStatement statement) {
 		
 	}
 	
-	private void parse(Statement.EchoEmbeddingStatement statement) {
+	public void parse(Statement.EchoExpressionStatement statement) {
 		
 	}
 	
-	private void parse(Statement.EchoExpressionStatement statement) {
+	public void parse(Statement.CDataStatement statement) {
 		
 	}
 	
-	private void parse(Statement.CDataStatement statement) {
-		
-	}
-	
-	private void parse(Statement.YieldStatement statement) {
+	public void parse(Statement.YieldStatement statement) {
 		
 	}
 	

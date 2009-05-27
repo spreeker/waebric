@@ -27,9 +27,10 @@ class ExpressionParser extends AbstractParser {
 	}
 	
 	public Expression parseExpression() {
-		Token peek = tokens.peek(1);
-		
+		if(! tokens.hasNext()) { return null; }
+
 		Expression expression = null;
+		Token peek = tokens.peek(1); // Determine expression type based on look-ahead
 		Class<? extends Expression> type = getExpressionClass(peek);
 		if(type == Expression.VarExpression.class) {
 			expression = new Expression.VarExpression();
