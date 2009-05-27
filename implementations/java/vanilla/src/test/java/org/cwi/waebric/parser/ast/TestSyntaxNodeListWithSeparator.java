@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -15,7 +16,7 @@ public class TestSyntaxNodeListWithSeparator {
 	
 	@Before
 	public void setUp() {
-		mappings = new SyntaxNodeListWithSeparator<Mapping>(";");
+		mappings = new SyntaxNodeListWithSeparator<Mapping>(';');
 		mappings.add(new Mapping());
 		mappings.add(new Mapping());
 	}
@@ -30,6 +31,8 @@ public class TestSyntaxNodeListWithSeparator {
 	public void testGetChildren() {
 		assertNotNull(mappings.getChildren());
 		assertTrue(mappings.getChildren().length == 3);
+		assertEquals(Mapping.class, mappings.getChildren()[0].getClass());
+		assertEquals(CharacterLiteral.class, mappings.getChildren()[1].getClass());
 		
 		int expected = 3;
 		while(expected < 25) {

@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 public class Arguments extends SyntaxNodeListWithSeparator<Argument> {
 
 	public Arguments() {
-		super("" + WaebricSymbol.COMMA);
+		super(WaebricSymbol.COMMA);
 	}
 
 	/**

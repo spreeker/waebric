@@ -28,6 +28,12 @@ public abstract class Markup implements ISyntaxNode {
 		this.designator = designator;
 	}
 
+	/**
+	 * Designator Arguments -> Markup
+	 * 
+	 * @author schagen
+	 *
+	 */
 	public static class MarkupWithArguments extends Markup {
 
 		protected Arguments arguments;
@@ -59,6 +65,11 @@ public abstract class Markup implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * Designator -> Argument
+	 * @author schagen
+	 *
+	 */
 	public static class MarkupWithoutArguments extends Markup {
 
 		public ISyntaxNode[] getChildren() {

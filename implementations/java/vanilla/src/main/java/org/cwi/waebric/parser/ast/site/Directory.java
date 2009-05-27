@@ -14,7 +14,7 @@ public class Directory extends SyntaxNodeListWithSeparator<PathElement> {
 	 * Separate path elements with a slash /
 	 */
 	public Directory() {
-		super("" + WaebricSymbol.SLASH);
+		super(WaebricSymbol.SLASH);
 	}
 
 }

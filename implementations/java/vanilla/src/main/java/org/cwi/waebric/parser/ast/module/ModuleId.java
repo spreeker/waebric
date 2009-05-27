@@ -10,7 +10,7 @@ public class ModuleId implements ISyntaxNode {
 	private SyntaxNodeListWithSeparator<IdCon> identifier;
 	
 	public ModuleId() {
-		identifier = new SyntaxNodeListWithSeparator<IdCon>("" + WaebricSymbol.PERIOD);
+		identifier = new SyntaxNodeListWithSeparator<IdCon>(WaebricSymbol.PERIOD);
 	}
 	
 	public ISyntaxNode[] getIdentifierElements() {

@@ -148,7 +148,7 @@ public abstract class Expression implements ISyntaxNode {
 		private SyntaxNodeListWithSeparator<Expression> expressions;
 		
 		public ExpressionCollection() {
-			expressions = new SyntaxNodeListWithSeparator<Expression>("" + WaebricSymbol.COMMA);
+			expressions = new SyntaxNodeListWithSeparator<Expression>(WaebricSymbol.COMMA);
 		}
 		
 		public boolean addExpression(Expression expression) {
@@ -179,7 +179,7 @@ public abstract class Expression implements ISyntaxNode {
 		private SyntaxNodeListWithSeparator<KeyValuePair> pairs;
 		
 		public KeyValuePairCollection() {
-			pairs = new SyntaxNodeListWithSeparator<KeyValuePair>("" + WaebricSymbol.COMMA);
+			pairs = new SyntaxNodeListWithSeparator<KeyValuePair>(WaebricSymbol.COMMA);
 		}
 		
 		public boolean addKeyValuePair(KeyValuePair pair) {

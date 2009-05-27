@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 public class Mappings extends SyntaxNodeListWithSeparator<Mapping> {
 	
 	public Mappings() {
-		super("" + WaebricSymbol.SEMICOLON);
+		super(WaebricSymbol.SEMICOLON);
 	}
 
 	/**

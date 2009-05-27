@@ -38,9 +38,9 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implemen
 		 * Serial ID
 		 */
 		private static final long serialVersionUID = -2538711881618951310L;
-		private final String separator;
+		private final char separator;
 		
-		public SyntaxNodeListWithSeparator(String separator) {
+		public SyntaxNodeListWithSeparator(char separator) {
 			this.separator = separator;
 		}
 		
@@ -56,7 +56,7 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implemen
 				children.add(this.get(i));
 				
 				// Attach separator when element is not last in collection
-				if(i < this.size()-1) { children.add(new StringLiteral(separator)); }
+				if(i < this.size()-1) { children.add(new CharacterLiteral(separator)); }
 			}
 			
 			return children.toArray(new ISyntaxNode[0]);
