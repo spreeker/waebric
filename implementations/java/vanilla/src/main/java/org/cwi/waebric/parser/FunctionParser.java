@@ -50,7 +50,7 @@ class FunctionParser extends AbstractParser {
 	 * @param formals
 	 */
 	public void parse(Formals formals) {
-		// TODO: LOLOL
+		statementParser.parse(formals);
 	}
 	
 	/**
