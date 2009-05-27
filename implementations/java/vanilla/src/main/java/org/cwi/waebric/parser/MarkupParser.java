@@ -171,7 +171,7 @@ public class MarkupParser extends AbstractParser {
 			}
 			
 			Argument argument = null; // Determine argument type based on lookahead
-			if(tokens.hasNext(2) && tokens.peek(2).equals(WaebricSymbol.EQUAL_SIGN)) {
+			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
 				argument = new Argument.ArgumentWithVar();
 			} else {
 				argument = new Argument.ArgumentWithoutVar();

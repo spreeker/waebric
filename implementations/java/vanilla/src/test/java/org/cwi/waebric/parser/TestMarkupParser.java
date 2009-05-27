@@ -5,10 +5,14 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.markup.Argument;
+import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
@@ -41,21 +45,40 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testMarkup() {
-		// TODO
+		// Mark up with arguments
+		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Markup.MarkupWithArguments markupa = new Markup.MarkupWithArguments();
+		parser.visit(markupa);
+		
+		assertEquals(0, exceptions.size());
+		assertNotNull(markupa.getDesignator());
+		assertEquals(2, markupa.getArguments().size());
+		
+		// Mark up without arguments
+		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Markup.MarkupWithoutArguments markup = new Markup.MarkupWithoutArguments();
+		parser.visit(markup);
+		
+		assertEquals(0, exceptions.size());
+		assertNotNull(markup.getDesignator());
 	}
 	
 	@Test
 	public void testDesignator() {
-		iterator = TestScanner.quickScan("designator1 @99,#myattribute,@99%12");
+		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Designator designator = new Designator();
 		parser.visit(designator);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(designator.getIdentifier().equals("designator1"));
-		assertTrue(designator.getAttributes().size() == 3);
+		assertEquals(0, exceptions.size());
+		assertEquals("myfunction", designator.getIdentifier().toString());
+		assertEquals(3, designator.getAttributes().size());
 	}
 	
 	@Test
@@ -67,11 +90,11 @@ public class TestMarkupParser {
 		parser.visit(attributes);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(attributes.size() == 3);
-		assertTrue(attributes.get(0) instanceof Attribute.AttributeNatCon);
-		assertTrue(attributes.get(1) instanceof Attribute.AttributeIdCon);
-		assertTrue(attributes.get(2) instanceof Attribute.AttributeDoubleNatCon);
+		assertEquals(0, exceptions.size());
+		assertEquals(3, attributes.size());
+		assertEquals(Attribute.AttributeNatCon.class, attributes.get(0).getClass());
+		assertEquals(Attribute.AttributeIdCon.class, attributes.get(1).getClass());
+		assertEquals(Attribute.AttributeDoubleNatCon.class, attributes.get(2).getClass());
 	}
 	
 	@Test
@@ -83,8 +106,8 @@ public class TestMarkupParser {
 		AttributeIdCon attributei = new Attribute.AttributeIdCon('#');
 		parser.visit(attributei);
 		
-		assertTrue(exceptions.size() == 0);
-		assertTrue(attributei.getIdentifier().equals("myattribute"));
+		assertEquals(0, exceptions.size());
+		assertEquals("myattribute", attributei.getIdentifier().toString());
 		
 		// Regular natural attribute
 		iterator = TestScanner.quickScan("@99");
@@ -93,8 +116,8 @@ public class TestMarkupParser {
 		AttributeNatCon attributen = new Attribute.AttributeNatCon();
 		parser.visit(attributen);
 		
-		assertTrue(exceptions.size() == 0);
-		assertTrue(attributen.getNumber().equals(99));
+		assertEquals(0, exceptions.size());
+		assertEquals(99, attributen.getNumber().getIdentifier().getLiteral());
 		
 		// Double natural attribute
 		iterator = TestScanner.quickScan("@99%12");
@@ -103,19 +126,46 @@ public class TestMarkupParser {
 		AttributeDoubleNatCon attributedn = new Attribute.AttributeDoubleNatCon();
 		parser.visit(attributedn);
 		
-		assertTrue(exceptions.size() == 0);
-		assertTrue(attributedn.getNumber().equals(99));
-		assertTrue(attributedn.getSecondNumber().equals(12));
+		assertEquals(0, exceptions.size());
+		assertEquals(99, attributedn.getNumber().getIdentifier().getLiteral());
+		assertEquals(12, attributedn.getSecondNumber().getIdentifier().getLiteral());
 	}
 	
 	@Test
 	public void testArguments() {
-		// TODO
+		iterator = TestScanner.quickScan("(var1=argument1,argument2)");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Arguments arguments = new Arguments();
+		parser.visit(arguments);
+		
+		assertEquals(0, exceptions.size());
+		assertEquals(Argument.ArgumentWithVar.class, arguments.get(0).getClass());
+		assertEquals(Argument.ArgumentWithoutVar.class, arguments.get(1).getClass());
 	}
 	
 	@Test
 	public void testArgument() {
-		// TODO		
+		// Variable argument
+		iterator = TestScanner.quickScan("var1=12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Argument.ArgumentWithVar argumentv = new Argument.ArgumentWithVar();
+		parser.visit(argumentv);
+		
+		assertEquals(0, exceptions.size());
+		assertEquals("var1", argumentv.getVar().getIdentifier().toString());
+		assertEquals(Expression.NatExpression.class, argumentv.getExpression().getClass());
+		
+		// Plain argument
+		iterator = TestScanner.quickScan("12");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Argument.ArgumentWithoutVar argument = new Argument.ArgumentWithoutVar();
+		parser.visit(argument);
+		
+		assertEquals(0, exceptions.size());
+		assertEquals(Expression.NatExpression.class, argument.getExpression().getClass());
 	}
 	
 	@Test
@@ -127,8 +177,8 @@ public class TestMarkupParser {
 		parser.visit(var);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(var.getIdentifier().equals("var1"));
+		assertEquals(0, exceptions.size());
+		assertEquals("var1", var.getIdentifier().toString());
 	}
 
 }
