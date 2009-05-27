@@ -54,7 +54,7 @@ public class TestMarkupParser {
 		
 		assertEquals(0, exceptions.size());
 		assertNotNull(markupa.getDesignator());
-		assertEquals(2, markupa.getArguments().size());
+		assertEquals(2, markupa.getArguments().getElementCount());
 		
 		// Mark up without arguments
 		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12");
@@ -140,8 +140,8 @@ public class TestMarkupParser {
 		parser.parse(arguments);
 		
 		assertEquals(0, exceptions.size());
-		assertEquals(Argument.ArgumentWithVar.class, arguments.get(0).getClass());
-		assertEquals(Argument.ArgumentWithoutVar.class, arguments.get(1).getClass());
+		assertEquals(Argument.ArgumentWithVar.class, arguments.getElement(0).getClass());
+		assertEquals(Argument.ArgumentWithoutVar.class, arguments.getElement(1).getClass());
 	}
 	
 	@Test

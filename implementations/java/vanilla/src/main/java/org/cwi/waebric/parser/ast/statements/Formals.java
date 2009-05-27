@@ -19,8 +19,12 @@ public class Formals implements ISyntaxNode {
 		vars = new SyntaxNodeListWithSeparator<Var>(WaebricSymbol.COMMA);
 	}
 	
-	public ISyntaxNode[] getVars() {
-		return vars.getElements();
+	public int getVarsCount() {
+		return vars.size();
+	}
+	
+	public Var getVars(int index) {
+		return vars.get(index);
 	}
 	
 	public boolean addVar(Var var) {

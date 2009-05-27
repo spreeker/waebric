@@ -18,8 +18,22 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implemen
 	 */
 	private static final long serialVersionUID = -5624162057293783716L;
 
-	public ISyntaxNode[] getChildren() {
+	/**
+	 * Retrieve elements
+	 * 
+	 * @return
+	 */
+	public ISyntaxNode[] getElements() {
 		return this.toArray(new ISyntaxNode[0]);
+	}
+	
+	/**
+	 * Retrieve children
+	 * 
+	 * @return
+	 */
+	public ISyntaxNode[] getChildren() {
+		return getElements();
 	}
 	
 	/**
@@ -38,16 +52,16 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends ArrayList<E> implemen
 		 * Serial ID
 		 */
 		private static final long serialVersionUID = -2538711881618951310L;
+		
+		/**
+		 * Separation character
+		 */
 		private final char separator;
 		
 		public SyntaxNodeListWithSeparator(char separator) {
 			this.separator = separator;
 		}
-		
-		public ISyntaxNode[] getElements() {
-			return this.toArray(new ISyntaxNode[0]);
-		}
-		
+
 		@Override
 		public ISyntaxNode[] getChildren() {
 			ArrayList<ISyntaxNode> children = new ArrayList<ISyntaxNode>();

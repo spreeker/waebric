@@ -1,23 +1,43 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 
 /**
- * Collection of Argument objects.
+ * "(" { Argument "," }* ")" -> Arguments
  * 
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Arguments extends SyntaxNodeListWithSeparator<Argument> {
+public class Arguments implements ISyntaxNode {
 
+	private SyntaxNodeListWithSeparator<Argument> arguments;
+	
 	public Arguments() {
-		super(WaebricSymbol.COMMA);
+		arguments = new SyntaxNodeListWithSeparator<Argument>(WaebricSymbol.COMMA);
 	}
 
-	/**
-	 * Serial ID
-	 */
-	private static final long serialVersionUID = -8582049249913945792L;
+	@Override
+	public ISyntaxNode[] getChildren() {
+		return new ISyntaxNode[] {
+			new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
+			arguments,
+			new CharacterLiteral(WaebricSymbol.RPARANTHESIS)
+		};
+	}
+
+	public boolean add(Argument argument) {
+		return arguments.add(argument);
+	}
+	
+	public Argument getElement(int index) {
+		return arguments.get(index);
+	}
+	
+	public int getElementCount() {
+		return arguments.size();
+	}
 	
 }

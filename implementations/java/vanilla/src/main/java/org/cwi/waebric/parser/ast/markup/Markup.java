@@ -60,7 +60,7 @@ public abstract class Markup implements ISyntaxNode {
 		}
 		
 		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { arguments, designator };
+			return new ISyntaxNode[] { designator, arguments };
 		}
 		
 	}

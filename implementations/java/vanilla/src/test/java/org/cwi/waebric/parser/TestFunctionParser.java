@@ -42,4 +42,9 @@ public class TestFunctionParser {
 		// Assertions: TODO
 	}
 	
+	@Test
+	public void testFormals() {
+		
+	}
+	
 }
