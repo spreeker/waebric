@@ -26,6 +26,10 @@ public class ExpressionParser extends AbstractParser {
 		super(tokens, exceptions);
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	public void visit(Expression expression) {
 		// Delegate parse to sub function
 		if(expression instanceof Expression.VarExpression) {
@@ -45,12 +49,20 @@ public class ExpressionParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.VarExpression expression) {
 		Var var = new Var();
 		visit(var);
 		expression.setVar(var);
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.NatExpression expression) {
 		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
 			NatCon natural = new NatCon(current.getLexeme().toString());
@@ -58,18 +70,30 @@ public class ExpressionParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.TextExpression expression) {
 		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
 			expression.setText(new StringLiteral(current.getLexeme().toString()));
 		}
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.SymbolExpression expression) {
 		SymbolCon symbol = new SymbolCon();
 		visit(symbol);
 		expression.setSymbol(symbol);
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.ExpressionWithIdCon expression) {
 		// Parse sub expression
 		Expression subExpression = newExpression(tokens.peek(1));
@@ -86,6 +110,10 @@ public class ExpressionParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.ExpressionCollection expression) {
 		next("expression collection opening", "\"[\" expressions","" + WaebricSymbol.LBRACKET);
 		
@@ -99,17 +127,19 @@ public class ExpressionParser extends AbstractParser {
 			visit(subExpression);
 			expression.addExpression(subExpression);
 			
-			// Parse comma separator
-			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
-				tokens.next(); // Skip comma separator
-			} else {
-				break; // No more separator, quit parsing
+			// While not end of expressions, comma separator is expected
+			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
+				next("expressions separator", "expression \",\" expression", "" + WaebricSymbol.COMMA);
 			}
 		}
 		
 		next("expression collection closure", "expressions \"]\"", "" + WaebricSymbol.RBRACKET);
 	}
 	
+	/**
+	 * 
+	 * @param expression
+	 */
 	private void visit(Expression.KeyValuePairCollection expression) {
 		next("key value pair collection opening", "\"{\" pairs", "" + WaebricSymbol.LCBRACKET);
 		
@@ -123,17 +153,19 @@ public class ExpressionParser extends AbstractParser {
 			visit(pair);
 			expression.addKeyValuePair(pair);
 			
-			// Parse comma separator
-			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
-				tokens.next(); // Skip comma separator
-			} else {
-				break; // No more separator, quit parsing
+			// While not end of pairs, comma separator is expected
+			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
+				next("key value pair separator", "key value pair \",\" key value pair", "" + WaebricSymbol.COMMA);
 			}
 		}
 		
 		next("key value pair collection closure", "pairs \"}\"", "" + WaebricSymbol.RCBRACKET);
 	}
 	
+	/**
+	 * 
+	 * @param pair
+	 */
 	private void visit(KeyValuePair pair) {
 		// Parse identifier
 		if(next("identifier", "identifier \":\" expression", TokenSort.IDENTIFIER)) {
@@ -150,11 +182,19 @@ public class ExpressionParser extends AbstractParser {
 		pair.setExpression(expression);
 	}
 
+	/**
+	 * 
+	 * @param symbol
+	 */
 	private void visit(SymbolCon symbol) {
 		next("symbol opening quote", "\"'\" characters","" + WaebricSymbol.SQUOTE);
 		// TODO: Figure out how to stop loop
 	}
 
+	/**
+	 * 
+	 * @param var
+	 */
 	public void visit(Var var) {
 		if(next("identifier", "identifier",TokenSort.IDENTIFIER)) {
 			var.setIdentifier(new IdCon(current.getLexeme().toString()));
@@ -191,6 +231,11 @@ public class ExpressionParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param token
+	 * @return
+	 */
 	public static Expression newExpression(Token token) {
 		try {
 			return getExpressionType(token).newInstance();

@@ -54,18 +54,13 @@ public class MarkupParser extends AbstractParser {
 	 * @param designator
 	 */
 	public void visit(Designator designator) {
-		current = tokens.next(); // Retrieve identifier
-		
-		// Parse identifier
-		if(current.getSort() == TokenSort.IDENTIFIER) {
+		if(next("designator identifier", "identifier", TokenSort.IDENTIFIER)) {
+			// Parse identifier
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
-		} else {
-			exceptions.add(new UnexpectedTokenException(
-					current, "designator identifier", "identifier"));
 		}
 		
-		// Parse attributes
+		// Parse potential attributes
 		visit(designator.getAttributes());
 	}
 	
@@ -88,10 +83,10 @@ public class MarkupParser extends AbstractParser {
 				} else {
 					attribute = new Attribute.AttributeNatCon();
 				}
-			} else if(symbol == '#' || symbol == '.' || symbol == '$' || symbol == ':') {
+			} else if(isAttributeSign(symbol)) {
 				attribute = new Attribute.AttributeIdCon(symbol);
 			}  else {
-				break; // Non attribute symbol found, break while
+				return; // Non attribute symbol found, quit attribute parsing
 			}
 			
 			// Parse attribute
@@ -99,21 +94,37 @@ public class MarkupParser extends AbstractParser {
 			attributes.add(attribute);
 			
 			if(! tokens.hasNext() || ! tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
-				break; // Out of comma separators, thus end of attributes
+				break; // Cannot detect comma separator, quit parsing attributes
 			} else {
-				tokens.next(); // Skip comma
+				tokens.next(); // Skip parsing comma separator
 			}
 		}
 	}
 	
+	/**
+	 * 
+	 * @param c
+	 * @return
+	 */
 	public static boolean isAttributeSign(char c) {
 		return c == '#' || c == '.' || c == '$' || c == ':' || c == '@';
 	}
 	
+	/**
+	 * 
+	 * @param attribute
+	 */
 	public void visit(Attribute attribute) {
-		next("attribute symbol", "# . $ @", TokenSort.SYMBOL); // Process first separator
+		// Parse attribute symbol
+		if(next("attribute symbol", "symbol", TokenSort.SYMBOL)) {
+			if(! isAttributeSign(current.getLexeme().toString().charAt(0))) {
+				exceptions.add(new UnexpectedTokenException(
+						current, "attribute symbol", "symbols { # . $ : @ }"));
+			}
+		}
 		
-		current = tokens.next(); // Retrieve value
+		// Parse name
+		current = tokens.next();
 		if(attribute instanceof AttributeIdCon) {
 			// Identifier attribute
 			IdCon identifier = new IdCon(current.getLexeme().toString());
@@ -146,6 +157,10 @@ public class MarkupParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param arguments
+	 */
 	public void visit(Arguments arguments) {
 		// Parse arguments opening token "("
 		next("arguments opening paranthesis", "\"(\" arguments", "" + WaebricSymbol.LPARANTHESIS);
@@ -155,9 +170,7 @@ public class MarkupParser extends AbstractParser {
 				break; // End of arguments reached, break while
 			}
 			
-			Argument argument = null;
-			
-			// Determine argument type based on lookahead
+			Argument argument = null; // Determine argument type based on lookahead
 			if(tokens.hasNext(2) && tokens.peek(2).equals(WaebricSymbol.EQUAL_SIGN)) {
 				argument = new Argument.ArgumentWithVar();
 			} else {

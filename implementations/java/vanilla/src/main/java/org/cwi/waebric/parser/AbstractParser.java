@@ -34,7 +34,7 @@ public abstract class AbstractParser {
 	 * 
 	 * @param name Name of expected token, used for error reporting
 	 * @param expected Grammar of expected token, used for error reporting
-	 * @return Contains next
+	 * @return Success status of finding next token.
 	 */
 	protected boolean next(String name, String expected) {
 		if(tokens.hasNext()) {
@@ -55,7 +55,7 @@ public abstract class AbstractParser {
 	 * @param name Name of expected token, used for error reporting
 	 * @param expected Grammar of expected token, used for error reporting
 	 * @param sort Expected token sort, used for type checking
-	 * @return Contains next
+	 * @return Success status of finding and type-checking next token.
 	 */
 	protected boolean next(String name, String expected, TokenSort sort) {
 		if(next(name, expected)) {
@@ -78,7 +78,7 @@ public abstract class AbstractParser {
 	 * @param name Name of expected token, used for error reporting
 	 * @param expected Grammar of expected token, used for error reporting
 	 * @param lexeme Expected token lexeme, used for type checking
-	 * @return Contains next
+	 * @return Success status of finding and type-checking next token.
 	 */
 	protected boolean next(String name, String expected, String lexeme) {
 		if(next(name, expected)) {

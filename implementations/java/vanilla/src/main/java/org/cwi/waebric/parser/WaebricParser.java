@@ -3,14 +3,11 @@ package org.cwi.waebric.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.SyntaxTree;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
  * Parser attempts to reconstruct the derivation of a Waebric program,
@@ -49,11 +46,6 @@ public class WaebricParser extends AbstractParser {
 	
 	public SyntaxTree getAbstractSyntaxTree() {
 		return tree;
-	}
-	
-	public static boolean isKeyword(Token token, WaebricKeyword keyword) {
-		if(token == null) { return false; }
-		return token.getSort() == TokenSort.KEYWORD && token.getLexeme() == keyword;
 	}
 	
 }
