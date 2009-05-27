@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.predicates;
 
-public class Predicate {
+import org.cwi.waebric.parser.ast.ISyntaxNode;
+
+public abstract class Predicate implements ISyntaxNode {
 
 }

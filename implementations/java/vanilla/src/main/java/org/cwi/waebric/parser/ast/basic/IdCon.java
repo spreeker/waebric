@@ -3,6 +3,11 @@ package org.cwi.waebric.parser.ast.basic;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
+/**
+ * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}
+ * @author schagen
+ *
+ */
 public class IdCon implements ISyntaxNode {
 
 	private StringLiteral identifier;

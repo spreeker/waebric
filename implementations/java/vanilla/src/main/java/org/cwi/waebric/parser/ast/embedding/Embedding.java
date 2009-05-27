@@ -1,5 +1,13 @@
 package org.cwi.waebric.parser.ast.embedding;
 
-public class Embedding {
+import org.cwi.waebric.parser.ast.ISyntaxNode;
+
+public class Embedding implements ISyntaxNode {
+
+	@Override
+	public ISyntaxNode[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

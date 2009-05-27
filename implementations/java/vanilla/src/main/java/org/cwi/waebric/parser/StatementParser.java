@@ -8,7 +8,6 @@ import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
  * Statement parser
