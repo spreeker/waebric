@@ -101,7 +101,7 @@ class ExpressionParser extends AbstractParser {
 		expression.setExpression(subExpression);
 
 		// Parse period separator
-		next("period", "expression \".\" identifier","" + WaebricSymbol.PERIOD);
+		next("period", "expression \".\" identifier", WaebricSymbol.PERIOD);
 
 		// Parse identifier
 		if(next("period", "expression \".\" identifier", TokenSort.IDENTIFIER)) {
@@ -115,7 +115,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	private void parse(Expression.ExpressionCollection expression) {
-		next("expression collection opening", "\"[\" expressions","" + WaebricSymbol.LBRACKET);
+		next("expression collection opening", "\"[\" expressions", WaebricSymbol.LBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
@@ -129,11 +129,11 @@ class ExpressionParser extends AbstractParser {
 			
 			// While not end of expressions, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
-				next("expressions separator", "expression \",\" expression", "" + WaebricSymbol.COMMA);
+				next("expressions separator", "expression \",\" expression", WaebricSymbol.COMMA);
 			}
 		}
 		
-		next("expression collection closure", "expressions \"]\"", "" + WaebricSymbol.RBRACKET);
+		next("expression collection closure", "expressions \"]\"", WaebricSymbol.RBRACKET);
 	}
 	
 	/**
@@ -141,7 +141,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	private void parse(Expression.KeyValuePairCollection expression) {
-		next("key value pair collection opening", "\"{\" pairs", "" + WaebricSymbol.LCBRACKET);
+		next("key value pair collection opening", "\"{\" pairs", WaebricSymbol.LCBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -155,11 +155,11 @@ class ExpressionParser extends AbstractParser {
 			
 			// While not end of pairs, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
-				next("key value pair separator", "key value pair \",\" key value pair", "" + WaebricSymbol.COMMA);
+				next("key value pair separator", "key value pair \",\" key value pair", WaebricSymbol.COMMA);
 			}
 		}
 		
-		next("key value pair collection closure", "pairs \"}\"", "" + WaebricSymbol.RCBRACKET);
+		next("key value pair collection closure", "pairs \"}\"", WaebricSymbol.RCBRACKET);
 	}
 	
 	/**
@@ -174,7 +174,7 @@ class ExpressionParser extends AbstractParser {
 		}
 		
 		// Parse separator
-		next("colon", "identifier \":\" expression", "" + WaebricSymbol.COLON);
+		next("colon", "identifier \":\" expression", WaebricSymbol.COLON);
 		
 		// Parse expression
 		Expression expression = newExpression(tokens.peek(1));
@@ -187,7 +187,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param symbol
 	 */
 	private void parse(SymbolCon symbol) {
-		next("symbol opening quote", "\"'\" characters","" + WaebricSymbol.SQUOTE);
+		next("symbol opening quote", "\"'\" characters", WaebricSymbol.SQUOTE);
 		// TODO: Figure out how to stop loop
 	}
 

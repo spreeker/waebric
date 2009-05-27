@@ -80,9 +80,9 @@ public abstract class AbstractParser {
 	 * @param lexeme Expected token lexeme, used for type checking
 	 * @return Success status of finding and type-checking next token.
 	 */
-	protected boolean next(String name, String expected, String lexeme) {
+	protected boolean next(String name, String expected, Object lexeme) {
 		if(next(name, expected)) {
-			if(current.getLexeme().toString().equals(lexeme)) {
+			if(current.getLexeme().equals(lexeme)) {
 				return true; // Correct token
 			} else {
 				exceptions.add(new UnexpectedTokenException(current, name, expected));

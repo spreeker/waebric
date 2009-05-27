@@ -42,7 +42,7 @@ class FunctionParser extends AbstractParser {
 		// TODO: 0..* Statements
 		
 		// Parse function definition end
-		next("function end", "end", "" + WaebricKeyword.getLiteral(WaebricKeyword.END));
+		next("function end", "end", WaebricKeyword.END);
 	}
 	
 	/**

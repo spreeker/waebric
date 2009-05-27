@@ -14,8 +14,10 @@ import org.cwi.waebric.parser.ast.site.Mappings;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
+import org.cwi.waebric.parser.ast.site.Path.PathWithDir;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -44,7 +46,7 @@ class SiteParser extends AbstractParser {
 	 */
 	public void parse(Site site) {
 		parse(site.getMappings()); // Delegate mappings
-		next("site end", "site mappings end", "" + WaebricKeyword.END); // Parse end keyword
+		next("site end", "site mappings end", WaebricKeyword.END); // Parse end keyword
 	}
 	
 	/**
@@ -56,13 +58,15 @@ class SiteParser extends AbstractParser {
 			Mapping mapping = new Mapping();
 			parse(mapping);
 			mappings.add(mapping);
-			
-			// Retrieve separator
-			current = tokens.next();
-			if(current.getLexeme().equals(WaebricKeyword.END)) {
-				break; // End token reached, stop parsing mappings
-			} else if(! current.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				exceptions.add(new UnexpectedTokenException(current, "mapping separator", ";"));
+				
+			if(tokens.hasNext()) {
+				Token peek = tokens.peek(1);
+				if(peek.getLexeme().equals(WaebricKeyword.END)) {
+					break; // End token reached, stop parsing mappings
+				} else {
+					// Without end, a semicolon mapping separator is expected
+					next("mapping separator", "semicolon", WaebricSymbol.SEMICOLON);
+				}
 			}
 		}
 	}
@@ -83,7 +87,7 @@ class SiteParser extends AbstractParser {
 		mapping.setPath(path);
 		
 		// Parse colon separator
-		next("mapping separator", "path \":\" markup", "" + WaebricSymbol.COLON);
+		next("mapping separator", "path \":\" markup", WaebricSymbol.COLON);
 		
 		Markup markup = null; // Determine mark-up type based on look-ahead
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
@@ -105,7 +109,7 @@ class SiteParser extends AbstractParser {
 			// Parse directory
 			DirName dir = new DirName();
 			parse(dir);
-			path.setDirName(dir);
+			((PathWithDir) path).setDirName(dir);
 		}
 		
 		// Parse filename
@@ -132,7 +136,7 @@ class SiteParser extends AbstractParser {
 		while(tokens.hasNext()) {
 			if(directory.getElements().length != 0) {
 				// Between each path element a slash is expected
-				next("directory separator", "slash", "" + WaebricSymbol.SLASH);
+				next("directory separator", "slash", WaebricSymbol.SLASH);
 			}
 			
 			// Detect period separator for potential file names
@@ -171,7 +175,7 @@ class SiteParser extends AbstractParser {
 		}
 		
 		// Parse period separator
-		next("period", "name \".\" extension", "" + WaebricSymbol.PERIOD);
+		next("period", "name \".\" extension", WaebricSymbol.PERIOD);
 		
 		// Parse file extension
 		if(next("file extension", "name \".\" extension", TokenSort.IDENTIFIER)) {

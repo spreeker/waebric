@@ -148,7 +148,7 @@ class MarkupParser extends AbstractParser {
 		// Double natural attribute
 		if(attribute instanceof AttributeDoubleNatCon) {
 			// Process second separator "%"
-			next("double natural attribute separator", "%", "" + WaebricSymbol.PERCENT_SIGN);
+			next("double natural attribute separator", "%", WaebricSymbol.PERCENT_SIGN);
 			
 			try {
 				// Parse second value
@@ -168,7 +168,7 @@ class MarkupParser extends AbstractParser {
 	 */
 	public void parse(Arguments arguments) {
 		// Parse arguments opening token "("
-		next("arguments opening paranthesis", "\"(\" arguments", "" + WaebricSymbol.LPARANTHESIS);
+		next("arguments opening paranthesis", "\"(\" arguments", WaebricSymbol.LPARANTHESIS);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
@@ -188,12 +188,12 @@ class MarkupParser extends AbstractParser {
 			
 			// While not end of arguments, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-				next("arguments separator", "argument \",\" argument", "" + WaebricSymbol.COMMA);
+				next("arguments separator", "argument \",\" argument", WaebricSymbol.COMMA);
 			}
 		}
 		
 		// Parse arguments closing token ")"
-		next("arguments closing paranthesis", "arguments \")\"", "" + WaebricSymbol.RPARANTHESIS);
+		next("arguments closing paranthesis", "arguments \")\"", WaebricSymbol.RPARANTHESIS);
 	}
 	
 	public void parse(Argument argument) {

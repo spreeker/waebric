@@ -13,7 +13,7 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
 public abstract class Path implements ISyntaxNode {
 
 	protected FileName fileName;
-	protected DirName dirName;
+
 
 	/**
 	 * Retrieve file name
@@ -32,22 +32,6 @@ public abstract class Path implements ISyntaxNode {
 	}
 
 	/**
-	 * Retrieve directory name
-	 * @return
-	 */
-	public DirName getDirName() {
-		return dirName;
-	}
-
-	/**
-	 * Store directory name
-	 * @param dir
-	 */
-	public void setDirName(DirName dir) {
-		this.dirName = dir;
-	}
-
-	/**
 	 * Path implementation, consisting of a directory name and file name<br><br>
 	 * 
 	 * Grammar:<br>
@@ -60,12 +44,30 @@ public abstract class Path implements ISyntaxNode {
 	 */
 	public static class PathWithDir extends Path {
 		
+		protected DirName dirName;
+		
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] {
 					dirName,
 					new CharacterLiteral(WaebricSymbol.SLASH),
 					fileName
 				};
+		}
+		
+		/**
+		 * Retrieve directory name
+		 * @return
+		 */
+		public DirName getDirName() {
+			return dirName;
+		}
+
+		/**
+		 * Store directory name
+		 * @param dir
+		 */
+		public void setDirName(DirName dir) {
+			this.dirName = dir;
 		}
 		
 		@Override

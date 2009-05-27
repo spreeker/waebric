@@ -5,10 +5,12 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.functions.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -45,12 +47,12 @@ public class TestModuleParser {
 		parser.parse(moduleId);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(moduleId.getChildren().length == 7); // Four elements and three period separators
-		assertTrue(moduleId.getIdentifierElements()[0].equals("org"));
-		assertTrue(moduleId.getIdentifierElements()[1].equals("cwi"));
-		assertTrue(moduleId.getIdentifierElements()[2].equals("waebric"));
-		assertTrue(moduleId.getIdentifierElements()[3].equals("mymodule"));
+		assertEquals(0, exceptions.size());
+		assertEquals(7, moduleId.getChildren().length); // Four elements and three period separators
+		assertEquals("org", moduleId.getIdentifierElements()[0].toString());
+		assertEquals("cwi", moduleId.getIdentifierElements()[1].toString());
+		assertEquals("waebric", moduleId.getIdentifierElements()[2].toString());
+		assertEquals("mymodule", moduleId.getIdentifierElements()[3].toString());
 	}
 	
 	@Test
@@ -62,29 +64,30 @@ public class TestModuleParser {
 		parser.parse(modules);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(modules.size() == 2);
-		assertTrue(modules.getChildren()[0] instanceof Module);
-		assertTrue(modules.getChildren()[1] instanceof Module);
+		assertEquals(0, exceptions.size());
+		assertEquals(2, modules.size());
+		assertEquals(Module.class, modules.getChildren()[0].getClass());
+		assertEquals(Module.class, modules.getChildren()[1].getClass());
 		
 		// TODO: Word outside module definition error
 	}
 	
 	@Test
 	public void testModule() {
-		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
+		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule\nimport newmodule\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Module module = new Module();
 		parser.parse(module);
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(module.getChildren()[0].equals("module"));
-		assertTrue(module.getChildren()[1] instanceof ModuleId);
-		
-		// TODO: Invalid identifier
-		// TODO: Invalid keyword
+		assertEquals(0, exceptions.size());
+		assertEquals("module", module.getChildren()[0].toString());
+		assertEquals(ModuleId.class, module.getChildren()[1].getClass());
+		assertEquals(3, module.getElements().length);
+		assertEquals(Import.class, module.getElements()[0].getClass());
+		assertEquals(Site.class, module.getElements()[1].getClass());
+		assertEquals(FunctionDef.class, module.getElements()[2].getClass());
 	}
 	
 	@Test
@@ -96,9 +99,9 @@ public class TestModuleParser {
 		parser.parse(imprt); // Fill import object
 		
 		// Assertions
-		assertTrue(exceptions.size() == 0);
-		assertTrue(imprt.getChildren()[0].equals("import"));
-		assertTrue(imprt.getChildren()[1] instanceof ModuleId);
+		assertEquals(0, exceptions.size());
+		assertEquals("import", imprt.getChildren()[0].toString());
+		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
 		
 		// TODO: Invalid identifier
 	}
