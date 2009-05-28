@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.predicates.Type;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 
-public class PredicateParser extends AbstractParser {
+class PredicateParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
@@ -22,10 +22,7 @@ public class PredicateParser extends AbstractParser {
 	}
 
 	/**
-	 * Recognise and construct predicate sort based on look-ahead information.
-	 * 
-	 * @param name Expected token name, used for error handling
-	 * @param grammar Expected syntax, used for error handling
+	 * @see Predicate
 	 * @return Predicate
 	 */
 	public Predicate parsePredicate() {
@@ -54,7 +51,6 @@ public class PredicateParser extends AbstractParser {
 	}
 	
 	/**
-	 * Parse type from token stream.
 	 * @see Type
 	 * @return Type
 	 */
@@ -73,7 +69,14 @@ public class PredicateParser extends AbstractParser {
 		return null;
 	}
 	
+	/**
+	 * @see Expression
+	 * @param name
+	 * @param syntax
+	 * @return
+	 */
 	public Expression parseExpression(String name, String syntax) {
+		// Delegate parse to expression parser
 		return expressionParser.parseExpression(name, syntax);
 	}
 	

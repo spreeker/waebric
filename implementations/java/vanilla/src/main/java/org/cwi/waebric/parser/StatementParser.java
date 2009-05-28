@@ -5,6 +5,7 @@ import java.util.List;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
@@ -38,13 +39,13 @@ class StatementParser extends AbstractParser {
 	}
 	
 	/**
-	 * Recognise and construct statement sort based on look-ahead information.
+	 * Recognise and construct statement
 	 * 
-	 * @param previous Previous token
-	 * @param expected Expected syntax
+	 * @see Statement
+	 * 
+	 * @param name Construct name in which statement is used, used for error reporting.
+	 * @param syntax Syntax notation in which statement is called.
 	 * @return Statement
-	 * 
-	 * TODO
 	 */
 	public Statement parseStatement(String name, String syntax) {
 		if(! tokens.hasNext()) {
@@ -52,27 +53,37 @@ class StatementParser extends AbstractParser {
 			return null;
 		}
 	
+		// Delegate parse to sub-parse function
 		Token peek = tokens.peek(1);
 		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
+			// If(-else) statement
 			return parseIfStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
+			// Each statement
 			return parseEachStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
+			// Let statement
 			return parseLetStatement();
 		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
+			// Statement collection
 			return parseStatementCollection();
 		} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
+			// Comment statement
 			return parseCommentStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-			Token echoPeek = tokens.peek(2);
-			if(echoPeek.getSort().equals(TokenSort.TEXT)) {
+			// Echo statement
+			if(tokens.peek(2).getSort().equals(TokenSort.TEXT)) {
+				// Echo embedding (text)
 				return parseEchoEmbeddingStatement();
 			} else {
+				// Echo expression
 				return parseEchoExpressionStatement();
 			}
 		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
+			// CData statement
 			return parseCDataStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
+			// Yield statement
 			return parseYieldStatement();
 		} else {
 			reportUnexpectedToken(peek, "statement", 
@@ -81,6 +92,10 @@ class StatementParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * @see Statement.IfStatement
+	 * @return
+	 */
 	public Statement.IfStatement parseIfStatement() {
 		next("if keyword", "\"if\" \"(\"", WaebricKeyword.IF);
 		
@@ -109,6 +124,10 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
+	/**
+	 * @see Statement.EachStatement
+	 * @return
+	 */
 	public Statement.EachStatement parseEachStatement() {
 		Statement.EachStatement statement = new Statement.EachStatement();
 		
@@ -134,6 +153,10 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
+	/**
+	 * @see Statement.LetStatement
+	 * @return
+	 */
 	public Statement.LetStatement parseLetStatement() {
 		Statement.LetStatement statement = new Statement.LetStatement();
 		
@@ -162,6 +185,10 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
+	/**
+	 * @see Statement.StatementCollection
+	 * @return
+	 */
 	public Statement.StatementCollection parseStatementCollection() {
 		Statement.StatementCollection statement = new Statement.StatementCollection();
 		
@@ -178,30 +205,79 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
-	// TODO
+	/**
+	 * @see Statement.CommentStatement
+	 * @return
+	 */
 	public Statement.CommentStatement parseCommentStatement() {
 		Statement.CommentStatement statement = new Statement.CommentStatement();
+		
+		next("comment keyword", "\"comment\"", WaebricKeyword.COMMENT);
+		
+		if(next("comments statement text", "\"comments\" text", TokenSort.TEXT)) {
+			StrCon comment = new StrCon(current.getLexeme().toString());
+			statement.setComment(comment);
+		}
+		
 		return statement;
 	}
 	
-	// TODO
+	/**
+	 * @see Statement.EchoEmbeddingStatement
+	 * @return
+	 */
 	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement() {
 		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
+		
+		next("echo keyword", "\"echo\"", WaebricKeyword.ECHO);
+		
+		if(next("echo embedding", "\"echo\" embedding", TokenSort.TEXT)) {
+			// TODO: Embedding!
+		}
+		
+		next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON);
+		
 		return statement;
 	}
 	
-	// TODO
+	/**
+	 * @see Statement.EchoExpressionStatement
+	 * @return
+	 */
 	public Statement.EchoExpressionStatement parseEchoExpressionStatement() {
 		Statement.EchoExpressionStatement statement = new Statement.EchoExpressionStatement();
+		
+		next("echo keyword", "\"echo\"", WaebricKeyword.ECHO);
+		
+		Expression expression = parseExpression("echo expression", "\"echo\" expression \";\"");
+		statement.setExpression(expression);
+		
+		next("echo closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON);
+		
 		return statement;
 	}
 	
-	// TODO
+	/**
+	 * @see Statement.CDataStatement
+	 * @return
+	 */
 	public Statement.CDataStatement parseCDataStatement() {
 		Statement.CDataStatement statement = new Statement.CDataStatement();
+		
+		next("cdata keyword", "\"cdata\"", WaebricKeyword.CDATA);
+
+		Expression expression = parseExpression("cdata expression", "\"cdata\" expression \";\"");
+		statement.setExpression(expression);
+		
+		next("cdata closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON);
+		
 		return statement;
 	}
 	
+	/**
+	 * @see Statement.YieldStatement
+	 * @return
+	 */
 	public Statement.YieldStatement parseYieldStatement() {
 		Statement.YieldStatement statement = new Statement.YieldStatement();
 		
@@ -211,6 +287,10 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
+	/**
+	 * @see Assignment
+	 * @return
+	 */
 	public Assignment parseAssignment() {
 		if(! tokens.hasNext(2)) {
 			reportMissingToken("assignment", "var \"=\" or identifier \"(\"");
@@ -227,6 +307,10 @@ class StatementParser extends AbstractParser {
 		}
 	}
 	
+	/**
+	 * @see Assignment.VarAssignment
+	 * @return
+	 */
 	public Assignment.VarAssignment parseVarAssignment() {
 		Assignment.VarAssignment assignment = new Assignment.VarAssignment();
 		
@@ -243,6 +327,10 @@ class StatementParser extends AbstractParser {
 		return assignment;
 	}
 	
+	/**
+	 * @see Assignment.IdConAssignment
+	 * @return
+	 */
 	public Assignment.IdConAssignment parseIdConAssignment() {
 		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
 		
@@ -266,7 +354,7 @@ class StatementParser extends AbstractParser {
 	}
 	
 	/**
-	 * 
+	 * @see Formals
 	 * @param formals
 	 */
 	public Formals parseFormals() {
@@ -296,17 +384,41 @@ class StatementParser extends AbstractParser {
 		return formals;
 	}
 
+	/**
+	 * @see Expression
+	 * @see ExpressionParser
+	 * 
+	 * @param name
+	 * @param syntax
+	 * @return
+	 */
 	public Expression parseExpression(String name, String syntax) {
+		// Delegate parse to expression parser
 		return expressionParser.parseExpression(name, syntax);
 	}
 	
+	/**
+	 * @see Var
+	 * @see ExpressionParser
+	 * 
+	 * @param name
+	 * @param syntax
+	 * @return
+	 */
 	public Var parseVar(String name, String syntax) {
+		// Delegate parse to expression parser
 		Var var = new Var();
 		expressionParser.parse(var);
 		return var;
 	}
 	
+	/**
+	 * @see Predicate
+	 * @see PredicateParser
+	 * @return
+	 */
 	public Predicate parsePredicate() {
+		// No error reporting arguments needed, as predicates are only used in if-statements
 		return predicateParser.parsePredicate();
 	}
 

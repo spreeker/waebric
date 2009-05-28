@@ -7,6 +7,14 @@ public class StrCon implements ISyntaxNode {
 	
 	private StringLiteral string;
 
+	public StrCon(StringLiteral string) {
+		this.string = string;
+	}
+	
+	public StrCon(String string) {
+		this.string = new StringLiteral(string);
+	}
+	
 	public StringLiteral getString() {
 		return string;
 	}
