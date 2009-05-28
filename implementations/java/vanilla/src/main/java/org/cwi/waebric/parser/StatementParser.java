@@ -202,9 +202,12 @@ class StatementParser extends AbstractParser {
 		return statement;
 	}
 	
-	// TODO
 	public Statement.YieldStatement parseYieldStatement() {
 		Statement.YieldStatement statement = new Statement.YieldStatement();
+		
+		next("yield keyword", "\"yield\"", WaebricKeyword.YIELD);
+		next("yield closure", "\"yield\" \";\"", WaebricSymbol.SEMICOLON);
+		
 		return statement;
 	}
 	
@@ -215,44 +218,51 @@ class StatementParser extends AbstractParser {
 		}
 			
 		if(tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
-			Assignment.VarAssignment assignment = new Assignment.VarAssignment();
-			
-			// Parse variable
-			Var var = parseVar("assignment var", "var \"=\"");
-			assignment.setVar(var);
-			
-			tokens.next(); // Skip equals sign
-			
-			// Parse expression
-			Expression expression = parseExpression("var assignment expression", "var \"=\" expression");
-			assignment.setExpression(expression);
-			
-			next("var assignment closure", "var \"=\" expression \";\"", WaebricSymbol.SEMICOLON);
-			return assignment;
+			return parseVarAssignment();
 		} else if(tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
-			
-			// Parse identifier
-			if(next("assignment identifier", "identifier \"(\")", TokenSort.IDENTIFIER)) {
-				IdCon identifier = new IdCon(current.getLexeme().toString());
-				assignment.setIdentifier(identifier);
-			}
-			
-			// Parse formals
-			Formals formals = parseFormals();
-			assignment.setFormals(formals);
-			
-			next("id assignment equals", "formals \"=\" statement", WaebricSymbol.EQUAL_SIGN);
-			
-			// Parse statement
-			Statement subStatement = parseStatement("id assignment statement ", "\"=\" statement");
-			assignment.setStatement(subStatement);
-			
-			return assignment;
+			return parseIdConAssignment();
 		} else {
 			reportUnexpectedToken(tokens.peek(2), "assignment", "var \"=\" or identifier \"(\"");
 			return null;
 		}
+	}
+	
+	public Assignment.VarAssignment parseVarAssignment() {
+		Assignment.VarAssignment assignment = new Assignment.VarAssignment();
+		
+		// Parse variable
+		Var var = parseVar("assignment var", "var \"=\"");
+		assignment.setVar(var);
+		
+		next("assignment equals sign", "var \"=\"", WaebricSymbol.EQUAL_SIGN);
+		
+		// Parse expression
+		Expression expression = parseExpression("var assignment expression", "var \"=\" expression");
+		assignment.setExpression(expression);
+		
+		return assignment;
+	}
+	
+	public Assignment.IdConAssignment parseIdConAssignment() {
+		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
+		
+		// Parse identifier
+		if(next("assignment identifier", "identifier \"(\")", TokenSort.IDENTIFIER)) {
+			IdCon identifier = new IdCon(current.getLexeme().toString());
+			assignment.setIdentifier(identifier);
+		}
+		
+		// Parse formals
+		Formals formals = parseFormals();
+		assignment.setFormals(formals);
+		
+		next("id assignment equals", "formals \"=\" statement", WaebricSymbol.EQUAL_SIGN);
+		
+		// Parse statement
+		Statement subStatement = parseStatement("id assignment statement ", "\"=\" statement");
+		assignment.setStatement(subStatement);
+		
+		return assignment;
 	}
 	
 	/**
@@ -291,7 +301,6 @@ class StatementParser extends AbstractParser {
 	}
 	
 	public Var parseVar(String name, String syntax) {
-		// TODO
 		Var var = new Var();
 		expressionParser.parse(var);
 		return var;
