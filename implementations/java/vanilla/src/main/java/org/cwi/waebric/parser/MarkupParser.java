@@ -18,7 +18,6 @@ import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.MarkupWithArguments;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -123,8 +122,7 @@ class MarkupParser extends AbstractParser {
 		// Parse attribute symbol
 		if(next("attribute symbol", "symbol", TokenSort.SYMBOL)) {
 			if(! isAttributeSign(current.getLexeme().toString().charAt(0))) {
-				exceptions.add(new UnexpectedTokenException(
-						current, "attribute symbol", "symbols { # . $ : @ }"));
+				reportUnexpectedToken(current, "attribute symbol", "symbols { # . $ : @ }");
 			}
 		}
 		
@@ -140,8 +138,7 @@ class MarkupParser extends AbstractParser {
 				NatCon number = new NatCon(current.getLexeme().toString());
 				((AttributeNatCon) attribute).setNumber(number);
 			} catch(NumberFormatException e) {
-				exceptions.add(new UnexpectedTokenException(
-						current, "numeral attribute", "\"@\" number"));
+				reportUnexpectedToken(current, "numeral attribute", "\"@\" number");
 			}
 		}
 		
@@ -156,8 +153,7 @@ class MarkupParser extends AbstractParser {
 				NatCon second = new NatCon(current.getLexeme().toString());
 				((AttributeDoubleNatCon) attribute).setSecondNumber(second);
 			} catch(NumberFormatException e) {
-				exceptions.add(new UnexpectedTokenException(
-						current, "numeral attribute", "\"@\" number \"%\" number"));
+				reportUnexpectedToken(current, "numeral attribute", "\"@\" number \"%\" number");
 			}
 		}
 	}
@@ -207,7 +203,7 @@ class MarkupParser extends AbstractParser {
 		}
 		
 		// Parse expression
-		Expression expression = parseExpression();
+		Expression expression = parseExpression("argument", "var \"=\" expression");
 		argument.setExpression(expression);
 	}
 	
@@ -223,8 +219,8 @@ class MarkupParser extends AbstractParser {
 	 * @see org.cwi.waebric.parser.ExpressionParser
 	 * @return expression
 	 */
-	public Expression parseExpression() {
-		return expressionParser.parseExpression();
+	public Expression parseExpression(String name, String syntax) {
+		return expressionParser.parseExpression(name, syntax);
 	}
 
 }

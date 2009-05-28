@@ -43,7 +43,7 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("123");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate predicate = parser.parsePredicate("expression", "expression");
+		Predicate predicate = parser.parsePredicate();
 		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.PredicateWithoutType.class, predicate.getClass()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass()); // Correct expression
@@ -55,7 +55,7 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("bla.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate predicate = parser.parsePredicate("expression", "expression \".\" type \"?\"");
+		Predicate predicate = parser.parsePredicate();
 		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.PredicateWithType.class, predicate.getClass()); // Correct type
 		assertEquals(Expression.VarExpression.class, predicate.getExpression().getClass()); // Correct expression

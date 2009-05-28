@@ -8,7 +8,6 @@ import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.predicates.Type;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 
 public class PredicateParser extends AbstractParser {
@@ -25,21 +24,20 @@ public class PredicateParser extends AbstractParser {
 	/**
 	 * Recognise and construct predicate sort based on look-ahead information.
 	 * 
-	 * @param expected Expected token name, used for error handling
+	 * @param name Expected token name, used for error handling
 	 * @param grammar Expected syntax, used for error handling
 	 * @return Predicate
 	 */
-	public Predicate parsePredicate(String expected, String syntax) {
+	public Predicate parsePredicate() {
 		// Parse expression
-		Expression expression = parseExpression(expected, syntax);
-		
+		Expression expression = parseExpression("predicate", "expression or expression \".\" type \"?\"");
+
 		// Determine predicate type based on next token
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
 			Predicate.PredicateWithType predicate = new Predicate.PredicateWithType();
 			predicate.setExpression(expression); // Store expression
 			
-			next("predicate type separator \".\"", "predicate \".\" type \"?\"", 
-					WaebricSymbol.PERIOD); // Parse period
+			tokens.next(); // Skip period
 			
 			Type type = parseType(); // Parse type
 			predicate.setType(type); // Store type
@@ -51,7 +49,6 @@ public class PredicateParser extends AbstractParser {
 		} else {
 			Predicate.PredicateWithoutType predicate = new Predicate.PredicateWithoutType();
 			predicate.setExpression(expression); // Store expression
-			
 			return predicate; // Return predicate without type
 		}
 	}
@@ -69,20 +66,15 @@ public class PredicateParser extends AbstractParser {
 				type.setType(new StringLiteral(lexeme));
 				return type;
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, 
-						"type definition", "\"list\", \"record\" or \"string\""));
+				reportUnexpectedToken(current, "type definition", "\"list\", \"record\" or \"string\"");
 			}
 		}
 		
 		return null;
 	}
 	
-	/**
-	 * @see TODO
-	 * @return
-	 */
-	public Expression parseExpression(String expected, String syntax) {
-		return expressionParser.parseExpression();
+	public Expression parseExpression(String name, String syntax) {
+		return expressionParser.parseExpression(name, syntax);
 	}
 	
 }

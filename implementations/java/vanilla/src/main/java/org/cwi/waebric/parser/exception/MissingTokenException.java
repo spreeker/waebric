@@ -9,13 +9,13 @@ public class MissingTokenException extends ParserException {
 	 */
 	private static final long serialVersionUID = 8718366239518956356L;
 
-	public MissingTokenException(Token previous, String name, String expected) {
+	public MissingTokenException(Token previous, String name, String formula) {
 		super("Missing '" + name + "' token after: " + previous.toString() + ", " +
-				"attach the expected: (" + expected + ").");
+				"attach the expected: (" + formula + ").");
 	}
 	
-	public MissingTokenException(String name, String expected) {
-		super("Missing '" + name + "' token, attach the expected: (" + expected + ").");
+	public MissingTokenException(String name, String formula) {
+		super("Missing '" + name + "' token, attach the expected: (" + formula + ").");
 	}
 	
 }

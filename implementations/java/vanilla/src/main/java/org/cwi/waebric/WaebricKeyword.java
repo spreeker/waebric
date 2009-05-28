@@ -9,7 +9,7 @@ package org.cwi.waebric;
 public enum WaebricKeyword {
 	
 	// Statement
-	IF, EACH, LET, IN, 
+	IF, ELSE, EACH, LET, IN, 
 	COMMENT, ECHO, CDATA, YIELD,
 	
 	// Module

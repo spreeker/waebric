@@ -10,6 +10,7 @@ import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.KeyValuePair;
 import org.cwi.waebric.parser.ast.expressions.SymbolCon;
 import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -26,18 +27,12 @@ class ExpressionParser extends AbstractParser {
 		super(tokens, exceptions);
 	}
 	
-	/**
-	 * Recognise and construct expression sort based on look-ahead information.
-	 * 
-	 * @param previous Previous token
-	 * @param expected Expected syntax
-	 * @return Expression
-	 * 
-	 * TODO
-	 */
-	public Expression parseExpression() {
-		if(! tokens.hasNext()) { return null; }
-
+	public Expression parseExpression(String name, String syntax) {
+		if(! tokens.hasNext()) {
+			exceptions.add(new MissingTokenException(name, syntax));
+			return null;
+		}
+		
 		Expression expression = null;
 		Token peek = tokens.peek(1); // Determine expression type based on look-ahead
 		Class<? extends Expression> type = getExpressionClass(peek);
@@ -114,7 +109,7 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public void parse(Expression.ExpressionWithIdCon expression) {
 		// Parse sub expression
-		Expression subExpression = parseExpression();
+		Expression subExpression = parseExpression("expression", "expression \".\" identifier");
 		expression.setExpression(subExpression);
 
 		// Parse period separator
@@ -140,7 +135,7 @@ class ExpressionParser extends AbstractParser {
 			}
 			
 			// Parse sub expression
-			Expression subExpression = parseExpression();
+			Expression subExpression = parseExpression("expression", "\"[\" expression \"]\"");
 			expression.addExpression(subExpression);
 			
 			// While not end of expressions, comma separator is expected
@@ -193,7 +188,7 @@ class ExpressionParser extends AbstractParser {
 		next("colon", "identifier \":\" expression", WaebricSymbol.COLON);
 		
 		// Parse expression
-		Expression expression = parseExpression();
+		Expression expression = parseExpression("expression", "identifier \":\" expression");
 		pair.setExpression(expression);
 	}
 

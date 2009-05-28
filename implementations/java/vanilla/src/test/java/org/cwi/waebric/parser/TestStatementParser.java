@@ -38,8 +38,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("(var1,var2)");
 		parser = new StatementParser(iterator, exceptions);
 		
-		Formals formals = new Formals();
-		parser.parse(formals);
+		Formals formals = parser.parseFormals();
 		
 		// Assertions
 		assertEquals(0, exceptions.size());

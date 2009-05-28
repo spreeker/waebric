@@ -19,7 +19,7 @@ public abstract class Argument implements ISyntaxNode {
 	}
 
 	/**
-	 * Var "=" Expression -> Var
+	 * Var "=" Expression -> Argument
 	 * @author schagen
 	 *
 	 */

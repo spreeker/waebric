@@ -40,7 +40,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression expression = parser.parseExpression();
+		Expression expression = parser.parseExpression("expression", "test");
 		
 		// Assertions
 		assertEquals(0, exceptions.size());

@@ -41,13 +41,7 @@ public abstract class AbstractParser {
 			current = tokens.next(); // Retrieve next token in stream
 			return true;
 		} else {
-			if(current != null) { 
-				// Throw missing token exception, with current token
-				exceptions.add(new MissingTokenException(current, name, syntax));
-			} else {
-				// Throw missing token exception
-				exceptions.add(new MissingTokenException(name, syntax));
-			}
+			reportMissingToken(name, syntax);
 			return false;
 		}
 	}
@@ -68,8 +62,7 @@ public abstract class AbstractParser {
 			if(current.getSort() == sort) {
 				return true; // Token has been verified
 			} else {
-				// Throw unexpected token exception
-				exceptions.add(new UnexpectedTokenException(current, name, syntax));
+				reportUnexpectedToken(current, name, syntax);
 			}
 		}
 		
@@ -92,12 +85,33 @@ public abstract class AbstractParser {
 			if(current.getLexeme().equals(lexeme)) {
 				return true; // Token has been verified
 			} else {
-				// Throw unexpected token exception
-				exceptions.add(new UnexpectedTokenException(current, name, syntax));
+				reportUnexpectedToken(current, name, syntax);
 			}
 		}
 		
 		return false;
 	}
 	
+	/**
+	 * Report missing token
+	 * 
+	 * @param name
+	 * @param syntax
+	 */
+	protected void reportMissingToken(String name, String syntax) {
+		if(current == null) { exceptions.add(new MissingTokenException(name, syntax)); }
+		else { exceptions.add(new MissingTokenException(current, name, syntax)); }
+	}
+	
+	/**
+	 * Report unexpected token
+	 * 
+	 * @param token
+	 * @param name
+	 * @param syntax
+	 */
+	protected void reportUnexpectedToken(Token token, String name, String syntax) {
+		exceptions.add(new UnexpectedTokenException(token, name, syntax));
+	}
+
 }

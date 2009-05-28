@@ -49,16 +49,16 @@ class FunctionParser extends AbstractParser {
 	 * 
 	 * @param formals
 	 */
-	public void parse(Formals formals) {
-		statementParser.parse(formals);
+	public Formals parseFormals() {
+		return statementParser.parseFormals();
 	}
 	
 	/**
 	 * 
 	 * @param statement
 	 */
-	public Statement parseStatement() {
-		return statementParser.parseStatement();
+	public Statement parseStatement(String name, String syntax) {
+		return statementParser.parseStatement(name, syntax);
 	}
 
 }
