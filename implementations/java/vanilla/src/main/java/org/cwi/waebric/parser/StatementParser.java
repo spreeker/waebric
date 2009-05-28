@@ -53,43 +53,44 @@ class StatementParser extends AbstractParser {
 			return null;
 		}
 	
-		// Delegate parse to sub-parse function
-		Token peek = tokens.peek(1);
+		Token peek = tokens.peek(1); // Determine statement type based on look-ahead
 		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
-			// If(-else) statement
+			// If(-else) statements start with an if keyword
 			return parseIfStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
-			// Each statement
+			// Each statements start with an each keyword
 			return parseEachStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
-			// Let statement
+			// Let statements start with a let keyword
 			return parseLetStatement();
 		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
-			// Statement collection
+			// Statement collections start with a {
 			return parseStatementCollection();
 		} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
-			// Comment statement
+			// Comment statements start with a comments keyword
 			return parseCommentStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-			// Echo statement
+			// Echo statements start with an echo keyword
 			if(tokens.peek(2).getSort().equals(TokenSort.TEXT)) {
-				// Echo embedding (text)
+				// Embedding echo production is followed by a text
 				return parseEchoEmbeddingStatement();
 			} else {
-				// Echo expression
+				// Embedding echo production is followed by an expression
 				return parseEchoExpressionStatement();
 			}
 		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
-			// CData statement
+			// CData statements start with a cdata keyword
 			return parseCDataStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
-			// Yield statement
+			// Yield statements start with a yield keyword
 			return parseYieldStatement();
 		} else {
+			// Token stream cannot be seen as statement
 			reportUnexpectedToken(peek, "statement", 
 					"\"if\", \"each\", \"let\", \"{\", \"comment\", \"echo\", \"cdata\" or \"yield\"");
-			return null;
 		}
+		
+		return null;
 	}
 	
 	/**

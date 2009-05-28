@@ -17,9 +17,12 @@ import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
+ * Expressions
+ * 
  * module languages/waebric/syntax/Expressions
- * @author schagen
- *
+ * 
+ * @author Jeroen van Schagen
+ * @date 25-05-2009
  */
 class ExpressionParser extends AbstractParser {
 
@@ -33,99 +36,120 @@ class ExpressionParser extends AbstractParser {
 			return null;
 		}
 		
-		Expression expression = null;
 		Token peek = tokens.peek(1); // Determine expression type based on look-ahead
-		Class<? extends Expression> type = getExpressionClass(peek);
-		if(type == Expression.VarExpression.class) {
-			expression = new Expression.VarExpression();
-			parse((Expression.VarExpression) expression);
-		} else if(type == Expression.NatExpression.class) {
-			expression = new Expression.NatExpression();
-			parse((Expression.NatExpression) expression);
-		} else if(type == Expression.ListExpression.class) {
-			expression = new Expression.ListExpression();
-			parse((Expression.ListExpression) expression);
-		} else if(type == Expression.IdConExpression.class) {
-			expression = new Expression.IdConExpression();
-			parse((Expression.IdConExpression) expression);
-		} else if(type == Expression.RecordExpression.class) {
-			expression = new Expression.RecordExpression();
-			parse((Expression.RecordExpression) expression);
-		} else if(type == Expression.SymbolExpression.class) {
-			expression = new Expression.SymbolExpression();
-			parse((Expression.SymbolExpression) expression);
-		} else if(type == Expression.TextExpression.class) {
-			expression = new Expression.TextExpression();
-			parse((Expression.TextExpression) expression);
+		if(peek.getLexeme().equals(WaebricSymbol.LBRACKET)) {
+			// List expressions start with a [
+			return parseListExpression();
+		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
+			// Record expressions start with a {
+			return parseRecordExpression();
+		} else if(peek.getLexeme().equals(WaebricSymbol.SQUOTE)) {
+			// Symbol cons start with a '
+			return parseSymbolExpression();
+		} else if(peek.getSort().equals(TokenSort.NUMBER)) {
+			// Natural expressions consist of a natural
+			return parseNatExpression();
+		} else if(peek.getSort().equals(TokenSort.TEXT)) {
+			// Textual expressions consist of a text
+			return parseTextExpression();
+		} else if(peek.getSort().equals(TokenSort.IDENTIFIER)) {
+			// Variable expressions consist of variable
+			return parseVarExpression();
+		} else { // Identifier expressions are only remaining alternative
+			return parseIdConExpression();
 		}
-		
-		return expression;
 	}
 	
 	/**
 	 * @see Expression.VarExpression
 	 * @param expression
 	 */
-	public void parse(Expression.VarExpression expression) {
+	public Expression.VarExpression parseVarExpression() {
+		Expression.VarExpression expression = new Expression.VarExpression();
 		Var var = parseVar("var expression", "expression");
 		expression.setVar(var);
+		return expression;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.NatExpression
 	 * @param expression
 	 */
-	public void parse(Expression.NatExpression expression) {
+	public Expression.NatExpression parseNatExpression() {
 		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
+			Expression.NatExpression expression = new Expression.NatExpression();
 			NatCon natural = new NatCon(current.getLexeme().toString());
 			expression.setNatural(natural);
+			return expression;
 		}
+		
+		return null;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.TextExpression
 	 * @param expression
 	 */
-	public void parse(Expression.TextExpression expression) {
+	public Expression.TextExpression parseTextExpression() {
 		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
+			Expression.TextExpression expression = new Expression.TextExpression();
 			expression.setText(new StringLiteral(current.getLexeme().toString()));
+			return expression;
 		}
+		
+		return null;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.SymbolExpression
 	 * @param expression
 	 */
-	public void parse(Expression.SymbolExpression expression) {
+	public Expression.SymbolExpression parseSymbolExpression() {
+		Expression.SymbolExpression expression = new Expression.SymbolExpression();
+		
 		SymbolCon symbol = parseSymbolCon();
 		expression.setSymbol(symbol);
+		
+		return expression;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.IdConExpression
 	 * @param expression
 	 */
-	public void parse(Expression.IdConExpression expression) {
+	public Expression.IdConExpression parseIdConExpression() {
+		Expression.IdConExpression expression = new Expression.IdConExpression();
+		
 		// Parse sub expression
 		Expression subExpression = parseExpression("expression", "expression \".\" identifier");
 		expression.setExpression(subExpression);
 
 		// Parse period separator
-		next("period", "expression \".\" identifier", WaebricSymbol.PERIOD);
+		if(! next("period", "expression \".\" identifier", WaebricSymbol.PERIOD)) {
+			return null; // Incorrect expression syntax, quit parsing
+		}
 
 		// Parse identifier
 		if(next("period", "expression \".\" identifier", TokenSort.IDENTIFIER)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			expression.setIdentifier(identifier); // Store identifier
+		} else {
+			return null; // Incorrect expression syntax, return empty node
 		}
+		
+		return expression;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.ListExpression
 	 * @param expression
 	 */
-	public void parse(Expression.ListExpression expression) {
-		next("list opening", "\"[\" expressions", WaebricSymbol.LBRACKET);
+	public Expression.ListExpression parseListExpression() {
+		Expression.ListExpression expression = new Expression.ListExpression();
+		
+		if(! next("list opening", "\"[\" expressions", WaebricSymbol.LBRACKET)) {
+			return null; // Incorrect list syntax, quit parsing
+		}
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
@@ -142,15 +166,23 @@ class ExpressionParser extends AbstractParser {
 			}
 		}
 		
-		next("list closure", "expressions \"]\"", WaebricSymbol.RBRACKET);
+		if(! next("list closure", "expressions \"]\"", WaebricSymbol.RBRACKET)) {
+			return null; // Incorrect list syntax, return empty node
+		}
+		
+		return expression;
 	}
 	
 	/**
-	 * 
+	 * @see Expression.RecordExpression
 	 * @param expression
 	 */
-	public void parse(Expression.RecordExpression expression) {
-		next("record opening", "\"{\" pairs", WaebricSymbol.LCBRACKET);
+	public Expression.RecordExpression parseRecordExpression() {
+		Expression.RecordExpression expression = new Expression.RecordExpression();
+		
+		if(! next("record opening", "\"{\" pairs", WaebricSymbol.LCBRACKET)) {
+			return null; // Incorrect record syntax, quit parsing
+		}
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -158,8 +190,7 @@ class ExpressionParser extends AbstractParser {
 			}
 			
 			// Parse key value pair
-			KeyValuePair pair = new KeyValuePair();
-			parse(pair);
+			KeyValuePair pair = parseKeyValuePair();
 			expression.addKeyValuePair(pair);
 			
 			// While not end of pairs, comma separator is expected
@@ -168,26 +199,38 @@ class ExpressionParser extends AbstractParser {
 			}
 		}
 		
-		next("record closure", "pairs \"}\"", WaebricSymbol.RCBRACKET);
+		if(! next("record closure", "pairs \"}\"", WaebricSymbol.RCBRACKET)) {
+			return null; // Incorrect record syntax, return empty node
+		}
+		
+		return expression;
 	}
 	
 	/**
-	 * 
+	 * @see KeyValuePair
 	 * @param pair
 	 */
-	private void parse(KeyValuePair pair) {
+	public KeyValuePair parseKeyValuePair() {
+		KeyValuePair pair = new KeyValuePair();
+		
 		// Parse identifier
 		if(next("identifier", "identifier \":\" expression", TokenSort.IDENTIFIER)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			pair.setIdentifier(identifier);
+		} else {
+			return null; // Incorrect identifier syntax, quit parsing
 		}
 		
 		// Parse separator
-		next("colon", "identifier \":\" expression", WaebricSymbol.COLON);
+		if(! next("colon", "identifier \":\" expression", WaebricSymbol.COLON)) {
+			return null; // Incorrect pair syntax, quit parsing
+		}
 		
 		// Parse expression
 		Expression expression = parseExpression("expression", "identifier \":\" expression");
 		pair.setExpression(expression);
+		
+		return pair;
 	}
 
 	/**
@@ -195,10 +238,11 @@ class ExpressionParser extends AbstractParser {
 	 * @param symbol
 	 */
 	private SymbolCon parseSymbolCon() {
+		if(! next("symbol opening quote", "\"'\" characters", WaebricSymbol.SQUOTE)) {
+			return null; // Incorrect symbol syntax, quit parsing
+		}
+		
 		SymbolCon symbol = new SymbolCon();
-		
-		next("symbol opening quote", "\"'\" characters", WaebricSymbol.SQUOTE);
-		
 		// TODO: ~[0-31\ \t\n\r\;\,\127-255]
 		
 		return symbol;
@@ -216,36 +260,6 @@ class ExpressionParser extends AbstractParser {
 		}
 		
 		return null;
-	}
-	
-	/**
-	 * Stored in separate method as both mark-up and statement use
-	 * expressions in their syntax.
-	 * @param token
-	 * @return
-	 */
-	public static Class<? extends Expression> getExpressionClass(Token token) {
-		if(token.getLexeme().equals(WaebricSymbol.LBRACKET)) {
-			// Expression collections start with a [
-			return Expression.ListExpression.class;
-		} else if(token.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
-			// Key value pair collections start with a {
-			return Expression.RecordExpression.class;
-		} else if(token.getLexeme().equals(WaebricSymbol.SQUOTE)) {
-			// Symbol cons start with a '
-			return Expression.SymbolExpression.class;
-		} else if(token.getSort().equals(TokenSort.NUMBER)) {
-			// Natural expressions consist of a natural
-			return Expression.NatExpression.class;
-		} else if(token.getSort().equals(TokenSort.TEXT)) {
-			// Textual expressions consist of a text
-			return Expression.TextExpression.class;
-		} else if(token.getSort().equals(TokenSort.IDENTIFIER)) {
-			// Variable expressions consist of variable
-			return Expression.VarExpression.class;
-		} else { // Only remaining alternative: Expression "." IdCon -> Expression
-			return Expression.IdConExpression.class;
-		}
 	}
 
 }

@@ -162,7 +162,9 @@ class MarkupParser extends AbstractParser {
 		Arguments arguments = new Arguments();
 		
 		// Parse arguments opening token "("
-		next("arguments opening paranthesis", "\"(\" arguments", WaebricSymbol.LPARANTHESIS);
+		if(! next("arguments opening paranthesis", "\"(\" arguments", WaebricSymbol.LPARANTHESIS)) {
+			return null; // Incorrect arguments syntax, quit argument parse
+		}
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
@@ -180,7 +182,9 @@ class MarkupParser extends AbstractParser {
 		}
 		
 		// Parse arguments closing token ")"
-		next("arguments closing paranthesis", "arguments \")\"", WaebricSymbol.RPARANTHESIS);
+		if(! next("arguments closing paranthesis", "arguments \")\"", WaebricSymbol.RPARANTHESIS)) {
+			return null; // Incorrect arguments syntax, return empty node
+		}
 		
 		return arguments;
 	}
@@ -195,7 +199,6 @@ class MarkupParser extends AbstractParser {
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
 			Var var = parseVar("", "");
 			argument = new Argument.ArgumentWithVar(var);
-			
 			tokens.next(); // Skip equals sign
 		} else {
 			argument = new Argument.ArgumentWithoutVar();

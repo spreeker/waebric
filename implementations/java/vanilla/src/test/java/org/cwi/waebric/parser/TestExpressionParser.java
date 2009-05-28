@@ -52,26 +52,48 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.VarExpression expression = new Expression.VarExpression();
-		parser.parse(expression);
-		
-		// Assertions
+		Expression.VarExpression expression = parser.parseVarExpression();
 		assertEquals(0, exceptions.size());
 		assertEquals("variable1", expression.getVar().toString());
 	}
 	
 	@Test
-	public void testExpressionWithIdCon() {
+	public void testIdConExpression() {
 		iterator = TestScanner.quickScan("variable1.identifier1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.IdConExpression expression = new Expression.IdConExpression();
-		parser.parse(expression);
-		
-		// Assertions
+		Expression.IdConExpression expression = parser.parseIdConExpression();
 		assertTrue(exceptions.size() == 0);
-		assertTrue(expression.getIdentifier().equals("identifier1"));
-		assertTrue(expression.getExpression() instanceof Expression.VarExpression);
+		assertEquals("identifier1", expression.getIdentifier().toString());
+		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
+	}
+	
+	@Test
+	public void testSymbolExpression() {
+		iterator = TestScanner.quickScan("'abc");
+		parser = new ExpressionParser(iterator, exceptions);
+		
+		// TODO: Scanner does not allow symbol cons to be detected, :-(
+	}
+	
+	@Test
+	public void testNatExpression() {
+		iterator = TestScanner.quickScan("123");
+		parser = new ExpressionParser(iterator, exceptions);
+		
+		Expression.NatExpression expression = parser.parseNatExpression();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("123", expression.getNatural().toString());
+	}
+	
+	@Test
+	public void testTextExpression() {
+		iterator = TestScanner.quickScan("\"bla\"");
+		parser = new ExpressionParser(iterator, exceptions);
+		
+		Expression.TextExpression expression = parser.parseTextExpression();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("bla", expression.getText().toString());
 	}
 	
 	@Test
@@ -79,10 +101,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("[variable1,variable2]");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.ListExpression expression = new Expression.ListExpression();
-		parser.parse(expression);
-		
-		// Assertions
+		Expression.ListExpression expression = parser.parseListExpression();
 		assertTrue(exceptions.size() == 0);
 		assertTrue(expression.getElements().length == 2);
 		assertTrue(expression.getElements()[0] instanceof Expression.VarExpression);
@@ -94,10 +113,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("{identifier1: variable1, identifier2: variable2}");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.RecordExpression expression = new Expression.RecordExpression();
-		parser.parse(expression);
-		
-		// Assertions
+		Expression.RecordExpression expression = parser.parseRecordExpression();
 		assertTrue(exceptions.size() == 0);
 		assertTrue(expression.getElements().length == 2);
 		assertTrue(expression.getElements()[0] instanceof KeyValuePair);
