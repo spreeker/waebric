@@ -38,8 +38,8 @@ public abstract class Markup implements ISyntaxNode {
 
 		protected Arguments arguments;
 
-		public MarkupWithArguments() {
-			arguments = new Arguments();
+		public MarkupWithArguments(Arguments arguments) {
+			this.arguments = arguments;
 		}
 		
 		/**
@@ -48,15 +48,6 @@ public abstract class Markup implements ISyntaxNode {
 		 */
 		public Arguments getArguments() {
 			return arguments;
-		}
-
-		/**
-		 * Add argument
-		 * @param argument
-		 * @return success
-		 */
-		public boolean addArgument(Argument argument) {
-			return arguments.add(argument);
 		}
 		
 		public ISyntaxNode[] getChildren() {

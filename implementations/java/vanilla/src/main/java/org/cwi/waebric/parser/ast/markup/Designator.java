@@ -3,15 +3,22 @@ package org.cwi.waebric.parser.ast.markup;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
+/**
+ * Designator
+ * 
+ * Grammar:<br>
+ * <code>
+ * 	IdCon Attribute* -> Designator
+ * </code>
+ * 
+ * @author Jeroen van Schagen
+ * @date 25-05-2009
+ */
 public class Designator implements ISyntaxNode {
 
 	protected IdCon identifier;
 	protected Attributes attributes;
 
-	public Designator() {
-		this.attributes = new Attributes();
-	}
-	
 	public IdCon getIdentifier() {
 		return identifier;
 	}
@@ -24,8 +31,8 @@ public class Designator implements ISyntaxNode {
 		return attributes;
 	}
 
-	public boolean addAttribute(Attribute attribute) {
-		return attributes.add(attribute);
+	public void setAttributes(Attributes attributes) {
+		this.attributes = attributes;
 	}
 
 	public ISyntaxNode[] getChildren() {

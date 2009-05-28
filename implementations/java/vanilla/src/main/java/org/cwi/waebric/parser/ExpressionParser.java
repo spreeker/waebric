@@ -63,12 +63,11 @@ class ExpressionParser extends AbstractParser {
 	}
 	
 	/**
-	 * 
+	 * @see Expression.VarExpression
 	 * @param expression
 	 */
 	public void parse(Expression.VarExpression expression) {
-		Var var = new Var();
-		parse(var);
+		Var var = parseVar("var expression", "expression");
 		expression.setVar(var);
 	}
 	
@@ -98,8 +97,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	public void parse(Expression.SymbolExpression expression) {
-		SymbolCon symbol = new SymbolCon();
-		parse(symbol);
+		SymbolCon symbol = parseSymbolCon();
 		expression.setSymbol(symbol);
 	}
 	
@@ -193,22 +191,31 @@ class ExpressionParser extends AbstractParser {
 	}
 
 	/**
-	 * 
+	 * @see SymbolCon
 	 * @param symbol
 	 */
-	private void parse(SymbolCon symbol) {
+	private SymbolCon parseSymbolCon() {
+		SymbolCon symbol = new SymbolCon();
+		
 		next("symbol opening quote", "\"'\" characters", WaebricSymbol.SQUOTE);
-		// TODO: Figure out how to stop loop
+		
+		// TODO: ~[0-31\ \t\n\r\;\,\127-255]
+		
+		return symbol;
 	}
 
 	/**
-	 * 
+	 * @see Var
 	 * @param var
 	 */
-	public void parse(Var var) {
-		if(next("identifier", "identifier",TokenSort.IDENTIFIER)) {
+	public Var parseVar(String name, String syntax) {
+		if(next(name, syntax,TokenSort.IDENTIFIER)) {
+			Var var = new Var();
 			var.setIdentifier(new IdCon(current.getLexeme().toString()));
+			return var;
 		}
+		
+		return null;
 	}
 	
 	/**

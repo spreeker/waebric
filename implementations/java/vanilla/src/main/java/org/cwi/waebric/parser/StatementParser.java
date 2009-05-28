@@ -407,9 +407,7 @@ class StatementParser extends AbstractParser {
 	 */
 	public Var parseVar(String name, String syntax) {
 		// Delegate parse to expression parser
-		Var var = new Var();
-		expressionParser.parse(var);
-		return var;
+		return expressionParser.parseVar(name, syntax);
 	}
 	
 	/**

@@ -89,14 +89,7 @@ class SiteParser extends AbstractParser {
 		// Parse colon separator
 		next("mapping separator", "path \":\" markup", WaebricSymbol.COLON);
 		
-		Markup markup = null; // Determine mark-up type based on look-ahead
-		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			markup = new Markup.MarkupWithArguments();
-		} else {
-			markup = new Markup.MarkupWithoutArguments();
-		}
-		
-		parse(markup); // Parse mark up
+		Markup markup = parseMarkup();
 		mapping.setMarkup(markup);
 	}
 	
@@ -184,11 +177,14 @@ class SiteParser extends AbstractParser {
 	}
 	
 	/**
+	 * @see Markup
 	 * @see org.cwi.waebric.parser.MarkupParser
-	 * @param markup
+	 * @param name
+	 * @param syntax
+	 * @return Markup
 	 */
-	public void parse(Markup markup) {
-		markupParser.parse(markup);
+	public Markup parseMarkup() {
+		return markupParser.parseMarkup();
 	}
 
 }

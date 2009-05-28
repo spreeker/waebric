@@ -27,6 +27,10 @@ public abstract class Argument implements ISyntaxNode {
 
 		private Var var;
 
+		public ArgumentWithVar(Var var) {
+			this.var = var;
+		}
+		
 		public Var getVar() {
 			return var;
 		}
@@ -37,10 +41,10 @@ public abstract class Argument implements ISyntaxNode {
 
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { 
-					var,
-					new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
-					expression
-				};
+				var,
+				new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
+				expression
+			};
 		}
 		
 	}

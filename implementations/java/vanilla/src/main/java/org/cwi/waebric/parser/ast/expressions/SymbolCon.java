@@ -23,15 +23,10 @@ public class SymbolCon implements ISyntaxNode {
 	}
 
 	public ISyntaxNode[] getChildren() {
-		ISyntaxNode[] chars = characters.getChildren();
-		ISyntaxNode[] children = new ISyntaxNode[chars.length+1];
-		
-		children[0] = new CharacterLiteral(WaebricSymbol.SQUOTE);
-		for(int i = 0; i < children.length; i++) {
-			children[i+1] = chars[i];
-		}
-		
-		return children;
+		return new ISyntaxNode[] {
+			new CharacterLiteral(WaebricSymbol.SQUOTE),
+			characters
+		};
 	}
 
 }
