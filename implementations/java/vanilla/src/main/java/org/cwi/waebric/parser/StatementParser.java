@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.parser.exception.UnexpectedTokenException;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -52,40 +52,33 @@ class StatementParser extends AbstractParser {
 			return null;
 		}
 	
-//		Token peek = tokens.peek(1); // Determine statement type based on look-ahead
-//		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
-//			return parseIfStatement();
-//		} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
-//			return parseEachStatement();
-//		} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
-//			statement = new Statement.LetStatement();
-//			parse((Statement.LetStatement) statement);
-//		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
-//			statement = new Statement.StatementCollection();
-//			parse((Statement.StatementCollection) statement);
-//		} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
-//			statement = new Statement.CommentStatement();
-//			parse((Statement.CommentStatement) statement);
-//		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-//			Token echoPeek = tokens.peek(2);
-//			if(echoPeek.getSort().equals(TokenSort.TEXT)) {
-//				// Embedding start with text
-//				statement = new Statement.EchoEmbeddingStatement();
-//				parse((Statement.EchoEmbeddingStatement) statement);
-//			} else {
-//				// Only remaining echo alternative uses expressions
-//				statement = new Statement.EchoExpressionStatement();
-//				parse((Statement.EchoExpressionStatement) statement);
-//			}
-//		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
-//			statement = new Statement.CDataStatement();
-//			parse((Statement.CDataStatement) statement);
-//		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
-//			statement = new Statement.YieldStatement();
-//			parse((Statement.YieldStatement) statement);
-//		} 
-		
-		return null;
+		Token peek = tokens.peek(1);
+		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
+			return parseIfStatement();
+		} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
+			return parseEachStatement();
+		} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
+			return parseLetStatement();
+		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
+			return parseStatementCollection();
+		} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
+			return parseCommentStatement();
+		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
+			Token echoPeek = tokens.peek(2);
+			if(echoPeek.getSort().equals(TokenSort.TEXT)) {
+				return parseEchoEmbeddingStatement();
+			} else {
+				return parseEchoExpressionStatement();
+			}
+		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
+			return parseCDataStatement();
+		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
+			return parseYieldStatement();
+		} else {
+			reportUnexpectedToken(peek, "statement", 
+					"\"if\", \"each\", \"let\", \"{\", \"comment\", \"echo\", \"cdata\" or \"yield\"");
+			return null;
+		}
 	}
 	
 	public Statement.IfStatement parseIfStatement() {
@@ -146,33 +139,73 @@ class StatementParser extends AbstractParser {
 		
 		next("let keyword", "\"let\"", WaebricKeyword.LET);
 	
-		// Parse assignment
+		// Parse assignments
+		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.IN)) {
+			Assignment assignment = parseAssignment();
+			statement.addAssignment(assignment);
+		}
+		
+		if(statement.getAssignmentCount() == 0) {
+			reportMissingToken("let assignment", "\"let\" assignments+ \"in\"");
+		}
+		
+		next("let in keyword", "assignments \"in\" statements", WaebricKeyword.IN);
+		
+		// Parse sub-statements
+		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
+			Statement subStatement = parseStatement("let sub-statement", "\"in\" statements \"end\"");
+			statement.addStatement(subStatement);
+		}
+		
+		next("let end keyword", "\"in\" statements \"end\"", WaebricKeyword.END);
 		
 		return statement;
 	}
 	
-	public void parse(Statement.StatementCollection statement) {
+	public Statement.StatementCollection parseStatementCollection() {
+		Statement.StatementCollection statement = new Statement.StatementCollection();
 		
+		next("statement collection opening", "\"{\" statements", WaebricSymbol.LCBRACKET);
+		
+		// Parse sub-statements
+		while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
+			Statement subStatement = parseStatement("statement collection", "\"{\" { statement, \",\" } \"}\"");
+			statement.addStatement(subStatement);
+		}
+		
+		next("statement collection closure", "statements \"}\"", WaebricSymbol.RCBRACKET);
+		
+		return statement;
 	}
 	
-	public void parse(Statement.CommentStatement statement) {
-		
+	// TODO
+	public Statement.CommentStatement parseCommentStatement() {
+		Statement.CommentStatement statement = new Statement.CommentStatement();
+		return statement;
 	}
 	
-	public void parse(Statement.EchoEmbeddingStatement statement) {
-		
+	// TODO
+	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement() {
+		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
+		return statement;
 	}
 	
-	public void parse(Statement.EchoExpressionStatement statement) {
-		
+	// TODO
+	public Statement.EchoExpressionStatement parseEchoExpressionStatement() {
+		Statement.EchoExpressionStatement statement = new Statement.EchoExpressionStatement();
+		return statement;
 	}
 	
-	public void parse(Statement.CDataStatement statement) {
-		
+	// TODO
+	public Statement.CDataStatement parseCDataStatement() {
+		Statement.CDataStatement statement = new Statement.CDataStatement();
+		return statement;
 	}
 	
-	public void parse(Statement.YieldStatement statement) {
-		
+	// TODO
+	public Statement.YieldStatement parseYieldStatement() {
+		Statement.YieldStatement statement = new Statement.YieldStatement();
+		return statement;
 	}
 	
 	public Assignment parseAssignment() {
@@ -183,22 +216,41 @@ class StatementParser extends AbstractParser {
 			
 		if(tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
 			Assignment.VarAssignment assignment = new Assignment.VarAssignment();
+			
+			// Parse variable
 			Var var = parseVar("assignment var", "var \"=\"");
+			assignment.setVar(var);
+			
 			tokens.next(); // Skip equals sign
+			
+			// Parse expression
 			Expression expression = parseExpression("var assignment expression", "var \"=\" expression");
+			assignment.setExpression(expression);
+			
 			next("var assignment closure", "var \"=\" expression \";\"", WaebricSymbol.SEMICOLON);
 			return assignment;
 		} else if(tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
 			Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
+			
+			// Parse identifier
 			if(next("assignment identifier", "identifier \"(\")", TokenSort.IDENTIFIER)) {
 				IdCon identifier = new IdCon(current.getLexeme().toString());
 				assignment.setIdentifier(identifier);
 			}
 			
+			// Parse formals
+			Formals formals = parseFormals();
+			assignment.setFormals(formals);
+			
+			next("id assignment equals", "formals \"=\" statement", WaebricSymbol.EQUAL_SIGN);
+			
+			// Parse statement
+			Statement subStatement = parseStatement("id assignment statement ", "\"=\" statement");
+			assignment.setStatement(subStatement);
+			
 			return assignment;
 		} else {
-			exceptions.add(new UnexpectedTokenException(
-					tokens.peek(2), "assignment", "var \"=\" or identifier \"(\""));
+			reportUnexpectedToken(tokens.peek(2), "assignment", "var \"=\" or identifier \"(\"");
 			return null;
 		}
 	}
