@@ -14,7 +14,6 @@ import org.cwi.waebric.parser.ast.site.Mappings;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
-import org.cwi.waebric.parser.ast.site.Path.PathWithDir;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.token.Token;
@@ -41,91 +40,112 @@ class SiteParser extends AbstractParser {
 	}
 	
 	/**
-	 * 
+	 * @see Site
 	 * @param site
 	 */
-	public void parse(Site site) {
-		parse(site.getMappings()); // Delegate mappings
-		next("site end", "site mappings end", WaebricKeyword.END); // Parse end keyword
+	public Site parseSite() {
+		Site site = new Site();
+		
+		// Parse mappings
+		Mappings mappings = parseMappings();
+		site.setMappings(mappings);
+		
+		if(! next("site end", "site mappings end", WaebricKeyword.END)) {
+			return null; // Incorrect site syntax, return empty node
+		}
+		
+		return site;
 	}
 	
 	/**
-	 * 
+	 * @see Mappings
 	 * @param mappings
 	 */
-	public void parse(Mappings mappings) {
+	public Mappings parseMappings() {
+		Mappings mappings = new Mappings();
+		
 		while(tokens.hasNext()) {
-			Mapping mapping = new Mapping();
-			parse(mapping);
+			Mapping mapping = parseMapping();
 			mappings.add(mapping);
 				
 			if(tokens.hasNext()) {
 				Token peek = tokens.peek(1);
 				if(peek.getLexeme().equals(WaebricKeyword.END)) {
-					break; // End token reached, stop parsing mappings
+					break; // End token reached, quit parsing mappings
 				} else {
-					// Without end, a semicolon mapping separator is expected
+					// Expect mapping separator ";" between each mapping
 					next("mapping separator", "semicolon", WaebricSymbol.SEMICOLON);
 				}
 			}
 		}
+		
+		return mappings;
 	}
 	
 	/**
-	 * 
+	 * @see Mapping
 	 * @param mapping
 	 */
-	public void parse(Mapping mapping) {
-		Path path = null; // Determine path type based on look-ahead
-		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
-			path = new Path.PathWithDir();
-		} else {
-			path = new Path.PathWithoutDir();
-		}
+	public Mapping parseMapping() {
+		Mapping mapping = new Mapping();
 		
-		parse(path); // Parse path
+		// Parse path
+		Path path = parsePath();
 		mapping.setPath(path);
 		
 		// Parse colon separator
-		next("mapping separator", "path \":\" markup", WaebricSymbol.COLON);
+		if(! next("mapping separator", "path \":\" markup", WaebricSymbol.COLON)) {
+			return null; // Invalid mapping syntax, quit parsing
+		}
 		
 		Markup markup = parseMarkup();
 		mapping.setMarkup(markup);
+		
+		return mapping;
 	}
 	
 	/**
-	 * 
+	 * @see Path
 	 * @param path
 	 */
-	public void parse(Path path) {
-		if(path instanceof Path.PathWithDir) {
-			// Parse directory
-			DirName dir = new DirName();
-			parse(dir);
-			((PathWithDir) path).setDirName(dir);
+	public Path parsePath() {
+		Path path = null; // Determine path type based on look-ahead
+		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
+			// Parse directory name
+			DirName name = parseDirName();
+			path = new Path.PathWithDir(name);
+		} else {
+			path = new Path.PathWithoutDir();
 		}
-		
+
 		// Parse filename
-		FileName file = new FileName();
-		parse(file);
+		FileName file = parseFileName();
 		path.setFileName(file);
+		
+		return path;
 	}
 	
 	/**
-	 * 
-	 * @param dirName
+	 * @see DirName
+	 * @param Directory name
 	 */
-	public void parse(DirName dirName) {
-		Directory directory = new Directory();
-		parse(directory); // Delegate to directory
-		dirName.setDirectory(directory);
+	public DirName parseDirName() {
+		DirName name = new DirName();
+		
+		// Parse directory
+		Directory directory = parseDirectory();
+		name.setDirectory(directory);
+		
+		return name;
 	}
 	
 	/**
-	 * 
+	 * @see Directory
 	 * @param directory
 	 */
-	public void parse(Directory directory) {
+	public Directory parseDirectory() {
+		Directory directory = new Directory();
+		
 		while(tokens.hasNext()) {
 			if(directory.getElements().length != 0) {
 				// Between each path element a slash is expected
@@ -146,6 +166,8 @@ class SiteParser extends AbstractParser {
 						"identifier without white spaces, layout symbols, periods and backward slashes"));
 			}
 		}
+		
+		return directory;
 	}
 	
 	/**
@@ -158,13 +180,15 @@ class SiteParser extends AbstractParser {
 	}
 	
 	/**
-	 * 
-	 * @param fileName
+	 * @see FileName
+	 * @param File name
 	 */
-	public void parse(FileName fileName) {
+	public FileName parseFileName() {
+		FileName name = new FileName();
+		
 		// Parse file name
 		if(next("file name", "name \".\" extension", TokenSort.IDENTIFIER)) {
-			fileName.setName(new PathElement(current.getLexeme().toString()));
+			name.setName(new PathElement(current.getLexeme().toString()));
 		}
 		
 		// Parse period separator
@@ -172,8 +196,10 @@ class SiteParser extends AbstractParser {
 		
 		// Parse file extension
 		if(next("file extension", "name \".\" extension", TokenSort.IDENTIFIER)) {
-			fileName.setExt(new FileExt(current.getLexeme().toString()));
+			name.setExt(new FileExt(current.getLexeme().toString()));
 		}
+		
+		return name;
 	}
 	
 	/**

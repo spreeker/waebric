@@ -77,12 +77,10 @@ class ModuleParser extends AbstractParser {
 				parse(imprt);
 				module.addElement(imprt);
 			} else if(current.getLexeme() == WaebricKeyword.SITE) {
-				Site site = new Site();
-				parse(site);
+				Site site = parseSite();
 				module.addElement(site);
 			} else if(current.getLexeme() == WaebricKeyword.DEF) {
-				FunctionDef def = new FunctionDef();
-				parse(def);
+				FunctionDef def = parseFunctionDef();
 				module.addElement(def);
 			} else {
 				exceptions.add(new UnexpectedTokenException(
@@ -125,16 +123,16 @@ class ModuleParser extends AbstractParser {
 	 * @see org.cwi.waebric.parser.SiteParser
 	 * @param site
 	 */
-	public void parse(Site site) {
-		siteParser.parse(site);
+	public Site parseSite() {
+		return siteParser.parseSite();
 	}
 	
 	/**
 	 * org.cwi.waebric.parser.FunctionParser
 	 * @param def
 	 */
-	public void parse(FunctionDef def) {
-		functionParser.parse(def);
+	public FunctionDef parseFunctionDef() {
+		return functionParser.parseFunctionDef();
 	}
 
 }

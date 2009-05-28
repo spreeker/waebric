@@ -14,6 +14,7 @@ import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
@@ -110,10 +111,11 @@ class MarkupParser extends AbstractParser {
 	 * @param attribute
 	 */
 	public Attribute parseAttribute() {
-		// Parse attribute symbol		
-		if(next("attribute symbol", "symbol", TokenSort.SYMBOL)) {
-			char c = current.getLexeme().toString().charAt(0);
+		if(tokens.hasNext() && tokens.peek(1).getSort() == TokenSort.SYMBOL) {
+			Token peek = tokens.peek(1); // Retrieve symbol token
+			char c = peek.getLexeme().toString().charAt(0);
 			if(c == '#' || c == '.' || c == '$' || c ==':') { // Identifier attribute
+				tokens.next(); // Skip attribute symbol
 				Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(c);
 				
 				if(next("identifier attribute", "symbol identifier", TokenSort.IDENTIFIER)) {
@@ -124,6 +126,7 @@ class MarkupParser extends AbstractParser {
 				
 				return null; // Failed parse, return empty node
 			} else if(c == '@') { // Natural attribute
+				tokens.next(); // Skip attribute symbol
 				if(next("numeral attribute", "@ number", TokenSort.NUMBER)) {
 					NatCon number = new NatCon(current.getLexeme().toString());
 					
@@ -146,12 +149,10 @@ class MarkupParser extends AbstractParser {
 				} else {
 					return null; // Failed parse, return empty node
 				}
-			} else { // Unknown attribute
-				reportUnexpectedToken(current, "attribute", "# . $ : or @");
 			}
 		}
 
-		return null; // No symbol found, thus invalid attribute, return empty node
+		return null; // Return empty node, as no valid attribute was found
 	}
 
 	/**

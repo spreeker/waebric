@@ -16,8 +16,6 @@ import org.cwi.waebric.parser.ast.site.Mapping;
 import org.cwi.waebric.parser.ast.site.Mappings;
 import org.cwi.waebric.parser.ast.site.Path;
 import org.cwi.waebric.parser.ast.site.Site;
-import org.cwi.waebric.parser.ast.site.Path.PathWithDir;
-import org.cwi.waebric.parser.ast.site.Path.PathWithoutDir;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -50,10 +48,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("index1.html:function1(1);index2.html:function2 end");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Site site = new Site();
-		parser.parse(site);
-		
-		// Assertions
+		Site site = parser.parseSite();
 		assertEquals(0, exceptions.size());
 		assertEquals(2, site.getMappings().size());
 	}
@@ -63,10 +58,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("index1.html:function1(1);index2.html:function2");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Mappings mappings = new Mappings();
-		parser.parse(mappings);
-		
-		// Assertions
+		Mappings mappings = parser.parseMappings();
 		assertEquals(0, exceptions.size());
 		assertEquals(2, mappings.size());
 	}
@@ -79,10 +71,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("home/index.html: home(\"Hello world!\")");
 		parser = new SiteParser(iterator, exceptions);
 		
-		mapping = new Mapping();
-		parser.parse(mapping);
-		
-		// Assertions
+		mapping = parser.parseMapping();
 		assertEquals(0, exceptions.size());
 		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
 		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithArguments);
@@ -91,10 +80,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("index.html: home");
 		parser = new SiteParser(iterator, exceptions);
 		
-		mapping = new Mapping();
-		parser.parse(mapping);
-		
-		// Assertions
+		mapping = parser.parseMapping();
 		assertEquals(0, exceptions.size());
 		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
 		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithoutArguments);
@@ -106,10 +92,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla/myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
-		PathWithDir pathdf = new Path.PathWithDir();
-		parser.parse(pathdf);
-		
-		// Assertions
+		Path.PathWithDir pathdf = (Path.PathWithDir) parser.parsePath();
 		assertTrue(exceptions.size() == 0);
 		assertNotNull(pathdf.getDirName());
 		assertNotNull(pathdf.getFileName());
@@ -118,10 +101,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
-		PathWithoutDir pathf = new Path.PathWithoutDir();
-		parser.parse(pathf);
-		
-		// Assertions
+		Path.PathWithoutDir pathf = (Path.PathWithoutDir) parser.parsePath();
 		assertEquals(0, exceptions.size());
 		assertNotNull(pathf.getFileName());
 	}
@@ -131,10 +111,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
-		DirName dirName = new DirName();
-		parser.parse(dirName); // Parse directory name
-		
-		// Assertions
+		DirName dirName = parser.parseDirName();
 		assertEquals(0, exceptions.size());
 		assertEquals(Directory.class, dirName.getDirectory().getClass());
 	}
@@ -144,10 +121,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
-		FileName name = new FileName();
-		parser.parse(name); // Parse filename
-		
-		// Assertions
+		FileName name = parser.parseFileName();
 		assertEquals(0, exceptions.size());
 		assertEquals("myfile", name.getName().toString());
 		assertEquals("wae", name.getExt().toString());
@@ -158,10 +132,7 @@ public class TestSiteParser {
 		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Directory directory = new Directory();
-		parser.parse(directory); // Parse directory
-		
-		// Assertions
+		Directory directory = parser.parseDirectory();
 		assertEquals(0, exceptions.size());
 		assertEquals(5, directory.getElements().length);
 		assertEquals("org", directory.getElements()[0].toString());

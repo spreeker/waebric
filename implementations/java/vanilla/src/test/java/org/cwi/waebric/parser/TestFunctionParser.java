@@ -1,5 +1,9 @@
 package org.cwi.waebric.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +40,10 @@ public class TestFunctionParser {
 		iterator = TestScanner.quickScan("home end");
 		parser = new FunctionParser(iterator, exceptions);
 		
-		FunctionDef def = new FunctionDef();
-		parser.parse(def);
-		
-		// Assertions: TODO
+		FunctionDef def = parser.parseFunctionDef();
+		assertTrue(exceptions.size() == 0);
+		assertNull(def.getFormals());
+		assertEquals(0, def.getStatementCount());
 	}
 	
 }

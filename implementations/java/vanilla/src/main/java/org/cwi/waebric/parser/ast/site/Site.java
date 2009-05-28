@@ -5,20 +5,27 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.module.IModuleElement;
 
+/**
+ * Site<br><br>
+ * 
+ * Grammar:<br>
+ * <code>
+ * 	"site" Mappings "end" -> Site
+ * </code>
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
 public class Site implements IModuleElement {
 
 	private Mappings mappings;
-	
-	public Site() {
-		mappings = new Mappings();
-	}
 
 	public Mappings getMappings() {
 		return mappings;
 	}
 
-	public boolean addMapping(Mapping mapping) {
-		return mappings.add(mapping);
+	public void setMappings(Mappings mappings) {
+		this.mappings = mappings;
 	}
 
 	public ISyntaxNode[] getChildren() {

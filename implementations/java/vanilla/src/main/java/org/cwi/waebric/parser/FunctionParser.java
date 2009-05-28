@@ -3,6 +3,7 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.functions.FunctionDef;
 import org.cwi.waebric.parser.ast.statements.Formals;
@@ -12,9 +13,12 @@ import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
+ * Function parser
+ * 
  * module languages/waebric/syntax/Functions
- * @author schagen
- *
+ * 
+ * @author Jeroen van Schagen
+ * @date 27-05-2009
  */
 class FunctionParser extends AbstractParser {
 
@@ -28,21 +32,38 @@ class FunctionParser extends AbstractParser {
 	}
 
 	/**
-	 * 
+	 * @see FunctionDef
 	 * @param def
 	 */
-	public void parse(FunctionDef def) {
+	public FunctionDef parseFunctionDef() {
+		FunctionDef def = new FunctionDef();
+		
+		// Parse function identifier
 		if(next("function identifier", "identifier", TokenSort.IDENTIFIER)) {
-			// Parse function definition identifier
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			def.setIdentifier(identifier);
+		} else {
+			return null; // Invalid function syntax, quit parsing
 		}
 		
-		// TODO: Optional formals
-		// TODO: 0..* Statements
+		// Parse formals (optional)
+		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
+			Formals formals = parseFormals();
+			def.setFormals(formals);
+		}
 		
-		// Parse function definition end
-		next("function end", "end", WaebricKeyword.END);
+		// Parse statements
+		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
+			Statement subStatement = parseStatement("function statement", "identifier formals? statements*");
+			def.addStatement(subStatement);
+		}
+		
+		// Parse function closure
+		if(! next("function end", "end", WaebricKeyword.END)) {
+			return null; // Invalid function syntax, return empty node
+		}
+		
+		return def;
 	}
 	
 	/**
