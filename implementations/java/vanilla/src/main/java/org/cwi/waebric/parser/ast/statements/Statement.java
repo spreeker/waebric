@@ -142,6 +142,11 @@ public abstract class Statement implements ISyntaxNode {
 		private SyntaxNodeList<Assignment> assignments;
 		private SyntaxNodeList<Statement> statements;
 		
+		public LetStatement() {
+			assignments = new SyntaxNodeList<Assignment>();
+			statements = new SyntaxNodeList<Statement>();
+		}
+		
 		public boolean addAssignment(Assignment assignment) {
 			return assignments.add(assignment);
 		}
