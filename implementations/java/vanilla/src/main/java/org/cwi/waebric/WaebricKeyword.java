@@ -13,10 +13,7 @@ public enum WaebricKeyword {
 	COMMENT, ECHO, CDATA, YIELD,
 	
 	// Module
-	MODULE, IMPORT, DEF, END, SITE,
-	
-	// Predicates
-	LIST, RECORD, STRING;
+	MODULE, IMPORT, DEF, END, SITE;
 	
 	/**
 	 * Retrieve keyword literal

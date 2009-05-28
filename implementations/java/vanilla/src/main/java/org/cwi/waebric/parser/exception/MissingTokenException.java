@@ -14,4 +14,8 @@ public class MissingTokenException extends ParserException {
 				"attach the expected: (" + expected + ").");
 	}
 	
+	public MissingTokenException(String name, String expected) {
+		super("Missing '" + name + "' token, attach the expected: (" + expected + ").");
+	}
+	
 }

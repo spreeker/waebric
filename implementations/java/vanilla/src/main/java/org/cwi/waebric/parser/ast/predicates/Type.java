@@ -4,9 +4,14 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
- * "list" -> Type
- * "record" -> Type
- * "string" -> Type
+ * Type represents a type definition.<br><br>
+ * 
+ * Grammar:<br>
+ * <code>
+ * 	"list" -> Type<br>
+ * 	"record" -> Type<br>
+ * 	"string" -> Type<br>
+ * </code>
  * 
  * @author Jeroen van Schagen
  * @date 27-05-2009

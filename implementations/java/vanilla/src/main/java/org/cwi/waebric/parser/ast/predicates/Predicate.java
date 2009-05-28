@@ -5,6 +5,12 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 
+/**
+ * Predicates are ...
+ * 
+ * @author Jeroen van Schagen
+ * @date 27-05-2009
+ */
 public abstract class Predicate implements ISyntaxNode {
 
 	protected Expression expression;
@@ -18,9 +24,10 @@ public abstract class Predicate implements ISyntaxNode {
 	}
 
 	/**
-	 * Expression -> Predicate
-	 * @author schagen
-	 *
+	 * Grammar:<br>
+	 * <code>
+	 * 	Expression -> Predicate
+	 * </code>
 	 */
 	public static class PredicateWithoutType extends Predicate {
 
@@ -31,9 +38,10 @@ public abstract class Predicate implements ISyntaxNode {
 	}
 	
 	/**
-	 * Expression "." Type "?" -> Predicate
-	 * @author schagen
-	 *
+	 * Grammar:<br>
+	 * <code>
+	 * 	Expression "." Type "?" -> Predicate
+	 * </code>
 	 */
 	public static class PredicateWithType extends Predicate {
 

@@ -33,15 +33,21 @@ public abstract class AbstractParser {
 	 * @throws MissingTokenException Thrown when no more tokens are available
 	 * 
 	 * @param name Name of expected token, used for error reporting
-	 * @param expected Grammar of expected token, used for error reporting
+	 * @param syntax Grammar of expected token, used for error reporting
 	 * @return Success status of finding next token.
 	 */
-	protected boolean next(String name, String expected) {
+	protected boolean next(String name, String syntax) {
 		if(tokens.hasNext()) {
-			current = tokens.next();
+			current = tokens.next(); // Retrieve next token in stream
 			return true;
 		} else {
-			exceptions.add(new MissingTokenException(current, name, expected));
+			if(current != null) { 
+				// Throw missing token exception, with current token
+				exceptions.add(new MissingTokenException(current, name, syntax));
+			} else {
+				// Throw missing token exception
+				exceptions.add(new MissingTokenException(name, syntax));
+			}
 			return false;
 		}
 	}
@@ -53,16 +59,17 @@ public abstract class AbstractParser {
 	 * @throws UnexpectedTokenException Thrown when next token does not match expected sort
 	 * 
 	 * @param name Name of expected token, used for error reporting
-	 * @param expected Grammar of expected token, used for error reporting
+	 * @param syntax Grammar of expected token, used for error reporting
 	 * @param sort Expected token sort, used for type checking
 	 * @return Success status of finding and type-checking next token.
 	 */
-	protected boolean next(String name, String expected, TokenSort sort) {
-		if(next(name, expected)) {
+	protected boolean next(String name, String syntax, TokenSort sort) {
+		if(next(name, syntax)) {
 			if(current.getSort() == sort) {
-				return true; // Correct token
+				return true; // Token has been verified
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, name, expected));
+				// Throw unexpected token exception
+				exceptions.add(new UnexpectedTokenException(current, name, syntax));
 			}
 		}
 		
@@ -76,16 +83,17 @@ public abstract class AbstractParser {
 	 * @throws UnexpectedTokenException Thrown when next token does not match expected lexeme
 	 * 
 	 * @param name Name of expected token, used for error reporting
-	 * @param expected Grammar of expected token, used for error reporting
+	 * @param syntax Grammar of expected token, used for error reporting
 	 * @param lexeme Expected token lexeme, used for type checking
 	 * @return Success status of finding and type-checking next token.
 	 */
-	protected boolean next(String name, String expected, Object lexeme) {
-		if(next(name, expected)) {
+	protected boolean next(String name, String syntax, Object lexeme) {
+		if(next(name, syntax)) {
 			if(current.getLexeme().equals(lexeme)) {
-				return true; // Correct token
+				return true; // Token has been verified
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, name, expected));
+				// Throw unexpected token exception
+				exceptions.add(new UnexpectedTokenException(current, name, syntax));
 			}
 		}
 		

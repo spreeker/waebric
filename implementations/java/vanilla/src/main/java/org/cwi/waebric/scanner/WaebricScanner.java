@@ -67,8 +67,6 @@ public class WaebricScanner implements Iterable<Token> {
 						tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 					} else if(isIdentifier(tokenizer.sval)) { // Identifier
 						tokens.add(new Token(tokenizer.sval, TokenSort.IDENTIFIER, tokenizer.lineno()));
-					} else { // Unknown word
-						exceptions.add(new UnknownTokenException(tokenizer.sval, tokenizer.lineno()));
 					}
 				break;
 				case StreamTokenizer.TT_EOF: break;
