@@ -42,15 +42,15 @@ class ExpressionParser extends AbstractParser {
 		} else if(type == Expression.NatExpression.class) {
 			expression = new Expression.NatExpression();
 			parse((Expression.NatExpression) expression);
-		} else if(type == Expression.ExpressionCollection.class) {
-			expression = new Expression.ExpressionCollection();
-			parse((Expression.ExpressionCollection) expression);
-		} else if(type == Expression.ExpressionWithIdCon.class) {
-			expression = new Expression.ExpressionWithIdCon();
-			parse((Expression.ExpressionWithIdCon) expression);
-		} else if(type == Expression.KeyValuePairCollection.class) {
-			expression = new Expression.KeyValuePairCollection();
-			parse((Expression.KeyValuePairCollection) expression);
+		} else if(type == Expression.ListExpression.class) {
+			expression = new Expression.ListExpression();
+			parse((Expression.ListExpression) expression);
+		} else if(type == Expression.IdConExpression.class) {
+			expression = new Expression.IdConExpression();
+			parse((Expression.IdConExpression) expression);
+		} else if(type == Expression.RecordExpression.class) {
+			expression = new Expression.RecordExpression();
+			parse((Expression.RecordExpression) expression);
 		} else if(type == Expression.SymbolExpression.class) {
 			expression = new Expression.SymbolExpression();
 			parse((Expression.SymbolExpression) expression);
@@ -107,7 +107,7 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	public void parse(Expression.ExpressionWithIdCon expression) {
+	public void parse(Expression.IdConExpression expression) {
 		// Parse sub expression
 		Expression subExpression = parseExpression("expression", "expression \".\" identifier");
 		expression.setExpression(subExpression);
@@ -126,8 +126,8 @@ class ExpressionParser extends AbstractParser {
 	 * 
 	 * @param expression
 	 */
-	public void parse(Expression.ExpressionCollection expression) {
-		next("expression collection opening", "\"[\" expressions", WaebricSymbol.LBRACKET);
+	public void parse(Expression.ListExpression expression) {
+		next("list opening", "\"[\" expressions", WaebricSymbol.LBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
@@ -140,19 +140,19 @@ class ExpressionParser extends AbstractParser {
 			
 			// While not end of expressions, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
-				next("expressions separator", "expression \",\" expression", WaebricSymbol.COMMA);
+				next("list element separator", "expression \",\" expression", WaebricSymbol.COMMA);
 			}
 		}
 		
-		next("expression collection closure", "expressions \"]\"", WaebricSymbol.RBRACKET);
+		next("list closure", "expressions \"]\"", WaebricSymbol.RBRACKET);
 	}
 	
 	/**
 	 * 
 	 * @param expression
 	 */
-	public void parse(Expression.KeyValuePairCollection expression) {
-		next("key value pair collection opening", "\"{\" pairs", WaebricSymbol.LCBRACKET);
+	public void parse(Expression.RecordExpression expression) {
+		next("record opening", "\"{\" pairs", WaebricSymbol.LCBRACKET);
 		
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -166,11 +166,11 @@ class ExpressionParser extends AbstractParser {
 			
 			// While not end of pairs, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
-				next("key value pair separator", "key value pair \",\" key value pair", WaebricSymbol.COMMA);
+				next("record element separator", "key value pair \",\" key value pair", WaebricSymbol.COMMA);
 			}
 		}
 		
-		next("key value pair collection closure", "pairs \"}\"", WaebricSymbol.RCBRACKET);
+		next("record closure", "pairs \"}\"", WaebricSymbol.RCBRACKET);
 	}
 	
 	/**
@@ -220,10 +220,10 @@ class ExpressionParser extends AbstractParser {
 	public static Class<? extends Expression> getExpressionClass(Token token) {
 		if(token.getLexeme().equals(WaebricSymbol.LBRACKET)) {
 			// Expression collections start with a [
-			return Expression.ExpressionCollection.class;
+			return Expression.ListExpression.class;
 		} else if(token.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
 			// Key value pair collections start with a {
-			return Expression.KeyValuePairCollection.class;
+			return Expression.RecordExpression.class;
 		} else if(token.getLexeme().equals(WaebricSymbol.SQUOTE)) {
 			// Symbol cons start with a '
 			return Expression.SymbolExpression.class;
@@ -237,7 +237,7 @@ class ExpressionParser extends AbstractParser {
 			// Variable expressions consist of variable
 			return Expression.VarExpression.class;
 		} else { // Only remaining alternative: Expression "." IdCon -> Expression
-			return Expression.ExpressionWithIdCon.class;
+			return Expression.IdConExpression.class;
 		}
 	}
 

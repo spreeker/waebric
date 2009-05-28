@@ -107,7 +107,7 @@ public abstract class Expression implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class ExpressionWithIdCon extends Expression {
+	public static class IdConExpression extends Expression {
 
 		private Expression expression;
 		private IdCon identifier;
@@ -143,11 +143,11 @@ public abstract class Expression implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class ExpressionCollection extends Expression {
+	public static class ListExpression extends Expression {
 
 		private SyntaxNodeListWithSeparator<Expression> expressions;
 		
-		public ExpressionCollection() {
+		public ListExpression() {
 			expressions = new SyntaxNodeListWithSeparator<Expression>(WaebricSymbol.COMMA);
 		}
 		
@@ -174,11 +174,11 @@ public abstract class Expression implements ISyntaxNode {
 	 * @author schagen
 	 *
 	 */
-	public static class KeyValuePairCollection extends Expression {
+	public static class RecordExpression extends Expression {
 
 		private SyntaxNodeListWithSeparator<KeyValuePair> pairs;
 		
-		public KeyValuePairCollection() {
+		public RecordExpression() {
 			pairs = new SyntaxNodeListWithSeparator<KeyValuePair>(WaebricSymbol.COMMA);
 		}
 		

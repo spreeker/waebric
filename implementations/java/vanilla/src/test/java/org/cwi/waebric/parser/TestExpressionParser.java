@@ -65,7 +65,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("variable1.identifier1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.ExpressionWithIdCon expression = new Expression.ExpressionWithIdCon();
+		Expression.IdConExpression expression = new Expression.IdConExpression();
 		parser.parse(expression);
 		
 		// Assertions
@@ -79,7 +79,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("[variable1,variable2]");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.ExpressionCollection expression = new Expression.ExpressionCollection();
+		Expression.ListExpression expression = new Expression.ListExpression();
 		parser.parse(expression);
 		
 		// Assertions
@@ -94,7 +94,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("{identifier1: variable1, identifier2: variable2}");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.KeyValuePairCollection expression = new Expression.KeyValuePairCollection();
+		Expression.RecordExpression expression = new Expression.RecordExpression();
 		parser.parse(expression);
 		
 		// Assertions

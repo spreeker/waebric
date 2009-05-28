@@ -6,6 +6,21 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 
+/**
+ * Waebric provides shorthand notation for common XHTML attributes.<br><br>
+ * 
+ * Meaning of attribute shorthands:<br>
+ * <code>
+ * 	div.x == div(class=x)<br>
+ * 	div#x == div(id=x)<br>
+ * 	input$x == input(name=x)<br>
+ * 	input:x == input(type=x)<br>
+ * 	img@w%h == img(width=w,height=h)
+ * </code>
+ * 
+ * @author Jeroen van Schagen
+ * @date 25-05-2009
+ */
 public abstract class Attribute implements ISyntaxNode {
 	
 	protected StringLiteral symbol;
@@ -14,6 +29,14 @@ public abstract class Attribute implements ISyntaxNode {
 		return symbol;
 	}
 
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"#" IdCon -> Attribute
+	 *  "." IdCon -> Attribute
+	 *  "$" IdCOn -> Attribute
+	 * </code>
+	 */
 	public static class AttributeIdCon extends Attribute {
 
 		private IdCon identifier;
@@ -36,6 +59,12 @@ public abstract class Attribute implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"@" w:NatCon -> Attribute
+	 * </code>
+	 */
 	public static class AttributeNatCon extends Attribute {
 
 		protected NatCon number;
@@ -58,6 +87,12 @@ public abstract class Attribute implements ISyntaxNode {
 		
 	}
 	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"@" w:NatCon "%" h:NatCon -> Attribute
+	 * </code>
+	 */
 	public static class AttributeDoubleNatCon extends AttributeNatCon {
 
 		private final StringLiteral secondSymbol;
