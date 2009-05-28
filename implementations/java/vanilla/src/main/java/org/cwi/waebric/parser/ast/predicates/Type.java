@@ -27,6 +27,16 @@ public class Type implements ISyntaxNode {
 	public void setType(StringLiteral type) {
 		this.type = type;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return type.equals(obj);
+	}
+	
+	@Override
+	public String toString() {
+		return type.toString();
+	}
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { type };

@@ -50,8 +50,8 @@ public class WaebricScanner implements Iterable<Token> {
 		
 		tokenizer.whitespaceChars(WaebricLayout.NEW_LINE, WaebricLayout.NEW_LINE);
 		tokenizer.whitespaceChars(WaebricLayout.TAB, WaebricLayout.TAB);
-		tokenizer.ordinaryChars((int) '/', (int) '/');
-		tokenizer.ordinaryChars((int) '.', (int) '.');
+		tokenizer.ordinaryChar((int) '/');
+		tokenizer.ordinaryChar((int) '.');
 		
 		// Scan and store tokens
 		tokens.clear();

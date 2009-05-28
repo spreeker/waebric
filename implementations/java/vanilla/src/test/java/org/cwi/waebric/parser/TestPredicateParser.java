@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.expressions.Expression;
+import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.predicates.Type;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
@@ -37,12 +39,43 @@ public class TestPredicateParser {
 	
 	@Test
 	public void testPredicateWithoutType() {
+		// Correct predicate
+		iterator = TestScanner.quickScan("123");
+		parser = new PredicateParser(iterator, exceptions);
 		
+		Predicate predicate = parser.parsePredicate("expression", "expression");
+		assertEquals(0, exceptions.size()); // Error free
+		assertEquals(Predicate.PredicateWithoutType.class, predicate.getClass()); // Correct type
+		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass()); // Correct expression
 	}
 	
 	@Test
 	public void testPredicateWithType() {
+		// Correct predicate
+		iterator = TestScanner.quickScan("bla.string?");
+		parser = new PredicateParser(iterator, exceptions);
 		
+		Predicate predicate = parser.parsePredicate("expression", "expression \".\" type \"?\"");
+		assertEquals(0, exceptions.size()); // Error free
+		assertEquals(Predicate.PredicateWithType.class, predicate.getClass()); // Correct type
+		assertEquals(Expression.VarExpression.class, predicate.getExpression().getClass()); // Correct expression
+		assertEquals("string", ((Predicate.PredicateWithType) predicate).getType().toString()); // Correct type
+	}
+	
+	@Test
+	public void testPredicateIncorrectExpression() {
+		// TODO
+	}
+	
+	@Test
+	public void testPredicateIncorrectType() {
+		// TODO
+	}
+	
+	
+	@Test
+	public void testPredicateMissingEnd() {
+		// TODO
 	}
 	
 	@Test
