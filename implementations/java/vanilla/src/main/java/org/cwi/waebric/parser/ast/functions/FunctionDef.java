@@ -24,6 +24,10 @@ public class FunctionDef implements IModuleElement {
 	private Formals formals;
 	private SyntaxNodeList<Statement> statements;
 
+	public FunctionDef() {
+		statements = new SyntaxNodeList<Statement>();
+	}
+	
 	public IdCon getIdentifier() {
 		return identifier;
 	}

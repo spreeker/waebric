@@ -5,10 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Expression.NatExpression;
+import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
+import org.cwi.waebric.parser.ast.statements.Statement.IfElseStatement;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -74,8 +77,98 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testInvalidAssignment() {
+	public void testIfStatement() {
+		iterator = TestScanner.quickScan("if(123) comment \"succes\"");
+		parser = new StatementParser(iterator, exceptions);
 		
+		Statement.IfStatement statement = parser.parseIfStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(Predicate.PredicateWithoutType.class, statement.getPredicate().getClass());
+		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
+	}
+	
+	@Test
+	public void testIfElseStatement() {
+		iterator = TestScanner.quickScan("if(123) comment \"succes\" else yield;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.IfElseStatement statement = (IfElseStatement) parser.parseIfStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(Predicate.PredicateWithoutType.class, statement.getPredicate().getClass());
+		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
+		assertEquals(Statement.YieldStatement.class, statement.getSecondStatement().getClass());
+	}
+	
+	@Test
+	public void testEchoEmbeddingStatement() {
+		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		// TODO: Cannot be tested until embedding is completed
+	}
+	
+	@Test
+	public void testEchoExpressionStatement() {
+		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.EchoExpressionStatement statement = parser.parseEchoExpressionStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
+	}
+	
+	@Test
+	public void testEachStatement() {
+		iterator = TestScanner.quickScan("each (var1:10) comment \"test\"");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.EachStatement statement = parser.parseEachStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals("var1", statement.getVar().getIdentifier().toString());
+		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
+		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
+	}
+	
+	@Test
+	public void testLetStatement() {
+		iterator = TestScanner.quickScan("let var=100 in comment \"test\" end");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.LetStatement statement = parser.parseLetStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(1, statement.getAssignmentCount());
+		assertEquals(Assignment.VarAssignment.class, statement.getAssignment(0).getClass());
+		assertEquals(1, statement.getStatementCount());
+		assertEquals(Statement.CommentStatement.class, statement.getStatement(0).getClass());
+	}
+	
+	@Test
+	public void testCDataStatement() {
+		iterator = TestScanner.quickScan("cdata 10;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.CDataStatement statement = parser.parseCDataStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
+	}
+	
+	@Test
+	public void testCommentStatement() {
+		iterator = TestScanner.quickScan("comment \"OH NOES TEH HAXZOR\";");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.CommentStatement statement = parser.parseCommentStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals("OH NOES TEH HAXZOR", statement.getComment().toString());
+	}
+	
+	@Test
+	public void testStatementCollection() {
+		iterator = TestScanner.quickScan("yield;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		parser.parseYieldStatement();
+		assertEquals(0, exceptions.size());
 	}
 
 }
