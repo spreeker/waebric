@@ -194,17 +194,12 @@ public class WaebricTokenizer {
 	private TokenSort nextSymbol() throws IOException {
 		read(); // Retrieve first symbol
 		
-		if(isSymbol(current)) { // SymbolCon
-			do {
-				svalue += (char) current; // Build symbol value
-				read(); // Retrieve next symbol
-			} while(isSymbol(current));
-			
-			return TokenSort.SYMBOLCON;
-		} else { // Symbol character '
-			cvalue = '\'';
-			return TokenSort.SYMBOLCHAR;
+		while(isSymbol(current)) {
+			svalue += (char) current; // Build symbol value
+			read(); // Retrieve next symbol
 		}
+		
+		return TokenSort.SYMBOLCON;
 	}
 	
 	/**
@@ -226,11 +221,11 @@ public class WaebricTokenizer {
 	 * @throws IOException
 	 */
 	private TokenSort nextNumber() throws IOException {
-		do {
+		while(isNumeral(current)) {
 			ivalue *= 10; // Create space for next character
 			ivalue += toNumber(current);
 			read(); // Read next number
-		} while(isNumeral(current));
+		}
 		
 		// NatCon
 		return TokenSort.NATCON;
@@ -249,10 +244,10 @@ public class WaebricTokenizer {
 		if(isLetter(current) || isNumeral(current)) {
 			svalue += head; // Place head in value
 			
-			do {
+			while(isLetter(current) || isNumeral(current)) {
 				svalue += (char) current;
 				read(); // Read next character
-			} while(isLetter(current) || isNumeral(current));
+			}
 			
 			// When word is not a keyword it is an identifier
 			return isKeyword(svalue) ? TokenSort.KEYWORD : TokenSort.IDCON;

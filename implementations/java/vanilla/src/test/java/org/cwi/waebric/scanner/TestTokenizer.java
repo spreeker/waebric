@@ -98,8 +98,8 @@ public class TestTokenizer {
 		assertEquals(11, tokenizer.getTokenCharacterNumber());
 		
 		TokenSort emptySymbol = tokenizer.nextToken();
-		assertEquals(TokenSort.SYMBOLCHAR, emptySymbol);
-		assertEquals('\'', tokenizer.getCharacterValue());
+		assertEquals(TokenSort.SYMBOLCON, emptySymbol);
+		assertEquals("", tokenizer.getStringValue());
 		assertEquals(1, tokenizer.getTokenLineNumber());
 		assertEquals(16, tokenizer.getTokenCharacterNumber());
 		
@@ -108,6 +108,10 @@ public class TestTokenizer {
 	
 	@Test
 	public void testSymbolCharacter() throws IOException {
+		StringReader reader = new StringReader("@");
+		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
+		
+		TokenSort atSymbol = tokenizer.nextToken();
 		
 	}
 	
