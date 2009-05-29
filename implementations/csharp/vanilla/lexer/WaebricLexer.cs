@@ -5,7 +5,7 @@ using Lexer.Tokenizer;
 
 namespace Lexer
 {
-    class WaebricLexer
+    public class WaebricLexer
     {
         #region Private Members
 
