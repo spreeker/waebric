@@ -29,9 +29,9 @@ public class WaebricTokenizer {
 	private int ivalue;
 	
 	// Location of current token
-	private int lineno = 0;
+	private int lineno = 1;
 	private int charno = 0;
-	
+
 	// Current character decimal
 	private int current;
 	
@@ -68,7 +68,7 @@ public class WaebricTokenizer {
 		current = reader.read();
 		
 		// Maintain actual line and character numbers
-		if(current == '\n') { charno = 0; lineno++; } // New line
+		if(current == '\n') { charno = 1; lineno++; } // New line
 		else if(current == '\t') { charno += TAB_LENGTH; } // Tab
 		else if(current >= 0) { charno++; } // Not end of file
 	}
@@ -126,18 +126,20 @@ public class WaebricTokenizer {
 	private TokenSort nextComments() throws IOException {
 		read(); // Retrieve next symbol
 		if(current == '*') { // Multiple-line comment /* */
-			read(); // Retrieve first comment character
 			char previous;
+			read(); // Retrieve first comment character
 			do {
 				previous = (char) current; // Update previous
 				read(); // Retrieve next comment character
 			} while(!  (previous == '*' && current == '/'));
+			read(); // Retrieve next character
 			return nextToken(); // Comments are ignored, thus return next
 		} else if(current == '/') { // Single-line comment //
 			read(); // Retrieve first comment character
 			do {
 				read(); // Retrieve next comment character
 			} while(current != '\n');
+			read(); // Retrieve next character
 			return nextToken(); // Comments are ignored, thus return next
 		} else { // Symbol character /
 			cvalue = '/';
@@ -171,6 +173,7 @@ public class WaebricTokenizer {
 		} while(current != '"');
 		
 		read(); // Skip double quote
+		
 		return TokenSort.STRCON;
 	}
 	
@@ -183,12 +186,17 @@ public class WaebricTokenizer {
 	private TokenSort nextSymbol() throws IOException {
 		read(); // Retrieve first symbol
 		
-		do {
-			svalue += (char) current; // Build symbol value
-			read(); // Retrieve next symbol
-		} while(isSymbol(current));
-		
-		return TokenSort.SYMBOLCON;
+		if(isSymbol(current)) { // SymbolCon
+			do {
+				svalue += (char) current; // Build symbol value
+				read(); // Retrieve next symbol
+			} while(isSymbol(current));
+			
+			return TokenSort.SYMBOLCON;
+		} else { // Symbol character '
+			cvalue = '\'';
+			return TokenSort.SYMBOLCHAR;
+		}
 	}
 	
 	/**
@@ -227,7 +235,7 @@ public class WaebricTokenizer {
 	 * @throws IOException
 	 */
 	private TokenSort nextWord() throws IOException {
-		char head = (char) current; // Store head
+		int head = current; // Store head letter
 		
 		read(); // Retrieve next character
 		if(isLetter(current) || isNumeral(current)) {
@@ -241,7 +249,7 @@ public class WaebricTokenizer {
 			// When word is not a keyword it is an identifier
 			return isKeyword(svalue) ? TokenSort.KEYWORD : TokenSort.IDCON;
 		} else {
-			cvalue = head;
+			cvalue = (char) head;
 			read(); // Read next character
 			return TokenSort.SYMBOLCHAR;
 		}
@@ -316,7 +324,9 @@ public class WaebricTokenizer {
 	}
 	
 	/**
-	 * Return current line number.
+	 * Return current line number. When using this function
+	 * with next token, be aware that it will represent the end
+	 * line number of that token, not the begin position.
 	 * 
 	 * @return
 	 */
@@ -325,7 +335,9 @@ public class WaebricTokenizer {
 	}
 	
 	/**
-	 * Return current character number.
+	 * Return current character number. When using this function
+	 * with next token, be aware that it will represent the end
+	 * character position of that token, not the begin position.
 	 * 
 	 * @return
 	 */
