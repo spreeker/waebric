@@ -96,7 +96,7 @@ public class TestStatementParser {
 		assertEquals(0, exceptions.size());
 		assertEquals(Predicate.PredicateWithoutType.class, statement.getPredicate().getClass());
 		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
-		assertEquals(Statement.YieldStatement.class, statement.getSecondStatement().getClass());
+		assertEquals(Statement.YieldStatement.class, statement.getElseStatement().getClass());
 	}
 	
 	@Test
@@ -109,7 +109,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEchoExpressionStatement() {
-		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
+		iterator = TestScanner.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Statement.EchoExpressionStatement statement = parser.parseEchoExpressionStatement();

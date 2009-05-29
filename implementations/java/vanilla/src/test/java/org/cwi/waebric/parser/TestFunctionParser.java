@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.functions.FunctionDef;
+import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -36,13 +37,14 @@ public class TestFunctionParser {
 	
 	@Test
 	public void testFunctionDef() {
-		iterator = TestScanner.quickScan("home(var1,var2) end");
+		iterator = TestScanner.quickScan("home(var1,var2) comment \"lol\" end");
 		parser = new FunctionParser(iterator, exceptions);
 		
 		FunctionDef def = parser.parseFunctionDef();
 		assertTrue(exceptions.size() == 0);
 		assertEquals(2, def.getFormals().getVarCount());
-		assertEquals(0, def.getStatementCount());
+		assertEquals(1, def.getStatementCount());
+		assertEquals(Statement.CommentStatement.class, def.getStatement(0).getClass());
 	}
 	
 }

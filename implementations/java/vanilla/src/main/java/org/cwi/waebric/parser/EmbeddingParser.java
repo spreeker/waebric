@@ -13,7 +13,15 @@ import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 
-public class EmbeddingParser extends AbstractParser {
+/**
+ * Embedding
+ * 
+ * module languages/waebric/syntax/Embedding
+ * 
+ * @author Jeroen van Schagen
+ * @date 29-05-2009
+ */
+class EmbeddingParser extends AbstractParser {
 	
 	private final MarkupParser markupParser;
 	private final ExpressionParser expressionParser;
@@ -51,11 +59,11 @@ public class EmbeddingParser extends AbstractParser {
 	}
 
 	public Expression parseExpression(String name, String syntax) {
-		return null;
+		return expressionParser.parseExpression(name, syntax);
 	}
 	
-	public Markup parseMarkup(String name, String syntax) {
-		return null;
+	public Markup parseMarkup() {
+		return markupParser.parseMarkup();
 	}
 	
 }

@@ -59,14 +59,14 @@ public abstract class Statement implements ISyntaxNode {
 	 */
 	public static class IfElseStatement extends IfStatement {
 		
-		private Statement secondStatement;
+		private Statement elseStatement;
 		
-		public Statement getSecondStatement() {
-			return secondStatement;
+		public IfElseStatement(Statement elseStatement) {
+			this.elseStatement = elseStatement;
 		}
 		
-		public void setSecondStatement(Statement secondStatement) {
-			this.secondStatement = secondStatement;
+		public Statement getElseStatement() {
+			return elseStatement;
 		}
 
 		public ISyntaxNode[] getChildren() {
@@ -77,7 +77,7 @@ public abstract class Statement implements ISyntaxNode {
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
 				statement,
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
-				secondStatement
+				elseStatement
 			};
 		}
 		

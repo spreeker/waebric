@@ -70,14 +70,12 @@ class StatementParser extends AbstractParser {
 			// Comment statements start with a comments keyword
 			return parseCommentStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-			// Echo statements start with an echo keyword
+			// Embedding echo production is followed by a text
 			if(tokens.peek(2).getSort().equals(TokenSort.TEXT)) {
-				// Embedding echo production is followed by a text
 				return parseEchoEmbeddingStatement();
-			} else {
-				// Embedding echo production is followed by an expression
-				return parseEchoExpressionStatement();
-			}
+			} 
+			// Embedding echo production is followed by an expression
+			else { return parseEchoExpressionStatement(); }
 		} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
 			// CData statements start with a cdata keyword
 			return parseCDataStatement();
@@ -87,7 +85,8 @@ class StatementParser extends AbstractParser {
 		} else {
 			// Token stream cannot be seen as statement
 			reportUnexpectedToken(peek, "statement", 
-					"\"if\", \"each\", \"let\", \"{\", \"comment\", \"echo\", \"cdata\" or \"yield\"");
+					"\"if\", \"each\", \"let\", \"{\", \"comment\", " +
+					"\"echo\", \"cdata\" or \"yield\"");
 		}
 		
 		return null;
@@ -98,30 +97,36 @@ class StatementParser extends AbstractParser {
 	 * @return
 	 */
 	public Statement.IfStatement parseIfStatement() {
-		next("if keyword", "\"if\" \"(\"", WaebricKeyword.IF);
+		if(! next("if keyword", "\"if\" \"(\"", WaebricKeyword.IF)) {
+			return null; // Invalid syntax
+		}
 		
-		next("predicate opening", "\"if\" \"(\" predicate", WaebricSymbol.LPARANTHESIS);
+		if(! next("predicate opening", "\"if\" \"(\" predicate", WaebricSymbol.LPARANTHESIS)) {
+			return null; // Invalid syntax
+		}
 		Predicate predicate = parsePredicate(); // Parse predicate
-		next("predicate closure", "\"(\" predicate \")\"", WaebricSymbol.RPARANTHESIS);
+		if(! next("predicate closure", "\"(\" predicate \")\"", WaebricSymbol.RPARANTHESIS)) {
+			return null; // Invalid syntax
+		}
 		
-		// Parse statement
-		Statement subStatement = parseStatement(
-				"if statement", "\"if\" \"(\" predicate \")\" statement");
+		// Parse if sub-statement
+		Statement subStatement = 
+			parseStatement("if statement", "\"if\" \"(\" predicate \")\" statement");
 
-		Statement.IfStatement statement = null;
+		Statement.IfStatement statement = null; // Determine type
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricKeyword.ELSE)) {
-			statement = new Statement.IfElseStatement(); // If-else statement
 			tokens.next(); // Skip else keyword
 			
 			// Parse else sub-statement
-			Statement secondStatement = parseStatement("else statement", "\"else\" statement");
-			((Statement.IfElseStatement) statement).setSecondStatement(secondStatement);
+			Statement elseStatement = parseStatement("else statement", "\"else\" statement");
+			statement = new Statement.IfElseStatement(elseStatement);
 		} else {
-			statement = new Statement.IfStatement(); // If statement
+			statement = new Statement.IfStatement();
 		}
 		
 		statement.setPredicate(predicate); // Store predicate
 		statement.setStatement(subStatement); // Store if sub-statement
+		
 		return statement;
 	}
 	
@@ -132,20 +137,28 @@ class StatementParser extends AbstractParser {
 	public Statement.EachStatement parseEachStatement() {
 		Statement.EachStatement statement = new Statement.EachStatement();
 		
-		next("each keyword", "\"each\"", WaebricKeyword.EACH);
-		next("each left parenthesis", "\"each\" \"(\" var", WaebricSymbol.LPARANTHESIS);
+		if(! next("each keyword", "\"each\"", WaebricKeyword.EACH)) {
+			return null; // Invalid syntax
+		}
 		
-		// Parse variable
+		if(! next("each left parenthesis", "\"each\" \"(\" var", WaebricSymbol.LPARANTHESIS)) {
+			return null; // Invalid syntax
+		}
+		
 		Var var = parseVar("each var", "\"(\" var \":\"");
 		statement.setVar(var);
 		
-		next("each colon separator", "var \":\" expression", WaebricSymbol.COLON);
+		if(! next("each colon separator", "var \":\" expression", WaebricSymbol.COLON)) {
+			return null; // Invalid syntax
+		}
 		
 		// Parse expression
 		Expression expression = parseExpression("each expression", "\":\" expression \")\"");
 		statement.setExpression(expression);
 		
-		next("each right parenthesis", "expression \")\" statement", WaebricSymbol.RPARANTHESIS);
+		if(! next("each right parenthesis", "expression \")\" statement", WaebricSymbol.RPARANTHESIS)) {
+			return null; // Invalid syntax
+		}
 		
 		// Parse sub-statement
 		Statement subStatement = parseStatement("each statement", "\") statement");
@@ -161,7 +174,9 @@ class StatementParser extends AbstractParser {
 	public Statement.LetStatement parseLetStatement() {
 		Statement.LetStatement statement = new Statement.LetStatement();
 		
-		next("let keyword", "\"let\"", WaebricKeyword.LET);
+		if(! next("let keyword", "\"let\"", WaebricKeyword.LET)) {
+			return null; // Invalid syntax
+		}
 	
 		// Parse assignments
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.IN)) {
@@ -181,7 +196,9 @@ class StatementParser extends AbstractParser {
 			statement.addStatement(subStatement);
 		}
 		
-		next("let end keyword", "\"in\" statements \"end\"", WaebricKeyword.END);
+		if(! next("let end keyword", "\"in\" statements \"end\"", WaebricKeyword.END)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
@@ -193,7 +210,9 @@ class StatementParser extends AbstractParser {
 	public Statement.StatementCollection parseStatementCollection() {
 		Statement.StatementCollection statement = new Statement.StatementCollection();
 		
-		next("statement collection opening", "\"{\" statements", WaebricSymbol.LCBRACKET);
+		if(! next("statement collection opening", "\"{\" statements", WaebricSymbol.LCBRACKET)) {
+			return null; // Invalid syntax
+		}
 		
 		// Parse sub-statements
 		while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -201,7 +220,9 @@ class StatementParser extends AbstractParser {
 			statement.addStatement(subStatement);
 		}
 		
-		next("statement collection closure", "statements \"}\"", WaebricSymbol.RCBRACKET);
+		if(! next("statement collection closure", "statements \"}\"", WaebricSymbol.RCBRACKET)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
@@ -213,7 +234,9 @@ class StatementParser extends AbstractParser {
 	public Statement.CommentStatement parseCommentStatement() {
 		Statement.CommentStatement statement = new Statement.CommentStatement();
 		
-		next("comment keyword", "\"comment\"", WaebricKeyword.COMMENT);
+		if(! next("comment keyword", "\"comment\"", WaebricKeyword.COMMENT)) {
+			return null; // Invalid syntax
+		}
 		
 		if(next("comments statement text", "\"comments\" text", TokenSort.TEXT)) {
 			StrCon comment = new StrCon(current.getLexeme().toString());
@@ -230,13 +253,19 @@ class StatementParser extends AbstractParser {
 	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement() {
 		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
 		
-		next("echo keyword", "\"echo\"", WaebricKeyword.ECHO);
+		if(! next("echo keyword", "\"echo\"", WaebricKeyword.ECHO)) {
+			return null; // Invalid syntax
+		}
 		
 		if(next("echo embedding", "\"echo\" embedding", TokenSort.TEXT)) {
 			// TODO: Embedding!
+		} else {
+			return null; // Invalid syntax
 		}
 		
-		next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON);
+		if(! next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
@@ -248,12 +277,16 @@ class StatementParser extends AbstractParser {
 	public Statement.EchoExpressionStatement parseEchoExpressionStatement() {
 		Statement.EchoExpressionStatement statement = new Statement.EchoExpressionStatement();
 		
-		next("echo keyword", "\"echo\"", WaebricKeyword.ECHO);
+		if(! next("echo keyword", "\"echo\"", WaebricKeyword.ECHO)) { 
+			return null; // Invalid syntax
+		}
 		
 		Expression expression = parseExpression("echo expression", "\"echo\" expression \";\"");
 		statement.setExpression(expression);
 		
-		next("echo closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON);
+		if(! next("echo closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
@@ -265,12 +298,16 @@ class StatementParser extends AbstractParser {
 	public Statement.CDataStatement parseCDataStatement() {
 		Statement.CDataStatement statement = new Statement.CDataStatement();
 		
-		next("cdata keyword", "\"cdata\"", WaebricKeyword.CDATA);
+		if(! next("cdata keyword", "\"cdata\"", WaebricKeyword.CDATA)) {
+			return null; // Invalid syntax
+		}
 
 		Expression expression = parseExpression("cdata expression", "\"cdata\" expression \";\"");
 		statement.setExpression(expression);
 		
-		next("cdata closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON);
+		if(! next("cdata closure", "\"echo\" expression \";\"", WaebricSymbol.SEMICOLON)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
@@ -282,8 +319,13 @@ class StatementParser extends AbstractParser {
 	public Statement.YieldStatement parseYieldStatement() {
 		Statement.YieldStatement statement = new Statement.YieldStatement();
 		
-		next("yield keyword", "\"yield\"", WaebricKeyword.YIELD);
-		next("yield closure", "\"yield\" \";\"", WaebricSymbol.SEMICOLON);
+		if(! next("yield keyword", "\"yield\"", WaebricKeyword.YIELD)) {
+			return null; // Invalid syntax
+		}
+		
+		if(! next("yield closure", "\"yield\" \";\"", WaebricSymbol.SEMICOLON)) {
+			return null; // Invalid syntax
+		}
 		
 		return statement;
 	}
