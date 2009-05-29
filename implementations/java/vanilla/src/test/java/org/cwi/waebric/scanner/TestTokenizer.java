@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.TokenSort;
 import org.junit.Before;
@@ -112,22 +113,53 @@ public class TestTokenizer {
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
 		TokenSort atSymbol = tokenizer.nextToken();
+		assertEquals(TokenSort.SYMBOLCHAR, atSymbol);
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
 		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 	@Test
 	public void testNumber() throws IOException {
+		StringReader reader = new StringReader("00713379001");
+		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
+		TokenSort atSymbol = tokenizer.nextToken();
+		assertEquals(TokenSort.NATCON, atSymbol);
+		assertEquals(713379001, tokenizer.getIntegerValue());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 	@Test
 	public void testIdentifier() throws IOException {
+		StringReader reader = new StringReader("identifier1");
+		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
+		TokenSort atSymbol = tokenizer.nextToken();
+		assertEquals(TokenSort.IDCON, atSymbol);
+		assertEquals("identifier1", tokenizer.getStringValue());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 	@Test
 	public void testKeyword() throws IOException {
+		StringReader reader = new StringReader("module");
+		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
+		TokenSort atSymbol = tokenizer.nextToken();
+		assertEquals(TokenSort.KEYWORD, atSymbol);
+		assertEquals(WaebricKeyword.MODULE, WaebricKeyword.valueOf(tokenizer.getStringValue()));
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 }
