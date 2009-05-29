@@ -81,8 +81,6 @@ namespace Lexer.Tokenizer
                 {
                     break; //We found something interesting so analyze it
                 }
-                peek = (char)InputStream.Peek();
-                status = InputStream.Read();
             }
             if (status == -1)
             {
