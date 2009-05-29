@@ -23,17 +23,18 @@ public class WaebricTokenizer {
 	 */
 	public static final int TAB_LENGTH = 5;
 	
-	// Value of current token
+	// Current character properties
+	private int current;
+	private int lineno = 1;
+	private int charno = 0;
+	
+	// Current token properties
 	private String svalue;
 	private char cvalue;
 	private int ivalue;
 	
-	// Location of current token
-	private int lineno = 1;
-	private int charno = 0;
-
-	// Current character decimal
-	private int current;
+	private int tlineno = 1;
+	private int tcharno = 0;
 	
 	private final Reader reader;
 	private List<ScannerException> exceptions;
@@ -67,8 +68,11 @@ public class WaebricTokenizer {
 	private void read() throws IOException {
 		current = reader.read();
 		
+		// Debugging TODO: Remove when bug fixed
+		System.out.println("Currently reading " + current + " which represents a \" " + (char) current + " \"");
+		
 		// Maintain actual line and character numbers
-		if(current == '\n') { charno = 1; lineno++; } // New line
+		if(current == '\n') { charno = 0; lineno++; } // New line
 		else if(current == '\t') { charno += TAB_LENGTH; } // Tab
 		else if(current >= 0) { charno++; } // Not end of file
 	}
@@ -85,6 +89,10 @@ public class WaebricTokenizer {
 		svalue = "";
 		cvalue = 0;
 		ivalue = 0;
+		
+		// Store token start location
+		tlineno = lineno;
+		tcharno = charno;
 		
 		if(current < 0) {
 			// End of file
@@ -324,9 +332,7 @@ public class WaebricTokenizer {
 	}
 	
 	/**
-	 * Return current line number. When using this function
-	 * with next token, be aware that it will represent the end
-	 * line number of that token, not the begin position.
+	 * Return current line number.
 	 * 
 	 * @return
 	 */
@@ -335,14 +341,30 @@ public class WaebricTokenizer {
 	}
 	
 	/**
-	 * Return current character number. When using this function
-	 * with next token, be aware that it will represent the end
-	 * character position of that token, not the begin position.
+	 * Return current character number.
 	 * 
 	 * @return
 	 */
 	public int getCharacterNumber() {
 		return charno;
+	}
+	
+	/**
+	 * Return token line number.
+	 * 
+	 * @return
+	 */
+	public int getTokenLineNumber() {
+		return tlineno;
+	}
+	
+	/**
+	 * Return token character number.
+	 * 
+	 * @return
+	 */
+	public int getTokenCharacterNumber() {
+		return tcharno;
 	}
 	
 	/**

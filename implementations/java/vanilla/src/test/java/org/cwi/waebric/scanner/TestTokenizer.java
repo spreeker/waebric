@@ -26,7 +26,8 @@ public class TestTokenizer {
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
 		TokenSort sort = tokenizer.nextToken();
-		assertEquals(TokenSort.EOF, sort); // Comments is not processed, thus it reads an empty program
+		// Comments is not processed, thus it reads an empty program
+		assertEquals(TokenSort.EOF, sort);
 	}
 	
 	@Test
@@ -35,16 +36,31 @@ public class TestTokenizer {
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
 		TokenSort sort = tokenizer.nextToken();
-		assertEquals(TokenSort.EOF, sort); // Comments is not processed, thus it reads an empty program
+		// Comments is not processed, thus it reads an empty program
+		assertEquals(TokenSort.EOF, sort);
 	}
 	
 	@Test
 	public void testLayout() throws IOException {
-//		StringReader reader = new StringReader("\nlol\tlol\rlol lol");
-//		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
-//		
-//		TokenSort sort = tokenizer.nextToken();
-//		// TODO
+		StringReader reader = new StringReader("id1\nid2\tid3");
+		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
+		
+		TokenSort id1 = tokenizer.nextToken();
+		assertEquals(TokenSort.IDCON, id1);
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+		
+		TokenSort id2 = tokenizer.nextToken();
+		assertEquals(TokenSort.IDCON, id2);
+		assertEquals(2, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+
+		TokenSort id3 = tokenizer.nextToken();
+		assertEquals(TokenSort.IDCON, id3);
+		assertEquals(2, tokenizer.getTokenLineNumber());
+		assertEquals(9, tokenizer.getTokenCharacterNumber());
+		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 	@Test
@@ -87,6 +103,8 @@ public class TestTokenizer {
 		assertEquals('\'', tokenizer.getCharacterValue());
 		assertEquals(1, tokenizer.getLineNumber());
 		assertEquals(16, tokenizer.getCharacterNumber());
+		
+		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
 	@Test
