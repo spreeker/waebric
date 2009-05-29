@@ -119,7 +119,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEachStatement() {
-		iterator = TestScanner.quickScan("each (var1:10) comment \"test\"");
+		iterator = TestScanner.quickScan("each(var1:10) comment \"test\"");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Statement.EachStatement statement = parser.parseEachStatement();

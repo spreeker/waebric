@@ -1,10 +1,12 @@
 package org.cwi.waebric.scanner;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -57,11 +59,21 @@ public class TestScanner {
 	}
 	
 	@Test
+	public void testFileScan() throws IOException {
+		Reader reader = new FileReader("src/test/waebric/9000lines.wae");
+		WaebricScanner scanner = new WaebricScanner(reader);
+		List<ScannerException> exceptions = scanner.tokenizeStream();
+		iterator = scanner.iterator();
+		
+		assertTrue(exceptions.size() == 0); // No scanner exceptions, all valid tokens
+	}
+	
+	@Test
 	public void testScanIdentifier() {
 		iterator = quickScan("identifier1 html identifier2");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.IDENTIFIER));
+			assertTrue(current.getSort().equals(TokenSort.IDCON));
 		}
 	}
 	
@@ -70,7 +82,7 @@ public class TestScanner {
 		iterator = quickScan("1 2 3 99 9999 123.456 0 -1 -99");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.NUMBER));
+			assertEquals(current.getLexeme().toString(), TokenSort.NATCON, current.getSort());
 		}
 	}
 	
@@ -79,7 +91,7 @@ public class TestScanner {
 		iterator = quickScan("\"text1\" \"text2\" \"text3\"");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.TEXT));
+			assertTrue(current.getSort().equals(TokenSort.STRCON));
 		}
 	}
 	
@@ -97,17 +109,17 @@ public class TestScanner {
 		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? / .");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.SYMBOL));
+			assertTrue(current.getSort().equals(TokenSort.SYMBOLCHAR));
 		}
 		
 		// Symbols as separator
 		iterator = quickScan("@attribute");
 		current = iterator.next(); // Dot symbol
 		assertTrue(current.getLexeme().equals('@'));
-		assertTrue(current.getSort().equals(TokenSort.SYMBOL));
+		assertTrue(current.getSort().equals(TokenSort.SYMBOLCHAR));
 		current = iterator.next(); // Identifier
 		assertTrue(current.getLexeme().equals("attribute"));
-		assertTrue(current.getSort().equals(TokenSort.IDENTIFIER));
+		assertTrue(current.getSort().equals(TokenSort.IDCON));
 	}
 	
 	@Test

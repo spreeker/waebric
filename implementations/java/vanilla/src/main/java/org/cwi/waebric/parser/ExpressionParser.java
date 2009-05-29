@@ -46,13 +46,13 @@ class ExpressionParser extends AbstractParser {
 		} else if(peek.getLexeme().equals(WaebricSymbol.SQUOTE)) {
 			// Symbol cons start with a '
 			return parseSymbolExpression();
-		} else if(peek.getSort().equals(TokenSort.NUMBER)) {
+		} else if(peek.getSort().equals(TokenSort.NATCON)) {
 			// Natural expressions consist of a natural
 			return parseNatExpression();
-		} else if(peek.getSort().equals(TokenSort.TEXT)) {
+		} else if(peek.getSort().equals(TokenSort.STRCON)) {
 			// Textual expressions consist of a text
 			return parseTextExpression();
-		} else if(peek.getSort().equals(TokenSort.IDENTIFIER)) {
+		} else if(peek.getSort().equals(TokenSort.IDCON)) {
 			// Variable expressions consist of variable
 			return parseVarExpression();
 		} else { // Identifier expressions are only remaining alternative
@@ -76,7 +76,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	public Expression.NatExpression parseNatExpression() {
-		if(next("natural expression", "natural number", TokenSort.NUMBER)) {
+		if(next("natural expression", "natural number", TokenSort.NATCON)) {
 			Expression.NatExpression expression = new Expression.NatExpression();
 			NatCon natural = new NatCon(current.getLexeme().toString());
 			expression.setNatural(natural);
@@ -91,7 +91,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	public Expression.TextExpression parseTextExpression() {
-		if(next("text expression", "\"text\"", TokenSort.TEXT)) {
+		if(next("text expression", "\"text\"", TokenSort.STRCON)) {
 			Expression.TextExpression expression = new Expression.TextExpression();
 			expression.setText(new StringLiteral(current.getLexeme().toString()));
 			return expression;
@@ -130,7 +130,7 @@ class ExpressionParser extends AbstractParser {
 		}
 
 		// Parse identifier
-		if(next("period", "expression \".\" identifier", TokenSort.IDENTIFIER)) {
+		if(next("period", "expression \".\" identifier", TokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			expression.setIdentifier(identifier); // Store identifier
 		} else {
@@ -214,7 +214,7 @@ class ExpressionParser extends AbstractParser {
 		KeyValuePair pair = new KeyValuePair();
 		
 		// Parse identifier
-		if(next("identifier", "identifier \":\" expression", TokenSort.IDENTIFIER)) {
+		if(next("identifier", "identifier \":\" expression", TokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			pair.setIdentifier(identifier);
 		} else {
@@ -253,7 +253,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param var
 	 */
 	public Var parseVar(String name, String syntax) {
-		if(next(name, syntax,TokenSort.IDENTIFIER)) {
+		if(next(name, syntax,TokenSort.IDCON)) {
 			Var var = new Var();
 			var.setIdentifier(new IdCon(current.getLexeme().toString()));
 			return var;

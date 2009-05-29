@@ -69,7 +69,7 @@ class MarkupParser extends AbstractParser {
 		Designator designator = new Designator();
 		
 		// Parse identifier
-		if(next("designator identifier", "identifier", TokenSort.IDENTIFIER)) {
+		if(next("designator identifier", "identifier", TokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
 		} else {
@@ -111,14 +111,14 @@ class MarkupParser extends AbstractParser {
 	 * @param attribute
 	 */
 	public Attribute parseAttribute() {
-		if(tokens.hasNext() && tokens.peek(1).getSort() == TokenSort.SYMBOL) {
+		if(tokens.hasNext() && tokens.peek(1).getSort() == TokenSort.SYMBOLCHAR) {
 			Token peek = tokens.peek(1); // Retrieve symbol token
 			char c = peek.getLexeme().toString().charAt(0);
 			if(c == '#' || c == '.' || c == '$' || c ==':') { // Identifier attribute
 				tokens.next(); // Skip attribute symbol
 				Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(c);
 				
-				if(next("identifier attribute", "symbol identifier", TokenSort.IDENTIFIER)) {
+				if(next("identifier attribute", "symbol identifier", TokenSort.IDCON)) {
 					IdCon identifier = new IdCon(current.getLexeme().toString());
 					attribute.setIdentifier(identifier);
 					return attribute;
@@ -127,13 +127,13 @@ class MarkupParser extends AbstractParser {
 				return null; // Failed parse, return empty node
 			} else if(c == '@') { // Natural attribute
 				tokens.next(); // Skip attribute symbol
-				if(next("numeral attribute", "@ number", TokenSort.NUMBER)) {
+				if(next("numeral attribute", "@ number", TokenSort.NATCON)) {
 					NatCon number = new NatCon(current.getLexeme().toString());
 					
 					// Double natural attribute
 					if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERCENT_SIGN)) {
 						tokens.next(); // Skip percent sign
-						if(next("second numeral attribute", "number % number", TokenSort.NUMBER)) {
+						if(next("second numeral attribute", "number % number", TokenSort.NATCON)) {
 							NatCon second = new NatCon(current.getLexeme().toString());
 							Attribute.AttributeDoubleNatCon attribute = new Attribute.AttributeDoubleNatCon();
 							attribute.setNumber(number);

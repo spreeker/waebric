@@ -71,7 +71,7 @@ class StatementParser extends AbstractParser {
 			return parseCommentStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
 			// Embedding echo production is followed by a text
-			if(tokens.peek(2).getSort().equals(TokenSort.TEXT)) {
+			if(tokens.peek(2).getSort().equals(TokenSort.STRCON)) {
 				return parseEchoEmbeddingStatement();
 			} 
 			// Embedding echo production is followed by an expression
@@ -238,7 +238,7 @@ class StatementParser extends AbstractParser {
 			return null; // Invalid syntax
 		}
 		
-		if(next("comments statement text", "\"comments\" text", TokenSort.TEXT)) {
+		if(next("comments statement text", "\"comments\" text", TokenSort.STRCON)) {
 			StrCon comment = new StrCon(current.getLexeme().toString());
 			statement.setComment(comment);
 		}
@@ -257,7 +257,7 @@ class StatementParser extends AbstractParser {
 			return null; // Invalid syntax
 		}
 		
-		if(next("echo embedding", "\"echo\" embedding", TokenSort.TEXT)) {
+		if(next("echo embedding", "\"echo\" embedding", TokenSort.STRCON)) {
 			// TODO: Embedding!
 		} else {
 			return null; // Invalid syntax
@@ -378,7 +378,7 @@ class StatementParser extends AbstractParser {
 		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
 		
 		// Parse identifier
-		if(next("assignment identifier", "identifier \"(\")", TokenSort.IDENTIFIER)) {
+		if(next("assignment identifier", "identifier \"(\")", TokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			assignment.setIdentifier(identifier);
 		}

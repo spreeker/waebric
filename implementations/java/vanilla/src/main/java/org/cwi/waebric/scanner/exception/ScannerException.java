@@ -15,4 +15,12 @@ public abstract class ScannerException extends Exception {
 		super(message);
 	}
 	
+	/**
+	 * 
+	 * @param cause
+	 */
+	public ScannerException(Throwable cause) {
+		super(cause);
+	}
+	
 }

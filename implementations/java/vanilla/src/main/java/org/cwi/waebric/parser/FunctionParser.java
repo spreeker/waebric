@@ -39,7 +39,7 @@ class FunctionParser extends AbstractParser {
 		FunctionDef def = new FunctionDef();
 		
 		// Parse function identifier
-		if(next("function identifier", "identifier", TokenSort.IDENTIFIER)) {
+		if(next("function identifier", "identifier", TokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			def.setIdentifier(identifier);
 		} else {

@@ -187,7 +187,7 @@ class SiteParser extends AbstractParser {
 		FileName name = new FileName();
 		
 		// Parse file name
-		if(next("file name", "name \".\" extension", TokenSort.IDENTIFIER)) {
+		if(next("file name", "name \".\" extension", TokenSort.IDCON)) {
 			name.setName(new PathElement(current.getLexeme().toString()));
 		}
 		
@@ -195,7 +195,7 @@ class SiteParser extends AbstractParser {
 		next("period", "name \".\" extension", WaebricSymbol.PERIOD);
 		
 		// Parse file extension
-		if(next("file extension", "name \".\" extension", TokenSort.IDENTIFIER)) {
+		if(next("file extension", "name \".\" extension", TokenSort.IDCON)) {
 			name.setExt(new FileExt(current.getLexeme().toString()));
 		}
 		

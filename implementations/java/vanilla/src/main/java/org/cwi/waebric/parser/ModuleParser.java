@@ -96,7 +96,7 @@ class ModuleParser extends AbstractParser {
 	public void parse(ModuleId moduleId) {
 		while(tokens.hasNext()) {
 			// Parse identifier
-			if(next("module identifier", "identifier", TokenSort.IDENTIFIER)) {
+			if(next("module identifier", "identifier", TokenSort.IDCON)) {
 				moduleId.addIdentifierElement(new IdCon(current.getLexeme().toString()));
 			}
 			

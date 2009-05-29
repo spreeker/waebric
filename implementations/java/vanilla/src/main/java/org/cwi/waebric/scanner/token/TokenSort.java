@@ -15,14 +15,13 @@ public enum TokenSort {
 	 * 	<code>module helloworld</code><br>
 	 * helloworld is the identifier
 	 */
-	IDENTIFIER,
+	IDCON,
 	
 	/**
-	 * Number tokens include all characters that represents numbers, these
-	 * include naturals and digits.
+	 * Number tokens include all characters that represents natural numbers.
 	 * @see java.lang.Integer
 	 */
-	NUMBER, 
+	NATCON, 
 	
 	/**
 	 * Text tokens represent all characters stored between double quotes.<br><br>
@@ -30,7 +29,18 @@ public enum TokenSort {
 	 * For example:<br>
 	 * "This is text"
 	 */
-	TEXT, 
+	STRCON, 
+	
+	/**
+	 * "'" SymbolChar
+	 */
+	SYMBOLCON,
+	
+	/**
+	 * Symbol char tokens are all regular ASCII symbols between the decimal range
+	 * of 32..126
+	 */
+	SYMBOLCHAR,
 	
 	/**
 	 * Keyword tokens are words that are literally part of the language grammar.<br><br>
@@ -42,9 +52,13 @@ public enum TokenSort {
 	KEYWORD,
 	
 	/**
-	 * Symbols tokens are all regular ASCII symbols between the decimal range
-	 * of 32..126
+	 * End of file
 	 */
-	SYMBOL;
+	EOF,
+	
+	/**
+	 * Unknown token
+	 */
+	UNKNOWN;
 	
 }

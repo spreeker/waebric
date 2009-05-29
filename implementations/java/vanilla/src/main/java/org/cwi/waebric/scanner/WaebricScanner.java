@@ -50,8 +50,7 @@ public class WaebricScanner implements Iterable<Token> {
 		
 		tokenizer.whitespaceChars(WaebricLayout.NEW_LINE, WaebricLayout.NEW_LINE);
 		tokenizer.whitespaceChars(WaebricLayout.TAB, WaebricLayout.TAB);
-		tokenizer.ordinaryChar((int) '/');
-		tokenizer.ordinaryChar((int) '.');
+		tokenizer.ordinaryChars(46, 47);
 		
 		// Scan and store tokens
 		tokens.clear();
@@ -59,14 +58,14 @@ public class WaebricScanner implements Iterable<Token> {
 		while(curr != StreamTokenizer.TT_EOF) {
 			switch(curr) {
 				case StreamTokenizer.TT_NUMBER:
-					tokens.add(new Token(tokenizer.nval, TokenSort.NUMBER, tokenizer.lineno()));
+					tokens.add(new Token(tokenizer.nval, TokenSort.NATCON, tokenizer.lineno()));
 				break;
 				case StreamTokenizer.TT_WORD:
 					if(isKeyword(tokenizer.sval)) { // Waebric keyword
 						WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
 						tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
 					} else if(isIdentifier(tokenizer.sval)) { // Identifier
-						tokens.add(new Token(tokenizer.sval, TokenSort.IDENTIFIER, tokenizer.lineno()));
+						tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
 					}
 				break;
 				case StreamTokenizer.TT_EOF: break;
@@ -74,9 +73,9 @@ public class WaebricScanner implements Iterable<Token> {
 				default:
 					char c = (char) curr;
 					if(c == WaebricSymbol.DQUOTE) { // Text
-						tokens.add(new Token(tokenizer.sval, TokenSort.TEXT, tokenizer.lineno()));
+						tokens.add(new Token(tokenizer.sval, TokenSort.STRCON, tokenizer.lineno()));
 					} else if(isSymbol(c)) { // Symbol
-						tokens.add(new Token(c, TokenSort.SYMBOL, tokenizer.lineno()));
+						tokens.add(new Token(c, TokenSort.SYMBOLCHAR, tokenizer.lineno()));
 					} else { // Unknown character
 						exceptions.add(new UnknownTokenException(c, tokenizer.lineno()));
 					}
