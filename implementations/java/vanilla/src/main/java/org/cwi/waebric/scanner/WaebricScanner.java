@@ -90,6 +90,11 @@ public class WaebricScanner implements Iterable<Token> {
 		return exceptions;
 	}
 	
+	static boolean isKeyword(String sval) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Retrieve token
 	 * 
@@ -116,23 +121,6 @@ public class WaebricScanner implements Iterable<Token> {
 	 */
 	public TokenIterator iterator() {
 		return new TokenIterator(tokens);
-	}
-	
-	/**
-	 * Determine whether a certain text fragment is a literal.
-	 * 
-	 * @param data Text fragment
-	 * @return literal?
-	 */
-	public static boolean isKeyword(String data) {
-		try {
-			// Literal should be in enumeration
-			WaebricKeyword literal = WaebricKeyword.valueOf(data.toUpperCase());
-			return literal != null;
-		} catch(IllegalArgumentException e) {
-			// Enumeration does not exists
-			return false;
-		}
 	}
 	
 	/**

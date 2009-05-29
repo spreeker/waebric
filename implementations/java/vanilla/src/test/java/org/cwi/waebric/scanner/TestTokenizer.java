@@ -14,7 +14,7 @@ public class TestTokenizer {
 	
 	@Test
 	public void testTokenizer() throws IOException {
-		FileReader reader = new FileReader("src/test/waebric/comments/comments.wae");
+		FileReader reader = new FileReader("src/test/waebric/tokens/identifier.wae");
 		ArrayList<ScannerException> exceptions = new ArrayList<ScannerException>();
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
