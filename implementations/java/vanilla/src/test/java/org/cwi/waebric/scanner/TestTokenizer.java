@@ -26,7 +26,6 @@ public class TestTokenizer {
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
 		TokenSort sort = tokenizer.nextToken();
-		// Comments is not processed, thus it reads an empty program
 		assertEquals(TokenSort.EOF, sort);
 	}
 	
@@ -36,7 +35,6 @@ public class TestTokenizer {
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
 		TokenSort sort = tokenizer.nextToken();
-		// Comments is not processed, thus it reads an empty program
 		assertEquals(TokenSort.EOF, sort);
 	}
 	
@@ -70,8 +68,9 @@ public class TestTokenizer {
 		
 		TokenSort sort = tokenizer.nextToken();
 		assertEquals(TokenSort.STRCON, sort);
-		assertEquals(1, tokenizer.getLineNumber());
-		assertEquals(6, tokenizer.getCharacterNumber());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+		
 		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
 	
@@ -83,26 +82,26 @@ public class TestTokenizer {
 		TokenSort textSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCON, textSymbol);
 		assertEquals("abc", tokenizer.getStringValue());
-		assertEquals(1, tokenizer.getLineNumber());
-		assertEquals(5, tokenizer.getCharacterNumber());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
 		
 		TokenSort numeralSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCON, numeralSymbol);
 		assertEquals("123", tokenizer.getStringValue());
-		assertEquals(1, tokenizer.getLineNumber());
-		assertEquals(10, tokenizer.getCharacterNumber());	
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(6, tokenizer.getTokenCharacterNumber());	
 		
 		TokenSort asciiSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCON, asciiSymbol);
 		assertEquals("@#!", tokenizer.getStringValue());
-		assertEquals(1, tokenizer.getLineNumber());
-		assertEquals(15, tokenizer.getCharacterNumber());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(11, tokenizer.getTokenCharacterNumber());
 		
 		TokenSort emptySymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCHAR, emptySymbol);
 		assertEquals('\'', tokenizer.getCharacterValue());
-		assertEquals(1, tokenizer.getLineNumber());
-		assertEquals(16, tokenizer.getCharacterNumber());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(16, tokenizer.getTokenCharacterNumber());
 		
 		assertEquals(TokenSort.EOF, tokenizer.nextToken());
 	}
