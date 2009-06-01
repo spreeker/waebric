@@ -1,27 +1,32 @@
 package org.cwi.waebric.scanner.token;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestTokenIterator {
 
-	private final String PROGRAM_PATH = "src/test/waebric/simpleexample.wae";
 	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() throws IOException {
-		FileReader reader = new FileReader(PROGRAM_PATH);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream();
-		iterator = scanner.iterator();	
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token(123, TokenSort.NATCON, 1, 2)); // Number
+		tokens.add(new Token("identifier1", TokenSort.IDCON, 3, 4)); // Identifier
+		tokens.add(new Token(WaebricKeyword.DEF, TokenSort.KEYWORD, 5, 6)); // Keyword
+		tokens.add(new Token("text", TokenSort.STRCON, 7, 8)); // String
+		tokens.add(new Token('@', TokenSort.SYMBOLCHAR, 9, 10)); // Character
+		tokens.add(new Token("symbol1", TokenSort.SYMBOLCON, 11, 12)); // Symbol
+		iterator = new TokenIterator(tokens);
 	}
 	
 	@After
@@ -30,24 +35,11 @@ public class TestTokenIterator {
 	}
 	
 	@Test
-	public void testRegex() {
-		String regex = "(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)"; // TODO: \\ and .
-
-		assertFalse(new String("gotlolmofo").matches(regex));
-		assertTrue(new String("got lolmofo").matches(regex));
-		assertTrue(new String("got \t lolmofo").matches(regex));
-		assertTrue(new String("got\nlolmofo").matches(regex));
-		assertTrue(new String("got\rlolmofo").matches(regex));
-		assertTrue(new String("got.lolmofo").matches(regex));
-		assertTrue(new String("got/lolmofo").matches(regex));
-		assertTrue(new String("got\\\\lolmofo").matches(regex));
-	}
-	
-	@Test
 	public void testPeek() {
-		assertTrue(iterator.peek(1).getLexeme().equals(WaebricKeyword.MODULE));
-		assertTrue(iterator.peek(2).getLexeme().equals("homepage"));
-		assertTrue(iterator.peek(3).getLexeme().equals(WaebricKeyword.SITE));
+		iterator.next(); // Go to first token
+		assertEquals("identifier1", iterator.peek(1).getLexeme());
+		assertEquals(WaebricKeyword.DEF, iterator.peek(2).getLexeme());
+		assertEquals("text", iterator.peek(3).getLexeme());
 	}
 	
 	@Test
@@ -56,8 +48,8 @@ public class TestTokenIterator {
 		
 		assertTrue(iterator.hasNext(0));
 		assertTrue(iterator.hasNext(1));
-		assertTrue(iterator.hasNext(26));
-		assertFalse(iterator.hasNext(27));
+		assertTrue(iterator.hasNext(5));
+		assertFalse(iterator.hasNext(6));
 		assertFalse(iterator.hasNext(-1));
 
 		while(iterator.hasNext()) {
@@ -65,7 +57,7 @@ public class TestTokenIterator {
 			current = iterator.next();
 		}
 		
-		assertTrue(current.getLexeme().equals(WaebricKeyword.END));
+		assertTrue(current.getLexeme().equals("symbol1"));
 	}
 	
 	@Test

@@ -14,6 +14,7 @@ public class Token {
 	private Object lexeme;
 	private TokenSort sort;
 	private int line;
+	private int character;
 	
 	/**
 	 * Initialize token
@@ -22,10 +23,11 @@ public class Token {
 	 * @param sort Token type
 	 * @param line Line number
 	 */
-	public Token(Object lexeme, TokenSort sort, int line) {
+	public Token(Object lexeme, TokenSort sort, int line, int character) {
 		this.lexeme = lexeme;
 		this.sort = sort;
 		this.line = line;
+		this.character = character;
 	}
 
 	/**
@@ -52,12 +54,21 @@ public class Token {
 		return line;
 	}
 	
+	/**
+	 * Retrieve character number
+	 * @return
+	 */
+	public int getCharacter() {
+		return character;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Token) {
 			Token token = (Token) obj;
 			if(token.getSort() != this.sort) { return false; }
 			if(token.getLine() != this.line) { return false; }
+			if(token.getCharacter() != this.character) { return false; }
 			return token.getLexeme().equals(this.lexeme);
 		}
 		
@@ -66,7 +77,8 @@ public class Token {
 	
 	@Override
 	public String toString() {
-		return "\"" + lexeme.toString() + "\" " + sort.name() + " (line: " + line + ")";
+		return "\"" + lexeme.toString() + "\" " + sort.name() + 
+		" (line: " + line + ", character: " + character + ")";
 	}
 
 }

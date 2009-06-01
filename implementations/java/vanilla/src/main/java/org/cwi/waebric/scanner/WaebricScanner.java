@@ -2,15 +2,11 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.WaebricLayout;
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.exception.ScannerException;
-import org.cwi.waebric.scanner.exception.UnknownTokenException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -25,16 +21,17 @@ import org.cwi.waebric.scanner.token.TokenSort;
  */
 public class WaebricScanner implements Iterable<Token> {
 
-	private StreamTokenizer tokenizer;
+	private WaebricTokenizer tokenizer;
 	private List<Token> tokens;
 	
 	/**
 	 * Initialize scanner
 	 * 
 	 * @param reader Input character stream
+	 * @throws IOException 
 	 */
-	public WaebricScanner(Reader reader) {
-		tokenizer = new StreamTokenizer(reader);
+	public WaebricScanner(Reader reader) throws IOException {
+		tokenizer = new WaebricTokenizer(reader);
 		tokens = new ArrayList<Token>();
 	}
 	
@@ -48,42 +45,27 @@ public class WaebricScanner implements Iterable<Token> {
 	public List<ScannerException> tokenizeStream() throws IOException {
 		List<ScannerException> exceptions = new ArrayList<ScannerException>();
 		
-		tokenizer.whitespaceChars(WaebricLayout.NEW_LINE, WaebricLayout.NEW_LINE);
-		tokenizer.whitespaceChars(WaebricLayout.TAB, WaebricLayout.TAB);
-		tokenizer.ordinaryChars(46, 47);
-		
 		// Scan and store tokens
 		tokens.clear();
-		int curr = tokenizer.nextToken();
-		while(curr != StreamTokenizer.TT_EOF) {
-			switch(curr) {
-				case StreamTokenizer.TT_NUMBER:
-					tokens.add(new Token(tokenizer.nval, TokenSort.NATCON, tokenizer.lineno()));
-				break;
-				case StreamTokenizer.TT_WORD:
-					if(isKeyword(tokenizer.sval)) { // Waebric keyword
-						WaebricKeyword literal = WaebricKeyword.valueOf(tokenizer.sval.toUpperCase());
-						tokens.add(new Token(literal, TokenSort.KEYWORD, tokenizer.lineno()));
-					} else if(isIdentifier(tokenizer.sval)) { // Identifier
-						tokens.add(new Token(tokenizer.sval, TokenSort.IDCON, tokenizer.lineno()));
-					}
-				break;
-				case StreamTokenizer.TT_EOF: break;
-				case StreamTokenizer.TT_EOL: break;
-				default:
-					char c = (char) curr;
-					if(c == WaebricSymbol.DQUOTE) { // Text
-						tokens.add(new Token(tokenizer.sval, TokenSort.STRCON, tokenizer.lineno()));
-					} else if(isSymbol(c)) { // Symbol
-						tokens.add(new Token(c, TokenSort.SYMBOLCHAR, tokenizer.lineno()));
-					} else { // Unknown character
-						exceptions.add(new UnknownTokenException(c, tokenizer.lineno()));
-					}
-				break;
+		TokenSort current = tokenizer.nextToken();
+		while(current != TokenSort.EOF) {
+			if(current == TokenSort.NATCON) {
+				Token token = new Token(tokenizer.getIntegerValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				tokens.add(token);
+			} else if(current == TokenSort.SYMBOLCHAR) {
+				Token token = new Token(tokenizer.getCharacterValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				tokens.add(token);
+			} else if(current == TokenSort.KEYWORD) {
+				WaebricKeyword keyword = WaebricKeyword.valueOf(tokenizer.getStringValue().toUpperCase());
+				Token token = new Token(keyword, current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				tokens.add(token);
+			} else if(current == TokenSort.IDCON || current == TokenSort.STRCON || current == TokenSort.STRCON) {
+				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				tokens.add(token);
 			}
-
-			// Read next token
-			curr = tokenizer.nextToken();
+			
+			// Retrieve next token
+			current = tokenizer.nextToken();
 		}
 		
 		// Report exceptions

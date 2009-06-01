@@ -45,17 +45,16 @@ public class TestScanner {
 	 */
 	public static TokenIterator quickScan(String data) {
 		Reader reader = new StringReader(data);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		
 		try {
+			WaebricScanner scanner = new WaebricScanner(reader);
 			List<ScannerException> exceptions = scanner.tokenizeStream();
 			assertNotNull(exceptions);
 			assertTrue(exceptions.size() == 0);
+			return scanner.iterator();
 		} catch(IOException e) {
 			fail(e.getMessage());
+			return null;
 		}
-		
-		return scanner.iterator();
 	}
 	
 	@Test
@@ -79,7 +78,7 @@ public class TestScanner {
 	
 	@Test
 	public void testScanNumber() {
-		iterator = quickScan("1 2 3 99 9999 123.456 0 -1 -99");
+		iterator = quickScan("1 2 3 99 9999 123 456");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertEquals(current.getLexeme().toString(), TokenSort.NATCON, current.getSort());
@@ -120,12 +119,6 @@ public class TestScanner {
 		current = iterator.next(); // Identifier
 		assertTrue(current.getLexeme().equals("attribute"));
 		assertTrue(current.getSort().equals(TokenSort.IDCON));
-	}
-	
-	@Test
-	public void testIsKeyword() {
-		assertTrue(WaebricScanner.isKeyword("module"));
-		assertFalse(WaebricScanner.isKeyword("rofl"));
 	}
 
 	@Test

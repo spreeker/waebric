@@ -2,11 +2,8 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.exception.ScannerException;
-import org.cwi.waebric.scanner.exception.UnknownTokenException;
 import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
@@ -16,7 +13,7 @@ import org.cwi.waebric.scanner.token.TokenSort;
  * @author Jeroen van Schagen
  * @date 29-05-2009
  */
-public class WaebricTokenizer {
+class WaebricTokenizer {
 	
 	/**
 	 * Default tab character length
@@ -37,7 +34,6 @@ public class WaebricTokenizer {
 	private int tcharno = 0;
 	
 	private final Reader reader;
-	private List<ScannerException> exceptions;
 	
 	/**
 	 * Construct tokenizer based on reader, in case an invalid reader is given,
@@ -49,14 +45,12 @@ public class WaebricTokenizer {
 	 * @param exceptions Collection of scan exceptions
 	 * @throws IOException Thrown by Reader
 	 */
-	public WaebricTokenizer(Reader reader, List<ScannerException> exceptions) throws IOException {
+	public WaebricTokenizer(Reader reader) throws IOException {
 		if(reader == null) {
 			throw new NullPointerException();
 		}
 		
 		this.reader = reader;
-		this.exceptions = exceptions;
-		
 		read(); // Buffer first character
 	}
 	
@@ -112,13 +106,9 @@ public class WaebricTokenizer {
 		} else if(isLetter(current)) {
 			// Identifier
 			return nextWord();
-		} else if(isSymbol(current)) {
-			// Symbol character
-			return nextSymbolCharacter();
 		} else {
-			// Unknown
-			exceptions.add(new UnknownTokenException("" + (char) current, lineno));
-			return TokenSort.UNKNOWN;
+			// Symbol character
+			return nextCharacterSymbol();
 		}
 	}
 	
@@ -206,7 +196,7 @@ public class WaebricTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextSymbolCharacter() throws IOException {
+	private TokenSort nextCharacterSymbol() throws IOException {
 		cvalue = (char) current;
 		read(); // Retrieve next character
 		return TokenSort.SYMBOLCHAR;

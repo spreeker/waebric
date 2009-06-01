@@ -54,11 +54,6 @@ public enum TokenSort {
 	/**
 	 * End of file
 	 */
-	EOF,
-	
-	/**
-	 * Unknown token
-	 */
-	UNKNOWN;
+	EOF;
 	
 }
