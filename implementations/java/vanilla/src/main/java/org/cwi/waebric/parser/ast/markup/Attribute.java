@@ -53,6 +53,11 @@ public abstract class Attribute implements ISyntaxNode {
 			this.identifier = identifier;
 		}
 		
+		@Override
+		public String toString() {
+			return "" + symbol + identifier;
+		}
+		
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { symbol, identifier };
 		}
@@ -79,6 +84,11 @@ public abstract class Attribute implements ISyntaxNode {
 		
 		public void setNumber(NatCon number) {
 			this.number = number;
+		}
+		
+		@Override
+		public String toString() {
+			return "" + symbol + number;
 		}
 		
 		public ISyntaxNode[] getChildren() {
@@ -113,6 +123,11 @@ public abstract class Attribute implements ISyntaxNode {
 		
 		public void setSecondNumber(NatCon secondNumber) {
 			this.secondNumber = secondNumber;
+		}
+		
+		@Override
+		public String toString() {
+			return "" + symbol + number + secondSymbol + secondNumber;
 		}
 		
 		@Override

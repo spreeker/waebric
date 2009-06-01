@@ -6,11 +6,11 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
+import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.KeyValuePair;
 import org.cwi.waebric.parser.ast.expressions.SymbolCon;
 import org.cwi.waebric.parser.ast.expressions.Var;
-import org.cwi.waebric.parser.ast.text.Text;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.Token;
@@ -94,7 +94,7 @@ class ExpressionParser extends AbstractParser {
 	public Expression.TextExpression parseTextExpression() {
 		if(next("text expression", "\"text\"", TokenSort.STRCON)) {
 			Expression.TextExpression expression = new Expression.TextExpression();
-			Text text = new Text(new StringLiteral(current.getLexeme().toString()));
+			StrCon text = new StrCon(new StringLiteral(current.getLexeme().toString()));
 			expression.setText(text);
 			return expression;
 		}

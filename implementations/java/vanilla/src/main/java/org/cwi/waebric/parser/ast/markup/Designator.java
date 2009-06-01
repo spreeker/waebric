@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -14,7 +15,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
-public class Designator implements ISyntaxNode {
+public class Designator extends AbstractSyntaxNode {
 
 	protected IdCon identifier;
 	protected Attributes attributes;

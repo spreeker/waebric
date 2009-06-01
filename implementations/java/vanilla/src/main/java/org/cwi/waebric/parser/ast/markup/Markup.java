@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 
 /**
@@ -8,7 +9,7 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public abstract class Markup implements ISyntaxNode {
+public abstract class Markup extends AbstractSyntaxNode {
 
 	protected Designator designator;
 	
@@ -31,8 +32,8 @@ public abstract class Markup implements ISyntaxNode {
 	/**
 	 * Designator Arguments -> Markup
 	 * 
-	 * @author schagen
-	 *
+	 * @author Jeroen van Schagen
+	 * @date 20-05-2009
 	 */
 	public static class MarkupWithArguments extends Markup {
 
@@ -58,8 +59,8 @@ public abstract class Markup implements ISyntaxNode {
 	
 	/**
 	 * Designator -> Argument
-	 * @author schagen
-	 *
+	 * @author Jeroen van Schagen
+	 * @date 22-05-2009
 	 */
 	public static class MarkupWithoutArguments extends Markup {
 

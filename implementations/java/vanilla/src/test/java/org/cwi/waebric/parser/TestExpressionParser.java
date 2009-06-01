@@ -95,7 +95,7 @@ public class TestExpressionParser {
 		
 		Expression.TextExpression expression = parser.parseTextExpression();
 		assertTrue(exceptions.size() == 0);
-		assertEquals("bla", expression.getText().toString());
+		assertEquals("bla", expression.getText().getString().toString());
 	}
 	
 	@Test

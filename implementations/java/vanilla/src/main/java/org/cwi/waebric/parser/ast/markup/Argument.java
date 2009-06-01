@@ -1,12 +1,13 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
 
-public abstract class Argument implements ISyntaxNode {
+public abstract class Argument extends AbstractSyntaxNode {
 
 	protected Expression expression;
 

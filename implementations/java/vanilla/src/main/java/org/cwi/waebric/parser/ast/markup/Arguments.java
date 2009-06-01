@@ -11,32 +11,21 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Arguments implements ISyntaxNode {
+public class Arguments extends SyntaxNodeListWithSeparator<Argument> {
 
-	private SyntaxNodeListWithSeparator<Argument> arguments;
-	
 	public Arguments() {
-		arguments = new SyntaxNodeListWithSeparator<Argument>(WaebricSymbol.COMMA);
+		super(WaebricSymbol.COMMA);
 	}
 
 	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
-			new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
-			arguments,
-			new CharacterLiteral(WaebricSymbol.RPARANTHESIS)
-		};
-	}
-
-	public boolean add(Argument argument) {
-		return arguments.add(argument);
-	}
-	
-	public Argument getElement(int index) {
-		return arguments.get(index);
-	}
-	
-	public int getElementCount() {
-		return arguments.size();
+		ISyntaxNode[] children = super.getChildren();
+		ISyntaxNode[] actual = new ISyntaxNode[children.length+2];
+		actual[0] = new CharacterLiteral(WaebricSymbol.LPARANTHESIS);
+		actual[actual.length-1] = new CharacterLiteral(WaebricSymbol.RPARANTHESIS);
+		for(int i = 1; i < actual.length-1; i++) {
+			actual[i] = children[i-1];
+		}
+		return actual;
 	}
 	
 }

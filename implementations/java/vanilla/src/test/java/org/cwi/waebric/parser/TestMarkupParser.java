@@ -63,7 +63,9 @@ public class TestMarkupParser {
 		Markup.MarkupWithArguments markupa = (MarkupWithArguments) parser.parseMarkup();
 		assertEquals(0, exceptions.size());
 		assertNotNull(markupa.getDesignator());
-		assertEquals(2, markupa.getArguments().getElementCount());
+		assertEquals(2, markupa.getArguments().size());
+		
+		System.out.println(markupa.toString());
 	}
 	
 	@Test
@@ -125,8 +127,8 @@ public class TestMarkupParser {
 		
 		Arguments arguments = parser.parseArguments();
 		assertEquals(0, exceptions.size());
-		assertEquals(Argument.ArgumentWithVar.class, arguments.getElement(0).getClass());
-		assertEquals(Argument.ArgumentWithoutVar.class, arguments.getElement(1).getClass());
+		assertEquals(Argument.ArgumentWithVar.class, arguments.get(0).getClass());
+		assertEquals(Argument.ArgumentWithoutVar.class, arguments.get(1).getClass());
 	}
 	
 	@Test
