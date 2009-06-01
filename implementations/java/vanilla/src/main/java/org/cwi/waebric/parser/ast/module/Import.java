@@ -4,7 +4,7 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
-public class Import implements IModuleElement {
+public class Import extends ModuleElement {
 	
 	private static final String IMPORT_KEYWORD = WaebricKeyword.IMPORT.name().toLowerCase();
 	
@@ -20,14 +20,9 @@ public class Import implements IModuleElement {
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
-				new StringLiteral(IMPORT_KEYWORD), 
-				identifier
-			};
-	}
-	
-	@Override
-	public String toString() {
-		return identifier.toString();
+			new StringLiteral(IMPORT_KEYWORD), 
+			identifier
+		};
 	}
 
 }

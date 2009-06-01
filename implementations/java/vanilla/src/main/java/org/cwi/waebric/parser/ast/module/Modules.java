@@ -10,9 +10,4 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList;
  */
 public class Modules extends SyntaxNodeList<Module> {
 
-	/**
-	 * Serial ID
-	 */
-	private static final long serialVersionUID = -3057622092071369291L;
-
 }

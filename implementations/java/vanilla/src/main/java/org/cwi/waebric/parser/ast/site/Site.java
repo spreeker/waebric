@@ -3,7 +3,7 @@ package org.cwi.waebric.parser.ast.site;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.module.IModuleElement;
+import org.cwi.waebric.parser.ast.module.ModuleElement;
 
 /**
  * Site<br><br>
@@ -16,7 +16,7 @@ import org.cwi.waebric.parser.ast.module.IModuleElement;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Site implements IModuleElement {
+public class Site extends ModuleElement {
 
 	private Mappings mappings;
 

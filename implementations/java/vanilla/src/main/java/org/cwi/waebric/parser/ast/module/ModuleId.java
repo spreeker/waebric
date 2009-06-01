@@ -1,11 +1,12 @@
 package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
-public class ModuleId implements ISyntaxNode {
+public class ModuleId extends AbstractSyntaxNode {
 
 	private SyntaxNodeListWithSeparator<IdCon> identifier;
 	
@@ -23,11 +24,6 @@ public class ModuleId implements ISyntaxNode {
 
 	public ISyntaxNode[] getChildren() {
 		return identifier.getChildren();
-	}
-	
-	@Override
-	public String toString() {
-		return identifier.toString();
 	}
 	
 	@Override

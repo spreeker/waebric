@@ -5,7 +5,7 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.IModuleElement;
+import org.cwi.waebric.parser.ast.module.ModuleElement;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 
@@ -14,7 +14,7 @@ import org.cwi.waebric.parser.ast.statements.Statement;
  * @author schagen
  *
  */
-public class FunctionDef implements IModuleElement {
+public class FunctionDef extends ModuleElement {
 	
 	// Keyword literals
 	private static final String DEF_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.DEF);
