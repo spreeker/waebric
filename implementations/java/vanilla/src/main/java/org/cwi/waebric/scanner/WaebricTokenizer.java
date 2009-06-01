@@ -68,9 +68,6 @@ public class WaebricTokenizer {
 	private void read() throws IOException {
 		current = reader.read();
 		
-		// Debugging TODO: Remove when bug fixed
-		System.out.println("Currently reading " + current + " which represents a \" " + (char) current + " \"");
-		
 		// Maintain actual line and character numbers
 		if(current == '\n') { charno = 0; lineno++; } // New line
 		else if(current == '\t') { charno += TAB_LENGTH; } // Tab
@@ -133,6 +130,7 @@ public class WaebricTokenizer {
 	 */
 	private TokenSort nextComments() throws IOException {
 		read(); // Retrieve next symbol
+		
 		if(current == '*') { // Multiple-line comment /* */
 			char previous;
 			read(); // Retrieve first comment character
@@ -180,7 +178,7 @@ public class WaebricTokenizer {
 			read(); // Retrieve next text character
 		} while(current != '"');
 		
-		read(); // Skip double quote
+		read(); // Skip closure symbol "
 		
 		return TokenSort.STRCON;
 	}
@@ -242,7 +240,7 @@ public class WaebricTokenizer {
 		
 		read(); // Retrieve next character
 		if(isLetter(current) || isNumeral(current)) {
-			svalue += head; // Place head in value
+			svalue += (char) head; // Place head in value
 			
 			while(isLetter(current) || isNumeral(current)) {
 				svalue += (char) current;

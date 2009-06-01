@@ -139,8 +139,8 @@ public class TestTokenizer {
 		StringReader reader = new StringReader("identifier1");
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
-		TokenSort atSymbol = tokenizer.nextToken();
-		assertEquals(TokenSort.IDCON, atSymbol);
+		TokenSort identifier = tokenizer.nextToken();
+		assertEquals(TokenSort.IDCON, identifier);
 		assertEquals("identifier1", tokenizer.getStringValue());
 		assertEquals(1, tokenizer.getTokenLineNumber());
 		assertEquals(1, tokenizer.getTokenCharacterNumber());
@@ -153,9 +153,9 @@ public class TestTokenizer {
 		StringReader reader = new StringReader("module");
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader, exceptions);
 		
-		TokenSort atSymbol = tokenizer.nextToken();
-		assertEquals(TokenSort.KEYWORD, atSymbol);
-		assertEquals(WaebricKeyword.MODULE, WaebricKeyword.valueOf(tokenizer.getStringValue()));
+		TokenSort keyword = tokenizer.nextToken();
+		assertEquals(TokenSort.KEYWORD, keyword);
+		assertEquals(WaebricKeyword.MODULE, WaebricKeyword.valueOf(tokenizer.getStringValue().toUpperCase()));
 		assertEquals(1, tokenizer.getTokenLineNumber());
 		assertEquals(1, tokenizer.getTokenCharacterNumber());
 		

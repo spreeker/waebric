@@ -19,7 +19,6 @@ public class Arguments implements ISyntaxNode {
 		arguments = new SyntaxNodeListWithSeparator<Argument>(WaebricSymbol.COMMA);
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.LPARANTHESIS),

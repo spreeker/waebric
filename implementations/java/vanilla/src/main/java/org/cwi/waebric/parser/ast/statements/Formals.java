@@ -31,7 +31,6 @@ public class Formals implements ISyntaxNode {
 		return vars.add(var);
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
