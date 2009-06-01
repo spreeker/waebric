@@ -59,7 +59,7 @@ public class WaebricScanner implements Iterable<Token> {
 				WaebricKeyword keyword = WaebricKeyword.valueOf(tokenizer.getStringValue().toUpperCase());
 				Token token = new Token(keyword, current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
 				tokens.add(token);
-			} else if(current == TokenSort.IDCON || current == TokenSort.STRCON || current == TokenSort.STRCON) {
+			} else if(current == TokenSort.IDCON || current == TokenSort.STRCON || current == TokenSort.SYMBOLCON) {
 				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
 				tokens.add(token);
 			}
