@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 
@@ -10,7 +11,7 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public abstract class Path implements ISyntaxNode {
+public abstract class Path extends AbstractSyntaxNode {
 
 	protected FileName fileName;
 
@@ -52,11 +53,6 @@ public abstract class Path implements ISyntaxNode {
 			return dirName;
 		}
 		
-		@Override
-		public String toString() {
-			return dirName.toString() + "/" + fileName.toString();
-		}
-		
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] {
 				dirName,
@@ -78,11 +74,6 @@ public abstract class Path implements ISyntaxNode {
 		@Override
 		public boolean equals(Object obj) {
 			return fileName.equals(obj);
-		}
-		
-		@Override
-		public String toString() {
-			return fileName.toString();
 		}
 		
 		public ISyntaxNode[] getChildren() {

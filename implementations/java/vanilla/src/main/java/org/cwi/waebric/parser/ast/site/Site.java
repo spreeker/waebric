@@ -30,9 +30,9 @@ public class Site extends ModuleElement {
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
-			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.END)),
+			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.SITE)),
 			mappings,
-			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.SITE))
+			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.END))
 		};
 	}
 

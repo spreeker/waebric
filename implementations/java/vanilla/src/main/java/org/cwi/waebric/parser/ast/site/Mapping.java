@@ -1,11 +1,19 @@
 package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
-public class Mapping implements ISyntaxNode {
+/**
+ * Path ":" Markup -> Mapping
+ * 
+ * @author Jeroen van Schagen
+ * @date 22-05-2009
+ *
+ */
+public class Mapping extends AbstractSyntaxNode {
 
 	private Path path;
 	private Markup markup;
@@ -28,10 +36,10 @@ public class Mapping implements ISyntaxNode {
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { 
-				path, 
-				new CharacterLiteral(WaebricSymbol.COLON), 
-				markup
-			};
+			path, 
+			new CharacterLiteral(WaebricSymbol.COLON), 
+			markup
+		};
 	}
 
 }

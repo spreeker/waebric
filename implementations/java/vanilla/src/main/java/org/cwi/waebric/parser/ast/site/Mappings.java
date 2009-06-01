@@ -15,9 +15,4 @@ public class Mappings extends SyntaxNodeListWithSeparator<Mapping> {
 		super(WaebricSymbol.SEMICOLON);
 	}
 
-	/**
-	 * Serial ID
-	 */
-	private static final long serialVersionUID = -6962647667939837646L;
-
 }
