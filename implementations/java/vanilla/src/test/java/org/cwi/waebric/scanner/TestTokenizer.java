@@ -67,7 +67,7 @@ public class TestTokenizer {
 	
 	@Test
 	public void testSymbol() throws IOException {
-		StringReader reader = new StringReader("\'abc '123 '@#! '");
+		StringReader reader = new StringReader("'abc '123 '@#! '");
 		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
 		
 		TokenSort textSymbol = tokenizer.nextToken();

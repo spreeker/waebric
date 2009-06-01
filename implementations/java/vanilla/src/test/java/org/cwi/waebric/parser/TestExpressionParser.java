@@ -73,7 +73,9 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("'abc");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		// TODO: Scanner does not allow symbol cons to be detected, :-(
+		Expression.SymbolExpression expression = parser.parseSymbolExpression();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("abc", expression.getSymbol().toString());
 	}
 	
 	@Test

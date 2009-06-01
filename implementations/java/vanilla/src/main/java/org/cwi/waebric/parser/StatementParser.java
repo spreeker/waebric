@@ -234,10 +234,12 @@ class StatementParser extends AbstractParser {
 	public Statement.CommentStatement parseCommentStatement() {
 		Statement.CommentStatement statement = new Statement.CommentStatement();
 		
+		// Expect comment keyword
 		if(! next("comment keyword", "\"comment\"", WaebricKeyword.COMMENT)) {
-			return null; // Invalid syntax
+			return null; // Invalid keyword, quit statement parse
 		}
 		
+		// Parse text, which expects a StrCon "text"
 		if(next("comments statement text", "\"comments\" text", TokenSort.STRCON)) {
 			StrCon comment = new StrCon(current.getLexeme().toString());
 			statement.setComment(comment);

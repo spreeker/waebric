@@ -52,13 +52,13 @@ public class TestPredicateParser {
 	@Test
 	public void testPredicateWithType() {
 		// Correct predicate
-		iterator = TestScanner.quickScan("bla.string?");
+		iterator = TestScanner.quickScan("123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate predicate = parser.parsePredicate();
 		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.PredicateWithType.class, predicate.getClass()); // Correct type
-		assertEquals(Expression.VarExpression.class, predicate.getExpression().getClass()); // Correct expression
+		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass()); // Correct expression
 		assertEquals("string", ((Predicate.PredicateWithType) predicate).getType().toString()); // Correct type
 	}
 	

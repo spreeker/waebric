@@ -10,6 +10,7 @@ import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.KeyValuePair;
 import org.cwi.waebric.parser.ast.expressions.SymbolCon;
 import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.text.Text;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.Token;
@@ -43,8 +44,8 @@ class ExpressionParser extends AbstractParser {
 		} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
 			// Record expressions start with a {
 			return parseRecordExpression();
-		} else if(peek.getLexeme().equals(WaebricSymbol.SQUOTE)) {
-			// Symbol cons start with a '
+		} else if(peek.getSort().equals(TokenSort.SYMBOLCON)) {
+			// Symbol expressions consist of a symbol
 			return parseSymbolExpression();
 		} else if(peek.getSort().equals(TokenSort.NATCON)) {
 			// Natural expressions consist of a natural
@@ -93,7 +94,8 @@ class ExpressionParser extends AbstractParser {
 	public Expression.TextExpression parseTextExpression() {
 		if(next("text expression", "\"text\"", TokenSort.STRCON)) {
 			Expression.TextExpression expression = new Expression.TextExpression();
-			expression.setText(new StringLiteral(current.getLexeme().toString()));
+			Text text = new Text(new StringLiteral(current.getLexeme().toString()));
+			expression.setText(text);
 			return expression;
 		}
 		
@@ -105,12 +107,14 @@ class ExpressionParser extends AbstractParser {
 	 * @param expression
 	 */
 	public Expression.SymbolExpression parseSymbolExpression() {
-		Expression.SymbolExpression expression = new Expression.SymbolExpression();
+		if(next("symbol expression", "\'symbol", TokenSort.SYMBOLCON)) {
+			Expression.SymbolExpression expression = new Expression.SymbolExpression();
+			SymbolCon symbol = new SymbolCon(new StringLiteral(current.getLexeme().toString()));
+			expression.setSymbol(symbol);
+			return expression;
+		}
 		
-		SymbolCon symbol = parseSymbolCon();
-		expression.setSymbol(symbol);
-		
-		return expression;
+		return null;
 	}
 	
 	/**
@@ -232,22 +236,7 @@ class ExpressionParser extends AbstractParser {
 		
 		return pair;
 	}
-
-	/**
-	 * @see SymbolCon
-	 * @param symbol
-	 */
-	private SymbolCon parseSymbolCon() {
-		if(! next("symbol opening quote", "\"'\" characters", WaebricSymbol.SQUOTE)) {
-			return null; // Incorrect symbol syntax, quit parsing
-		}
-		
-		SymbolCon symbol = new SymbolCon();
-		// TODO: ~[0-31\ \t\n\r\;\,\127-255]
-		
-		return symbol;
-	}
-
+	
 	/**
 	 * @see Var
 	 * @param var
