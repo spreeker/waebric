@@ -7,6 +7,7 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
+import org.cwi.waebric.parser.ast.basic.SymbolCon;
 
 public abstract class Expression implements ISyntaxNode {
 

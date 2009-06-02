@@ -97,6 +97,15 @@ public class WaebricScanner implements Iterable<Token> {
 	}
 	
 	/**
+	 * Retrieve token list
+	 * 
+	 * @return
+	 */
+	public List<Token> getTokens() {
+		return tokens;
+	}
+	
+	/**
 	 * Retrieve token iterator
 	 * 
 	 * @return iterator

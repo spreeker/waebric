@@ -1,5 +1,28 @@
 package org.cwi.waebric.parser.ast.embedding;
 
-public class MidText {
+import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.StringLiteral;
 
+/**
+ * ">" TextChar* "<" -> MidText
+ * 
+ * @author Jeroen van Schagen
+ * @date 02-06-2009
+ */
+public class MidText extends AbstractSyntaxNode {
+
+	private StringLiteral text;
+	
+	@Override
+	public ISyntaxNode[] getChildren() {
+		return new ISyntaxNode[] {
+			new CharacterLiteral(WaebricSymbol.LESS_THAN),
+			text,
+			new CharacterLiteral(WaebricSymbol.GREATER_THAN)
+		};
+	}
+	
 }

@@ -33,4 +33,7 @@ public class WaebricSymbol {
 	public static final char LCBRACKET = '{';
 	public static final char RCBRACKET = '}';
 	
+	public static final char LESS_THAN = '<';
+	public static final char GREATER_THAN = '>';
+	
 }

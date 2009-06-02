@@ -1,5 +1,36 @@
 package org.cwi.waebric.parser.ast.embedding;
 
-public class PostText {
+import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.StringLiteral;
+
+/**
+ * ">" TextChar* "\""
+ * 
+ * @author Jeroen van Schagen 
+ * @date 02-06-2009
+ */
+public class PostText extends AbstractSyntaxNode {
+
+	private StringLiteral text;
+	
+	public StringLiteral getText() {
+		return text;
+	}
+
+	public void setText(StringLiteral text) {
+		this.text = text;
+	}
+
+	@Override
+	public ISyntaxNode[] getChildren() {
+		return new ISyntaxNode[] {
+			new CharacterLiteral(WaebricSymbol.GREATER_THAN),
+			text,
+			new CharacterLiteral(WaebricSymbol.DQUOTE)
+		};
+	}
 
 }
