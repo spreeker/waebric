@@ -86,4 +86,25 @@ class EmbeddingParser extends AbstractParser {
 		return markupParser.parseMarkup();
 	}
 	
+	public StringLiteral parseTextChars() {
+		String data = "";
+		
+		Token previous = current;
+		while(tokens.hasNext()) {
+			current = tokens.next();
+			Object lexeme = current.getLexeme();
+			
+			if(lexeme.equals('<')) { 
+				break;
+			} else if(lexeme.equals('&') || lexeme.equals('"')) {
+				if(previous.getLexeme().equals('\\')) { break; }
+			}
+
+			data += current.getLexeme().toString();
+			previous = current;
+		}
+		
+		return new StringLiteral(data);
+	}
+	
 }

@@ -103,10 +103,10 @@ public class TestScanner {
 	
 	@Test
 	public void testString() {
-		iterator = quickScan("\"Hello\\nNew line!\"");
+		iterator = quickScan("\"String, using a\\nnew line!\"");
 		current = iterator.next();
 		assertEquals(TokenSort.STRCON, current.getSort());
-		assertEquals("Hello\\nNew line!", current.getLexeme().toString());
+		assertEquals("String, using a\\nnew line!", current.getLexeme().toString());
 		assertFalse(iterator.hasNext());
 	}
 	
@@ -127,10 +127,10 @@ public class TestScanner {
 
 	@Test
 	public void testScanText() {
-		iterator = quickScan("\"Hello\nNew line!\"<");
+		iterator = quickScan("\"Text, using a \nnew line!\"<");
 		current = iterator.next();
 		assertEquals(TokenSort.TEXT, current.getSort());
-		assertEquals("Hello\nNew line!", current.getLexeme().toString());
+		assertEquals("Text, using a \nnew line!", current.getLexeme().toString());
 		
 		Token symbol = iterator.next();
 		assertEquals(TokenSort.SYMBOLCHAR, symbol.getSort());
@@ -144,6 +144,11 @@ public class TestScanner {
 		assertTrue(WaebricScanner.isText("@"));
 		assertTrue(WaebricScanner.isText("\n"));
 		assertTrue(WaebricScanner.isText(""));
+		assertTrue(WaebricScanner.isText("\\&"));
+		assertFalse(WaebricScanner.isText("&"));
+		assertTrue(WaebricScanner.isText("\\\""));
+		assertFalse(WaebricScanner.isText("\""));
+		assertTrue(WaebricScanner.isText("\\"));
 		assertFalse(WaebricScanner.isText("Hi!<"));
 	}
 	

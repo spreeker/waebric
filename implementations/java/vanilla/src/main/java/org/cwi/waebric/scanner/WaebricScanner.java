@@ -142,9 +142,28 @@ public class WaebricScanner implements Iterable<Token> {
 	 */
 	public static boolean isText(String lexeme) {
 		char chars[] = lexeme.toCharArray();
-		for(char c: chars) {
-			if(! isTextChar(c)) { return false; }
+		
+		for(int i = 0; i < chars.length; i++) {
+			char c = chars[i]; // Retrieve current character
+			if(! isTextChar(c)) {
+				// Allow "\\&" "\\""
+				if(c == '&' || c == '"') {
+					if(i > 0) {
+						char previous = chars[i-1];
+						if(previous == '\\') {
+							i++; // Skip checking & or ' and accept
+						} else {
+							return false; // Incorrect occurrence of & or " character
+						}
+					} else {
+						return false; // Incorrect occurrence of & or " character
+					}
+				} else {
+					return false; // Incorrect character
+				}
+			}
 		}
+		
 		return true;
 	}
 	
@@ -154,7 +173,8 @@ public class WaebricScanner implements Iterable<Token> {
 	 * @return
 	 */
 	public static boolean isTextChar(char c) {
-		return c > 31 && c < 128 && c != '<' || c == '\n' || c == '\t' || c == '\r';
+		return c > 31 && c < 128 && c != '<' && c != '&' && c != '"' 
+			|| c == '\n' || c == '\t' || c == '\r';
 	}
 	
 	/**
@@ -167,13 +187,13 @@ public class WaebricScanner implements Iterable<Token> {
 		
 		for(int i = 0; i < chars.length; i++) {
 			char c = chars[i]; // Retrieve current character
-			if(! isStringChar(c)) { 
+			if(! isStringChar(c)) {
+				// Allow "\\n" "\\t" "\\\"" "\\\\"
 				if(c == '\\') {
-					// Allow "\\n" "\\t" "\\\"" "\\\\"
 					if(i+1 < chars.length) {
 						char peek = chars[i+1];
 						if(peek == 'n' || peek == 't' || peek == '"' || peek == '\\') {
-							i++; // Skip next character
+							i++; // Check checking \\ and accept
 						} else {
 							return false; // Invalid occurrence of '\\'
 						}
