@@ -100,25 +100,14 @@ public class TestScanner {
 		assertTrue(current.getLexeme().equals("attribute"));
 		assertTrue(current.getSort().equals(TokenSort.IDCON));
 	}
-
-	@Test
-	public void testScanText() {
-		
-	}
-	
-	@Test
-	public void testIsText() {
-		assertTrue(WaebricScanner.isText("Hello there"));
-		assertTrue(WaebricScanner.isText("Hello"));
-		assertTrue(WaebricScanner.isText("@"));
-		assertTrue(WaebricScanner.isText("\n"));
-		assertTrue(WaebricScanner.isText(""));
-		assertFalse(WaebricScanner.isText("<"));
-	}
 	
 	@Test
 	public void testString() {
-		
+		iterator = quickScan("\"Hello\\nNew line!\"");
+		current = iterator.next();
+		assertEquals(TokenSort.STRCON, current.getSort());
+		assertEquals("Hello\\nNew line!", current.getLexeme().toString());
+		assertFalse(iterator.hasNext());
 	}
 	
 	@Test
@@ -135,10 +124,39 @@ public class TestScanner {
 		assertFalse(WaebricScanner.isString("\""));
 		assertFalse(WaebricScanner.isString("\\"));
 	}
+
+	@Test
+	public void testScanText() {
+		iterator = quickScan("\"Hello\nNew line!\"<");
+		current = iterator.next();
+		assertEquals(TokenSort.TEXT, current.getSort());
+		assertEquals("Hello\nNew line!", current.getLexeme().toString());
+		
+		Token symbol = iterator.next();
+		assertEquals(TokenSort.SYMBOLCHAR, symbol.getSort());
+		assertEquals("<", symbol.getLexeme().toString());
+	}
 	
 	@Test
-	public void testInvalid() {
+	public void testIsText() {
+		assertTrue(WaebricScanner.isText("Hello there"));
+		assertTrue(WaebricScanner.isText("Hello"));
+		assertTrue(WaebricScanner.isText("@"));
+		assertTrue(WaebricScanner.isText("\n"));
+		assertTrue(WaebricScanner.isText(""));
+		assertFalse(WaebricScanner.isText("Hi!<"));
+	}
+	
+	@Test
+	public void testTextDelegate() {
+		iterator = quickScan("\"no string\nno text<\"");
+		while(iterator.hasNext()) { current = iterator.next(); }
 		
+		// Last token
+		assertEquals(TokenSort.SYMBOLCHAR, current.getSort());
+		assertEquals("\"", current.getLexeme().toString());
+		assertEquals(2, current.getLine());
+		assertEquals(9, current.getCharacter());		
 	}
 	
 }

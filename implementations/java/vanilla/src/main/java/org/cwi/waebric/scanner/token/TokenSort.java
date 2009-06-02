@@ -24,13 +24,13 @@ public enum TokenSort {
 	NATCON, 
 	
 	/**
-	 * String represents a single word.<br><br>
-	 * [\"] StringChar* [\"] -> StrCon
-	 * ~[\0-\31\n\t\"\\] -> StrChar
-	 * "\\n" -> StrChar { cons("newline") }
-	 * "\\t" -> StrChar { cons("tab") }
-	 * "\\\"" -> StrChar { cons("quote") }
-	 * "\\\\" -> StrChar { cons("backslash") }
+	 * Strings tokens represent text without layout, stored between double quotes.<br><br>
+	 * [\"] StringChar* [\"] -> StrCon<br>
+	 * ~[\0-\31\n\t\"\\] -> StrChar<br>
+	 * "\\n" -> StrChar { cons("newline") }<br>
+	 * "\\t" -> StrChar { cons("tab") }<br>
+	 * "\\\"" -> StrChar { cons("quote") }<br>
+	 * "\\\\" -> StrChar { cons("backslash") }<br>
 	 * 
 	 * For example:<br>
 	 * "Hello"
@@ -38,9 +38,9 @@ public enum TokenSort {
 	STRCON,
 	
 	/**
-	 * Text tokens represent all text stored between double quotes.<br><br>
-	 * "\"" TextChar* "\"" -> Text
-	 * ~[\0-\31\<\128-\255] \/ [\n\t\r] -> TextChar
+	 * Text tokens represent all symbols and layout, stored between double quotes.<br><br>
+	 * "\"" TextChar* "\"" -> Text<br>
+	 * ~[\0-\31\<\128-\255] \/ [\n\t\r] -> TextChar<br>
 	 * 
 	 * For example:<br>
 	 * "This is text"

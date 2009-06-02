@@ -94,7 +94,7 @@ public class WaebricScanner implements Iterable<Token> {
 			exceptions.addAll(e);
 			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getTokenLineNumber(), tokenizer.getTokenLineNumber()));
 			tokens.addAll(scanner.getTokens());
-			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()-1));
+			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()));
 		}
 	}
 
