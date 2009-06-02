@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Parser.Ast.Module
 {
+    /// <summary>
+    /// ModuleElement
+    /// </summary>
     public class ModuleElement : ISyntaxNode
     {
     }

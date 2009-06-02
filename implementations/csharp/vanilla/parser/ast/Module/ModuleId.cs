@@ -6,7 +6,7 @@ using System.Text;
 namespace Parser.Ast.Module
 {
     /// <summary>
-    /// 
+    /// ModuleIdentifier
     /// </summary>
     public class ModuleId : ISyntaxNode
     {
