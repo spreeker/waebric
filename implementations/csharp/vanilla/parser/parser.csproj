@@ -51,6 +51,10 @@
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\Module\Module.cs" />
+    <Compile Include="Ast\Module\ModuleElement.cs" />
+    <Compile Include="Ast\Module\ModuleElementList.cs" />
+    <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
@@ -58,6 +62,14 @@
     <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Ast\Embedding\" />
+    <Folder Include="Ast\Functions\" />
+    <Folder Include="Ast\Markup\" />
+    <Folder Include="Ast\Predicates\" />
+    <Folder Include="Ast\Site\" />
+    <Folder Include="Ast\Statements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
