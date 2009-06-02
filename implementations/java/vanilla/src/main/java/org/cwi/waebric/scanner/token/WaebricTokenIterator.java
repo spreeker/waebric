@@ -12,12 +12,12 @@ import java.util.List;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class TokenIterator implements Iterator<Token> {
+public class WaebricTokenIterator implements Iterator<WaebricToken> {
 
-	private List<Token> collection;
+	private List<WaebricToken> collection;
 	private int curr = -1;
 	
-	public TokenIterator(List<Token> collection) {
+	public WaebricTokenIterator(List<WaebricToken> collection) {
 		this.collection = collection;
 	}
 	
@@ -29,12 +29,12 @@ public class TokenIterator implements Iterator<Token> {
 		return curr+k >= 0 && curr+k < collection.size();
 	}
 
-	public Token next() {
+	public WaebricToken next() {
 		curr++;
 		return collection.get(curr);
 	}
 	
-	public Token peek(int k) {
+	public WaebricToken peek(int k) {
 		if(!hasNext(k)) { return null; }
 		return collection.get(curr+k);
 	}

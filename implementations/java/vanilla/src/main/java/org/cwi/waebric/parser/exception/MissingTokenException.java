@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.exception;
 
-import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.WaebricToken;
 
 public class MissingTokenException extends ParserException {
 
@@ -9,7 +9,7 @@ public class MissingTokenException extends ParserException {
 	 */
 	private static final long serialVersionUID = 8718366239518956356L;
 
-	public MissingTokenException(Token previous, String name, String formula) {
+	public MissingTokenException(WaebricToken previous, String name, String formula) {
 		super("Missing '" + name + "' token after: " + previous.toString() + ", " +
 				"attach the expected: (" + formula + ").");
 	}

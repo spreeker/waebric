@@ -13,9 +13,9 @@ import org.cwi.waebric.parser.ast.embedding.TextTail;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Embedding
@@ -30,7 +30,7 @@ class EmbeddingParser extends AbstractParser {
 	private final MarkupParser markupParser;
 	private final ExpressionParser expressionParser;
 
-	public EmbeddingParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public EmbeddingParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Initiate sub-parsers
@@ -65,8 +65,8 @@ class EmbeddingParser extends AbstractParser {
 			return null;
 		}
 
-		Token peek = tokens.peek(1); // Optional: Parse text
-		if(peek.getSort() == TokenSort.IDCON) {
+		WaebricToken peek = tokens.peek(1); // Optional: Parse text
+		if(peek.getSort() == WaebricTokenSort.IDCON) {
 			text.setText(new StringLiteral(peek.getLexeme().toString()));
 			tokens.next(); // Skip text
 		}
@@ -89,7 +89,7 @@ class EmbeddingParser extends AbstractParser {
 	public StringLiteral parseTextChars() {
 		String data = "";
 		
-		Token previous = current;
+		WaebricToken previous = current;
 		while(tokens.hasNext()) {
 			current = tokens.next();
 			Object lexeme = current.getLexeme();

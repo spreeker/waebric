@@ -9,7 +9,7 @@ import java.util.List;
 import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
-import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class TestEmbeddingParser {
 	private EmbeddingParser parser;
 	
 	private List<ParserException> exceptions;
-	private TokenIterator iterator;
+	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {

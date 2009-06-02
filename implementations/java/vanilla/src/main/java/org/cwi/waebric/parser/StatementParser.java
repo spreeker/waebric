@@ -14,9 +14,9 @@ import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Statement parser
@@ -31,7 +31,7 @@ class StatementParser extends AbstractParser {
 	private final ExpressionParser expressionParser;
 	private final PredicateParser predicateParser;
 	
-	public StatementParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public StatementParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parsers
@@ -54,7 +54,7 @@ class StatementParser extends AbstractParser {
 			return null;
 		}
 	
-		Token peek = tokens.peek(1); // Determine statement type based on look-ahead
+		WaebricToken peek = tokens.peek(1); // Determine statement type based on look-ahead
 		if(peek.getLexeme().equals(WaebricKeyword.IF)) {
 			// If(-else) statements start with an if keyword
 			return parseIfStatement();
@@ -72,7 +72,7 @@ class StatementParser extends AbstractParser {
 			return parseCommentStatement();
 		} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
 			// Embedding echo production is followed by a text
-			if(tokens.peek(2).getSort().equals(TokenSort.STRCON)) {
+			if(tokens.peek(2).getSort().equals(WaebricTokenSort.QUOTE)) {
 				return parseEchoEmbeddingStatement();
 			} 
 			// Embedding echo production is followed by an expression
@@ -241,8 +241,8 @@ class StatementParser extends AbstractParser {
 		}
 		
 		// Parse text, which expects a text
-		if(next("comments text", "\"comments\" text", TokenSort.TEXT)) {
-			if(WaebricScanner.isString(current.getLexeme().toString())) {
+		if(next("comments text", "\"comments\" text", WaebricTokenSort.QUOTE)) {
+			if(WaebricScanner.isStringChars(current.getLexeme().toString())) {
 				StrCon comment = new StrCon(current.getLexeme().toString());
 				statement.setComment(comment);
 			} else {
@@ -264,7 +264,7 @@ class StatementParser extends AbstractParser {
 			return null; // Invalid syntax
 		}
 		
-		if(next("echo embedding", "\"echo\" embedding", TokenSort.STRCON)) {
+		if(next("echo embedding", "\"echo\" embedding", WaebricTokenSort.QUOTE)) {
 			// TODO: Embedding!
 		} else {
 			return null; // Invalid syntax
@@ -385,7 +385,7 @@ class StatementParser extends AbstractParser {
 		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
 		
 		// Parse identifier
-		if(next("assignment identifier", "identifier \"(\")", TokenSort.IDCON)) {
+		if(next("assignment identifier", "identifier \"(\")", WaebricTokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			assignment.setIdentifier(identifier);
 		}

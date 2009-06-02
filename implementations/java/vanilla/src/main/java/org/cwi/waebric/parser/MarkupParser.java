@@ -14,9 +14,9 @@ import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Markup
@@ -30,7 +30,7 @@ class MarkupParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
-	public MarkupParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public MarkupParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parsers
@@ -69,7 +69,7 @@ class MarkupParser extends AbstractParser {
 		Designator designator = new Designator();
 		
 		// Parse identifier
-		if(next("designator identifier", "identifier", TokenSort.IDCON)) {
+		if(next("designator identifier", "identifier", WaebricTokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			designator.setIdentifier(identifier);
 		} else {
@@ -111,14 +111,14 @@ class MarkupParser extends AbstractParser {
 	 * @param attribute
 	 */
 	public Attribute parseAttribute() {
-		if(tokens.hasNext() && tokens.peek(1).getSort() == TokenSort.SYMBOLCHAR) {
-			Token peek = tokens.peek(1); // Retrieve symbol token
+		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.CHARACTER) {
+			WaebricToken peek = tokens.peek(1); // Retrieve symbol token
 			char c = peek.getLexeme().toString().charAt(0);
 			if(c == '#' || c == '.' || c == '$' || c ==':') { // Identifier attribute
 				tokens.next(); // Skip attribute symbol
 				Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(c);
 				
-				if(next("identifier attribute", "symbol identifier", TokenSort.IDCON)) {
+				if(next("identifier attribute", "symbol identifier", WaebricTokenSort.IDCON)) {
 					IdCon identifier = new IdCon(current.getLexeme().toString());
 					attribute.setIdentifier(identifier);
 					return attribute;
@@ -127,13 +127,13 @@ class MarkupParser extends AbstractParser {
 				return null; // Failed parse, return empty node
 			} else if(c == '@') { // Natural attribute
 				tokens.next(); // Skip attribute symbol
-				if(next("numeral attribute", "@ number", TokenSort.NATCON)) {
+				if(next("numeral attribute", "@ number", WaebricTokenSort.NATCON)) {
 					NatCon number = new NatCon(current.getLexeme().toString());
 					
 					// Double natural attribute
 					if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERCENT_SIGN)) {
 						tokens.next(); // Skip percent sign
-						if(next("second numeral attribute", "number % number", TokenSort.NATCON)) {
+						if(next("second numeral attribute", "number % number", WaebricTokenSort.NATCON)) {
 							NatCon second = new NatCon(current.getLexeme().toString());
 							Attribute.AttributeDoubleNatCon attribute = new Attribute.AttributeDoubleNatCon();
 							attribute.setNumber(number);

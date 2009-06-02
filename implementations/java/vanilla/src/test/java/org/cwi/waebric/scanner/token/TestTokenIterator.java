@@ -15,18 +15,18 @@ import org.junit.Test;
 
 public class TestTokenIterator {
 
-	private TokenIterator iterator;
+	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() throws IOException {
-		ArrayList<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token(123, TokenSort.NATCON, 1, 2)); // Number
-		tokens.add(new Token("identifier1", TokenSort.IDCON, 3, 4)); // Identifier
-		tokens.add(new Token(WaebricKeyword.DEF, TokenSort.KEYWORD, 5, 6)); // Keyword
-		tokens.add(new Token("text", TokenSort.STRCON, 7, 8)); // String
-		tokens.add(new Token('@', TokenSort.SYMBOLCHAR, 9, 10)); // Character
-		tokens.add(new Token("symbol1", TokenSort.SYMBOLCON, 11, 12)); // Symbol
-		iterator = new TokenIterator(tokens);
+		ArrayList<WaebricToken> tokens = new ArrayList<WaebricToken>();
+		tokens.add(new WaebricToken(123, WaebricTokenSort.NATCON, 1, 2)); // Number
+		tokens.add(new WaebricToken("identifier1", WaebricTokenSort.IDCON, 3, 4)); // Identifier
+		tokens.add(new WaebricToken(WaebricKeyword.DEF, WaebricTokenSort.KEYWORD, 5, 6)); // Keyword
+		tokens.add(new WaebricToken("text", WaebricTokenSort.QUOTE, 7, 8)); // Quote
+		tokens.add(new WaebricToken('@', WaebricTokenSort.CHARACTER, 9, 10)); // Character
+		tokens.add(new WaebricToken("symbol1", WaebricTokenSort.SYMBOLCON, 11, 12)); // Symbol
+		iterator = new WaebricTokenIterator(tokens);
 	}
 	
 	@After
@@ -44,7 +44,7 @@ public class TestTokenIterator {
 	
 	@Test
 	public void testNextAndHasNext() {
-		Token current = iterator.next();
+		WaebricToken current = iterator.next();
 		
 		assertTrue(iterator.hasNext(0));
 		assertTrue(iterator.hasNext(1));
@@ -64,9 +64,9 @@ public class TestTokenIterator {
 	public void testRemove() {
 		iterator.next(); // Start token
 		iterator.next(); // Token to be removed
-		Token peek = iterator.peek(1);
+		WaebricToken peek = iterator.peek(1);
 		iterator.remove();
-		Token current = iterator.next();
+		WaebricToken current = iterator.next();
 		
 		assertTrue(peek.equals(current));
 	}

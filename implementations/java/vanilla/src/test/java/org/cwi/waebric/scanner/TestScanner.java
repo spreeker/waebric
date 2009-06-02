@@ -12,16 +12,16 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.cwi.waebric.scanner.exception.ScannerException;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 import org.junit.After;
 import org.junit.Test;
 
 public class TestScanner {
 
-	private TokenIterator iterator;
-	private Token current;
+	private WaebricTokenIterator iterator;
+	private WaebricToken current;
 	
 	@After
 	public void tearDown() {
@@ -42,7 +42,7 @@ public class TestScanner {
 	 * @return iterator
 	 * @throws IOException
 	 */
-	public static TokenIterator quickScan(String data) {
+	public static WaebricTokenIterator quickScan(String data) {
 		Reader reader = new StringReader(data);
 		try {
 			WaebricScanner scanner = new WaebricScanner(reader);
@@ -57,20 +57,21 @@ public class TestScanner {
 	}
 	
 	@Test
-	public void testScanIdentifier() {
-		iterator = quickScan("identifier1 html identifier2");
+	public void testScanNumber() {
+		// TODO: Stored incorrect
+		iterator = quickScan("1 2 3 99 9999 123 456");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.IDCON));
+			assertEquals(current.getLexeme().toString(), WaebricTokenSort.NATCON, current.getSort());
 		}
 	}
 	
 	@Test
-	public void testScanNumber() {
-		iterator = quickScan("1 2 3 99 9999 123 456");
+	public void testScanIdentifier() {
+		iterator = quickScan("identifier1abc html identifier2");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertEquals(current.getLexeme().toString(), TokenSort.NATCON, current.getSort());
+			assertTrue(current.getSort().equals(WaebricTokenSort.IDCON));
 		}
 	}
 	
@@ -79,89 +80,85 @@ public class TestScanner {
 		iterator = quickScan("module site import def end");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.KEYWORD));
+			assertTrue(current.getSort().equals(WaebricTokenSort.KEYWORD));
 		}
 	}
 	
 	@Test
-	public void testScanSymbol() {
+	public void testScanCharacter() {
 		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? / .");
 		while(iterator.hasNext()) {
 			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.SYMBOLCHAR));
+			assertTrue(current.getSort().equals(WaebricTokenSort.CHARACTER));
 		}
 		
 		// Symbols as separator
 		iterator = quickScan("@attribute");
+		
 		current = iterator.next(); // Dot symbol
 		assertTrue(current.getLexeme().equals('@'));
-		assertTrue(current.getSort().equals(TokenSort.SYMBOLCHAR));
+		assertTrue(current.getSort().equals(WaebricTokenSort.CHARACTER));
+		
 		current = iterator.next(); // Identifier
 		assertTrue(current.getLexeme().equals("attribute"));
-		assertTrue(current.getSort().equals(TokenSort.IDCON));
-	}
-	
-//	@Test
-//	public void testString() {
-//		iterator = quickScan("\"String, using a\\nnew line!\"");
-//		current = iterator.next();
-//		assertEquals(TokenSort.STRCON, current.getSort());
-//		assertEquals("String, using a\\nnew line!", current.getLexeme().toString());
-//		assertFalse(iterator.hasNext());
-//	}
-	
-	@Test
-	public void testIsString() {
-		assertTrue(WaebricScanner.isString("Hello")); // Regular word
-		assertTrue(WaebricScanner.isString("@")); // Symbol
-		assertTrue(WaebricScanner.isString("")); // Empty
-		assertTrue(WaebricScanner.isString("\\n")); // New-line
-		assertTrue(WaebricScanner.isString("\\t")); // Tab
-		assertTrue(WaebricScanner.isString("\\\"")); // Quote
-		assertTrue(WaebricScanner.isString("\\\\")); // Back
-		assertFalse(WaebricScanner.isString("\n")); // Regular new-line
-		assertFalse(WaebricScanner.isString("\t")); // Regular tab
-		assertFalse(WaebricScanner.isString("\"")); // Regular quote
-		assertFalse(WaebricScanner.isString("\\")); // Regular back
+		assertTrue(current.getSort().equals(WaebricTokenSort.IDCON));
 	}
 
-//	@Test
-//	public void testScanText() {
-//		iterator = quickScan("\"Text, using a \nnew line!\"<");
-//		current = iterator.next();
-//		assertEquals(TokenSort.TEXT, current.getSort());
-//		assertEquals("Text, using a \nnew line!", current.getLexeme().toString());
-//		
-//		Token symbol = iterator.next();
-//		assertEquals(TokenSort.SYMBOLCHAR, symbol.getSort());
-//		assertEquals("<", symbol.getLexeme().toString());
-//	}
-	
 	@Test
-	public void testIsText() {
-		assertTrue(WaebricScanner.isText("Hello there")); // Sentence
-		assertTrue(WaebricScanner.isText("Hello")); // Word
-		assertTrue(WaebricScanner.isText("@")); // Symbol
-		assertTrue(WaebricScanner.isText("\n")); // Layout
-		assertTrue(WaebricScanner.isText("")); // Empty
-		assertTrue(WaebricScanner.isText("\\&")); // &
-		assertTrue(WaebricScanner.isText("\\\"")); // "
-		assertTrue(WaebricScanner.isText("\\")); // Back
-		assertFalse(WaebricScanner.isText("&")); // Regular &
-		assertFalse(WaebricScanner.isText("\"")); // Regular "
-		assertFalse(WaebricScanner.isText("Hi!<")); // Text by <
+	public void testScanQuote() {
+		iterator = quickScan("\"text\" \"123\" \"@@@\"");
+		current = iterator.next();
+		assertEquals("text", current.getLexeme().toString());
 	}
 	
-//	@Test
-//	public void testTextDelegate() {
-//		iterator = quickScan("\"no string\nno text<\"");
-//		while(iterator.hasNext()) { current = iterator.next(); }
-//		
-//		// Last token
-//		assertEquals(TokenSort.SYMBOLCHAR, current.getSort());
-//		assertEquals("\"", current.getLexeme().toString());
-//		assertEquals(2, current.getLine());
-//		assertEquals(9, current.getCharacter());		
-//	}
+	@Test
+	public void testScanSymbol() {
+		// TODO: Not functional yet
+		iterator = quickScan("'abc '123 '@@@ 'abc123@@@");
+		current = iterator.next();
+		assertEquals("abc", current.getLexeme().toString());
+		assertFalse(iterator.hasNext());
+	}
+	
+	@Test
+	public void testIsStringChars() {
+		assertTrue(WaebricScanner.isStringChars("Hello")); // Regular word
+		assertTrue(WaebricScanner.isStringChars("@")); // Symbol
+		assertTrue(WaebricScanner.isStringChars("")); // Empty
+		assertTrue(WaebricScanner.isStringChars("\\n")); // New-line
+		assertTrue(WaebricScanner.isStringChars("\\t")); // Tab
+		assertTrue(WaebricScanner.isStringChars("\\\"")); // Quote
+		assertTrue(WaebricScanner.isStringChars("\\\\")); // Back
+		assertFalse(WaebricScanner.isStringChars("\n")); // Regular new-line
+		assertFalse(WaebricScanner.isStringChars("\t")); // Regular tab
+		assertFalse(WaebricScanner.isStringChars("\"")); // Regular quote
+		assertFalse(WaebricScanner.isStringChars("\\")); // Regular back
+	}
+
+	@Test
+	public void testIsTextChars() {
+		assertTrue(WaebricScanner.isTextChars("Hello there")); // Sentence
+		assertTrue(WaebricScanner.isTextChars("Hello")); // Word
+		assertTrue(WaebricScanner.isTextChars("@")); // Symbol
+		assertTrue(WaebricScanner.isTextChars("\n")); // Layout
+		assertTrue(WaebricScanner.isTextChars("")); // Empty
+		assertTrue(WaebricScanner.isTextChars("\\&")); // &
+		assertTrue(WaebricScanner.isTextChars("\\\"")); // "
+		assertTrue(WaebricScanner.isTextChars("\\")); // Back
+		assertFalse(WaebricScanner.isTextChars("&")); // Regular &
+		assertFalse(WaebricScanner.isTextChars("\"")); // Regular "
+		assertFalse(WaebricScanner.isTextChars("Hi!<")); // Text by <
+	}
+	
+	@Test
+	public void testIsSymbolChars() {
+		assertTrue(WaebricScanner.isSymbolChars("abc")); // Word
+		assertTrue(WaebricScanner.isSymbolChars("123")); // Number
+		assertTrue(WaebricScanner.isSymbolChars("@@@")); // Symbols
+		assertTrue(WaebricScanner.isSymbolChars("abc123@@@")); // All
+		assertFalse(WaebricScanner.isSymbolChars(" ")); // Layout
+		assertFalse(WaebricScanner.isSymbolChars("\n")); // Layout
+		assertFalse(WaebricScanner.isSymbolChars("\t")); // Layout
+	}
 	
 }

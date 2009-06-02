@@ -9,10 +9,10 @@ package org.cwi.waebric.scanner.token;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class Token {
+public class WaebricToken {
 
 	private Object lexeme;
-	private TokenSort sort;
+	private WaebricTokenSort sort;
 	private int line;
 	private int character;
 	
@@ -23,7 +23,7 @@ public class Token {
 	 * @param sort Token type
 	 * @param line Line number
 	 */
-	public Token(Object lexeme, TokenSort sort, int line, int character) {
+	public WaebricToken(Object lexeme, WaebricTokenSort sort, int line, int character) {
 		this.lexeme = lexeme;
 		this.sort = sort;
 		this.line = line;
@@ -42,7 +42,7 @@ public class Token {
 	 * Retrieve token sort
 	 * @return
 	 */
-	public TokenSort getSort() {
+	public WaebricTokenSort getSort() {
 		return sort;
 	}
 
@@ -64,8 +64,8 @@ public class Token {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Token) {
-			Token token = (Token) obj;
+		if(obj instanceof WaebricToken) {
+			WaebricToken token = (WaebricToken) obj;
 			if(token.getSort() != this.sort) { return false; }
 			if(token.getLine() != this.line) { return false; }
 			if(token.getCharacter() != this.character) { return false; }

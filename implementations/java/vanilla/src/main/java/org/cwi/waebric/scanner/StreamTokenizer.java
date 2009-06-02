@@ -3,22 +3,26 @@ package org.cwi.waebric.scanner;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.token.TokenSort;
-
 /**
- * Tokenizer for Waebric programs, reads input stream and processes
- * it into a token stream.
+ * Convert a character stream into a stream of tokens.
  * 
  * @author Jeroen van Schagen
  * @date 29-05-2009
  */
-class StreamTokenizer {
+public class StreamTokenizer {
 	
 	/**
 	 * Default tab character length
 	 */
 	public static final int TAB_LENGTH = 5;
+	
+	// Token type constants
+	public static final int END_OF_FILE = -1;
+	public static final int CHARACTER = 0;
+	public static final int NUMBER = 1;
+	public static final int WORD = 2;
+	public static final int LAYOUT = 3;
+	public static final int COMMENT = 4;
 	
 	// Current character properties
 	private int current;
@@ -26,13 +30,16 @@ class StreamTokenizer {
 	private int charno = 0;
 	
 	// Current token properties
-	private String svalue;
-	private char cvalue;
-	private int ivalue;
+	private String sval;
+	private char cval;
+	private int ival;
 	
 	private int tlineno = 1;
 	private int tcharno = 0;
 	
+	/**
+	 * Character stream
+	 */
 	private final Reader reader;
 	
 	/**
@@ -75,11 +82,11 @@ class StreamTokenizer {
 	 * @return sort
 	 * @throws IOException
 	 */
-	public TokenSort nextToken() throws IOException {
+	public int nextToken() throws IOException {
 		// Reset values
-		svalue = "";
-		cvalue = 0;
-		ivalue = 0;
+		sval = "";
+		cval = 0;
+		ival = -1;
 		
 		// Store token start location
 		tlineno = lineno;
@@ -87,28 +94,22 @@ class StreamTokenizer {
 		
 		if(current < 0) {
 			// End of file
-			return TokenSort.EOF;
+			return END_OF_FILE;
 		} else if(current == '/') {
-			// Comments
+			// Comments token
 			return nextComments();
 		} else if(isLayout(current)) {
-			// Layout
+			// Layout character
 			return nextLayout();
-		} else if(current == '"') {
-			// String
-			return nextText();
-		} else if(current == '\'') {
-			// Symbol
-			return nextSymbol();
 		} else if(isNumeral(current)) {
-			// Number
+			// Number token
 			return nextNumber();
 		} else if(isLetter(current)) {
-			// Identifier
+			// Word token
 			return nextWord();
 		} else {
 			// Symbol character
-			return nextCharacterSymbol();
+			return nextCharacter();
 		}
 	}
 	
@@ -118,28 +119,36 @@ class StreamTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextComments() throws IOException {
+	private int nextComments() throws IOException {
 		read(); // Retrieve next symbol
 		
 		if(current == '*') { // Multiple-line comment /* */
 			char previous;
 			read(); // Retrieve first comment character
+			
+			sval = "*/";
 			do {
-				previous = (char) current; // Update previous
+				sval += (char) current;
+				previous = (char) current;
 				read(); // Retrieve next comment character
-			} while(!  (previous == '*' && current == '/'));
+			} while(!(previous == '*' && current == '/'));
+			
 			read(); // Retrieve next character
-			return nextToken(); // Comments are ignored, thus return next
+			return COMMENT;
 		} else if(current == '/') { // Single-line comment //
 			read(); // Retrieve first comment character
+			
+			sval = "//";
 			do {
+				sval += (char) current;
 				read(); // Retrieve next comment character
 			} while(current != '\n');
+			
 			read(); // Retrieve next character
-			return nextToken(); // Comments are ignored, thus return next
+			return COMMENT;
 		} else { // Symbol character /
-			cvalue = '/';
-			return TokenSort.SYMBOLCHAR;
+			cval = '/';
+			return CHARACTER;
 		}
 	}
 	
@@ -149,46 +158,10 @@ class StreamTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextLayout() throws IOException {
+	private int nextLayout() throws IOException {
+		cval = (char) current;
 		read(); // Retrieve next character
-		return nextToken(); // Skip separator and return next token instead
-	}
-	
-	/**
-	 * Retrieve next string token.
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	private TokenSort nextText() throws IOException {
-		read(); // Retrieve first text character
-		
-		while(current != '"') {
-			if(current < 0) { return TokenSort.TEXT; }
-			svalue += (char) current; // Build string value
-			read(); // Retrieve next text character
-		}
-		
-		read(); // Skip closure symbol "
-		
-		return TokenSort.TEXT;
-	}
-	
-	/**
-	 * Retrieve next symbol token.
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	private TokenSort nextSymbol() throws IOException {
-		read(); // Retrieve first symbol
-		
-		while(isSymbolChar(current)) {
-			svalue += (char) current; // Build symbol value
-			read(); // Retrieve next symbol
-		}
-		
-		return TokenSort.SYMBOLCON;
+		return LAYOUT;
 	}
 	
 	/**
@@ -197,10 +170,10 @@ class StreamTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextCharacterSymbol() throws IOException {
-		cvalue = (char) current;
+	private int nextCharacter() throws IOException {
+		cval = (char) current;
 		read(); // Retrieve next character
-		return TokenSort.SYMBOLCHAR;
+		return CHARACTER;
 	}
 	
 	/**
@@ -209,15 +182,14 @@ class StreamTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextNumber() throws IOException {
+	private int nextNumber() throws IOException {
 		while(isNumeral(current)) {
-			ivalue *= 10; // Create space for next character
-			ivalue += toNumber(current);
+			ival *= 10; // Create space for next character
+			ival += current - 48; // '0' equals decimal 48
 			read(); // Read next number
 		}
-		
-		// NatCon
-		return TokenSort.NATCON;
+
+		return NUMBER;
 	}
 	
 	/**
@@ -226,24 +198,25 @@ class StreamTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextWord() throws IOException {
+	private int nextWord() throws IOException {
 		int head = current; // Store head letter
-		
 		read(); // Retrieve next character
-		if(isLetter(current) || isNumeral(current)) {
-			svalue += (char) head; // Place head in value
+		
+		if(isLetter(current)) {
+			// A sequence of letters are found, thus token as word not character
+			sval += (char) head; // Place head in value
 			
 			while(isLetter(current) || isNumeral(current)) {
-				svalue += (char) current;
+				sval += (char) current;
 				read(); // Read next character
 			}
 			
-			// When word is not a keyword it is an identifier
-			return isKeyword(svalue) ? TokenSort.KEYWORD : TokenSort.IDCON;
+			return WORD;
 		} else {
-			cvalue = (char) head;
+			// Only one letter is found, thus token as character
+			cval = (char) head;
 			read(); // Read next character
-			return TokenSort.SYMBOLCHAR;
+			return CHARACTER;
 		}
 	}
 
@@ -275,44 +248,6 @@ class StreamTokenizer {
 	 */
 	private boolean isLayout(int c) {
 		return c == ' ' || c == '\t' || c =='\n' || c == '\r';
-	}
-	
-	/**
-	 * Check if character is a symbol.
-	 * 
-	 * @param c
-	 * @return 
-	 */
-	private boolean isSymbolChar(int c) {
-		return c > 31 && c < 127 && ! isLayout(c) && c != ';' && c != ',' && c != '>';
-	}
-	
-
-	/**
-	 * Check if lexeme is a keyword.
-	 * 
-	 * @param lexeme Token value
-	 * @return 
-	 */
-	public boolean isKeyword(String lexeme) {
-		try {
-			// Literal should be in enumeration
-			WaebricKeyword literal = WaebricKeyword.valueOf(lexeme.toUpperCase());
-			return literal != null;
-		} catch(IllegalArgumentException e) {
-			// Enumeration does not exists
-			return false;
-		}
-	}
-
-	/**
-	 * Convert character to an integer value.
-	 * 
-	 * @param decimal
-	 * @return
-	 */
-	private int toNumber(int decimal) {
-		return decimal - 48; // '0' is positioned at decimal 48
 	}
 	
 	/**
@@ -357,7 +292,7 @@ class StreamTokenizer {
 	 * @return
 	 */
 	public int getIntegerValue() {
-		return ivalue;
+		return ival;
 	}
 	
 	/**
@@ -366,7 +301,7 @@ class StreamTokenizer {
 	 * @return
 	 */
 	public char getCharacterValue() {
-		return cvalue;
+		return cval;
 	}
 	
 	/**
@@ -375,7 +310,22 @@ class StreamTokenizer {
 	 * @return
 	 */
 	public String getStringValue() {
-		return svalue;
+		return sval;
+	}
+	
+	/**
+	 * 
+	 */
+	public String toString() {
+		if(! sval.equals("")) {
+			return sval;
+		} else if(cval > 0) {
+			return "" + cval;
+		} else if(ival >= 0) {
+			return "" + ival;
+		}
+		
+		return null;
 	}
 	
 }

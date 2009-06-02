@@ -2,9 +2,9 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
@@ -19,10 +19,10 @@ import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 public abstract class AbstractParser {
 
 	protected final List<ParserException> exceptions;
-	protected final TokenIterator tokens;
-	protected Token current;
+	protected final WaebricTokenIterator tokens;
+	protected WaebricToken current;
 	
-	public AbstractParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public AbstractParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		this.exceptions = exceptions;
 		this.tokens = tokens;
 	}
@@ -57,7 +57,7 @@ public abstract class AbstractParser {
 	 * @param sort Expected token sort, used for type checking
 	 * @return Success status of finding and type-checking next token.
 	 */
-	protected boolean next(String name, String syntax, TokenSort sort) {
+	protected boolean next(String name, String syntax, WaebricTokenSort sort) {
 		if(next(name, syntax)) {
 			if(current.getSort() == sort) {
 				return true; // Token has been verified
@@ -110,7 +110,7 @@ public abstract class AbstractParser {
 	 * @param name
 	 * @param syntax
 	 */
-	protected void reportUnexpectedToken(Token token, String name, String syntax) {
+	protected void reportUnexpectedToken(WaebricToken token, String name, String syntax) {
 		exceptions.add(new UnexpectedTokenException(token, name, syntax));
 	}
 

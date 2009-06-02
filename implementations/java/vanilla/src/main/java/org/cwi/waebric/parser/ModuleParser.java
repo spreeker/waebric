@@ -13,8 +13,8 @@ import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Module parser
@@ -29,7 +29,7 @@ class ModuleParser extends AbstractParser {
 	private final SiteParser siteParser;
 	private final FunctionParser functionParser;
 	
-	public ModuleParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public ModuleParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Initialize sub parsers
@@ -96,7 +96,7 @@ class ModuleParser extends AbstractParser {
 	public void parse(ModuleId moduleId) {
 		while(tokens.hasNext()) {
 			// Parse identifier
-			if(next("module identifier", "identifier", TokenSort.IDCON)) {
+			if(next("module identifier", "identifier", WaebricTokenSort.IDCON)) {
 				moduleId.add(new IdCon(current.getLexeme().toString()));
 			}
 			

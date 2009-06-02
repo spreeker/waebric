@@ -16,9 +16,9 @@ import org.cwi.waebric.parser.ast.site.PathElement;
 import org.cwi.waebric.parser.ast.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Site parser
@@ -32,7 +32,7 @@ class SiteParser extends AbstractParser {
 
 	private final MarkupParser markupParser;
 	
-	public SiteParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public SiteParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parser
@@ -69,7 +69,7 @@ class SiteParser extends AbstractParser {
 			mappings.add(mapping);
 				
 			if(tokens.hasNext()) {
-				Token peek = tokens.peek(1);
+				WaebricToken peek = tokens.peek(1);
 				if(peek.getLexeme().equals(WaebricKeyword.END)) {
 					break; // End token reached, quit parsing mappings
 				} else {
@@ -187,7 +187,7 @@ class SiteParser extends AbstractParser {
 		FileName name = new FileName();
 		
 		// Parse file name
-		if(next("file name", "name \".\" extension", TokenSort.IDCON)) {
+		if(next("file name", "name \".\" extension", WaebricTokenSort.IDCON)) {
 			name.setName(new PathElement(current.getLexeme().toString()));
 		}
 		
@@ -195,7 +195,7 @@ class SiteParser extends AbstractParser {
 		next("period", "name \".\" extension", WaebricSymbol.PERIOD);
 		
 		// Parse file extension
-		if(next("file extension", "name \".\" extension", TokenSort.IDCON)) {
+		if(next("file extension", "name \".\" extension", WaebricTokenSort.IDCON)) {
 			name.setExt(new FileExt(current.getLexeme().toString()));
 		}
 		

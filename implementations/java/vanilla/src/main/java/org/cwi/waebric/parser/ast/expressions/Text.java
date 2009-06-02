@@ -7,6 +7,8 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
+ * "\"" TextChar* "\"" -> Text<br>
+ * ~[\0-\31\<\128-\255] \/ [\n\t\r] -> TextChar<br>
  * 
  * @author Jeroen van Schagen
  * @date 20-05-2009

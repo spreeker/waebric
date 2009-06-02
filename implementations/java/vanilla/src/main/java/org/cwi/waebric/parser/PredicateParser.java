@@ -8,13 +8,13 @@ import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.predicates.Type;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 
 class PredicateParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
-	public PredicateParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public PredicateParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parser

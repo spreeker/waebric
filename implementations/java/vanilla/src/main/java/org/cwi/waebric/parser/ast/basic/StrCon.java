@@ -7,6 +7,12 @@ import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
+ * [\"] StringChar* [\"] -> StrCon<br>
+ * ~[\0-\31\n\t\"\\] -> StrChar<br>
+ * "\\n" -> StrChar { cons("newline") }<br>
+ * "\\t" -> StrChar { cons("tab") }<br>
+ * "\\\"" -> StrChar { cons("quote") }<br>
+ * "\\\\" -> StrChar { cons("backslash") }<br>
  * 
  * @author Jeroen van Schagen
  * @date 20-05-2009

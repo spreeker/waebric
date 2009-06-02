@@ -9,8 +9,8 @@ import org.cwi.waebric.parser.ast.functions.FunctionDef;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.TokenSort;
+import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Function parser
@@ -24,7 +24,7 @@ class FunctionParser extends AbstractParser {
 
 	private final StatementParser statementParser;
 	
-	public FunctionParser(TokenIterator tokens, List<ParserException> exceptions) {
+	public FunctionParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parser
@@ -39,7 +39,7 @@ class FunctionParser extends AbstractParser {
 		FunctionDef def = new FunctionDef();
 		
 		// Parse function identifier
-		if(next("function identifier", "identifier", TokenSort.IDCON)) {
+		if(next("function identifier", "identifier", WaebricTokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			def.setIdentifier(identifier);
 		} else {
