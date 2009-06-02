@@ -1,8 +1,12 @@
 package org.cwi.waebric.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -58,32 +62,36 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPreText() {
-		iterator = TestScanner.quickScan("\"left<");
-		parser = new EmbeddingParser(iterator, exceptions);
+//		iterator = TestScanner.quickScan("\"left<");
+//		parser = new EmbeddingParser(iterator, exceptions);
 		// TODO: Create test assertions
 	}
 	
 	@Test
 	public void testTextTail() {
-		iterator = TestScanner.quickScan(">right\"");
-		parser = new EmbeddingParser(iterator, exceptions);
-		
-		iterator = TestScanner.quickScan(">mid<123>");
-		parser = new EmbeddingParser(iterator, exceptions);
+//		iterator = TestScanner.quickScan(">right\"");
+//		parser = new EmbeddingParser(iterator, exceptions);
+//		
+//		iterator = TestScanner.quickScan(">mid<123>");
+//		parser = new EmbeddingParser(iterator, exceptions);
 	}
 	
 	@Test
 	public void testPostTest() {
 		iterator = TestScanner.quickScan(">right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
+		
 		// TODO: Create test assertions
 	}
 	
 	@Test
 	public void testMidText() {
-		iterator = TestScanner.quickScan(">mid<123>");
+		iterator = TestScanner.quickScan(">mid<");
 		parser = new EmbeddingParser(iterator, exceptions);
-		// TODO: Create test assertions
+		
+		MidText text = parser.parseMidText();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("mid", text.getText().toString());
 	}
 
 }

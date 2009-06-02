@@ -163,10 +163,11 @@ class StreamTokenizer {
 	private TokenSort nextText() throws IOException {
 		read(); // Retrieve first text character
 		
-		do { 
+		while(current != '"') {
+			if(current < 0) { return TokenSort.TEXT; }
 			svalue += (char) current; // Build string value
 			read(); // Retrieve next text character
-		} while(current != '"');
+		}
 		
 		read(); // Skip closure symbol "
 		

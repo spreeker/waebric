@@ -16,6 +16,14 @@ public class MidText extends AbstractSyntaxNode {
 
 	private StringLiteral text;
 	
+	public StringLiteral getText() {
+		return text;
+	}
+	
+	public void setText(StringLiteral text) {
+		this.text = text;
+	}
+	
 	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {

@@ -2,6 +2,8 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
+import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.embedding.Embed;
 import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.embedding.MidText;
@@ -11,7 +13,9 @@ import org.cwi.waebric.parser.ast.embedding.TextTail;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.scanner.token.TokenSort;
 
 /**
  * Embedding
@@ -55,7 +59,23 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	public MidText parseMidText() {
-		return null;
+		MidText text = new MidText();
+		
+		if(! next("Embed closure token >", "\">\" TextChars \"<\"", WaebricSymbol.GREATER_THAN)) {
+			return null;
+		}
+
+		Token peek = tokens.peek(1); // Optional: Parse text
+		if(peek.getSort() == TokenSort.IDCON) {
+			text.setText(new StringLiteral(peek.getLexeme().toString()));
+			tokens.next(); // Skip text
+		}
+		
+		if(! next("Embed opening token <", "\">\" TextChars \"<\"", WaebricSymbol.LESS_THAN)) {
+			return null;
+		}
+		
+		return text;
 	}
 
 	public Expression parseExpression(String name, String syntax) {
