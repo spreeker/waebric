@@ -6,7 +6,10 @@ using System.Collections;
 
 namespace Parser.Ast
 {
-    public class NodeList
+    /// <summary>
+    /// Class which holds a list of nodes as node
+    /// </summary>
+    public class NodeList : ISyntaxNode
     {
         private List<ISyntaxNode> list = new List<ISyntaxNode>();
 

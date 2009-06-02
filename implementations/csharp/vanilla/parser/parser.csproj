@@ -51,8 +51,10 @@
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
+    <Compile Include="ModuleParser.cs" />
     <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

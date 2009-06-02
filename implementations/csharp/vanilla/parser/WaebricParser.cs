@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Parser.Ast;
 using Lexer.Tokenizer;
+using Parser.Ast.Module;
 
 namespace Parser
 {
@@ -12,8 +13,14 @@ namespace Parser
     /// </summary>
     public class WaebricParser : AbstractParser
     {
-        //MODULEPARSER SHOULD BE DECLARED HERE
-        private SyntaxTree tree;
+        #region Private Members
+
+        private ModuleParser moduleParser;
+        private SyntaxTree tree = new SyntaxTree();
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Creates a WaebricParser
@@ -22,6 +29,7 @@ namespace Parser
         public WaebricParser(TokenIterator tokenStream)
             : base(tokenStream, new List<Exception>())
         {
+            moduleParser = new ModuleParser(tokenStream, ExceptionList);
         }
 
         /// <summary>
@@ -32,6 +40,12 @@ namespace Parser
         {
             //Clear exceptions before start parsing
             ExceptionList.Clear();
+
+            //Make new ModuleList to store modules in and add it to root of tree
+            ModuleList moduleList = new ModuleList();
+            tree.SetRoot(moduleList);
+
+            //TODO: ModuleParser must called here
 
             return ExceptionList;
         }
@@ -44,5 +58,7 @@ namespace Parser
         {
             return tree;
         }
+
+        #endregion
     }
 }

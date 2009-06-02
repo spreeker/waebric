@@ -13,7 +13,7 @@ namespace Parser
     /// </summary>
     public abstract class AbstractParser
     {
-        #region Private Members
+        #region Private/Protected Members
         
         protected List<Exception> ExceptionList;
         protected TokenIterator TokenStream;
@@ -36,7 +36,7 @@ namespace Parser
 
         #endregion Public Methods
 
-        #region Private Methods
+        #region Private/Protected Methods
 
         /// <summary>
         /// Get NextToken and verify if it exists
