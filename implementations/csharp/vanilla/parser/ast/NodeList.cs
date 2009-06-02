@@ -8,7 +8,7 @@ namespace Parser.Ast
 {
     public class NodeList
     {
-        private ArrayList<ISyntaxNode> list = new ArrayList();
+        private List<ISyntaxNode> list = new List<ISyntaxNode>();
 
         /// <summary>
         /// Get size of NodeList

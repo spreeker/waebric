@@ -28,7 +28,7 @@ namespace Parser
         /// </summary>
         /// <param name="tokenStream">Tokenized Stream</param>
         /// <param name="exceptionList">List of Exceptions</param>
-        public override AbstractParser(TokenIterator tokenStream, List<Exception> exceptionList)
+        public AbstractParser(TokenIterator tokenStream, List<Exception> exceptionList)
         {
             this.TokenStream = tokenStream;
             this.ExceptionList = exceptionList;

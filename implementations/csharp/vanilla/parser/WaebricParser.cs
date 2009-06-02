@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Parser.Ast;
+using Lexer.Tokenizer;
 
 namespace Parser
 {
@@ -39,7 +40,7 @@ namespace Parser
         /// Retrieves the AST of the program if succesfully parsed.
         /// </summary>
         /// <returns>AST or null if nothing parsed or exception raised</returns>
-        public SyntaxtTree GetTree()
+        public SyntaxTree GetTree()
         {
             return tree;
         }
