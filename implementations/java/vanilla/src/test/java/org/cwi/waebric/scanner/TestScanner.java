@@ -112,17 +112,17 @@ public class TestScanner {
 	
 	@Test
 	public void testIsString() {
-		assertTrue(WaebricScanner.isString("Hello"));
-		assertTrue(WaebricScanner.isString("\\n"));
-		assertTrue(WaebricScanner.isString("\\t"));
-		assertTrue(WaebricScanner.isString("\\\""));
-		assertTrue(WaebricScanner.isString("\\\\"));
-		assertTrue(WaebricScanner.isString("@"));
-		assertTrue(WaebricScanner.isString(""));
-		assertFalse(WaebricScanner.isString("\n"));
-		assertFalse(WaebricScanner.isString("\t"));
-		assertFalse(WaebricScanner.isString("\""));
-		assertFalse(WaebricScanner.isString("\\"));
+		assertTrue(WaebricScanner.isString("Hello")); // Regular word
+		assertTrue(WaebricScanner.isString("@")); // Symbol
+		assertTrue(WaebricScanner.isString("")); // Empty
+		assertTrue(WaebricScanner.isString("\\n")); // New-line
+		assertTrue(WaebricScanner.isString("\\t")); // Tab
+		assertTrue(WaebricScanner.isString("\\\"")); // Quote
+		assertTrue(WaebricScanner.isString("\\\\")); // Back
+		assertFalse(WaebricScanner.isString("\n")); // Regular new-line
+		assertFalse(WaebricScanner.isString("\t")); // Regular tab
+		assertFalse(WaebricScanner.isString("\"")); // Regular quote
+		assertFalse(WaebricScanner.isString("\\")); // Regular back
 	}
 
 	@Test
@@ -139,17 +139,17 @@ public class TestScanner {
 	
 	@Test
 	public void testIsText() {
-		assertTrue(WaebricScanner.isText("Hello there"));
-		assertTrue(WaebricScanner.isText("Hello"));
-		assertTrue(WaebricScanner.isText("@"));
-		assertTrue(WaebricScanner.isText("\n"));
-		assertTrue(WaebricScanner.isText(""));
-		assertTrue(WaebricScanner.isText("\\&"));
-		assertFalse(WaebricScanner.isText("&"));
-		assertTrue(WaebricScanner.isText("\\\""));
-		assertFalse(WaebricScanner.isText("\""));
-		assertTrue(WaebricScanner.isText("\\"));
-		assertFalse(WaebricScanner.isText("Hi!<"));
+		assertTrue(WaebricScanner.isText("Hello there")); // Sentence
+		assertTrue(WaebricScanner.isText("Hello")); // Word
+		assertTrue(WaebricScanner.isText("@")); // Symbol
+		assertTrue(WaebricScanner.isText("\n")); // Layout
+		assertTrue(WaebricScanner.isText("")); // Empty
+		assertTrue(WaebricScanner.isText("\\&")); // &
+		assertTrue(WaebricScanner.isText("\\\"")); // "
+		assertTrue(WaebricScanner.isText("\\")); // Back
+		assertFalse(WaebricScanner.isText("&")); // Regular &
+		assertFalse(WaebricScanner.isText("\"")); // Regular "
+		assertFalse(WaebricScanner.isText("Hi!<")); // Text by <
 	}
 	
 	@Test
