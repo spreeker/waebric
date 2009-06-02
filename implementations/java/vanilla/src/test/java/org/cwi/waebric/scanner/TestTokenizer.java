@@ -1,8 +1,6 @@
 package org.cwi.waebric.scanner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -16,7 +14,7 @@ public class TestTokenizer {
 	@Test
 	public void testMultipleLineComments() throws IOException {
 		StringReader reader = new StringReader("/* Multi line comments */");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort sort = tokenizer.nextToken();
 		assertEquals(TokenSort.EOF, sort);
@@ -25,7 +23,7 @@ public class TestTokenizer {
 	@Test
 	public void testSingleLineComments() throws IOException {
 		StringReader reader = new StringReader("// Single line comments\n");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort sort = tokenizer.nextToken();
 		assertEquals(TokenSort.EOF, sort);
@@ -34,7 +32,7 @@ public class TestTokenizer {
 	@Test
 	public void testLayout() throws IOException {
 		StringReader reader = new StringReader("id1\nid2\tid3");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort id1 = tokenizer.nextToken();
 		assertEquals(TokenSort.IDCON, id1);
@@ -57,10 +55,10 @@ public class TestTokenizer {
 	@Test
 	public void testString() throws IOException {
 		StringReader reader = new StringReader("\"text\"");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort sort = tokenizer.nextToken();
-		assertEquals(TokenSort.STRCON, sort);
+		assertEquals(TokenSort.TEXT, sort);
 		assertEquals(1, tokenizer.getTokenLineNumber());
 		assertEquals(1, tokenizer.getTokenCharacterNumber());
 		
@@ -70,7 +68,7 @@ public class TestTokenizer {
 	@Test
 	public void testSymbol() throws IOException {
 		StringReader reader = new StringReader("'abc '123 '@#! '");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort textSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCON, textSymbol);
@@ -102,7 +100,7 @@ public class TestTokenizer {
 	@Test
 	public void testSymbolCharacter() throws IOException {
 		StringReader reader = new StringReader("@");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort atSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.SYMBOLCHAR, atSymbol);
@@ -115,7 +113,7 @@ public class TestTokenizer {
 	@Test
 	public void testNumber() throws IOException {
 		StringReader reader = new StringReader("00713379001");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort atSymbol = tokenizer.nextToken();
 		assertEquals(TokenSort.NATCON, atSymbol);
@@ -129,7 +127,7 @@ public class TestTokenizer {
 	@Test
 	public void testIdentifier() throws IOException {
 		StringReader reader = new StringReader("identifier1");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort identifier = tokenizer.nextToken();
 		assertEquals(TokenSort.IDCON, identifier);
@@ -143,7 +141,7 @@ public class TestTokenizer {
 	@Test
 	public void testKeyword() throws IOException {
 		StringReader reader = new StringReader("module");
-		WaebricTokenizer tokenizer = new WaebricTokenizer(reader);
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		TokenSort keyword = tokenizer.nextToken();
 		assertEquals(TokenSort.KEYWORD, keyword);

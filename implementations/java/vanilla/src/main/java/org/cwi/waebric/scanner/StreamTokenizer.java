@@ -13,7 +13,7 @@ import org.cwi.waebric.scanner.token.TokenSort;
  * @author Jeroen van Schagen
  * @date 29-05-2009
  */
-class WaebricTokenizer {
+class StreamTokenizer {
 	
 	/**
 	 * Default tab character length
@@ -45,7 +45,7 @@ class WaebricTokenizer {
 	 * @param exceptions Collection of scan exceptions
 	 * @throws IOException Thrown by Reader
 	 */
-	public WaebricTokenizer(Reader reader) throws IOException {
+	public StreamTokenizer(Reader reader) throws IOException {
 		if(reader == null) {
 			throw new NullPointerException();
 		}

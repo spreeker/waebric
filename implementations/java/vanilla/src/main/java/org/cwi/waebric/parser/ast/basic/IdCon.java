@@ -1,37 +1,34 @@
 package org.cwi.waebric.parser.ast.basic;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
  * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}
- * @author schagen
- *
+ * 
+ * @author Jeroen van Schagen
+ * @date 02-06-2009
  */
-public class IdCon implements ISyntaxNode {
+public class IdCon extends AbstractSyntaxNode {
 
-	private StringLiteral identifier;
+	private StringLiteral literal;
 	
 	public IdCon(String identifier) {
-		this.identifier = new StringLiteral(identifier);
+		this.literal = new StringLiteral(identifier);
 	}
 	
-	public StringLiteral getIdentifier() {
-		return identifier;
-	}
-
-	public ISyntaxNode[] getChildren() {
-		return new StringLiteral[] { identifier };
-	}
-	
-	@Override
-	public String toString() {
-		return identifier.toString();
+	public StringLiteral getLiteral() {
+		return literal;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return identifier.equals(obj);
+		return literal.equals(obj);
 	}
-	
+
+	public ISyntaxNode[] getChildren() {
+		return new StringLiteral[] { literal };
+	}
+
 }

@@ -54,7 +54,7 @@ public class TestExpressionParser {
 		
 		Expression.VarExpression expression = parser.parseVarExpression();
 		assertEquals(0, exceptions.size());
-		assertEquals("variable1", expression.getVar().toString());
+		assertEquals("variable1", expression.getVar().getIdentifier().getLiteral().toString());
 	}
 	
 	@Test
@@ -64,7 +64,7 @@ public class TestExpressionParser {
 		
 		Expression.IdConExpression expression = parser.parseIdConExpression();
 		assertTrue(exceptions.size() == 0);
-		assertEquals("identifier1", expression.getIdentifier().toString());
+		assertEquals("identifier1", expression.getIdentifier().getLiteral().toString());
 		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
 	}
 	
@@ -75,7 +75,7 @@ public class TestExpressionParser {
 		
 		Expression.SymbolExpression expression = parser.parseSymbolExpression();
 		assertTrue(exceptions.size() == 0);
-		assertEquals("abc", expression.getSymbol().toString());
+		assertEquals("abc", expression.getSymbol().getLiteral().toString());
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ public class TestExpressionParser {
 		
 		Expression.NatExpression expression = parser.parseNatExpression();
 		assertTrue(exceptions.size() == 0);
-		assertEquals("123", expression.getNatural().toString());
+		assertEquals(123, expression.getNatural().getLiteral().getInteger());
 	}
 	
 	@Test
@@ -95,7 +95,7 @@ public class TestExpressionParser {
 		
 		Expression.TextExpression expression = parser.parseTextExpression();
 		assertTrue(exceptions.size() == 0);
-		assertEquals("bla", expression.getText().getString().toString());
+		assertEquals("bla", expression.getText().getLiteral().toString());
 	}
 	
 	@Test

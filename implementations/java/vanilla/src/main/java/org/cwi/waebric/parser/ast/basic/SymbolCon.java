@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
@@ -10,32 +11,27 @@ import org.cwi.waebric.parser.ast.StringLiteral;
  * @author schagen
  *
  */
-public class SymbolCon implements ISyntaxNode {
+public class SymbolCon extends AbstractSyntaxNode {
 	
-	private StringLiteral symbol;
+	private StringLiteral literal;
 	
 	public SymbolCon(StringLiteral symbol) {
-		this.symbol = symbol;
+		this.literal = symbol;
 	}
 
-	public StringLiteral getSymbol() {
-		return symbol;
+	public StringLiteral getLiteral() {
+		return literal;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return symbol.equals(obj);
-	}
-	
-	@Override
-	public String toString() {
-		return symbol.toString();
+		return literal.equals(obj);
 	}
 
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.SQUOTE),
-			symbol
+			literal
 		};
 	}
 

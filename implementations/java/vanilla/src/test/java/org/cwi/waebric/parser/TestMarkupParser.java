@@ -64,8 +64,6 @@ public class TestMarkupParser {
 		assertEquals(0, exceptions.size());
 		assertNotNull(markupa.getDesignator());
 		assertEquals(2, markupa.getArguments().size());
-		
-		System.out.println(markupa.toString());
 	}
 	
 	@Test
@@ -75,7 +73,7 @@ public class TestMarkupParser {
 		
 		Designator designator = parser.parseDesignator();
 		assertEquals(0, exceptions.size());
-		assertEquals("myfunction", designator.getIdentifier().toString());
+		assertEquals("myfunction", designator.getIdentifier().getLiteral().toString());
 		assertEquals(3, designator.getAttributes().size());
 	}
 	
@@ -100,7 +98,7 @@ public class TestMarkupParser {
 		
 		Attribute.AttributeIdCon attributei = (AttributeIdCon) parser.parseAttribute();
 		assertEquals(0, exceptions.size());
-		assertEquals("myattribute", attributei.getIdentifier().toString());
+		assertEquals("myattribute", attributei.getIdentifier().getLiteral().toString());
 		
 		// Regular natural attribute
 		iterator = TestScanner.quickScan("@99");
@@ -108,7 +106,7 @@ public class TestMarkupParser {
 		
 		Attribute.AttributeNatCon attributen = (AttributeNatCon) parser.parseAttribute();
 		assertEquals(0, exceptions.size());
-		assertEquals(99, attributen.getNumber().getIdentifier().getLiteral());
+		assertEquals(99, attributen.getNumber().getLiteral().getInteger());
 		
 		// Double natural attribute
 		iterator = TestScanner.quickScan("@99%12");
@@ -116,8 +114,8 @@ public class TestMarkupParser {
 		
 		Attribute.AttributeDoubleNatCon attributedn = (AttributeDoubleNatCon) parser.parseAttribute();
 		assertEquals(0, exceptions.size());
-		assertEquals(99, attributedn.getNumber().getIdentifier().getLiteral());
-		assertEquals(12, attributedn.getSecondNumber().getIdentifier().getLiteral());
+		assertEquals(99, attributedn.getNumber().getLiteral().getInteger());
+		assertEquals(12, attributedn.getSecondNumber().getLiteral().getInteger());
 	}
 	
 	@Test
@@ -139,7 +137,7 @@ public class TestMarkupParser {
 		
 		Argument.ArgumentWithVar argumentv = (ArgumentWithVar) parser.parseArgument();
 		assertEquals(0, exceptions.size());
-		assertEquals("var1", argumentv.getVar().getIdentifier().toString());
+		assertEquals("var1", argumentv.getVar().getIdentifier().getLiteral().toString());
 		assertEquals(Expression.NatExpression.class, argumentv.getExpression().getClass());
 		
 		// Plain argument
@@ -158,7 +156,7 @@ public class TestMarkupParser {
 		
 		Var var = parser.parseVar("", "");
 		assertEquals(0, exceptions.size());
-		assertEquals("var1", var.getIdentifier().toString());
+		assertEquals("var1", var.getIdentifier().getLiteral().toString());
 	}
 
 }

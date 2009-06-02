@@ -47,8 +47,8 @@ public class TestStatementParser {
 		Formals formals = parser.parseFormals();
 		assertEquals(0, exceptions.size());
 		assertEquals(2, formals.getVarCount());
-		assertEquals("var1", formals.getVar(0).toString());
-		assertEquals("var2", formals.getVar(1).toString());
+		assertEquals("var1", formals.getVar(0).getIdentifier().getLiteral().toString());
+		assertEquals("var2", formals.getVar(1).getIdentifier().getLiteral().toString());
 	}
 	
 	@Test
@@ -58,7 +58,7 @@ public class TestStatementParser {
 		
 		Assignment.VarAssignment assignment = parser.parseVarAssignment();
 		assertEquals(0, exceptions.size());
-		assertEquals("var", assignment.getVar().toString());
+		assertEquals("var", assignment.getVar().getIdentifier().getLiteral().toString());
 		assertEquals(NatExpression.class, assignment.getExpression().getClass());
 	}
 	
@@ -69,10 +69,10 @@ public class TestStatementParser {
 		
 		Assignment.IdConAssignment assignment = parser.parseIdConAssignment();
 		assertEquals(0, exceptions.size());
-		assertEquals("identifier1", assignment.getIdentifier().toString());
+		assertEquals("identifier1", assignment.getIdentifier().getLiteral().toString());
 		assertEquals(2, assignment.getFormals().getVarCount());
-		assertEquals("var1", assignment.getFormals().getVar(0).toString());
-		assertEquals("var2", assignment.getFormals().getVar(1).toString());
+		assertEquals("var1", assignment.getFormals().getVar(0).getIdentifier().getLiteral().toString());
+		assertEquals("var2", assignment.getFormals().getVar(1).getIdentifier().getLiteral().toString());
 		assertEquals(Statement.YieldStatement.class, assignment.getStatement().getClass());
 	}
 	
@@ -124,7 +124,7 @@ public class TestStatementParser {
 		
 		Statement.EachStatement statement = parser.parseEachStatement();
 		assertEquals(0, exceptions.size());
-		assertEquals("var1", statement.getVar().getIdentifier().toString());
+		assertEquals("var1", statement.getVar().getIdentifier().getLiteral().toString());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
 	}
@@ -159,7 +159,7 @@ public class TestStatementParser {
 		
 		Statement.CommentStatement statement = parser.parseCommentStatement();
 		assertEquals(0, exceptions.size());
-		assertEquals("OH NOES TEH HAXZOR", statement.getComment().toString());
+		assertEquals("OH NOES TEH HAXZOR", statement.getComment().getLiteral().toString());
 	}
 	
 	@Test

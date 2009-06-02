@@ -8,12 +8,8 @@ public class StringLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 	
-	public String getLiteral() {
+	public String getString() {
 		return literal;
-	}
-
-	public void setLiteral(String literal) {
-		this.literal = literal;
 	}
 
 	public ISyntaxNode[] getChildren() {

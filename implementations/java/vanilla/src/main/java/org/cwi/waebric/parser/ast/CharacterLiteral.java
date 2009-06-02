@@ -8,12 +8,8 @@ public class CharacterLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 
-	public char getLiteral() {
+	public char getCharacter() {
 		return literal;
-	}
-
-	public void setLiteral(char literal) {
-		this.literal = literal;
 	}
 
 	public ISyntaxNode[] getChildren() {

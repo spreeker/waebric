@@ -12,12 +12,8 @@ public class IntegerLiteral implements ISyntaxNode {
 		this.literal = (int) Double.parseDouble(identifier);
 	}
 
-	public int getLiteral() {
+	public int getInteger() {
 		return literal;
-	}
-
-	public void setLiteral(int literal) {
-		this.literal = literal;
 	}
 
 	public ISyntaxNode[] getChildren() {

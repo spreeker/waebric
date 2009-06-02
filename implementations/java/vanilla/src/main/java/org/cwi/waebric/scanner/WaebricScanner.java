@@ -23,7 +23,7 @@ import org.cwi.waebric.scanner.token.TokenSort;
  */
 public class WaebricScanner implements Iterable<Token> {
 
-	private WaebricTokenizer tokenizer;
+	private StreamTokenizer tokenizer;
 	private List<Token> tokens;
 	
 	/**
@@ -33,7 +33,7 @@ public class WaebricScanner implements Iterable<Token> {
 	 * @throws IOException 
 	 */
 	public WaebricScanner(Reader reader) throws IOException {
-		tokenizer = new WaebricTokenizer(reader);
+		tokenizer = new StreamTokenizer(reader);
 		tokens = new ArrayList<Token>();
 	}
 	

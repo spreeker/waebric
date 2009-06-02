@@ -49,10 +49,10 @@ public class TestModuleParser {
 		// Assertions
 		assertEquals(0, exceptions.size());
 		assertEquals(7, moduleId.getChildren().length); // Four elements and three period separators
-		assertEquals("org", moduleId.getIdentifierElements()[0].toString());
-		assertEquals("cwi", moduleId.getIdentifierElements()[1].toString());
-		assertEquals("waebric", moduleId.getIdentifierElements()[2].toString());
-		assertEquals("mymodule", moduleId.getIdentifierElements()[3].toString());
+		assertEquals("org", moduleId.get(0).getLiteral().toString());
+		assertEquals("cwi", moduleId.get(1).getLiteral().toString());
+		assertEquals("waebric", moduleId.get(2).getLiteral().toString());
+		assertEquals("mymodule", moduleId.get(3).getLiteral().toString());
 	}
 	
 	@Test
