@@ -24,12 +24,28 @@ public enum TokenSort {
 	NATCON, 
 	
 	/**
-	 * Text tokens represent all characters stored between double quotes.<br><br>
+	 * String represents a single word.<br><br>
+	 * [\"] StringChar* [\"] -> StrCon
+	 * ~[\0-\31\n\t\"\\] -> StrChar
+	 * "\\n" -> StrChar { cons("newline") }
+	 * "\\t" -> StrChar { cons("tab") }
+	 * "\\\"" -> StrChar { cons("quote") }
+	 * "\\\\" -> StrChar { cons("backslash") }
+	 * 
+	 * For example:<br>
+	 * "Hello"
+	 */
+	STRCON,
+	
+	/**
+	 * Text tokens represent all text stored between double quotes.<br><br>
+	 * "\"" TextChar* "\"" -> Text
+	 * ~[\0-\31\<\128-\255] \/ [\n\t\r] -> TextChar
 	 * 
 	 * For example:<br>
 	 * "This is text"
 	 */
-	STRCON, 
+	TEXT,
 	
 	/**
 	 * "'" SymbolChar

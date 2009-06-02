@@ -96,7 +96,7 @@ class WaebricTokenizer {
 			return nextLayout();
 		} else if(current == '"') {
 			// String
-			return nextString();
+			return nextText();
 		} else if(current == '\'') {
 			// Symbol
 			return nextSymbol();
@@ -160,7 +160,7 @@ class WaebricTokenizer {
 	 * @return
 	 * @throws IOException
 	 */
-	private TokenSort nextString() throws IOException {
+	private TokenSort nextText() throws IOException {
 		read(); // Retrieve first text character
 		
 		do { 
@@ -170,7 +170,7 @@ class WaebricTokenizer {
 		
 		read(); // Skip closure symbol "
 		
-		return TokenSort.STRCON;
+		return TokenSort.TEXT;
 	}
 	
 	/**

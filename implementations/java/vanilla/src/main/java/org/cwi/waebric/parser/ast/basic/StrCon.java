@@ -5,6 +5,11 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
+/**
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
 public class StrCon implements ISyntaxNode {
 	
 	private StringLiteral string;

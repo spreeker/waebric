@@ -2,10 +2,12 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -50,18 +52,20 @@ public class WaebricScanner implements Iterable<Token> {
 		TokenSort current = tokenizer.nextToken();
 		while(current != TokenSort.EOF) {
 			if(current == TokenSort.NATCON) {
-				Token token = new Token(tokenizer.getIntegerValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				Token token = new Token(tokenizer.getIntegerValue(), current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
 				tokens.add(token);
 			} else if(current == TokenSort.SYMBOLCHAR) {
-				Token token = new Token(tokenizer.getCharacterValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				Token token = new Token(tokenizer.getCharacterValue(), current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
 				tokens.add(token);
 			} else if(current == TokenSort.KEYWORD) {
 				WaebricKeyword keyword = WaebricKeyword.valueOf(tokenizer.getStringValue().toUpperCase());
-				Token token = new Token(keyword, current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+				Token token = new Token(keyword, current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
 				tokens.add(token);
-			} else if(current == TokenSort.IDCON || current == TokenSort.STRCON || current == TokenSort.SYMBOLCON) {
-				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getLineNumber(), tokenizer.getCharacterNumber());
+			} else if(current == TokenSort.IDCON || current == TokenSort.SYMBOLCON) {
+				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
 				tokens.add(token);
+			} else if(current == TokenSort.TEXT) {
+				tokenizeText(exceptions);
 			}
 			
 			// Retrieve next token
@@ -72,9 +76,26 @@ public class WaebricScanner implements Iterable<Token> {
 		return exceptions;
 	}
 	
-	static boolean isKeyword(String sval) {
-		// TODO Auto-generated method stub
-		return false;
+	private void tokenizeText(List<ScannerException> exceptions) throws IOException {
+		String lexeme = tokenizer.getStringValue();
+		
+		if(isString(lexeme)) {
+			// String: one valid word
+			Token string = new Token(lexeme, TokenSort.STRCON, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
+			tokens.add(string);
+		} else if(isText(lexeme)) {
+			// Text: sequence of valid words
+			Token text = new Token(lexeme, TokenSort.TEXT, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
+			tokens.add(text);
+		} else {
+			// No valid text or string, delegate tokenization to next level
+			WaebricScanner scanner = new WaebricScanner(new StringReader(lexeme));
+			List<ScannerException> e = scanner.tokenizeStream();
+			exceptions.addAll(e);
+			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getTokenLineNumber(), tokenizer.getTokenLineNumber()));
+			tokens.addAll(scanner.getTokens());
+			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()-1));
+		}
 	}
 
 	/**
@@ -115,60 +136,66 @@ public class WaebricScanner implements Iterable<Token> {
 	}
 	
 	/**
-	 * Determine whether a certain text fragment is an identifier.
 	 * 
-	 * @param data Text fragment
-	 * @return identifier?
+	 * @param lexeme
+	 * @return
 	 */
-	public static boolean isIdentifier(String data) {
-		if(data == null || data.equals("")) { return false; }
-		char[] chars = data.toCharArray();
+	public static boolean isText(String lexeme) {
+		char chars[] = lexeme.toCharArray();
+		for(char c: chars) {
+			if(! isTextChar(c)) { return false; }
+		}
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @return
+	 */
+	public static boolean isTextChar(char c) {
+		return c > 31 && c < 128 && c != '<' || c == '\n' || c == '\t' || c == '\r';
+	}
+	
+	/**
+	 * 
+	 * @param lexeme
+	 * @return
+	 */
+	public static boolean isString(String lexeme) {
+		char chars[] = lexeme.toCharArray();
 		
-		// The character head should be a letter
-		if(!isLetter(chars[0])) { return false; } 
-		
-		// All characters in the body should be letters or digits
-		for(char c : chars) {
-			if(!(isLetter(c) || isDigit(c))) { return false; }
+		for(int i = 0; i < chars.length; i++) {
+			char c = chars[i]; // Retrieve current character
+			if(! isStringChar(c)) { 
+				if(c == '\\') {
+					// Allow "\\n" "\\t" "\\\"" "\\\\"
+					if(i+1 < chars.length) {
+						char peek = chars[i+1];
+						if(peek == 'n' || peek == 't' || peek == '"' || peek == '\\') {
+							i++; // Skip next character
+						} else {
+							return false; // Invalid occurrence of '\\'
+						}
+					} else {
+						return false; // Invalid occurrence of '\\'
+					}
+				} else {
+					return false; // Invalid string symbol found
+				}
+			}
 		}
 		
 		return true;
 	}
 	
-	public static boolean isSymbol(String data) {
-		if(data == null || data.equals("")) { return false; }
-		char[] chars = data.toCharArray();
-		
-		// Symbols are always only one character long
-		if(chars.length != 1) { return false; }
-		
-		// Only symbols between decimal 32 and 126 are valid
-		return isSymbol(chars[0]);
-	}
-	
-	public static boolean isSymbol(char c) {
-		int decimal = (int) c;
-		return decimal >= 32 && decimal <= 126;
-	}
-	
 	/**
-	 * Determine whether a certain character is a letter.
 	 * 
-	 * @param c Character
-	 * @return letter?
+	 * @param c
+	 * @return
 	 */
-	public static boolean isLetter(char c) {
-		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-	}
-	
-	/**
-	 * Determine whether a certain character is a digit.
-	 * 
-	 * @param c Character
-	 * @return digit?
-	 */
-	public static boolean isDigit(char c) {
-		return c >= '0' && c <= '9';
+	public static boolean isStringChar(char c) {
+		return c > 31 && c != '\n' && c != '\t' && c != '"' && c != '\\';
 	}
 
 }

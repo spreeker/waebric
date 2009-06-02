@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -58,16 +57,6 @@ public class TestScanner {
 	}
 	
 	@Test
-	public void testFileScan() throws IOException {
-		Reader reader = new FileReader("src/test/waebric/9000lines.wae");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		List<ScannerException> exceptions = scanner.tokenizeStream();
-		iterator = scanner.iterator();
-		
-		assertTrue(exceptions.size() == 0); // No scanner exceptions, all valid tokens
-	}
-	
-	@Test
 	public void testScanIdentifier() {
 		iterator = quickScan("identifier1 html identifier2");
 		while(iterator.hasNext()) {
@@ -82,15 +71,6 @@ public class TestScanner {
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertEquals(current.getLexeme().toString(), TokenSort.NATCON, current.getSort());
-		}
-	}
-	
-	@Test
-	public void testScanTest() {
-		iterator = quickScan("\"text1\" \"text2\" \"text3\"");
-		while(iterator.hasNext()) {
-			current = iterator.next();
-			assertTrue(current.getSort().equals(TokenSort.STRCON));
 		}
 	}
 	
@@ -122,57 +102,43 @@ public class TestScanner {
 	}
 
 	@Test
-	public void testIsIdentifier() {
-		assertTrue(WaebricScanner.isIdentifier("identifier"));
-		assertTrue(WaebricScanner.isIdentifier("identifier1"));
-		assertTrue(WaebricScanner.isIdentifier("html"));
-		assertFalse(WaebricScanner.isIdentifier("identifier@"));
-		assertFalse(WaebricScanner.isIdentifier("1identifier"));
-		assertFalse(WaebricScanner.isIdentifier("@identifier"));
-		assertFalse(WaebricScanner.isIdentifier(" identifier"));
-		assertFalse(WaebricScanner.isIdentifier(""));
-		assertFalse(WaebricScanner.isIdentifier(null));
+	public void testScanText() {
+		
 	}
 	
 	@Test
-	public void testIsSymbol() {
-		for(char c = ' '; c <= '~'; c++) {
-			assertTrue(WaebricScanner.isSymbol("" + c));
-		}
-		
-		assertFalse(WaebricScanner.isSymbol("aa"));
-		assertFalse(WaebricScanner.isSymbol("11"));
-		assertFalse(WaebricScanner.isSymbol(""));
-		assertFalse(WaebricScanner.isSymbol(null));
+	public void testIsText() {
+		assertTrue(WaebricScanner.isText("Hello there"));
+		assertTrue(WaebricScanner.isText("Hello"));
+		assertTrue(WaebricScanner.isText("@"));
+		assertTrue(WaebricScanner.isText("\n"));
+		assertTrue(WaebricScanner.isText(""));
+		assertFalse(WaebricScanner.isText("<"));
 	}
 	
 	@Test
-	public void testIsLetter() {
-		for(char c = 'a'; c <= 'z'; c++) {
-			assertTrue(WaebricScanner.isLetter(c));
-		}
+	public void testString() {
 		
-		for(char c = 'A'; c <= 'Z'; c++) {
-			assertTrue(WaebricScanner.isLetter(c));
-		}
-
-		assertFalse(WaebricScanner.isLetter(' '));
-		assertFalse(WaebricScanner.isLetter('@'));
-		assertFalse(WaebricScanner.isLetter('\n'));
-		assertFalse(WaebricScanner.isLetter('1'));
 	}
 	
 	@Test
-	public void testIsNumber() {
-		for(char c = '0'; c <= '9'; c++) {
-			assertTrue(WaebricScanner.isDigit(c));
-		}
+	public void testIsString() {
+		assertTrue(WaebricScanner.isString("Hello"));
+		assertTrue(WaebricScanner.isString("\\n"));
+		assertTrue(WaebricScanner.isString("\\t"));
+		assertTrue(WaebricScanner.isString("\\\""));
+		assertTrue(WaebricScanner.isString("\\\\"));
+		assertTrue(WaebricScanner.isString("@"));
+		assertTrue(WaebricScanner.isString(""));
+		assertFalse(WaebricScanner.isString("\n"));
+		assertFalse(WaebricScanner.isString("\t"));
+		assertFalse(WaebricScanner.isString("\""));
+		assertFalse(WaebricScanner.isString("\\"));
+	}
+	
+	@Test
+	public void testInvalid() {
 		
-		assertFalse(WaebricScanner.isDigit('a'));
-		assertFalse(WaebricScanner.isDigit('z'));
-		assertFalse(WaebricScanner.isDigit(' '));
-		assertFalse(WaebricScanner.isDigit('@'));
-		assertFalse(WaebricScanner.isDigit('\n'));
 	}
 	
 }
