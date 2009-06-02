@@ -8,14 +8,6 @@ public class CharacterLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 
-	public char getCharacter() {
-		return literal;
-	}
-
-	public ISyntaxNode[] getChildren() {
-		return null;
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		String data = obj.toString();
@@ -26,6 +18,14 @@ public class CharacterLiteral implements ISyntaxNode {
 	@Override
 	public String toString() {
 		return "" + literal;
+	}
+
+	public char toCharacter() {
+		return literal;
+	}
+	
+	public ISyntaxNode[] getChildren() {
+		return null;
 	}
 	
 }

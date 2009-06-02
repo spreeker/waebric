@@ -106,7 +106,7 @@ public class TestMarkupParser {
 		
 		Attribute.AttributeNatCon attributen = (AttributeNatCon) parser.parseAttribute();
 		assertEquals(0, exceptions.size());
-		assertEquals(99, attributen.getNumber().getLiteral().getInteger());
+		assertEquals(99, attributen.getNumber().getLiteral().toInteger());
 		
 		// Double natural attribute
 		iterator = TestScanner.quickScan("@99%12");
@@ -114,8 +114,8 @@ public class TestMarkupParser {
 		
 		Attribute.AttributeDoubleNatCon attributedn = (AttributeDoubleNatCon) parser.parseAttribute();
 		assertEquals(0, exceptions.size());
-		assertEquals(99, attributedn.getNumber().getLiteral().getInteger());
-		assertEquals(12, attributedn.getSecondNumber().getLiteral().getInteger());
+		assertEquals(99, attributedn.getNumber().getLiteral().toInteger());
+		assertEquals(12, attributedn.getSecondNumber().getLiteral().toInteger());
 	}
 	
 	@Test

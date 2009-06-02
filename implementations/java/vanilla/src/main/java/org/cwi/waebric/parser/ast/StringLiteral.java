@@ -8,14 +8,6 @@ public class StringLiteral implements ISyntaxNode {
 		this.literal = literal;
 	}
 	
-	public String getString() {
-		return literal;
-	}
-
-	public ISyntaxNode[] getChildren() {
-		return null;
-	}
-	
 	@Override
 	public String toString() {
 		return literal.toString();
@@ -24,6 +16,10 @@ public class StringLiteral implements ISyntaxNode {
 	@Override
 	public boolean equals(Object obj) {
 		return literal.equals(obj);
+	}
+	
+	public ISyntaxNode[] getChildren() {
+		return null;
 	}
 	
 }

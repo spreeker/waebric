@@ -11,13 +11,9 @@ public class IntegerLiteral implements ISyntaxNode {
 	public IntegerLiteral(String identifier) throws NumberFormatException {
 		this.literal = (int) Double.parseDouble(identifier);
 	}
-
-	public int getInteger() {
+	
+	public int toInteger() {
 		return literal;
-	}
-
-	public ISyntaxNode[] getChildren() {
-		return null;
 	}
 	
 	@Override
@@ -35,4 +31,8 @@ public class IntegerLiteral implements ISyntaxNode {
 		}
 	}
 
+	public ISyntaxNode[] getChildren() {
+		return null;
+	}
+	
 }
