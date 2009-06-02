@@ -183,7 +183,7 @@ class StreamTokenizer {
 	private TokenSort nextSymbol() throws IOException {
 		read(); // Retrieve first symbol
 		
-		while(isSymbol(current)) {
+		while(isSymbolChar(current)) {
 			svalue += (char) current; // Build symbol value
 			read(); // Retrieve next symbol
 		}
@@ -283,7 +283,7 @@ class StreamTokenizer {
 	 * @param c
 	 * @return 
 	 */
-	private boolean isSymbol(int c) {
+	private boolean isSymbolChar(int c) {
 		return c > 31 && c < 127 && ! isLayout(c) && c != ';' && c != ',' && c != '>';
 	}
 	
