@@ -44,6 +44,15 @@ namespace Lexer.Tokenizer
             }
         }
 
+        /// <summary>
+        /// Poll if there is a next token in stream available
+        /// </summary>
+        /// <returns>HasNext Token in Stream</returns>
+        public bool HasNext()
+        {
+            return (Index > (TokenArray.Length - 1));
+        }
+
         #endregion
     }
 }
