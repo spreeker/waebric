@@ -13,6 +13,7 @@ import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -239,10 +240,14 @@ class StatementParser extends AbstractParser {
 			return null; // Invalid keyword, quit statement parse
 		}
 		
-		// Parse text, which expects a StrCon "text"
-		if(next("comments statement text", "\"comments\" text", TokenSort.STRCON)) {
-			StrCon comment = new StrCon(current.getLexeme().toString());
-			statement.setComment(comment);
+		// Parse text, which expects a text
+		if(next("comments text", "\"comments\" text", TokenSort.TEXT)) {
+			if(WaebricScanner.isString(current.getLexeme().toString())) {
+				StrCon comment = new StrCon(current.getLexeme().toString());
+				statement.setComment(comment);
+			} else {
+				reportUnexpectedToken(current, "comments text", "\"comments\" \" text \"");
+			}
 		}
 		
 		return statement;

@@ -13,6 +13,7 @@ import org.cwi.waebric.parser.ast.expressions.Text;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.TokenSort;
@@ -93,10 +94,14 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression.TextExpression parseTextExpression() {
 		if(next("text expression", "\"text\"", TokenSort.STRCON)) {
-			Expression.TextExpression expression = new Expression.TextExpression();
-			Text text = new Text(new StringLiteral(current.getLexeme().toString()));
-			expression.setText(text);
-			return expression;
+			if(WaebricScanner.isText(current.getLexeme().toString())) {
+				Expression.TextExpression expression = new Expression.TextExpression();
+				Text text = new Text(new StringLiteral(current.getLexeme().toString()));
+				expression.setText(text);
+				return expression;
+			} else {
+				reportUnexpectedToken(current, "text expression", "\"text\"");
+			}
 		}
 		
 		return null;

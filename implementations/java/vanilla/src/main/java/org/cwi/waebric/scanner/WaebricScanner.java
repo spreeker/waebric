@@ -2,12 +2,10 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -65,7 +63,8 @@ public class WaebricScanner implements Iterable<Token> {
 				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
 				tokens.add(token);
 			} else if(current == TokenSort.TEXT) {
-				tokenizeText(exceptions);
+				Token token = new Token(tokenizer.getStringValue(), current, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
+				tokens.add(token);
 			}
 			
 			// Retrieve next token
@@ -76,27 +75,27 @@ public class WaebricScanner implements Iterable<Token> {
 		return exceptions;
 	}
 	
-	private void tokenizeText(List<ScannerException> exceptions) throws IOException {
-		String lexeme = tokenizer.getStringValue();
-		
-		if(isString(lexeme)) {
-			// String: one valid word
-			Token string = new Token(lexeme, TokenSort.STRCON, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
-			tokens.add(string);
-		} else if(isText(lexeme)) {
-			// Text: sequence of valid words
-			Token text = new Token(lexeme, TokenSort.TEXT, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
-			tokens.add(text);
-		} else {
-			// No valid text or string, delegate tokenization to next level
-			WaebricScanner scanner = new WaebricScanner(new StringReader(lexeme));
-			List<ScannerException> e = scanner.tokenizeStream();
-			exceptions.addAll(e);
-			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getTokenLineNumber(), tokenizer.getTokenLineNumber()));
-			tokens.addAll(scanner.getTokens());
-			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()));
-		}
-	}
+//	private void tokenizeText(List<ScannerException> exceptions) throws IOException {
+//		String lexeme = tokenizer.getStringValue();
+//		
+//		if(isString(lexeme)) {
+//			// String: one valid word
+//			Token string = new Token(lexeme, TokenSort.STRCON, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
+//			tokens.add(string);
+//		} else if(isText(lexeme)) {
+//			// Text: sequence of valid words
+//			Token text = new Token(lexeme, TokenSort.TEXT, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
+//			tokens.add(text);
+//		} else {
+//			// No valid text or string, delegate tokenization to next level
+//			WaebricScanner scanner = new WaebricScanner(new StringReader(lexeme));
+//			List<ScannerException> e = scanner.tokenizeStream();
+//			exceptions.addAll(e);
+//			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getTokenLineNumber(), tokenizer.getTokenLineNumber()));
+//			tokens.addAll(scanner.getTokens());
+//			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()));
+//		}
+//	}
 
 	/**
 	 * Retrieve token
