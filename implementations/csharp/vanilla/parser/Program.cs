@@ -24,7 +24,7 @@ namespace Parser
             lexer.LexicalizeStream();
             TokenIterator tokens = lexer.GetTokenIterator();
 
-
+            
         }
     }
 }

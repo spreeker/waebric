@@ -49,11 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractParser.cs" />
+    <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\NodeList.cs" />
+    <Compile Include="Ast\SyntaxTree.cs" />
+    <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ast\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
