@@ -4,6 +4,12 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
+/**
+ * "import" ModuleId -> Import
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
 public class Import extends ModuleElement {
 	
 	private static final String IMPORT_KEYWORD = WaebricKeyword.IMPORT.name().toLowerCase();

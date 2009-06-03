@@ -10,6 +10,6 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
  */
 public class ModuleElements extends AbstractSyntaxNodeList<ModuleElement> {
 
-	
+	// No additional functionality needed
 	
 }

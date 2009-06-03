@@ -5,7 +5,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSepar
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
- * ModuleId is a collection of modules, separated by periods
+ * { IdCon "." }+ -> ModuleId
  * 
  * @author Jeroen van Schagen
  * @date 20-05-2009

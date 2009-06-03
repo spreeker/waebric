@@ -12,4 +12,6 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
  */
 public abstract class ModuleElement extends AbstractSyntaxNode {
 
+	// See sub-classes for implementation
+	
 }
