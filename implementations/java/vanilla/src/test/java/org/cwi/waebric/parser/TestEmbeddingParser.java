@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.embedding.Embed;
+import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.ast.embedding.PostText;
 import org.cwi.waebric.parser.ast.embedding.PreText;
@@ -42,12 +43,15 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testEmbedding() {
-//		iterator = TestScanner.quickScan("\"<123>\"");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		iterator = TestScanner.quickScan("\"left<func1() 123>right\"");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		// TODO: Create test assertions
+		iterator = TestScanner.quickScan("\"<123>\"");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		Embedding simple = parser.parseEmbedding();
+		
+		iterator = TestScanner.quickScan("\"left<func1() 123>right\"");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		Embedding extended = parser.parseEmbedding();
 	}
 	
 	@Test
@@ -62,7 +66,7 @@ public class TestEmbeddingParser {
 		assertEquals(0, simple.getMarkupCount());
 		
 		// Embed with single mark-up
-		iterator = TestScanner.quickScan("func1 123>");
+		iterator = TestScanner.quickScan("func1 123");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed diff = parser.parseEmbed();

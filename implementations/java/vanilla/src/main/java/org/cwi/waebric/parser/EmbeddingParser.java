@@ -79,8 +79,7 @@ class EmbeddingParser extends AbstractParser {
 		while(tokens.hasNext(2)) {
 			embed.addMarkup(parseMarkup());
 			
-			Object peek = tokens.peek(2).getLexeme();
-			if(peek.equals(WaebricSymbol.GREATER_THAN)) {
+			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 				break; // Quit parsing
 			}
 		}
