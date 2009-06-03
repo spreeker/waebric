@@ -91,47 +91,39 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	public PreText parsePreText() {
-		next("Embedding pre-text opening quote \"", "\" TextChars* <", WaebricSymbol.DQUOTE);
+		next("Embedding opening quote \"", "\" TextChars* <", WaebricSymbol.DQUOTE);
 		
 		PreText pre = new PreText();
 		StringLiteral text = parseTextChars();
 		pre.setText(text);
 		
-		next("Embedding pre-text opening symbol <", "TextChars* < Embed", WaebricSymbol.LESS_THAN);
+		next("Embedding pre-text symbol <", "TextChars* < Embed", WaebricSymbol.LESS_THAN);
 		
 		return pre;
 	}
 	
 	public PostText parsePostText() {
-		return null;
+		next("Embedding post-text symbol >", "Embed > TextChars*", WaebricSymbol.GREATER_THAN);
+		
+		PostText post = new PostText();
+		StringLiteral text = parseTextChars();
+		post.setText(text);
+		
+		next("Embedding closure quote \"", "> TextChars* \"", WaebricSymbol.DQUOTE);
+		
+		return post;
 	}
 	
 	public MidText parseMidText() {
-		MidText text = new MidText();
+		next("Embedding mid-text start symbol >", "> TextChars* <", WaebricSymbol.GREATER_THAN);
 		
-		if(! next("Embed closure token >", "\">\" TextChars \"<\"", WaebricSymbol.GREATER_THAN)) {
-			return null;
-		}
-
-		WaebricToken peek = tokens.peek(1); // Optional: Parse text
-		if(peek.getSort() == WaebricTokenSort.IDCON) {
-			text.setText(new StringLiteral(peek.getLexeme().toString()));
-			tokens.next(); // Skip text
-		}
+		MidText mid = new MidText();
+		StringLiteral text = parseTextChars();
+		mid.setText(text);
 		
-		if(! next("Embed opening token <", "\">\" TextChars \"<\"", WaebricSymbol.LESS_THAN)) {
-			return null;
-		}
+		next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
 		
-		return text;
-	}
-
-	public Expression parseExpression(String name, String syntax) {
-		return expressionParser.parseExpression(name, syntax);
-	}
-	
-	public Markup parseMarkup() {
-		return markupParser.parseMarkup();
+		return mid;
 	}
 	
 	public StringLiteral parseTextChars() {
@@ -148,6 +140,14 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		return new StringLiteral(data);
+	}
+
+	public Expression parseExpression(String name, String syntax) {
+		return expressionParser.parseExpression(name, syntax);
+	}
+	
+	public Markup parseMarkup() {
+		return markupParser.parseMarkup();
 	}
 	
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.embedding.MidText;
+import org.cwi.waebric.parser.ast.embedding.PostText;
 import org.cwi.waebric.parser.ast.embedding.PreText;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
@@ -83,20 +84,22 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPostTest() {
-//		iterator = TestScanner.quickScan(">right\"");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		// TODO: Create test assertions
+		iterator = TestScanner.quickScan(">right\"");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		PostText text = parser.parsePostText();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("right", text.getText().toString());
 	}
 	
 	@Test
 	public void testMidText() {
-//		iterator = TestScanner.quickScan(">mid<");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		MidText text = parser.parseMidText();
-//		assertTrue(exceptions.size() == 0);
-//		assertEquals("mid", text.getText().toString());
+		iterator = TestScanner.quickScan(">mid<");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		MidText text = parser.parseMidText();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("mid", text.getText().toString());
 	}
 	
 	@Test
