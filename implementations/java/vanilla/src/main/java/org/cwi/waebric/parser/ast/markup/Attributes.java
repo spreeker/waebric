@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.parser.ast.SyntaxNodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 
 /**
  * Collection of attributes
@@ -8,6 +8,6 @@ import org.cwi.waebric.parser.ast.SyntaxNodeList;
  * @author Jeroen van Schagen
  * @date 22-05-2009
  */
-public class Attributes extends SyntaxNodeList<Attribute> {
+public class Attributes extends AbstractSyntaxNodeList<Attribute> {
 
 }

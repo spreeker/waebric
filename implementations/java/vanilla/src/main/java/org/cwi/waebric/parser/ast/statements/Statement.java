@@ -4,9 +4,8 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.SyntaxNodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.expressions.Expression;
@@ -41,8 +40,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.statement = statement;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				predicate,
@@ -70,8 +69,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return elseStatement;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				predicate,
@@ -119,8 +118,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.statement = statement;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.EACH)),
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				var,
@@ -140,12 +139,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class LetStatement extends Statement {
 
-		private SyntaxNodeList<Assignment> assignments;
-		private SyntaxNodeList<Statement> statements;
+		private AbstractSyntaxNodeList<Assignment> assignments;
+		private AbstractSyntaxNodeList<Statement> statements;
 		
 		public LetStatement() {
-			assignments = new SyntaxNodeList<Assignment>();
-			statements = new SyntaxNodeList<Statement>();
+			assignments = new AbstractSyntaxNodeList<Assignment>();
+			statements = new AbstractSyntaxNodeList<Statement>();
 		}
 		
 		public boolean addAssignment(Assignment assignment) {
@@ -172,8 +171,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return statements.size();
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.LET)),
 				assignments,
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IN)),
@@ -191,7 +190,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class StatementCollection extends Statement {
 
-		private SyntaxNodeList<Statement> statements;
+		private AbstractSyntaxNodeList<Statement> statements;
 		
 		public boolean addStatement(Statement statement) {
 			return statements.add(statement);
@@ -205,8 +204,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return statements.size();
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new CharacterLiteral(WaebricSymbol.LCBRACKET),
 				statements,
 				new CharacterLiteral(WaebricSymbol.RCBRACKET)
@@ -232,8 +231,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.comment = comment;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.COMMENT)),
 				comment,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
@@ -259,8 +258,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.ECHO)),
 				expression,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
@@ -286,8 +285,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.embedding = embedding;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.ECHO)),
 				embedding,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
@@ -313,8 +312,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.CDATA)),
 				expression,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
@@ -330,8 +329,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class YieldStatement extends Statement {
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.YIELD)),
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};

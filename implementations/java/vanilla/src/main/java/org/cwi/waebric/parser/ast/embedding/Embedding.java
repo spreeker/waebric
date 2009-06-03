@@ -1,7 +1,6 @@
 package org.cwi.waebric.parser.ast.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 
 /**
  * PreText Embed TextTail -> Embedding
@@ -39,8 +38,8 @@ public class Embedding extends AbstractSyntaxNode {
 		this.tail = tail;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { pre, embed, tail };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { pre, embed, tail };
 	}
 
 }

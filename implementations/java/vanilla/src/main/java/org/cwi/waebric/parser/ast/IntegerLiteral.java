@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast;
 
-public class IntegerLiteral implements ISyntaxNode {
+public class IntegerLiteral extends AbstractSyntaxNode {
 
 	private int literal;
 	
@@ -31,7 +31,7 @@ public class IntegerLiteral implements ISyntaxNode {
 		}
 	}
 
-	public ISyntaxNode[] getChildren() {
+	public AbstractSyntaxNode[] getChildren() {
 		return null;
 	}
 	

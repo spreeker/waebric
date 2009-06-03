@@ -2,8 +2,8 @@ package org.cwi.waebric.parser.ast.statements;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.expressions.Var;
 
 /**
@@ -17,9 +17,9 @@ public class Formals extends SyntaxNodeListWithSeparator<Var> {
 		super(WaebricSymbol.COMMA);
 	}
 
-	public ISyntaxNode[] getChildren() {
-		ISyntaxNode[] children = super.getChildren();
-		ISyntaxNode[] elements = new ISyntaxNode[children.length + 2];
+	public AbstractSyntaxNode[] getChildren() {
+		AbstractSyntaxNode[] children = super.getChildren();
+		AbstractSyntaxNode[] elements = new AbstractSyntaxNode[children.length + 2];
 		elements[0] = new CharacterLiteral(WaebricSymbol.LPARANTHESIS);
 		System.arraycopy(children, 0, elements, 1, children.length);
 		elements[elements.length - 1] = new CharacterLiteral(WaebricSymbol.RPARANTHESIS);

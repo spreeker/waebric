@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class FileName extends AbstractSyntaxNode {
@@ -26,8 +25,8 @@ public class FileName extends AbstractSyntaxNode {
 		this.ext = ext;
 	}
 	
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] {
 			name,
 			new StringLiteral("" + WaebricSymbol.PERIOD),
 			ext

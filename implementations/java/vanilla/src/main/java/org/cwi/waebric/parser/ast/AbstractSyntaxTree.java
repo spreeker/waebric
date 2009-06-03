@@ -8,16 +8,16 @@ package org.cwi.waebric.parser.ast;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class SyntaxTree {
+public class AbstractSyntaxTree {
 
-	private final ISyntaxNode root;
+	private final AbstractSyntaxNode root;
 	
 	/**
 	 * Initialize abstract syntax tree.
 	 * 
 	 * @param root Start of tree
 	 */
-	public SyntaxTree(ISyntaxNode root) {
+	public AbstractSyntaxTree(AbstractSyntaxNode root) {
 		this.root = root;
 	}
 	
@@ -26,7 +26,7 @@ public class SyntaxTree {
 	 * 
 	 * @return
 	 */
-	public final ISyntaxNode getRoot() {
+	public final AbstractSyntaxNode getRoot() {
 		return root;
 	}
 	

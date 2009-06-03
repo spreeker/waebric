@@ -1,7 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -36,8 +35,8 @@ public class Designator extends AbstractSyntaxNode {
 		this.attributes = attributes;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { identifier, attributes };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { identifier, attributes };
 	}
 
 }

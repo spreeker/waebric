@@ -1,8 +1,8 @@
 package org.cwi.waebric.parser.ast.site;
 
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 
-public class DirName implements ISyntaxNode {
+public class DirName extends AbstractSyntaxNode {
 
 	private Directory directory;
 
@@ -14,8 +14,8 @@ public class DirName implements ISyntaxNode {
 		this.directory = directory;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { directory };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { directory };
 	}
 	
 	@Override

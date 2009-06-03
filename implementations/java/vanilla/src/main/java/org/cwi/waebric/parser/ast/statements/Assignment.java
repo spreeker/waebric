@@ -3,7 +3,6 @@ package org.cwi.waebric.parser.ast.statements;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
@@ -51,8 +50,8 @@ public abstract class Assignment extends AbstractSyntaxNode {
 			this.statement = statement;
 		}
 	
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				identifier,
 				formals,
 				new CharacterLiteral(WaebricSymbol.EQUAL_SIGN),
@@ -88,8 +87,8 @@ public abstract class Assignment extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				var,
 				new CharacterLiteral('='),
 				expression

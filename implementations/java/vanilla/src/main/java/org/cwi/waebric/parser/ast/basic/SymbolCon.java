@@ -3,7 +3,6 @@ package org.cwi.waebric.parser.ast.basic;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -28,8 +27,8 @@ public class SymbolCon extends AbstractSyntaxNode {
 		return literal.equals(obj);
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.SQUOTE),
 			literal
 		};

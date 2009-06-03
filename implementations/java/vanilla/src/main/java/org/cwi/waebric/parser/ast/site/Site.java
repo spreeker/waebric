@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.module.ModuleElement;
 
@@ -28,8 +28,8 @@ public class Site extends ModuleElement {
 		this.mappings = mappings;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { 
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { 
 			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.SITE)),
 			mappings,
 			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.END))

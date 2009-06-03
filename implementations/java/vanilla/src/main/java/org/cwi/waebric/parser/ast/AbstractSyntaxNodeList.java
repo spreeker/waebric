@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
+public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode {
 
 	protected ArrayList<E> list = new ArrayList<E>();
 	
@@ -62,8 +62,8 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
 	 * 
 	 * @return
 	 */
-	public ISyntaxNode[] getElements() {
-		return list.toArray(new ISyntaxNode[0]);
+	public AbstractSyntaxNode[] getElements() {
+		return list.toArray(new AbstractSyntaxNode[0]);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
 	 * 
 	 * @return
 	 */
-	public ISyntaxNode[] getChildren() {
+	public AbstractSyntaxNode[] getChildren() {
 		return getElements();
 	}
 	
@@ -81,7 +81,7 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
 		
 		// Attach children data
 		name += "[";
-		ISyntaxNode[] children = this.getChildren();
+		AbstractSyntaxNode[] children = this.getChildren();
 		for(int i = 0; i < children.length; i++) {
 			if(i != 0) { name += ","; }
 			name += children[i].toString();
@@ -101,7 +101,7 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
-	public static class SyntaxNodeListWithSeparator<E extends ISyntaxNode> extends SyntaxNodeList<E> {
+	public static class SyntaxNodeListWithSeparator<E extends AbstractSyntaxNode> extends AbstractSyntaxNodeList<E> {
 		
 		/**
 		 * Separation character
@@ -113,15 +113,15 @@ public class SyntaxNodeList<E extends ISyntaxNode> extends AbstractSyntaxNode {
 		}
 
 		@Override
-		public ISyntaxNode[] getChildren() {
-			ArrayList<ISyntaxNode> children = new ArrayList<ISyntaxNode>();
+		public AbstractSyntaxNode[] getChildren() {
+			ArrayList<AbstractSyntaxNode> children = new ArrayList<AbstractSyntaxNode>();
 			
 			for(int i = 0; i < list.size(); i++) {
 				if(i != 0) { children.add(new CharacterLiteral(separator)); }
 				children.add(list.get(i));
 			}
 			
-			return children.toArray(new ISyntaxNode[0]);
+			return children.toArray(new AbstractSyntaxNode[0]);
 		}
 		
 	}

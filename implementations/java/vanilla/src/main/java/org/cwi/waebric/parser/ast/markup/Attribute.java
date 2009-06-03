@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
@@ -21,7 +21,7 @@ import org.cwi.waebric.parser.ast.basic.NatCon;
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
-public abstract class Attribute implements ISyntaxNode {
+public abstract class Attribute extends AbstractSyntaxNode {
 	
 	protected StringLiteral symbol;
 	
@@ -58,8 +58,8 @@ public abstract class Attribute implements ISyntaxNode {
 			return "" + symbol + identifier;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { symbol, identifier };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { symbol, identifier };
 		}
 		
 	}
@@ -91,8 +91,8 @@ public abstract class Attribute implements ISyntaxNode {
 			return "" + symbol + number;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { symbol, number };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { symbol, number };
 		}
 		
 	}
@@ -131,8 +131,8 @@ public abstract class Attribute implements ISyntaxNode {
 		}
 		
 		@Override
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { symbol, number, secondSymbol, secondNumber };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { symbol, number, secondSymbol, secondNumber };
 		}
 		
 	}

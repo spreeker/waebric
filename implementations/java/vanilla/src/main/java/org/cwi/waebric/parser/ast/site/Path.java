@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 
 /**
@@ -53,8 +52,8 @@ public abstract class Path extends AbstractSyntaxNode {
 			return dirName;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				dirName,
 				new CharacterLiteral(WaebricSymbol.SLASH),
 				fileName
@@ -76,8 +75,8 @@ public abstract class Path extends AbstractSyntaxNode {
 			return fileName.equals(obj);
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { fileName };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { fileName };
 		}
 		
 	}

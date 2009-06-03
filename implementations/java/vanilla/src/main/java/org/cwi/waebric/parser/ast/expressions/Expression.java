@@ -3,8 +3,7 @@ package org.cwi.waebric.parser.ast.expressions;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
@@ -28,8 +27,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.text = text;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { text };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { text };
 		}
 		
 	}
@@ -51,8 +50,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.var = var;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { var };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { var };
 		}
 		
 	}
@@ -74,8 +73,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.symbol = symbol;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { symbol };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { symbol };
 		}
 		
 	}
@@ -97,8 +96,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.natural = natural;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { natural };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { natural };
 		}
 		
 	}
@@ -129,8 +128,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] {
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
 				expression,
 				new CharacterLiteral(WaebricSymbol.PERIOD),
 				identifier
@@ -156,12 +155,12 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return expressions.add(expression);
 		}
 		
-		public ISyntaxNode[] getElements() {
+		public AbstractSyntaxNode[] getElements() {
 			return expressions.getElements();
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { 
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
 				new CharacterLiteral(WaebricSymbol.LBRACKET),
 				expressions,
 				new CharacterLiteral(WaebricSymbol.RBRACKET)
@@ -187,16 +186,16 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return pairs.add(pair);
 		}
 		
-		public ISyntaxNode[] getElements() {
+		public AbstractSyntaxNode[] getElements() {
 			return pairs.getElements();
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.LCBRACKET),
-					pairs,
-					new CharacterLiteral(WaebricSymbol.RCBRACKET)
-				};
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+				new CharacterLiteral(WaebricSymbol.LCBRACKET),
+				pairs,
+				new CharacterLiteral(WaebricSymbol.RCBRACKET)
+			};
 		}
 		
 	}

@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.site;
 
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
 
 public class Directory extends SyntaxNodeListWithSeparator<PathElement> {
 	

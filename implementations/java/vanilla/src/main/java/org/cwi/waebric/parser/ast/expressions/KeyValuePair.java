@@ -3,7 +3,6 @@ package org.cwi.waebric.parser.ast.expressions;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -32,12 +31,12 @@ public class KeyValuePair extends AbstractSyntaxNode {
 		this.expression = expression;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { 
-				identifier,
-				new CharacterLiteral(WaebricSymbol.COLON),
-				expression
-			};
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { 
+			identifier,
+			new CharacterLiteral(WaebricSymbol.COLON),
+			expression
+		};
 	}
 
 }

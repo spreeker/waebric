@@ -3,7 +3,7 @@ package org.cwi.waebric.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.SyntaxTree;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
@@ -21,7 +21,7 @@ import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 public class WaebricParser extends AbstractParser {
 
 	private final ModuleParser moduleParser;
-	private SyntaxTree tree;
+	private AbstractSyntaxTree tree;
 
 	public WaebricParser(WaebricScanner scanner) {
 		this(scanner.iterator());
@@ -38,13 +38,13 @@ public class WaebricParser extends AbstractParser {
 		exceptions.clear();
 		
 		Modules modules = new Modules(); // Construct root node
-		tree = new SyntaxTree(modules); // Construct AST
+		tree = new AbstractSyntaxTree(modules); // Construct AST
 		moduleParser.parse(modules); // Start parsing
 		
 		return exceptions;
 	}
 	
-	public SyntaxTree getAbstractSyntaxTree() {
+	public AbstractSyntaxTree getAbstractSyntaxTree() {
 		return tree;
 	}
 	

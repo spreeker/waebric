@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class Import extends ModuleElement {
@@ -18,8 +18,8 @@ public class Import extends ModuleElement {
 		this.identifier = identifier;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { 
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { 
 			new StringLiteral(IMPORT_KEYWORD), 
 			identifier
 		};

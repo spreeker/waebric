@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast;
 
-public class StringLiteral implements ISyntaxNode {
+public class StringLiteral extends AbstractSyntaxNode {
 
 	private String literal;
 	
@@ -18,7 +18,7 @@ public class StringLiteral implements ISyntaxNode {
 		return literal.equals(obj);
 	}
 	
-	public ISyntaxNode[] getChildren() {
+	public AbstractSyntaxNode[] getChildren() {
 		return null;
 	}
 	

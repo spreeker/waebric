@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
@@ -40,8 +39,8 @@ public abstract class Argument extends AbstractSyntaxNode {
 			this.var = var;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { 
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
 				var,
 				new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
 				expression
@@ -57,8 +56,8 @@ public abstract class Argument extends AbstractSyntaxNode {
 	 */
 	public static class ArgumentWithoutVar extends Argument {
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { expression };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { expression };
 		}
 		
 	}

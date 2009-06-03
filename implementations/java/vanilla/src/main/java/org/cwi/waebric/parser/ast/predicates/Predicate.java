@@ -3,7 +3,6 @@ package org.cwi.waebric.parser.ast.predicates;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 
 /**
@@ -32,8 +31,8 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 */
 	public static class PredicateWithoutType extends Predicate {
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { expression };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { expression };
 		}
 		
 	}
@@ -56,8 +55,8 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.type = type;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { 
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
 				expression,
 				new CharacterLiteral(WaebricSymbol.PERIOD),
 				type,

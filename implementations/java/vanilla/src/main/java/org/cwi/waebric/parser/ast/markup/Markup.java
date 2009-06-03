@@ -1,7 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 
 /**
  * Markup
@@ -51,8 +50,8 @@ public abstract class Markup extends AbstractSyntaxNode {
 			return arguments;
 		}
 		
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { designator, arguments };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { designator, arguments };
 		}
 		
 	}
@@ -64,8 +63,8 @@ public abstract class Markup extends AbstractSyntaxNode {
 	 */
 	public static class MarkupWithoutArguments extends Markup {
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { designator };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { designator };
 		}
 		
 	}

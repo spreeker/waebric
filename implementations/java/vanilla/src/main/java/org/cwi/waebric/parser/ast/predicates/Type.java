@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.predicates;
 
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -16,7 +16,7 @@ import org.cwi.waebric.parser.ast.StringLiteral;
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
-public class Type implements ISyntaxNode {
+public class Type extends AbstractSyntaxNode {
 	
 	private StringLiteral type;
 
@@ -38,8 +38,8 @@ public class Type implements ISyntaxNode {
 		return type.toString();
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { type };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { type };
 	}
 	
 }

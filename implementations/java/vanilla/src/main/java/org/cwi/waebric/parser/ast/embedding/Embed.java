@@ -1,8 +1,7 @@
 package org.cwi.waebric.parser.ast.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
-import org.cwi.waebric.parser.ast.SyntaxNodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
@@ -14,11 +13,11 @@ import org.cwi.waebric.parser.ast.markup.Markup;
  */
 public class Embed extends AbstractSyntaxNode {
 
-	private SyntaxNodeList<Markup> markups;
+	private AbstractSyntaxNodeList<Markup> markups;
 	private Expression expression;
 	
 	public Embed() {
-		this.markups = new SyntaxNodeList<Markup>();
+		this.markups = new AbstractSyntaxNodeList<Markup>();
 	}
 	
 	public Markup getMarkup(int index) {
@@ -41,8 +40,8 @@ public class Embed extends AbstractSyntaxNode {
 		this.expression = expression;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { markups, expression };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { markups, expression };
 	}
 
 }

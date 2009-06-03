@@ -1,7 +1,6 @@
 package org.cwi.waebric.parser.ast.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 
 /**
  * Text tail
@@ -26,8 +25,8 @@ public abstract class TextTail extends AbstractSyntaxNode {
 			this.post = post;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { post };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { post };
 		}
 		
 	}
@@ -65,8 +64,8 @@ public abstract class TextTail extends AbstractSyntaxNode {
 			this.tail = tail;
 		}
 
-		public ISyntaxNode[] getChildren() {
-			return new ISyntaxNode[] { mid, embed, tail };
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { mid, embed, tail };
 		}
 		
 	}

@@ -3,7 +3,6 @@ package org.cwi.waebric.parser.ast.embedding;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -24,8 +23,8 @@ public class PreText extends AbstractSyntaxNode {
 		this.text = text;
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.DQUOTE),
 			text,
 			new CharacterLiteral(WaebricSymbol.LESS_THAN)

@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class Module extends AbstractSyntaxNode {
@@ -28,12 +27,12 @@ public class Module extends AbstractSyntaxNode {
 		return elements.add(element);
 	}
 	
-	public ISyntaxNode[] getElements() {
+	public AbstractSyntaxNode[] getElements() {
 		return elements.getElements();
 	}
 	
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] {
 			new StringLiteral(MODULE_KEYWORD),
 			identifier,
 			elements

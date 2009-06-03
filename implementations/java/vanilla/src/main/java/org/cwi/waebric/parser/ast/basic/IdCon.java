@@ -1,7 +1,6 @@
 package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -27,7 +26,7 @@ public class IdCon extends AbstractSyntaxNode {
 		return literal.equals(obj);
 	}
 
-	public ISyntaxNode[] getChildren() {
+	public AbstractSyntaxNode[] getChildren() {
 		return new StringLiteral[] { literal };
 	}
 

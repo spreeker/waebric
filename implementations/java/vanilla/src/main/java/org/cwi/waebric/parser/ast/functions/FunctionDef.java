@@ -1,9 +1,9 @@
 package org.cwi.waebric.parser.ast.functions;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.SyntaxNodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.ModuleElement;
 import org.cwi.waebric.parser.ast.statements.Formals;
@@ -22,10 +22,10 @@ public class FunctionDef extends ModuleElement {
 	
 	private IdCon identifier;
 	private Formals formals;
-	private SyntaxNodeList<Statement> statements;
+	private AbstractSyntaxNodeList<Statement> statements;
 
 	public FunctionDef() {
-		statements = new SyntaxNodeList<Statement>();
+		statements = new AbstractSyntaxNodeList<Statement>();
 	}
 	
 	public IdCon getIdentifier() {
@@ -56,8 +56,8 @@ public class FunctionDef extends ModuleElement {
 		return statements.size();
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] {
 			new StringLiteral(DEF_LITERAL),
 			identifier,
 			formals,

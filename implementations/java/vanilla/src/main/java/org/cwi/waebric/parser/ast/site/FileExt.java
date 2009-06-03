@@ -1,9 +1,9 @@
 package org.cwi.waebric.parser.ast.site;
 
-import org.cwi.waebric.parser.ast.ISyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
-public class FileExt implements ISyntaxNode {
+public class FileExt extends AbstractSyntaxNode {
 
 	private StringLiteral literal;
 	
@@ -11,8 +11,8 @@ public class FileExt implements ISyntaxNode {
 		this.literal = new StringLiteral(literal);
 	}
 
-	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] { literal };
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { literal };
 	}
 	
 	@Override

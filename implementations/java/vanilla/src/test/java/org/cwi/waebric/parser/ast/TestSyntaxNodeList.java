@@ -9,11 +9,11 @@ import org.junit.Test;
 
 public class TestSyntaxNodeList {
 
-	private SyntaxNodeList<Mapping> mappings;
+	private AbstractSyntaxNodeList<Mapping> mappings;
 	
 	@Before
 	public void setUp() {
-		mappings = new SyntaxNodeList<Mapping>();
+		mappings = new AbstractSyntaxNodeList<Mapping>();
 		mappings.add(new Mapping());
 		mappings.add(new Mapping());
 	}

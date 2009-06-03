@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.cwi.waebric.parser.ast.SyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
 import org.cwi.waebric.parser.ast.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
