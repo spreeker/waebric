@@ -109,6 +109,17 @@ namespace Parser
             return false;
         }
 
+        /// <summary>
+        /// Match two objects. Used for token matching during parsing.
+        /// </summary>
+        /// <param name="retrieved">Object retrieved from TokenStream</param>
+        /// <param name="expected">Object which is expected</param>
+        /// <returns></returns>
+        protected bool Match(Object retrieved, Object expected)
+        {
+            return expected.Equals(retrieved);
+        }
+
         #endregion
     }
 }
