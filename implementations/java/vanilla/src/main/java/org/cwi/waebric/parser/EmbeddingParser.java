@@ -77,18 +77,16 @@ class EmbeddingParser extends AbstractParser {
 		
 		// Parse mark-up collection
 		while(tokens.hasNext(2)) {
-			WaebricToken peek = tokens.peek(2);
-			if(peek.getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
+			embed.addMarkup(parseMarkup());
+			
+			Object peek = tokens.peek(2).getLexeme();
+			if(peek.equals(WaebricSymbol.GREATER_THAN)) {
 				break; // Quit parsing
 			}
-			
-			embed.addMarkup(parseMarkup());
-			current = tokens.next(); // Iterate to next token
 		}
 		
 		// Parse expression
 		embed.setExpression(parseExpression("embed", "< Markup* Expression >"));
-		
 		return embed;
 	}
 	

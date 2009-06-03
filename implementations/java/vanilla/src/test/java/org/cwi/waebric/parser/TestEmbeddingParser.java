@@ -61,16 +61,26 @@ public class TestEmbeddingParser {
 		assertEquals(Expression.NatExpression.class, simple.getExpression().getClass());
 		assertEquals(0, simple.getMarkupCount());
 		
-		// Embed with mark-up
-		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
+		// Embed with single mark-up
+		iterator = TestScanner.quickScan("func1 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed diff = parser.parseEmbed();
 		assertTrue(exceptions.size() == 0);
 		assertEquals(Expression.NatExpression.class, diff.getExpression().getClass());
-		assertEquals(2, diff.getMarkupCount());
-		assertEquals(Markup.MarkupWithArguments.class, diff.getMarkup(0).getClass());
-		assertEquals(Markup.MarkupWithoutArguments.class, diff.getMarkup(1).getClass());
+		assertEquals(1, diff.getMarkupCount());
+		assertEquals(Markup.MarkupWithoutArguments.class, diff.getMarkup(0).getClass());
+		
+		// Embed with multiple mark-up
+		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		Embed diff2 = parser.parseEmbed();
+		assertTrue(exceptions.size() == 0);
+		assertEquals(Expression.NatExpression.class, diff2.getExpression().getClass());
+		assertEquals(2, diff2.getMarkupCount());
+		assertEquals(Markup.MarkupWithArguments.class, diff2.getMarkup(0).getClass());
+		assertEquals(Markup.MarkupWithoutArguments.class, diff2.getMarkup(1).getClass());
 	}
 	
 	@Test
