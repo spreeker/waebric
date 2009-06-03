@@ -42,19 +42,41 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	/**
-	 * Convert embedded "quote" token to multiple sub-tokens.
+	 * Convert embedded "quote" token to sub tokens.
 	 * 
 	 * @param lexeme
 	 */
-	private void tokenizeEmbedding(String lexeme) {
-		try {			
-			StringReader input = new StringReader(lexeme);
-			WaebricScanner scanner = new WaebricScanner(input);
+	private void tokenizeEmbedding() {
+		try {		
+			current = tokens.next();
+			
+			// Convert text (including first " symbol) to new token stream
+			StringReader reader = new StringReader(current.getLexeme().toString());
+			WaebricScanner scanner = new WaebricScanner(reader);
+			scanner.tokenizeStream();
+			
+			// Retrieve token stream
+			List<WaebricToken> elements = scanner.getTokens();
+			
+			// Attach " symbols to stream
+			elements.add(0, new WaebricToken(
+					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+					current.getLine(), current.getCharacter()));
+			elements.add(new WaebricToken(
+					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+					current.getLine(), current.getCharacter()));
+			
+			// Change token location to absolute instead of relative
+			for(WaebricToken token : elements) {
+				token.setCharacter(token.getCharacter() + current.getCharacter());
+				token.setLine(token.getLine() + current.getLine());
+			}
+			
+			// Swap quote token with extended token collection
 			tokens.remove();
-			tokens.addAll(scanner.getTokens());
-		} catch(IOException exception) {
-			System.out.println("Error sub-tokenizing embedding");
-			exception.printStackTrace();
+			tokens.addAll(elements);
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -62,7 +84,7 @@ class EmbeddingParser extends AbstractParser {
 		// Further tokenize stream when needed
 		WaebricToken peek = tokens.peek(1);
 		if(peek.getSort() == WaebricTokenSort.QUOTE) {
-			tokenizeEmbedding(peek.getLexeme().toString());
+			tokenizeEmbedding();
 		}
 		
 		Embedding embedding = new Embedding();
@@ -76,12 +98,8 @@ class EmbeddingParser extends AbstractParser {
 		Embed embed = new Embed();
 		
 		// Parse mark-up collection
-		while(tokens.hasNext(2)) {
+		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 			embed.addMarkup(parseMarkup());
-			
-			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
-				break; // Quit parsing
-			}
 		}
 		
 		// Parse expression
@@ -94,13 +112,14 @@ class EmbeddingParser extends AbstractParser {
 		StringLiteral text = parseTextChars();
 
 		if(tokens.hasNext()) {
-			current = tokens.next();
-			if(current.getLexeme().equals(WaebricSymbol.DQUOTE)) {
+			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.DQUOTE)) {
 				PostText post = new PostText();
 				post.setText(text);
 				
 				TextTail.PostTail tail = new TextTail.PostTail();
 				tail.setPost(post);
+				
+				tokens.next(); // Skip "
 				return tail;
 			} else {
 				next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
@@ -109,8 +128,10 @@ class EmbeddingParser extends AbstractParser {
 				mid.setText(text);
 
 				TextTail.MidTail tail = new TextTail.MidTail();
+				tail.setMid(mid);
 				tail.setEmbed(parseEmbed());
 				tail.setTail(parseTextTail());
+				
 				return tail;
 			}
 		}

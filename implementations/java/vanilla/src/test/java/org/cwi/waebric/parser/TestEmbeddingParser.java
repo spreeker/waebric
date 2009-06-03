@@ -12,6 +12,9 @@ import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.ast.embedding.PostText;
 import org.cwi.waebric.parser.ast.embedding.PreText;
+import org.cwi.waebric.parser.ast.embedding.TextTail;
+import org.cwi.waebric.parser.ast.embedding.TextTail.MidTail;
+import org.cwi.waebric.parser.ast.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
@@ -47,11 +50,22 @@ public class TestEmbeddingParser {
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding simple = parser.parseEmbedding();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("", simple.getPre().getText().toString());
+		assertEquals(Expression.NatExpression.class, simple.getEmbed().getExpression().getClass());
+		assertEquals(0, simple.getEmbed().getMarkupCount());
+		assertEquals(TextTail.PostTail.class, simple.getTail().getClass());
 		
 		iterator = TestScanner.quickScan("\"left<func1() 123>right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding extended = parser.parseEmbedding();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("left", extended.getPre().getText().toString());
+		assertEquals(Expression.NatExpression.class, extended.getEmbed().getExpression().getClass());
+		assertEquals(1, extended.getEmbed().getMarkupCount());
+		assertEquals(Markup.MarkupWithArguments.class, extended.getEmbed().getMarkup(0).getClass());
+		assertEquals(TextTail.PostTail.class, extended.getTail().getClass());
 	}
 	
 	@Test
@@ -66,7 +80,7 @@ public class TestEmbeddingParser {
 		assertEquals(0, simple.getMarkupCount());
 		
 		// Embed with single mark-up
-		iterator = TestScanner.quickScan("func1 123");
+		iterator = TestScanner.quickScan("func1 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed diff = parser.parseEmbed();
@@ -99,12 +113,21 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextTail() {
-		// TODO: Cannot be tested untill embed works
-//		iterator = TestScanner.quickScan(">right\"");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		iterator = TestScanner.quickScan(">mid<123>");
-//		parser = new EmbeddingParser(iterator, exceptions);
+		iterator = TestScanner.quickScan(">right\"");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		TextTail.PostTail post = (PostTail) parser.parseTextTail();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("right", post.getPost().getText().toString());
+		
+		iterator = TestScanner.quickScan(">mid<123>\"");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		TextTail.MidTail mid = (MidTail) parser.parseTextTail();
+		assertTrue(exceptions.size() == 0);
+		assertEquals("mid", mid.getMid().getText().toString());
+		assertEquals(Expression.NatExpression.class, mid.getEmbed().getExpression().getClass());
+		assertEquals(TextTail.PostTail.class, mid.getTail().getClass());
 	}
 	
 	@Test

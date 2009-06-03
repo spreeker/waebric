@@ -1,6 +1,5 @@
 package org.cwi.waebric.scanner.token;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 * 
 	 * @param tokens Collection of tokens
 	 */
-	public void addAll(Collection<? extends WaebricToken> tokens) {
+	public void addAll(List<? extends WaebricToken> tokens) {
 		collection.addAll(curr+1, tokens);
 	}
 	
