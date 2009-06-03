@@ -115,11 +115,11 @@ public class TestScanner {
 	
 	@Test
 	public void testScanSymbol() {
-		// TODO: Not functional yet
 		iterator = quickScan("'abc '123 '@@@ 'abc123@@@");
-		current = iterator.next();
-		assertEquals("abc", current.getLexeme().toString());
-		assertFalse(iterator.hasNext());
+		assertEquals("abc", iterator.next().getLexeme());
+		assertEquals("123", iterator.next().getLexeme());
+		assertEquals("@@@", iterator.next().getLexeme());
+		assertEquals("abc123@@@", iterator.next().getLexeme());
 	}
 	
 	@Test
