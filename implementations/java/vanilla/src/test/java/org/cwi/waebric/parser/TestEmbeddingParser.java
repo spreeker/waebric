@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.embedding.Embed;
 import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.ast.embedding.PostText;
 import org.cwi.waebric.parser.ast.embedding.PreText;
+import org.cwi.waebric.parser.ast.expressions.Expression;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -49,18 +52,25 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testEmbed() {
-//		// Simple embed without closure symbol
-//		iterator = TestScanner.quickScan("123");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		// Complicated embed with closure symbol <
-//		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		
-//		// Complicated embed without closure symbol <
-//		iterator = TestScanner.quickScan("func1(arg1) func2 123");
-//		parser = new EmbeddingParser(iterator, exceptions);
-//		// TODO: Create test assertions
+		// Expression only embed
+		iterator = TestScanner.quickScan("123");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		Embed simple = parser.parseEmbed();
+		assertTrue(exceptions.size() == 0);
+		assertEquals(Expression.NatExpression.class, simple.getExpression().getClass());
+		assertEquals(0, simple.getMarkupCount());
+		
+		// Embed with mark-up
+		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
+		parser = new EmbeddingParser(iterator, exceptions);
+		
+		Embed diff = parser.parseEmbed();
+		assertTrue(exceptions.size() == 0);
+		assertEquals(Expression.NatExpression.class, diff.getExpression().getClass());
+		assertEquals(2, diff.getMarkupCount());
+		assertEquals(Markup.MarkupWithArguments.class, diff.getMarkup(0).getClass());
+		assertEquals(Markup.MarkupWithoutArguments.class, diff.getMarkup(1).getClass());
 	}
 	
 	@Test
@@ -75,6 +85,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextTail() {
+		// TODO: Cannot be tested untill embed works
 //		iterator = TestScanner.quickScan(">right\"");
 //		parser = new EmbeddingParser(iterator, exceptions);
 //		

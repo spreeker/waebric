@@ -17,12 +17,20 @@ public class Embed extends AbstractSyntaxNode {
 	private SyntaxNodeList<Markup> markups;
 	private Expression expression;
 	
-	public SyntaxNodeList<Markup> getMarkups() {
-		return markups;
+	public Embed() {
+		this.markups = new SyntaxNodeList<Markup>();
 	}
 	
-	public void setMarkups(SyntaxNodeList<Markup> markups) {
-		this.markups = markups;
+	public Markup getMarkup(int index) {
+		return markups.get(index);
+	}
+	
+	public int getMarkupCount() {
+		return markups.size();
+	}
+	
+	public void addMarkup(Markup markup) {
+		markups.add(markup);
 	}
 	
 	public Expression getExpression() {

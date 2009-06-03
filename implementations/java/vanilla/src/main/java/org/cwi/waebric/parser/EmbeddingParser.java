@@ -66,27 +66,58 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		Embedding embedding = new Embedding();
-		
-		// Pre-text
-		PreText pre = parsePreText();
-		embedding.setPre(pre);
-		
-		// Embed
-		Embed embed = parseEmbed();
-		embedding.setEmbed(embed);
-		
-		// Text tail
-		TextTail tail = parseTextTail();
-		embedding.setTail(tail);
-		
+		embedding.setPre(parsePreText());
+		embedding.setEmbed(parseEmbed());
+		embedding.setTail(parseTextTail());
 		return embedding;
 	}
 	
 	public Embed parseEmbed() {
-		return null;
+		Embed embed = new Embed();
+		
+		// Parse mark-up collection
+		while(tokens.hasNext(2)) {
+			WaebricToken peek = tokens.peek(2);
+			if(peek.getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
+				break; // Quit parsing
+			}
+			
+			embed.addMarkup(parseMarkup());
+			current = tokens.next(); // Iterate to next token
+		}
+		
+		// Parse expression
+		embed.setExpression(parseExpression("embed", "< Markup* Expression >"));
+		
+		return embed;
 	}
 	
 	public TextTail parseTextTail() {
+		next("Embedding tailsymbol >", "Embed > TextChars*", WaebricSymbol.GREATER_THAN);
+		StringLiteral text = parseTextChars();
+
+		if(tokens.hasNext()) {
+			current = tokens.next();
+			if(current.getLexeme().equals(WaebricSymbol.DQUOTE)) {
+				PostText post = new PostText();
+				post.setText(text);
+				
+				TextTail.PostTail tail = new TextTail.PostTail();
+				tail.setPost(post);
+				return tail;
+			} else {
+				next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
+				
+				MidText mid = new MidText();
+				mid.setText(text);
+
+				TextTail.MidTail tail = new TextTail.MidTail();
+				tail.setEmbed(parseEmbed());
+				tail.setTail(parseTextTail());
+				return tail;
+			}
+		}
+		
 		return null;
 	}
 	
@@ -94,8 +125,7 @@ class EmbeddingParser extends AbstractParser {
 		next("Embedding opening quote \"", "\" TextChars* <", WaebricSymbol.DQUOTE);
 		
 		PreText pre = new PreText();
-		StringLiteral text = parseTextChars();
-		pre.setText(text);
+		pre.setText(parseTextChars());
 		
 		next("Embedding pre-text symbol <", "TextChars* < Embed", WaebricSymbol.LESS_THAN);
 		
@@ -106,8 +136,7 @@ class EmbeddingParser extends AbstractParser {
 		next("Embedding post-text symbol >", "Embed > TextChars*", WaebricSymbol.GREATER_THAN);
 		
 		PostText post = new PostText();
-		StringLiteral text = parseTextChars();
-		post.setText(text);
+		post.setText(parseTextChars());
 		
 		next("Embedding closure quote \"", "> TextChars* \"", WaebricSymbol.DQUOTE);
 		
@@ -118,8 +147,7 @@ class EmbeddingParser extends AbstractParser {
 		next("Embedding mid-text start symbol >", "> TextChars* <", WaebricSymbol.GREATER_THAN);
 		
 		MidText mid = new MidText();
-		StringLiteral text = parseTextChars();
-		mid.setText(text);
+		mid.setText(parseTextChars());
 		
 		next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
 		
