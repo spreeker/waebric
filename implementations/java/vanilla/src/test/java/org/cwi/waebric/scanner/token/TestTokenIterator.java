@@ -67,8 +67,23 @@ public class TestTokenIterator {
 		WaebricToken peek = iterator.peek(1);
 		iterator.remove();
 		WaebricToken current = iterator.next();
-		
 		assertTrue(peek.equals(current));
+	}
+	
+	@Test
+	public void testAdd() {
+		WaebricToken newbie = new WaebricToken("test", WaebricTokenSort.QUOTE, 1, 2);
+		iterator.add(newbie);
+		assertEquals(newbie, iterator.next());
+	}
+	
+	@Test
+	public void testAddAll() {
+		WaebricToken newbie = new WaebricToken("test", WaebricTokenSort.QUOTE, 1, 2);
+		ArrayList<WaebricToken> list = new ArrayList<WaebricToken>();
+		list.add(newbie);
+		iterator.addAll(list);
+		assertEquals(newbie, iterator.next());
 	}
 	
 }
