@@ -6,6 +6,7 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
+import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
@@ -28,6 +29,7 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  */
 class StatementParser extends AbstractParser {
 
+	private final EmbeddingParser embeddingParser;
 	private final ExpressionParser expressionParser;
 	private final PredicateParser predicateParser;
 	
@@ -37,6 +39,7 @@ class StatementParser extends AbstractParser {
 		// Construct sub parsers
 		expressionParser = new ExpressionParser(tokens, exceptions);
 		predicateParser = new PredicateParser(tokens, exceptions);
+		embeddingParser = new EmbeddingParser(tokens, exceptions);
 	}
 	
 	/**
@@ -258,20 +261,16 @@ class StatementParser extends AbstractParser {
 	 * @return
 	 */
 	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement() {
-		if(next("echo keyword", "\"echo\"", WaebricKeyword.ECHO)) {
-			if(next("echo embedding", "\"echo\" embedding", WaebricTokenSort.QUOTE)) {
-				// TODO: Parse embedding!
-				
-				if(next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON)) {
-					Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
-					return statement;
-				}
-			}
-		}
-		
-		return null;
-	}
+		next("echo keyword", "\"echo\"", WaebricKeyword.ECHO);
 	
+		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
+		statement.setEmbedding(parseEmbedding());
+		
+		next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON);
+		
+		return statement;
+	}
+
 	/**
 	 * @see Statement.EchoExpressionStatement
 	 * @return
@@ -463,6 +462,11 @@ class StatementParser extends AbstractParser {
 	public Predicate parsePredicate() {
 		// No error reporting arguments needed, as predicates are only used in if-statements
 		return predicateParser.parsePredicate();
+	}
+	
+	private Embedding parseEmbedding() {
+		// Delegate parse to embedding parser
+		return embeddingParser.parseEmbedding();
 	}
 
 }

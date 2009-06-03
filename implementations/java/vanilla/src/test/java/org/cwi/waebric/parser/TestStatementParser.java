@@ -101,10 +101,12 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEchoEmbeddingStatement() {
-		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
+		iterator = TestScanner.quickScan("echo \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		// TODO: Cannot be tested until embedding is completed
+		Statement.EchoEmbeddingStatement statement = parser.parseEchoEmbeddingStatement();
+		assertEquals(0, exceptions.size());
+		assertEquals(Expression.NatExpression.class, statement.getEmbedding().getEmbed().getExpression().getClass());
 	}
 	
 	@Test

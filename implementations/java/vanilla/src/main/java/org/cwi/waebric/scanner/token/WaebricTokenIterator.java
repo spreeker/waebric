@@ -1,5 +1,6 @@
 package org.cwi.waebric.scanner.token;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,6 +23,13 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 */
 	public WaebricTokenIterator(List<WaebricToken> collection) {
 		this.collection = collection;
+	}
+	
+	/**
+	 * Clone iterator
+	 */
+	public WaebricTokenIterator clone() {
+		return new WaebricTokenIterator(new ArrayList<WaebricToken>(collection));
 	}
 	
 	/**
