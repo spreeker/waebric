@@ -24,7 +24,6 @@ public class PostText extends AbstractSyntaxNode {
 		this.text = text;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.GREATER_THAN),

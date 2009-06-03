@@ -26,7 +26,6 @@ public abstract class TextTail extends AbstractSyntaxNode {
 			this.post = post;
 		}
 
-		@Override
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { post };
 		}
@@ -66,7 +65,6 @@ public abstract class TextTail extends AbstractSyntaxNode {
 			this.tail = tail;
 		}
 
-		@Override
 		public ISyntaxNode[] getChildren() {
 			return new ISyntaxNode[] { mid, embed, tail };
 		}

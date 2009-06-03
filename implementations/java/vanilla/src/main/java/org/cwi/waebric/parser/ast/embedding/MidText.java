@@ -24,7 +24,6 @@ public class MidText extends AbstractSyntaxNode {
 		this.text = text;
 	}
 	
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.LESS_THAN),

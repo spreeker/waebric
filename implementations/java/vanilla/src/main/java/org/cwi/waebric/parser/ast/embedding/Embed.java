@@ -41,7 +41,6 @@ public class Embed extends AbstractSyntaxNode {
 		this.expression = expression;
 	}
 
-	@Override
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { markups, expression };
 	}
