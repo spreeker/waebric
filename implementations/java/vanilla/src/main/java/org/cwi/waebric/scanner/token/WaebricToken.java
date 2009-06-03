@@ -62,6 +62,22 @@ public class WaebricToken {
 		return character;
 	}
 	
+	/**
+	 * Modify line number
+	 * @param line
+	 */
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	/**
+	 * Modify chararacter number
+	 * @param character
+	 */
+	public void setCharacter(int character) {
+		this.character = character;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof WaebricToken) {

@@ -183,6 +183,8 @@ public class StreamTokenizer {
 	 * @throws IOException
 	 */
 	private int nextNumber() throws IOException {
+		ival = 0;
+		
 		while(isNumeral(current)) {
 			ival *= 10; // Create space for next character
 			ival += current - 48; // '0' equals decimal 48

@@ -58,7 +58,6 @@ public class TestScanner {
 	
 	@Test
 	public void testScanNumber() {
-		// TODO: Stored incorrect
 		iterator = quickScan("1 2 3 99 9999 123 456");
 		while(iterator.hasNext()) {
 			current = iterator.next();
@@ -106,9 +105,12 @@ public class TestScanner {
 
 	@Test
 	public void testScanQuote() {
-		iterator = quickScan("\"text\" \"123\" \"@@@\"");
-		current = iterator.next();
-		assertEquals("text", current.getLexeme().toString());
+		iterator = quickScan("\"text\" \"123\"");
+		assertEquals("text", iterator.next().getLexeme());
+		assertEquals("123", iterator.next().getLexeme());
+		
+		iterator = quickScan("\"text 123 '@@");
+		assertEquals('"', iterator.next().getLexeme());
 	}
 	
 	@Test

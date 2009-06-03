@@ -258,23 +258,18 @@ class StatementParser extends AbstractParser {
 	 * @return
 	 */
 	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement() {
-		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
-		
-		if(! next("echo keyword", "\"echo\"", WaebricKeyword.ECHO)) {
-			return null; // Invalid syntax
+		if(next("echo keyword", "\"echo\"", WaebricKeyword.ECHO)) {
+			if(next("echo embedding", "\"echo\" embedding", WaebricTokenSort.QUOTE)) {
+				// TODO: Parse embedding!
+				
+				if(next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON)) {
+					Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
+					return statement;
+				}
+			}
 		}
 		
-		if(next("echo embedding", "\"echo\" embedding", WaebricTokenSort.QUOTE)) {
-			// TODO: Embedding!
-		} else {
-			return null; // Invalid syntax
-		}
-		
-		if(! next("echo closure", "\"echo\" embedding \";\"", WaebricSymbol.SEMICOLON)) {
-			return null; // Invalid syntax
-		}
-		
-		return statement;
+		return null;
 	}
 	
 	/**

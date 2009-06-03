@@ -2,10 +2,12 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -146,13 +148,28 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		
 		String data = "";
 		while(tokenizer.getCharacterValue() != '"') {
-			if(current < 0) { return; } // End of stream reached
-			data += tokenizer.toString();
-			current = tokenizer.nextToken();
+			// End of file found before closing "
+			if(current < 0) {
+				WaebricScanner scanner = new WaebricScanner(new StringReader(data));
+				List<ScannerException> e = scanner.tokenizeStream();
+				exceptions.addAll(e);
+				tokens.add(new WaebricToken(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
+				
+				// Attach quote start position to sub-token
+				for(WaebricToken token: scanner.getTokens()) {
+					token.setLine(lineno + token.getLine() - 1);
+					token.setCharacter(charno + token.getCharacter());
+					tokens.add(token);
+				}
+				
+				return;
+			}
+			
+			data += tokenizer.toString(); // Build quote data
+			current = tokenizer.nextToken(); // Retrieve next token
 		}
 
 		current = tokenizer.nextToken(); // Skip " closure character
-		
 		WaebricToken quote = new WaebricToken(data, WaebricTokenSort.QUOTE, lineno, charno);
 		tokens.add(quote);
 	}
@@ -178,28 +195,6 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		WaebricToken symbol = new WaebricToken(data, WaebricTokenSort.SYMBOLCON, lineno, charno);
 		tokens.add(symbol);
 	}
-	
-//	private void tokenizeText(List<ScannerException> exceptions) throws IOException {
-//		String lexeme = tokenizer.getStringValue();
-//		
-//		if(isString(lexeme)) {
-//			// String: one valid word
-//			Token string = new Token(lexeme, TokenSort.STRCON, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
-//			tokens.add(string);
-//		} else if(isText(lexeme)) {
-//			// Text: sequence of valid words
-//			Token text = new Token(lexeme, TokenSort.TEXT, tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber());
-//			tokens.add(text);
-//		} else {
-//			// No valid text or string, delegate tokenization to next level
-//			WaebricScanner scanner = new WaebricScanner(new StringReader(lexeme));
-//			List<ScannerException> e = scanner.tokenizeStream();
-//			exceptions.addAll(e);
-//			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getTokenLineNumber(), tokenizer.getTokenLineNumber()));
-//			tokens.addAll(scanner.getTokens());
-//			tokens.add(new Token(WaebricSymbol.DQUOTE, TokenSort.SYMBOLCHAR, tokenizer.getLineNumber(), tokenizer.getCharacterNumber()));
-//		}
-//	}
 
 	/**
 	 * Retrieve token
