@@ -46,9 +46,9 @@ public class TestStatementParser {
 		
 		Formals formals = parser.parseFormals();
 		assertEquals(0, exceptions.size());
-		assertEquals(2, formals.getVarCount());
-		assertEquals("var1", formals.getVar(0).getIdentifier().getLiteral().toString());
-		assertEquals("var2", formals.getVar(1).getIdentifier().getLiteral().toString());
+		assertEquals(2, formals.size());
+		assertEquals("var1", formals.get(0).getIdentifier().getLiteral().toString());
+		assertEquals("var2", formals.get(1).getIdentifier().getLiteral().toString());
 	}
 	
 	@Test
@@ -70,9 +70,9 @@ public class TestStatementParser {
 		Assignment.IdConAssignment assignment = parser.parseIdConAssignment();
 		assertEquals(0, exceptions.size());
 		assertEquals("identifier1", assignment.getIdentifier().getLiteral().toString());
-		assertEquals(2, assignment.getFormals().getVarCount());
-		assertEquals("var1", assignment.getFormals().getVar(0).getIdentifier().getLiteral().toString());
-		assertEquals("var2", assignment.getFormals().getVar(1).getIdentifier().getLiteral().toString());
+		assertEquals(2, assignment.getFormals().size());
+		assertEquals("var1", assignment.getFormals().get(0).getIdentifier().getLiteral().toString());
+		assertEquals("var2", assignment.getFormals().get(1).getIdentifier().getLiteral().toString());
 		assertEquals(Statement.YieldStatement.class, assignment.getStatement().getClass());
 	}
 	

@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.statements;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -13,12 +14,12 @@ import org.cwi.waebric.parser.ast.expressions.Var;
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
-public abstract class Assignment implements ISyntaxNode {
+public abstract class Assignment extends AbstractSyntaxNode {
 
 	/**
 	 * IdCon Formals "=" Statement -> Assignment
-	 * @author schagen
-	 *
+	 * @author Jeroen van Schagen
+	 * @date 26-05-2009
 	 */
 	public static class IdConAssignment extends Assignment {
 	
@@ -63,8 +64,8 @@ public abstract class Assignment implements ISyntaxNode {
 	
 	/**
 	 * Var "=" Expression -> Assignment
-	 * @author schagen
-	 *
+	 * @author Jeroen van Schagen
+	 * @date 26-05-2009
 	 */
 	public static class VarAssignment extends Assignment {
 		

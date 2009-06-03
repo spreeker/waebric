@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast.expressions;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.ISyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -8,7 +9,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author schagen
  *
  */
-public class Var implements ISyntaxNode {
+public class Var extends AbstractSyntaxNode {
 
 	private IdCon identifier;
 
@@ -20,16 +21,6 @@ public class Var implements ISyntaxNode {
 		this.identifier = identifier;
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		return identifier.equals(obj);
-	}
-	
-	@Override
-	public String toString() {
-		return identifier.toString();
-	}
-
 	public ISyntaxNode[] getChildren() {
 		return new ISyntaxNode[] { identifier };
 	}

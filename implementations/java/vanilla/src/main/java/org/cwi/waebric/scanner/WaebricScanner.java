@@ -96,7 +96,8 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		}
 		
 		if(isKeyword(word)) {
-			WaebricToken keyword = new WaebricToken(word, WaebricTokenSort.KEYWORD, lineno, charno);
+			WaebricKeyword type = WaebricKeyword.valueOf(word.toUpperCase());
+			WaebricToken keyword = new WaebricToken(type, WaebricTokenSort.KEYWORD, lineno, charno);
 			tokens.add(keyword);
 		} else {
 			WaebricToken identifier = new WaebricToken(word, WaebricTokenSort.IDCON, lineno, charno);

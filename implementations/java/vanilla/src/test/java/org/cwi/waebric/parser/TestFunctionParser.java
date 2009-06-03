@@ -42,7 +42,7 @@ public class TestFunctionParser {
 		
 		FunctionDef def = parser.parseFunctionDef();
 		assertTrue(exceptions.size() == 0);
-		assertEquals(2, def.getFormals().getVarCount());
+		assertEquals(2, def.getFormals().size());
 		assertEquals(1, def.getStatementCount());
 		assertEquals(Statement.CommentStatement.class, def.getStatement(0).getClass());
 	}

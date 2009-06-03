@@ -43,5 +43,10 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 		collection.remove(curr);
 		curr--;
 	}
+	
+	@Override
+	public String toString() {
+		return "Position: " + curr + ", Collection: " + collection.toString();
+	}
 
 }

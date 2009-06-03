@@ -380,7 +380,7 @@ class StatementParser extends AbstractParser {
 		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();
 		
 		// Parse identifier
-		if(next("assignment identifier", "identifier \"(\")", WaebricTokenSort.IDCON)) {
+		if(next("assignment identifier", "identifier", WaebricTokenSort.IDCON)) {
 			IdCon identifier = new IdCon(current.getLexeme().toString());
 			assignment.setIdentifier(identifier);
 		}
@@ -415,7 +415,7 @@ class StatementParser extends AbstractParser {
 			
 			// Parse variable
 			Var var = parseVar("formals variable", "\"( var \")\"");
-			formals.addVar(var);
+			formals.add(var);
 			
 			// While not end of formals, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {

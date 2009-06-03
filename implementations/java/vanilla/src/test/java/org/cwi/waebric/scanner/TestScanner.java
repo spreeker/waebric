@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -80,6 +81,7 @@ public class TestScanner {
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(WaebricTokenSort.KEYWORD));
+			assertTrue(current.getLexeme() instanceof WaebricKeyword);
 		}
 	}
 	

@@ -8,35 +8,22 @@ import org.cwi.waebric.parser.ast.expressions.Var;
 
 /**
  * "(" { Var "," }* ")" -> Formals
- * @author schagen
- *
+ * @author Jeroen van Schagen
+ * @date 26-05-2009
  */
-public class Formals implements ISyntaxNode {
-	
-	private SyntaxNodeListWithSeparator<Var> vars;
+public class Formals extends SyntaxNodeListWithSeparator<Var> {
 	
 	public Formals() {
-		vars = new SyntaxNodeListWithSeparator<Var>(WaebricSymbol.COMMA);
-	}
-	
-	public int getVarCount() {
-		return vars.size();
-	}
-	
-	public Var getVar(int index) {
-		return vars.get(index);
-	}
-	
-	public boolean addVar(Var var) {
-		return vars.add(var);
+		super(WaebricSymbol.COMMA);
 	}
 
 	public ISyntaxNode[] getChildren() {
-		return new ISyntaxNode[] {
-			new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
-			vars,
-			new CharacterLiteral(WaebricSymbol.RPARANTHESIS)
-		};
+		ISyntaxNode[] children = super.getChildren();
+		ISyntaxNode[] elements = new ISyntaxNode[children.length + 2];
+		elements[0] = new CharacterLiteral(WaebricSymbol.LPARANTHESIS);
+		System.arraycopy(children, 0, elements, 1, children.length);
+		elements[elements.length - 1] = new CharacterLiteral(WaebricSymbol.RPARANTHESIS);
+		return elements;
 	}
 
 }
