@@ -43,8 +43,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		ModuleId moduleId = new ModuleId();
-		parser.parse(moduleId);
+		ModuleId moduleId = parser.parseModuleId();
 		
 		// Assertions
 		assertEquals(0, exceptions.size());
@@ -60,8 +59,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("module mymodule1\nmodule mymodule2");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		Modules modules = new Modules();
-		parser.parse(modules);
+		Modules modules = parser.parseModules();
 		
 		// Assertions
 		assertEquals(0, exceptions.size());
@@ -77,8 +75,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule\nimport newmodule\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		Module module = new Module();
-		parser.parse(module);
+		Module module = parser.parseModule();
 		
 		// Assertions
 		assertEquals(0, exceptions.size());
@@ -95,8 +92,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		Import imprt = new Import();
-		parser.parse(imprt); // Fill import object
+		Import imprt = parser.parseImport();
 		
 		// Assertions
 		assertEquals(0, exceptions.size());

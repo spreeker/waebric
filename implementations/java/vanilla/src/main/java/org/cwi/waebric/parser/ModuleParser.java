@@ -41,28 +41,31 @@ class ModuleParser extends AbstractParser {
 	 * 
 	 * @param modules
 	 */
-	public void parse(Modules modules) {
+	public Modules parseModules() {
+		Modules modules = new Modules();
+		
 		while(tokens.hasNext()) {
 			current = tokens.next();
 			if(current.getLexeme().equals(WaebricKeyword.MODULE)) {
-				Module module = new Module();
-				parse(module);
+				Module module = parseModule();
 				modules.add(module);
 			} else {
 				exceptions.add(new UnexpectedTokenException(current, "module", "module identifier"));
 			}
 		}
+		
+		return modules;
 	}
 	
 	/**
 	 * 
 	 * @param module
 	 */
-	public void parse(Module module) {
+	public Module parseModule() {
+		Module module = new Module();
+		
 		// Module identifier
-		ModuleId identifier = new ModuleId();
-		parse(identifier);
-		module.setIdentifier(identifier);
+		module.setIdentifier(parseModuleId());
 		
 		// Module elements
 		while(tokens.hasNext()) {
@@ -73,8 +76,7 @@ class ModuleParser extends AbstractParser {
 			// Delegate to element visitors
 			current = tokens.next();
 			if(current.getLexeme() == WaebricKeyword.IMPORT) {
-				Import imprt = new Import();
-				parse(imprt);
+				Import imprt = parseImport();
 				module.addElement(imprt);
 			} else if(current.getLexeme() == WaebricKeyword.SITE) {
 				Site site = parseSite();
@@ -86,14 +88,18 @@ class ModuleParser extends AbstractParser {
 				exceptions.add(new UnexpectedTokenException(
 						current, "module keyword", "\"import\", \"site\" or \"def\""));
 			}
-		}	
+		}
+		
+		return module;
 	}
 	
 	/**
 	 * 
 	 * @param moduleId
 	 */
-	public void parse(ModuleId moduleId) {
+	public ModuleId parseModuleId() {
+		ModuleId moduleId = new ModuleId();
+		
 		while(tokens.hasNext()) {
 			// Parse identifier
 			if(next("module identifier", "identifier", WaebricTokenSort.IDCON)) {
@@ -107,16 +113,18 @@ class ModuleParser extends AbstractParser {
 				break; // No period detected, end of identifier
 			}
 		}
+		
+		return moduleId;
 	}
 	
 	/**
 	 * 
 	 * @param imprt
 	 */
-	public void parse(Import imprt) {
-		ModuleId identifier = new ModuleId();
-		parse(identifier);
-		imprt.setIdentifier(identifier);
+	public Import parseImport() {
+		Import imprt = new Import();
+		imprt.setIdentifier(parseModuleId());
+		return imprt;
 	}
 	
 	/**

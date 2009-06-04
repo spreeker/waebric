@@ -23,10 +23,18 @@ public class WaebricParser extends AbstractParser {
 	private final ModuleParser moduleParser;
 	private AbstractSyntaxTree tree;
 
+	/**
+	 * 
+	 * @param scanner
+	 */
 	public WaebricParser(WaebricScanner scanner) {
 		this(scanner.iterator());
 	}
 	
+	/**
+	 * 
+	 * @param iterator
+	 */
 	public WaebricParser(WaebricTokenIterator iterator) {
 		super(iterator, new ArrayList<ParserException>());
 		
@@ -34,16 +42,25 @@ public class WaebricParser extends AbstractParser {
 		moduleParser = new ModuleParser(tokens, exceptions);
 	}
 	
+	/**
+	 * Parse token stream in abstract syntax tree.
+	 * 
+	 * @return Exceptions
+	 */
 	public List<ParserException> parseTokens() {
 		exceptions.clear();
 		
-		Modules modules = new Modules(); // Construct root node
+		Modules modules = moduleParser.parseModules(); // Construct root node
 		tree = new AbstractSyntaxTree(modules); // Construct AST
-		moduleParser.parse(modules); // Start parsing
 		
 		return exceptions;
 	}
 	
+	/**
+	 * Retrieve abstract syntax tree (AST).
+	 * 
+	 * @return
+	 */
 	public AbstractSyntaxTree getAbstractSyntaxTree() {
 		return tree;
 	}
