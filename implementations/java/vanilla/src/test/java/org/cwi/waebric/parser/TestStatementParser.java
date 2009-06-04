@@ -6,11 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.embedding.Embed;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Expression.NatExpression;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
+import org.cwi.waebric.parser.ast.statements.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.ast.statements.Statement.IfElseStatement;
 import org.cwi.waebric.parser.exception.ParserException;
@@ -172,6 +175,64 @@ public class TestStatementParser {
 		
 		parser.parseYieldStatement();
 		assertEquals(0, exceptions.size());
+	}
+	
+	@Test
+	public void testMarkupStatement() {
+		iterator = TestScanner.quickScan("func1;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		Statement.MarkupStatement statement = (Statement.MarkupStatement) parser.parseStatement("", "");
+		assertEquals(0, exceptions.size());
+		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
+	}
+	
+	@Test
+	public void testExpressionMarkupsStatement() {
+		iterator = TestScanner.quickScan("func1 123;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		MarkupsStatement.ExpressionMarkupsStatement statement = (
+				MarkupsStatement.ExpressionMarkupsStatement) parser.parseStatement("", "");
+		assertEquals(0, exceptions.size());
+		assertEquals(1, statement.getMarkupCount());
+		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
+	}
+	
+	@Test
+	public void testEmbeddingMarkupsStatement() {
+		iterator = TestScanner.quickScan("func1 \"<123>\";");
+		parser = new StatementParser(iterator, exceptions);
+		
+		MarkupsStatement.EmbeddingMarkupsStatement statement = (
+				MarkupsStatement.EmbeddingMarkupsStatement) parser.parseStatement("", "");
+		assertEquals(0, exceptions.size());
+		assertEquals(1, statement.getMarkupCount());
+		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
+	}
+	
+	@Test
+	public void testStatementMarkupsStatement() {
+		iterator = TestScanner.quickScan("func1 yield;;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		MarkupsStatement.StatementMarkupsStatement statement = (
+				MarkupsStatement.StatementMarkupsStatement) parser.parseStatement("", "");
+		assertEquals(0, exceptions.size());
+		assertEquals(1, statement.getMarkupCount());
+		assertEquals(Statement.YieldStatement.class, statement.getStatement().getClass());
+	}
+	
+	@Test
+	public void testMarkupMarkupsStatement() {
+		iterator = TestScanner.quickScan("func1 func1;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		MarkupsStatement.MarkupMarkupsStatement statement = (
+				MarkupsStatement.MarkupMarkupsStatement) parser.parseStatement("", "");
+		assertEquals(0, exceptions.size());
+		assertEquals(1, statement.getMarkupCount());
+		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
 	}
 
 }

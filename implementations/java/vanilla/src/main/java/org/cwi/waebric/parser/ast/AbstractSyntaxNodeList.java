@@ -77,18 +77,15 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	@Override
 	public String toString() {
-		String name = this.getClass().getSimpleName();
+		String name = "[";
 		
-		// Attach children data
-		name += "[";
 		AbstractSyntaxNode[] children = this.getChildren();
 		for(int i = 0; i < children.length; i++) {
 			if(i != 0) { name += ","; }
 			name += children[i].toString();
 		}
-		name += "]";
-		
-		return name;
+
+		return name + "]";
 	}
 	
 	/**

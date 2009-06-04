@@ -441,7 +441,6 @@ class StatementParser extends AbstractParser {
 			markups.add(markup);
 			while(isMarkup()) {
 				markups.add(parseMarkup());
-				tokens.next();
 			}
 			
 			if(tokens.hasNext()) {
@@ -458,10 +457,10 @@ class StatementParser extends AbstractParser {
 					return parseEmbeddingMarkupsStatement(markups);
 				} else {
 					// Only remaining alternatives are expressions or statements
-					if(isExpression()) {
-						return parseExpressionMarkupsStatement(markups);
-					} else if(isStatement()) {
+					if(isStatement()) {
 						return parseStatementMarkupsStatement(markups);
+					} else if(isExpression()) {
+						return parseExpressionMarkupsStatement(markups);
 					} else {
 						reportUnexpectedToken(peek, "Markups statement", 
 								"Markup+ { Markup, Expression, Embedding or Statement }");
@@ -534,13 +533,17 @@ class StatementParser extends AbstractParser {
 		List<ParserException> e = new java.util.ArrayList<ParserException>();
 		WaebricTokenIterator i = tokens.clone();
 		ExpressionParser p = new ExpressionParser(i, e);
-		p.parseExpression("","");
-		
-		if(e.size() == 0) { // Cannot have parse exceptions
-			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
+		try {
+			p.parseExpression("","");
+			
+			if(e.size() == 0) { // Cannot have parse exceptions
+				return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
+			}
+			
+			return false;
+		} catch(Exception ex) {
+			return false;
 		}
-		
-		return false;
 	}
 	
 	private boolean isMarkup() {
