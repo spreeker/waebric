@@ -50,14 +50,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
+    <Compile Include="Ast\Basic\IdentifierCon.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\Module\Import.cs" />
     <Compile Include="Ast\Module\Module.cs" />
     <Compile Include="Ast\Module\ModuleElement.cs" />
     <Compile Include="Ast\Module\ModuleElementList.cs" />
     <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
+    <Compile Include="SiteParser.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
+    <Compile Include="FunctionParser.cs" />
     <Compile Include="ModuleParser.cs" />
     <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
