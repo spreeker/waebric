@@ -441,7 +441,25 @@ class StatementParser extends AbstractParser {
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
 			
-			// TODO: Work with actual formals
+			/**
+			 * PSEUDO IMPLEMENTATION
+			 * 
+			 * Parse: Markup+
+			 * while(current token is identifier and not var, and thus a markup)
+			 * 	identifier is var when it is contained in formals of related functiondef
+			 * add parse markup
+			 * 
+			 * Determine if next token is Statement, Expression, Embedding or Markup
+			 * if next is ; then previous token is markup
+			 * 	store markup and reduce markup list by 1
+			 * if next is quote and embedding "*\w<\w*>\w*"
+			 * 	parse embedding and store
+			 * check if statement parser can process token stream, then its statement
+			 * else check if expression parser can process etc..
+			 * else report unexpected token
+			 * 	
+			 */
+			
 			while(isMarkup(tokens.current(), new Formals())) {
 				markups.add(parseMarkup());
 			}
