@@ -14,6 +14,7 @@ import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
+import org.cwi.waebric.parser.ast.statements.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statements.Statement;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.WaebricScanner;
@@ -100,37 +101,6 @@ class StatementParser extends AbstractParser {
 		}
 		
 		return null;
-	}
-	
-	public Statement parseMarkupStatements() {
-		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
-		do {
-			markups.add(parseMarkup());
-			tokens.next();
-		} while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.SEMICOLON));
-		
-		if(markups.size() == 1) {
-			Statement.MarkupStatement statement = new Statement.MarkupStatement();
-			statement.setMarkup(markups.get(0));
-			
-			if(! tokens.current().getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				reportUnexpectedToken(tokens.current(), "Markup statement closure", "Markup \";\"");
-				return null;
-			}
-			
-			return statement;
-		} else {
-			WaebricToken peek = tokens.peek(1); // Determine mark-ups statement type
-			if(peek.getSort() == WaebricTokenSort.QUOTE) {
-				// Embedding
-			} else if(peek.getSort() == WaebricTokenSort.IDCON) {
-				// Statement or mark-up , depends if mark-up is followed by ;
-			} else if(peek.getSort() == WaebricTokenSort.KEYWORD) {
-				// Statement
-			}
-			
-			return null;
-		}
 	}
 	
 	/**
@@ -452,6 +422,138 @@ class StatementParser extends AbstractParser {
 		next("formals opening parenthesis", "left parenthesis", WaebricSymbol.RPARANTHESIS);
 		
 		return formals;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Statement parseMarkupStatements() {
+		Markup markup = parseMarkup(); // Retrieve mark-up
+		
+		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+			Statement.MarkupStatement statement = new Statement.MarkupStatement();
+			statement.setMarkup(markup);
+			return statement;
+		} else {
+			// Retrieve remaining mark-up tokens
+			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+			markups.add(markup);
+			while(isMarkup()) {
+				markups.add(parseMarkup());
+				tokens.next();
+			}
+			
+			if(tokens.hasNext()) {
+				WaebricToken peek = tokens.peek(1); // Determine mark-ups statement type
+				if(peek.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+					Markup end = markups.remove(markups.size()-1);
+					MarkupsStatement.MarkupMarkupsStatement statement = 
+						new MarkupsStatement.MarkupMarkupsStatement(markups);
+					statement.setMarkup(end);
+					return statement;
+				} else if(peek.getSort() == WaebricTokenSort.IDCON) {
+					return parseStatementMarkupsStatement(markups);
+				} else if(peek.getSort() == WaebricTokenSort.QUOTE) {
+					return parseEmbeddingMarkupsStatement(markups);
+				} else {
+					// Only remaining alternatives are expressions or statements
+					if(isExpression()) {
+						return parseExpressionMarkupsStatement(markups);
+					} else if(isStatement()) {
+						return parseStatementMarkupsStatement(markups);
+					} else {
+						reportUnexpectedToken(peek, "Markups statement", 
+								"Markup+ { Markup, Expression, Embedding or Statement }");
+					}
+				}
+			} else {
+				reportMissingToken("Markups statement", "Markup+ { Markup, Expression, Embedding or Statement }");
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param markups
+	 * @return
+	 */
+	private MarkupsStatement.EmbeddingMarkupsStatement parseEmbeddingMarkupsStatement(
+			AbstractSyntaxNodeList<Markup> markups) {
+		MarkupsStatement.EmbeddingMarkupsStatement statement = 
+			new MarkupsStatement.EmbeddingMarkupsStatement(markups);
+		statement.setEmbedding(parseEmbedding());
+		next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
+		return statement;
+	}
+	
+	/**
+	 * 
+	 * @param markups
+	 * @return
+	 */
+	private MarkupsStatement.StatementMarkupsStatement parseStatementMarkupsStatement(
+			AbstractSyntaxNodeList<Markup> markups) {
+		MarkupsStatement.StatementMarkupsStatement statement = 
+			new MarkupsStatement.StatementMarkupsStatement(markups);
+		statement.setStatement(parseStatement("Markup statement", "Markup+ Statement \";\""));
+		next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
+		return statement;
+	}
+
+	private boolean isStatement() {
+		List<ParserException> e = new java.util.ArrayList<ParserException>();
+		WaebricTokenIterator i = tokens.clone();
+		StatementParser p = new StatementParser(i, e);
+		p.parseStatement("","");
+		
+		if(e.size() == 0) { // Cannot have parse exceptions
+			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param markups
+	 * @return
+	 */
+	private MarkupsStatement.ExpressionMarkupsStatement parseExpressionMarkupsStatement(
+			AbstractSyntaxNodeList<Markup> markups) {
+		MarkupsStatement.ExpressionMarkupsStatement statement =
+			new MarkupsStatement.ExpressionMarkupsStatement(markups);
+		statement.setExpression(parseExpression("Markup statement", "Markup+ Expression \";\""));
+		next("Markup statement closure ;", "Markup+ Expression \";\"", WaebricSymbol.SEMICOLON);
+		return statement;
+	}
+	
+	private boolean isExpression() {
+		List<ParserException> e = new java.util.ArrayList<ParserException>();
+		WaebricTokenIterator i = tokens.clone();
+		ExpressionParser p = new ExpressionParser(i, e);
+		p.parseExpression("","");
+		
+		if(e.size() == 0) { // Cannot have parse exceptions
+			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
+		}
+		
+		return false;
+	}
+	
+	private boolean isMarkup() {
+		List<ParserException> e = new java.util.ArrayList<ParserException>();
+		WaebricTokenIterator i = tokens.clone();
+		MarkupParser p = new MarkupParser(i, e);
+		p.parseMarkup();
+		
+		if(e.size() == 0) { // Cannot have parse exceptions
+			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
+		}
+		
+		return false;
 	}
 
 	// Parse delegations

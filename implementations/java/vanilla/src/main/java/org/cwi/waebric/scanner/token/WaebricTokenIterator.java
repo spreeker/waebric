@@ -43,7 +43,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 * @return Clone
 	 */
 	public WaebricTokenIterator clone() {
-		return new WaebricTokenIterator(new java.util.ArrayList<WaebricToken>(collection));
+		return new WaebricTokenIterator(new java.util.ArrayList<WaebricToken>(collection), curr);
 	}
 	
 	/**
