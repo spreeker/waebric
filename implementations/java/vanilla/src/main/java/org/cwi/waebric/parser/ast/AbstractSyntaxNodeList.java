@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Generic syntax node list implementation for syntax nodes that
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode {
+public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements Iterable<E> {
 
 	protected ArrayList<E> list = new ArrayList<E>();
 	
@@ -74,6 +75,11 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	 */
 	public AbstractSyntaxNode[] getChildren() {
 		return getElements();
+	}
+	
+	@Override
+	public Iterator<E> iterator() {
+		return list.iterator();
 	}
 	
 	@Override

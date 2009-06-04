@@ -441,7 +441,9 @@ class StatementParser extends AbstractParser {
 			// Retrieve remaining mark-up tokens
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
-			while(isMarkup()) {
+			
+			// TODO: Work with actual formals
+			while(isMarkup(tokens.current(), new Formals())) {
 				markups.add(parseMarkup());
 			}
 			
@@ -509,12 +511,7 @@ class StatementParser extends AbstractParser {
 		WaebricTokenIterator i = tokens.clone();
 		StatementParser p = new StatementParser(i, e);
 		p.parseStatement("","");
-		
-		if(e.size() == 0) { // Cannot have parse exceptions
-			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
-		}
-		
-		return false;
+		return e.size() == 0;
 	}
 	
 	/**
@@ -535,30 +532,27 @@ class StatementParser extends AbstractParser {
 		List<ParserException> e = new java.util.ArrayList<ParserException>();
 		WaebricTokenIterator i = tokens.clone();
 		ExpressionParser p = new ExpressionParser(i, e);
-		try {
-			p.parseExpression("","");
-			
-			if(e.size() == 0) { // Cannot have parse exceptions
-				return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
-			}
-			
-			return false;
-		} catch(Exception ex) {
-			return false;
-		}
+		p.parseExpression("","");
+		return e.size() == 0;
 	}
 	
-	private boolean isMarkup() {
+	private boolean isVar(WaebricToken token, Formals formals) {
+		for(Var var: formals) {
+			String name = var.getIdentifier().getLiteral().toString();
+			if(token.getLexeme().equals(name)) { return true; }
+		}
+		
+		return false;
+	}
+	
+	private boolean isMarkup(WaebricToken token, Formals formals) {
+		if(isVar(token, formals)) { return false; } 
+		
 		List<ParserException> e = new java.util.ArrayList<ParserException>();
 		WaebricTokenIterator i = tokens.clone();
 		MarkupParser p = new MarkupParser(i, e);
 		p.parseMarkup();
-		
-		if(e.size() == 0) { // Cannot have parse exceptions
-			return i.hasNext() && i.next().getLexeme().equals(WaebricSymbol.SEMICOLON);
-		}
-		
-		return false;
+		return e.size() == 0;
 	}
 
 	// Parse delegations
