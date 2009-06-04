@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
@@ -12,11 +12,11 @@ import org.junit.Test;
 
 public class TestSyntaxNodeListWithSeparator {
 
-	private SyntaxNodeListWithSeparator<Mapping> mappings;
+	private AbstractSeparatedSyntaxNodeList<Mapping> mappings;
 	
 	@Before
 	public void setUp() {
-		mappings = new SyntaxNodeListWithSeparator<Mapping>(';');
+		mappings = new AbstractSeparatedSyntaxNodeList<Mapping>(';');
 		mappings.add(new Mapping());
 		mappings.add(new Mapping());
 	}

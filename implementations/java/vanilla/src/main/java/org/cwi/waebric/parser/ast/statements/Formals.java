@@ -3,7 +3,7 @@ package org.cwi.waebric.parser.ast.statements;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.expressions.Var;
 
 /**
@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.expressions.Var;
  * @author Jeroen van Schagen
  * @date 26-05-2009
  */
-public class Formals extends SyntaxNodeListWithSeparator<Var> {
+public class Formals extends AbstractSeparatedSyntaxNodeList<Var> {
 	
 	public Formals() {
 		super(WaebricSymbol.COMMA);

@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 import org.cwi.waebric.parser.ast.statements.Assignment;
 import org.cwi.waebric.parser.ast.statements.Formals;
@@ -32,6 +34,7 @@ class StatementParser extends AbstractParser {
 	private final EmbeddingParser embeddingParser;
 	private final ExpressionParser expressionParser;
 	private final PredicateParser predicateParser;
+	private final MarkupParser markupPaser;
 	
 	public StatementParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
@@ -40,6 +43,7 @@ class StatementParser extends AbstractParser {
 		expressionParser = new ExpressionParser(tokens, exceptions);
 		predicateParser = new PredicateParser(tokens, exceptions);
 		embeddingParser = new EmbeddingParser(tokens, exceptions);
+		markupPaser = new MarkupParser(tokens, exceptions);
 	}
 	
 	/**
@@ -86,14 +90,47 @@ class StatementParser extends AbstractParser {
 		} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
 			// Yield statements start with a yield keyword
 			return parseYieldStatement();
+		} else if(peek.getSort().equals(WaebricTokenSort.IDCON)) {
+			return parseMarkupStatements();
 		} else {
 			// Token stream cannot be seen as statement
 			reportUnexpectedToken(peek, "statement", 
 					"\"if\", \"each\", \"let\", \"{\", \"comment\", " +
-					"\"echo\", \"cdata\" or \"yield\"");
+					"\"echo\", \"cdata\", \"yield\" or Markup");
 		}
 		
 		return null;
+	}
+	
+	public Statement parseMarkupStatements() {
+		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+		do {
+			markups.add(parseMarkup());
+			tokens.next();
+		} while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.SEMICOLON));
+		
+		if(markups.size() == 1) {
+			Statement.MarkupStatement statement = new Statement.MarkupStatement();
+			statement.setMarkup(markups.get(0));
+			
+			if(! tokens.current().getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+				reportUnexpectedToken(tokens.current(), "Markup statement closure", "Markup \";\"");
+				return null;
+			}
+			
+			return statement;
+		} else {
+			WaebricToken peek = tokens.peek(1); // Determine mark-ups statement type
+			if(peek.getSort() == WaebricTokenSort.QUOTE) {
+				// Embedding
+			} else if(peek.getSort() == WaebricTokenSort.IDCON) {
+				// Statement or mark-up , depends if mark-up is followed by ;
+			} else if(peek.getSort() == WaebricTokenSort.KEYWORD) {
+				// Statement
+			}
+			
+			return null;
+		}
 	}
 	
 	/**
@@ -141,30 +178,20 @@ class StatementParser extends AbstractParser {
 	public Statement.EachStatement parseEachStatement() {
 		Statement.EachStatement statement = new Statement.EachStatement();
 		
-		if(! next("each keyword", "\"each\"", WaebricKeyword.EACH)) {
-			return null; // Invalid syntax
-		}
+		next("each keyword", "\"each\"", WaebricKeyword.EACH);
+		next("each left parenthesis", "\"each\" \"(\" var", WaebricSymbol.LPARANTHESIS);
 		
-		if(! next("each left parenthesis", "\"each\" \"(\" var", WaebricSymbol.LPARANTHESIS)) {
-			return null; // Invalid syntax
-		}
+		// Parse variables
+		statement.setVar(parseVar("each var", "\"(\" var \":\""));
 		
-		Var var = parseVar("each var", "\"(\" var \":\"");
-		statement.setVar(var);
-		
-		if(! next("each colon separator", "var \":\" expression", WaebricSymbol.COLON)) {
-			return null; // Invalid syntax
-		}
+		next("each colon separator", "var \":\" expression", WaebricSymbol.COLON);
 		
 		// Parse expression
-		Expression expression = parseExpression("each expression", "\":\" expression \")\"");
-		statement.setExpression(expression);
+		statement.setExpression(parseExpression("each expression", "\":\" expression \")\""));
 		
-		if(! next("each right parenthesis", "expression \")\" statement", WaebricSymbol.RPARANTHESIS)) {
-			return null; // Invalid syntax
-		}
+		next("each right parenthesis", "expression \")\" statement", WaebricSymbol.RPARANTHESIS);
 		
-		// Parse sub-statement
+		// Parse (sub) statement
 		Statement subStatement = parseStatement("each statement", "\") statement");
 		statement.setStatement(subStatement);
 		
@@ -407,14 +434,13 @@ class StatementParser extends AbstractParser {
 		// Expect left parenthesis
 		next("formals opening parenthesis", "left parenthesis", WaebricSymbol.LPARANTHESIS);
 		
+		// Parse variables
 		while(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				break; // End of formals found, break while
 			}
 			
-			// Parse variable
-			Var var = parseVar("formals variable", "\"( var \")\"");
-			formals.add(var);
+			formals.add(parseVar("formals variable", "\"( var \")\""));
 			
 			// While not end of formals, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
@@ -428,45 +454,25 @@ class StatementParser extends AbstractParser {
 		return formals;
 	}
 
-	/**
-	 * @see Expression
-	 * @see ExpressionParser
-	 * 
-	 * @param name
-	 * @param syntax
-	 * @return
-	 */
+	// Parse delegations
 	public Expression parseExpression(String name, String syntax) {
-		// Delegate parse to expression parser
 		return expressionParser.parseExpression(name, syntax);
 	}
 	
-	/**
-	 * @see Var
-	 * @see ExpressionParser
-	 * 
-	 * @param name
-	 * @param syntax
-	 * @return
-	 */
 	public Var parseVar(String name, String syntax) {
-		// Delegate parse to expression parser
 		return expressionParser.parseVar(name, syntax);
 	}
-	
-	/**
-	 * @see Predicate
-	 * @see PredicateParser
-	 * @return
-	 */
+
 	public Predicate parsePredicate() {
-		// No error reporting arguments needed, as predicates are only used in if-statements
 		return predicateParser.parsePredicate();
 	}
 	
 	private Embedding parseEmbedding() {
-		// Delegate parse to embedding parser
 		return embeddingParser.parseEmbedding();
+	}
+	
+	private Markup parseMarkup() {
+		return markupPaser.parseMarkup();
 	}
 
 }

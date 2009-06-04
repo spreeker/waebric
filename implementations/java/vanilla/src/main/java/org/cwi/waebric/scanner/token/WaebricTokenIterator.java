@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Token iterator which allows k lookahead, besides regular iterator
- * functionality.
+ * Token iterator which allows the iteration over tokens. Also allows
+ * k look-ahead functionality, which is useful for language parsing.
  * 
  * @author Jeroen van Schagen
  * @date 19-05-2009
@@ -13,19 +13,43 @@ import java.util.List;
 public class WaebricTokenIterator implements Iterator<WaebricToken> {
 
 	private List<WaebricToken> collection;
-	private int curr = -1;
+	private int curr;
 	
 	/**
-	 * Construct iterator based
+	 * Construct token iterator based on token collection. Current
+	 * position will by default be set on -1.
 	 * 
 	 * @param collection
 	 */
 	public WaebricTokenIterator(List<WaebricToken> collection) {
+		this(collection, -1);
+	}
+	
+	/**
+	 * Construct token iterator based on a token collection and current position.
+	 * 
+	 * @param collection
+	 * @param curr
+	 */
+	public WaebricTokenIterator(List<WaebricToken> collection, int curr) {
 		this.collection = collection;
+		this.curr = curr;
+	}
+	
+	/**
+	 * Clone iterator by copying the collection and current position. When 
+	 * using the cloned iterator, no changes will be made to the original iterator.
+	 * 
+	 * @return Clone
+	 */
+	public WaebricTokenIterator clone() {
+		return new WaebricTokenIterator(new java.util.ArrayList<WaebricToken>(collection));
 	}
 	
 	/**
 	 * Determine if iterator has next element
+	 * 
+	 * @return Boolean
 	 */
 	public boolean hasNext() {
 		return hasNext(1);
@@ -35,16 +59,16 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 * Determine if iterator has k next element(s)
 	 * 
 	 * @param k Lookahead
-	 * @return
+	 * @return Boolean
 	 */
 	public boolean hasNext(int k) {
 		return curr+k >= 0 && curr+k < collection.size();
 	}
 
 	/**
-	 * Retrieve next token by incrementing current position.
+	 * Retrieve next token and increment current position.
 	 * 
-	 * @return Next token
+	 * @return Token at current+1
 	 */
 	public WaebricToken next() {
 		curr++; // Increment current position
@@ -52,11 +76,10 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 	
 	/**
-	 * Retrieve token which is positioned current+k, no alterations
-	 * are made to the current position of iterator.
+	 * Retrieve token which is positioned current+k.
 	 * 
 	 * @param k Lookahead
-	 * @return Token at curr+k
+	 * @return Token at current+k
 	 */
 	public WaebricToken peek(int k) {
 		if(! hasNext(k)) { return null; }
@@ -64,8 +87,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 	
 	/**
-	 * Retrieve current token, executing this function does not alter
-	 * the current position.
+	 * Retrieve current token.
 	 * 
 	 * @return Current token
 	 */
@@ -74,7 +96,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 
 	/**
-	 * Remove current token and decrement current position.
+	 * Remove current token from iterator.
 	 */
 	public void remove() {
 		collection.remove(curr);
@@ -82,7 +104,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 	
 	/**
-	 * Store additional token behind current position.
+	 * Store additional token behind current token.
 	 * 
 	 * @param token Token
 	 */
@@ -91,7 +113,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 	
 	/**
-	 * Store collection of additional tokens behind current position.
+	 * Store collection of tokens behind current token.
 	 * 
 	 * @param tokens Collection of tokens
 	 */

@@ -101,14 +101,14 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
-	public static class SyntaxNodeListWithSeparator<E extends AbstractSyntaxNode> extends AbstractSyntaxNodeList<E> {
+	public static class AbstractSeparatedSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNodeList<E> {
 		
 		/**
 		 * Separation character
 		 */
 		private final char separator;
 		
-		public SyntaxNodeListWithSeparator(char separator) {
+		public AbstractSeparatedSyntaxNodeList(char separator) {
 			this.separator = separator;
 		}
 

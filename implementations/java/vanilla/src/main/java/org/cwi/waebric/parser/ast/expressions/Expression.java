@@ -3,7 +3,7 @@ package org.cwi.waebric.parser.ast.expressions;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.SyntaxNodeListWithSeparator;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
@@ -145,10 +145,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class ListExpression extends Expression {
 
-		private SyntaxNodeListWithSeparator<Expression> expressions;
+		private AbstractSeparatedSyntaxNodeList<Expression> expressions;
 		
 		public ListExpression() {
-			expressions = new SyntaxNodeListWithSeparator<Expression>(WaebricSymbol.COMMA);
+			expressions = new AbstractSeparatedSyntaxNodeList<Expression>(WaebricSymbol.COMMA);
 		}
 		
 		public boolean addExpression(Expression expression) {
@@ -176,10 +176,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class RecordExpression extends Expression {
 
-		private SyntaxNodeListWithSeparator<KeyValuePair> pairs;
+		private AbstractSeparatedSyntaxNodeList<KeyValuePair> pairs;
 		
 		public RecordExpression() {
-			pairs = new SyntaxNodeListWithSeparator<KeyValuePair>(WaebricSymbol.COMMA);
+			pairs = new AbstractSeparatedSyntaxNodeList<KeyValuePair>(WaebricSymbol.COMMA);
 		}
 		
 		public boolean addKeyValuePair(KeyValuePair pair) {
