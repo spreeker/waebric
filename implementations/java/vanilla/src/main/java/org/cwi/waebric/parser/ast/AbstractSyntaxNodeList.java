@@ -38,6 +38,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	 * @return
 	 */
 	public boolean add(E element) {
+		if(element == null) { return false; }
 		return list.add(element);
 	}
 	

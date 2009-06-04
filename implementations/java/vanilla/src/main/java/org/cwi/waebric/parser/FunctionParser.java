@@ -48,8 +48,7 @@ class FunctionParser extends AbstractParser {
 		
 		// Parse formals (optional)
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			Formals formals = parseFormals();
-			def.setFormals(formals);
+			def.setFormals(parseFormals());
 		}
 		
 		// Parse statements

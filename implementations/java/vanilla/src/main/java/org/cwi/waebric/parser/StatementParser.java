@@ -98,6 +98,7 @@ class StatementParser extends AbstractParser {
 			reportUnexpectedToken(peek, "statement", 
 					"\"if\", \"each\", \"let\", \"{\", \"comment\", " +
 					"\"echo\", \"cdata\", \"yield\" or Markup");
+			tokens.next(); // Skip token to prevent infinite loops
 		}
 		
 		return null;
@@ -401,26 +402,27 @@ class StatementParser extends AbstractParser {
 	public Formals parseFormals() {
 		Formals formals = new Formals();
 		
-		// Expect left parenthesis
-		next("formals opening parenthesis", "left parenthesis", WaebricSymbol.LPARANTHESIS);
-		
-		// Parse variables
-		while(tokens.hasNext()) {
-			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-				break; // End of formals found, break while
+		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
+			tokens.next(); // Accept '(' and go to next symbol
+			
+			// Parse variables
+			while(tokens.hasNext()) {
+				if(tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+					break; // End of formals found, break while
+				}
+				
+				formals.add(parseVar("formals variable", "\"( var \")\""));
+				
+				// While not end of formals, comma separator is expected
+				if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+					next("arguments separator", "argument \",\" argument", WaebricSymbol.COMMA);
+				}
 			}
 			
-			formals.add(parseVar("formals variable", "\"( var \")\""));
-			
-			// While not end of formals, comma separator is expected
-			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-				next("arguments separator", "argument \",\" argument", WaebricSymbol.COMMA);
-			}
+			// Expect right parenthesis
+			next("formals opening parenthesis", "left parenthesis", WaebricSymbol.RPARANTHESIS);
 		}
-		
-		// Expect right parenthesis
-		next("formals opening parenthesis", "left parenthesis", WaebricSymbol.RPARANTHESIS);
-		
+
 		return formals;
 	}
 	
@@ -458,19 +460,7 @@ class StatementParser extends AbstractParser {
 				} else {
 					// Only remaining alternatives are expressions or statements
 					if(isStatement()) {
-						MarkupsStatement.StatementMarkupsStatement statement = 
-							parseStatementMarkupsStatement(markups);
-						
-						// Statement markups statement cannot be followed by another markup+ statement
-						if(statement.getStatement() instanceof MarkupsStatement) {
-							reportUnexpectedToken(peek, "Statement markups statement", 
-								"A markups statement cannot be followed by another markups statement, " +
-								"use \";\" instead.");
-							
-							return null;
-						}
-						
-						return statement;
+						return parseStatementMarkupsStatement(markups);
 					} else if(isExpression()) {
 						return parseExpressionMarkupsStatement(markups);
 					} else {

@@ -201,25 +201,12 @@ public class StreamTokenizer {
 	 * @throws IOException
 	 */
 	private int nextWord() throws IOException {
-		int head = current; // Store head letter
-		read(); // Retrieve next character
-		
-		if(isLetter(current)) {
-			// A sequence of letters are found, thus token as word not character
-			sval += (char) head; // Place head in value
-			
-			while(isLetter(current) || isNumeral(current)) {
-				sval += (char) current;
-				read(); // Read next character
-			}
-			
-			return WORD;
-		} else {
-			// Only one letter is found, thus token as character
-			cval = (char) head;
+		do {
+			sval += (char) current;
 			read(); // Read next character
-			return CHARACTER;
-		}
+		} while(isLetter(current) || isNumeral(current));
+		
+		return WORD;
 	}
 
 	/**
