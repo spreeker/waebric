@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.expressions.Expression;
+import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.AndPredicate;

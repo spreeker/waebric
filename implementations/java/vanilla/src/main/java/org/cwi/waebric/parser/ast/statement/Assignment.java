@@ -4,8 +4,8 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Var;
 
 /**
  * Assignments

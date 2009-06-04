@@ -7,12 +7,11 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
-import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Formals;
-import org.cwi.waebric.parser.ast.statement.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
@@ -451,8 +450,8 @@ class StatementParser extends AbstractParser {
 				WaebricToken peek = tokens.peek(1); // Determine mark-ups statement type
 				if(peek.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 					Markup end = markups.remove(markups.size()-1);
-					MarkupsStatement.MarkupMarkupsStatement statement = 
-						new MarkupsStatement.MarkupMarkupsStatement(markups);
+					Statement.MarkupMarkupsStatement statement = 
+						new Statement.MarkupMarkupsStatement(markups);
 					statement.setMarkup(end);
 					return statement;
 				} else if(peek.getSort() == WaebricTokenSort.IDCON) {
@@ -483,10 +482,10 @@ class StatementParser extends AbstractParser {
 	 * @param markups
 	 * @return
 	 */
-	private MarkupsStatement.EmbeddingMarkupsStatement parseEmbeddingMarkupsStatement(
+	private Statement.EmbeddingMarkupsStatement parseEmbeddingMarkupsStatement(
 			AbstractSyntaxNodeList<Markup> markups) {
-		MarkupsStatement.EmbeddingMarkupsStatement statement = 
-			new MarkupsStatement.EmbeddingMarkupsStatement(markups);
+		Statement.EmbeddingMarkupsStatement statement = 
+			new Statement.EmbeddingMarkupsStatement(markups);
 		statement.setEmbedding(parseEmbedding());
 		next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
 		return statement;
@@ -497,10 +496,10 @@ class StatementParser extends AbstractParser {
 	 * @param markups
 	 * @return
 	 */
-	private MarkupsStatement.StatementMarkupsStatement parseStatementMarkupsStatement(
+	private Statement.StatementMarkupsStatement parseStatementMarkupsStatement(
 			AbstractSyntaxNodeList<Markup> markups) {
-		MarkupsStatement.StatementMarkupsStatement statement = 
-			new MarkupsStatement.StatementMarkupsStatement(markups);
+		Statement.StatementMarkupsStatement statement = 
+			new Statement.StatementMarkupsStatement(markups);
 		statement.setStatement(parseStatement("Markup statement", "Markup+ Statement \";\""));
 		next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
 		return statement;
@@ -519,10 +518,10 @@ class StatementParser extends AbstractParser {
 	 * @param markups
 	 * @return
 	 */
-	private MarkupsStatement.ExpressionMarkupsStatement parseExpressionMarkupsStatement(
+	private Statement.ExpressionMarkupsStatement parseExpressionMarkupsStatement(
 			AbstractSyntaxNodeList<Markup> markups) {
-		MarkupsStatement.ExpressionMarkupsStatement statement =
-			new MarkupsStatement.ExpressionMarkupsStatement(markups);
+		Statement.ExpressionMarkupsStatement statement =
+			new Statement.ExpressionMarkupsStatement(markups);
 		statement.setExpression(parseExpression("Markup statement", "Markup+ Expression \";\""));
 		next("Markup statement closure ;", "Markup+ Expression \";\"", WaebricSymbol.SEMICOLON);
 		return statement;

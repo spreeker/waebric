@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.expressions.KeyValuePair;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;

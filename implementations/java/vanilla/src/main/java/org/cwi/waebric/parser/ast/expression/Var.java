@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.expressions;
+package org.cwi.waebric.parser.ast.expression;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;

@@ -7,18 +7,22 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.StrCon;
-import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 
+/**
+ * Statements, the biggest blob of all Waebric
+ * 
+ * @author Jeroen van Schagen
+ * @date 25-05-2009
+ */
 public abstract class Statement extends AbstractSyntaxNode {
 
 	/**
 	 * "if" "(" Predicate ")" Statement NoElseMayFollow -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class IfStatement extends Statement {
 		
@@ -55,8 +59,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "if" "(" Predicate ")" Statement "else" Statement -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class IfElseStatement extends IfStatement {
 		
@@ -86,8 +88,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 
 	/**
 	 * "each" "(" Var ":" Expression ")" Statement -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class EachStatement extends Statement {
 
@@ -135,8 +135,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "let" Assignment+ "in" Statement* "end" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class LetStatement extends Statement {
 
@@ -186,8 +184,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "{" Statement* "}"
-	 * @author schagen
-	 *
 	 */
 	public static class StatementCollection extends Statement {
 
@@ -217,8 +213,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "comment" StrCon ";" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class CommentStatement extends Statement {
 
@@ -244,8 +238,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "echo" Expression ";" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class EchoExpressionStatement extends Statement {
 		
@@ -271,8 +263,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "echo" Embedding ";" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class EchoEmbeddingStatement extends Statement {
 		
@@ -298,8 +288,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "cdata" Expression ";" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class CDataStatement extends Statement {
 
@@ -325,8 +313,6 @@ public abstract class Statement extends AbstractSyntaxNode {
 	
 	/**
 	 * "yield" ";" -> Statement
-	 * @author schagen
-	 *
 	 */
 	public static class YieldStatement extends Statement {
 		
@@ -361,6 +347,146 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+	}
+	
+	/**
+	 * Markup statements are an abstraction for all statements
+	 * that start with Markup+
+	 * 
+	 * @author Jeroen van Schagen
+	 * @date 05-06-2009
+	 */
+	public abstract static class MarkupsStatement extends Statement {
+		
+		protected AbstractSyntaxNodeList<Markup> markups;
+		
+		public MarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+			this.markups = markups;
+		}
+		
+		public Markup getMarkup(int index) {
+			return markups.get(index);
+		}
+		
+		public int getMarkupCount() {
+			return markups.size();
+		}
+		
+	}
+	
+	/**
+	 * Markup+ Markup ";" -> Statement
+	 */
+	public static class MarkupMarkupsStatement extends MarkupsStatement {
+
+		public MarkupMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
+
+		private Markup markup;
+		
+		public Markup getMarkup() {
+			return markup;
+		}
+
+		public void setMarkup(Markup markup) {
+			this.markup = markup;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				markups,
+				markup,
+				new CharacterLiteral(WaebricSymbol.SEMICOLON)
+			};
+		}
+		
+	}
+	
+	/**
+	 * Markup+ Statement ";" -> Statement
+	 */
+	public static class StatementMarkupsStatement extends MarkupsStatement {
+		
+		private Statement statement;
+		
+		public StatementMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
+
+		public Statement getStatement() {
+			return statement;
+		}
+
+		public void setStatement(Statement statement) {
+			this.statement = statement;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				markups,
+				statement,
+				new CharacterLiteral(WaebricSymbol.SEMICOLON)
+			};
+		}
+		
+	}
+	
+	/**
+	 * Markup+ Expression ";" -> Statement
+	 */
+	public static class ExpressionMarkupsStatement extends MarkupsStatement {
+
+		private Expression expression;
+		
+		public ExpressionMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
+
+		public Expression getExpression() {
+			return expression;
+		}
+
+		public void setExpression(Expression expression) {
+			this.expression = expression;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				markups,
+				expression,
+				new CharacterLiteral(WaebricSymbol.SEMICOLON)
+			};
+		}
+		
+	}
+	
+	/**
+	 * Markup+ Embedding ";" -> Statement
+	 */
+	public static class EmbeddingMarkupsStatement extends MarkupsStatement {
+		
+		private Embedding embedding;
+		
+		public EmbeddingMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
+
+		public Embedding getEmbedding() {
+			return embedding;
+		}
+
+		public void setEmbedding(Embedding embedding) {
+			this.embedding = embedding;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				markups,
+				embedding,
+				new CharacterLiteral(WaebricSymbol.SEMICOLON)
+			};
+		}
 	}
 
 }

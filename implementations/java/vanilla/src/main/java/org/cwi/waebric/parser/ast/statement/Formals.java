@@ -4,7 +4,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
-import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.expression.Var;
 
 /**
  * "(" { Var "," }* ")" -> Formals

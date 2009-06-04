@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
