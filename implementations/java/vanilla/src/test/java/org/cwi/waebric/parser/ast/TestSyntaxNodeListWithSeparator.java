@@ -5,54 +5,54 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
-import org.cwi.waebric.parser.ast.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestSyntaxNodeListWithSeparator {
 
-	private AbstractSeparatedSyntaxNodeList<Mapping> mappings;
+	private AbstractSeparatedSyntaxNodeList<StringLiteral> literals;
 	
 	@Before
 	public void setUp() {
-		mappings = new AbstractSeparatedSyntaxNodeList<Mapping>(';');
-		mappings.add(new Mapping());
-		mappings.add(new Mapping());
+		literals = new AbstractSeparatedSyntaxNodeList<StringLiteral>(';');
+		literals.add(new StringLiteral("LOL"));
+		literals.add(new StringLiteral("LOL2"));
 	}
 	
 	@After
 	public void tearDown() {
-		mappings.clear();
-		mappings = null;
+		literals.clear();
+		literals = null;
 	}
 	
 	@Test
 	public void testGetChildren() {
-		assertNotNull(mappings.getChildren());
-		assertTrue(mappings.getChildren().length == 3);
-		assertEquals(Mapping.class, mappings.getChildren()[0].getClass());
-		assertEquals(CharacterLiteral.class, mappings.getChildren()[1].getClass());
+		AbstractSyntaxNode[] children = literals.getChildren();
+		
+		assertNotNull(children);
+		assertEquals(3, children.length);
+		assertEquals(StringLiteral.class, literals.getChildren()[0].getClass());
+		assertEquals(CharacterLiteral.class, literals.getChildren()[1].getClass());
 		
 		int expected = 3;
 		while(expected < 25) {
-			mappings.add(new Mapping());
+			literals.add(new StringLiteral("test"));
 			expected += 2; // When an element is added, a separator is automatically applied
-			assertTrue(mappings.getChildren().length == expected);
+			assertTrue(literals.getChildren().length == expected);
 		}
 	}
 	
 	@Test
 	public void testRemove() {
-		assertTrue(mappings.getChildren().length == 3);
+		assertTrue(literals.getChildren().length == 3);
 		
-		Mapping mapping = new Mapping();
-		mappings.add(mapping);
-		assertTrue(mappings.getChildren().length == 5);
-		assertTrue(mappings.getChildren()[4].equals(mapping));
+		literals.add(new StringLiteral("mappingftw"));
+		assertTrue(literals.getChildren().length == 5);
+		assertEquals("mappingftw", literals.getChildren()[4].toString());
 		
-		mappings.remove(2);
-		assertTrue(mappings.getChildren().length == 3);
+		literals.remove(2);
+		assertTrue(literals.getChildren().length == 3);
 	}
 	
 }

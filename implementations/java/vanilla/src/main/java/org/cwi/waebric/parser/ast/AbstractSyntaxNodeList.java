@@ -18,6 +18,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	/**
 	 * Retrieve size
+	 * 
 	 * @return
 	 */
 	public int size() {
@@ -26,6 +27,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	/**
 	 * Retrieve node
+	 * 
 	 * @param index
 	 * @return
 	 */
@@ -35,6 +37,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	/**
 	 * Add node
+	 * 
 	 * @param element
 	 * @return
 	 */
@@ -44,25 +47,26 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	}
 	
 	/**
-	 * Remove node
-	 * @param index
-	 * @return
+	 * Remove node at specified index.
+	 * 
+	 * @param index Position of removed node
+	 * @return Removed node
 	 */
 	public E remove(int index) {
 		return list.remove(index);
 	}
 	
 	/**
-	 * Remove all nodes
+	 * Remove all nodes from list.
 	 */
 	public void clear() {
 		list.clear();
 	}
 	
 	/**
-	 * Retrieve elements
+	 * Retrieve actual node elements in list.
 	 * 
-	 * @return
+	 * @return Elements
 	 */
 	public AbstractSyntaxNode[] getElements() {
 		return list.toArray(new AbstractSyntaxNode[0]);
@@ -71,13 +75,17 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	/**
 	 * Retrieve children
 	 * 
-	 * @return
+	 * @return Children
 	 */
 	public AbstractSyntaxNode[] getChildren() {
 		return getElements();
 	}
 	
-	@Override
+	/**
+	 * Create iterator
+	 * 
+	 * @return Iterator
+	 */
 	public Iterator<E> iterator() {
 		return list.iterator();
 	}
@@ -118,14 +126,22 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			ArrayList<AbstractSyntaxNode> children = new ArrayList<AbstractSyntaxNode>();
+			AbstractSyntaxNode[] elements = this.getElements();
 			
-			for(int i = 0; i < list.size(); i++) {
-				if(i != 0) { children.add(new CharacterLiteral(separator)); }
-				children.add(list.get(i));
+			int length = elements.length > 0 ? (elements.length * 2) - 1 : 0;
+			AbstractSyntaxNode[] children = new AbstractSyntaxNode[length];
+			
+			for(int i = 0; i < children.length; i++) {
+				if(i % 2 == 0) {
+					// Even index are reserved to elements
+					children[i] = elements[i/2];
+				} else {
+					// Uneven index are for separators
+					children[i] = new CharacterLiteral(separator);
+				}
 			}
-			
-			return children.toArray(new AbstractSyntaxNode[0]);
+
+			return children;
 		}
 		
 	}
