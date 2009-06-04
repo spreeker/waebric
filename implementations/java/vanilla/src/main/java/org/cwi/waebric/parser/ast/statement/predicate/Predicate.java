@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.predicates;
+package org.cwi.waebric.parser.ast.statement.predicate;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
@@ -7,7 +7,7 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 
 /**
- * Predicates are conditions, used in various statement constructs.
+ * Predicates are conditions, used in if(-else) statement constructs.
  * 
  * @author Jeroen van Schagen
  * @date 27-05-2009

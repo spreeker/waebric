@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.statements;
+package org.cwi.waebric.parser.ast.statement;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
@@ -7,11 +7,11 @@ import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.StrCon;
-import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.predicates.Predicate;
+import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 
 public abstract class Statement extends AbstractSyntaxNode {
 

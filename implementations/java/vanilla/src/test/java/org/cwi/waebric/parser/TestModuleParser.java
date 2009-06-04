@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.functions.FunctionDef;
+import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.ast.site.Site;
+import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;

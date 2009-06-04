@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.embedding;
+package org.cwi.waebric.parser.ast.statement.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 

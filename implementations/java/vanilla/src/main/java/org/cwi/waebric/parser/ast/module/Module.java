@@ -2,6 +2,7 @@ package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 public class Module extends AbstractSyntaxNode {
@@ -9,10 +10,10 @@ public class Module extends AbstractSyntaxNode {
 	private static final String MODULE_KEYWORD = WaebricKeyword.MODULE.name().toLowerCase();
 	
 	private ModuleId identifier;
-	private ModuleElements elements;
+	private AbstractSyntaxNodeList<ModuleElement> elements;
 	
 	public Module() {
-		elements = new ModuleElements();
+		elements = new AbstractSyntaxNodeList<ModuleElement>();
 	}
 	
 	public ModuleId getIdentifier() {

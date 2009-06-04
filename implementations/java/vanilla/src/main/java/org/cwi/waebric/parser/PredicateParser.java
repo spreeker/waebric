@@ -5,8 +5,8 @@ import java.util.List;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
-import org.cwi.waebric.parser.ast.predicates.Predicate;
-import org.cwi.waebric.parser.ast.predicates.Type;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
+import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 

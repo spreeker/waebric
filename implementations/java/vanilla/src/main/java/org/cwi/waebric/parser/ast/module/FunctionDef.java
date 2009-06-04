@@ -1,13 +1,12 @@
-package org.cwi.waebric.parser.ast.functions;
+package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.ModuleElement;
-import org.cwi.waebric.parser.ast.statements.Formals;
-import org.cwi.waebric.parser.ast.statements.Statement;
+import org.cwi.waebric.parser.ast.statement.Formals;
+import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
  * "def" IdCon Formals? Statement* "end" -> FunctionDef

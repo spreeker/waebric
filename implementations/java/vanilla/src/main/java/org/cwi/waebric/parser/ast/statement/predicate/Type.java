@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.predicates;
+package org.cwi.waebric.parser.ast.statement.predicate;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;

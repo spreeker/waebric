@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.statements;
+package org.cwi.waebric.parser.ast.statement;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;

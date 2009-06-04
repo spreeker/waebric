@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.site;
+package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;

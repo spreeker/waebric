@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast;
 
 import static org.junit.Assert.*;
 
-import org.cwi.waebric.parser.ast.site.Mapping;
+import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,13 +1,13 @@
-package org.cwi.waebric.parser.ast.site;
+package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
-public class FileExt extends AbstractSyntaxNode {
+public class PathElement extends AbstractSyntaxNode {
 
 	private StringLiteral literal;
 	
-	public FileExt(String literal) {
+	public PathElement(String literal) {
 		this.literal = new StringLiteral(literal);
 	}
 
