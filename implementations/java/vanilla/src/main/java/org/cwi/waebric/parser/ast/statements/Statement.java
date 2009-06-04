@@ -10,6 +10,7 @@ import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.embedding.Embedding;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.expressions.Var;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.predicates.Predicate;
 
 public abstract class Statement extends AbstractSyntaxNode {
@@ -338,4 +339,28 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 	}
 	
+	/**
+	 * Markup ";" -> Statement
+	 */
+	public static class MarkupStatement extends Statement {
+		
+		private Markup markup;
+
+		public Markup getMarkup() {
+			return markup;
+		}
+
+		public void setMarkup(Markup markup) {
+			this.markup = markup;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				markup,
+				new CharacterLiteral(WaebricSymbol.SEMICOLON)
+			};
+		}
+		
+	}
+
 }
