@@ -17,6 +17,10 @@ class PredicateParser extends AbstractParser {
 	public PredicateParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
 		super(tokens, exceptions);
 		
+//		if(tokens.current() == null && tokens.hasNext()) {
+//			tokens.next(); // Iterate to first element
+//		}
+		
 		// Construct sub parser
 		expressionParser = new ExpressionParser(tokens, exceptions);
 	}
@@ -26,28 +30,48 @@ class PredicateParser extends AbstractParser {
 	 * @return Predicate
 	 */
 	public Predicate parsePredicate() {
-		// Parse expression
-		Expression expression = parseExpression("predicate", "expression or expression \".\" type \"?\"");
-
-		// Determine predicate type based on next token
-		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
-			Predicate.PredicateWithType predicate = new Predicate.PredicateWithType();
-			predicate.setExpression(expression); // Store expression
-			
-			tokens.next(); // Skip period
-			
-			Type type = parseType(); // Parse type
-			predicate.setType(type); // Store type
-			
-			next("predicate closure token \"?\"", "predicate \".\" type \"?\"", 
-					WaebricSymbol.QUESTION_SIGN); // Parse question sign
-			
-			return predicate; // Return predicate with type
+		Predicate predicate;
+		
+		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.EXCLAMATION_SIGN)) {
+			// Parse "!" predicates
+			tokens.next(); // Accept "!" and move to next token
+			Predicate.NotPredicate notpredicate = new Predicate.NotPredicate();
+			notpredicate.setPredicate(parsePredicate()); // Parse sub-predicate
+			predicate = notpredicate;
 		} else {
-			Predicate.PredicateWithoutType predicate = new Predicate.PredicateWithoutType();
-			predicate.setExpression(expression); // Store expression
-			return predicate; // Return predicate without type
+			// Parse expression based predicates
+			Expression expression = parseExpression("predicate", "expression or expression \".\" type \"?\"");
+			
+			// Determine predicate type based on lookahead
+			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				Predicate.ExpressionTypePredicate exppredicate = new Predicate.ExpressionTypePredicate();
+				exppredicate.setExpression(expression);
+				tokens.next(); // Accept "." and move to next token
+				exppredicate.setType(parseType()); // Parse type
+				next("type predicate closure symbol \"?\"", "type \"?\"", WaebricSymbol.QUESTION_SIGN);
+				predicate = exppredicate;
+			} else {
+				Predicate.ExpressionPredicate exptpredicate = new Predicate.ExpressionPredicate();
+				exptpredicate.setExpression(expression); // Store expression
+				predicate = exptpredicate; // Return predicate without type
+			}
 		}
+		
+		if(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.AMPERSAND) && tokens.peek(2).getLexeme().equals(WaebricSymbol.AMPERSAND)) {
+			Predicate.AndPredicate andpredicate = new Predicate.AndPredicate();
+			tokens.next(); tokens.next(); // Accept '&&' tokens and jump to next predicate
+			andpredicate.setLeft(predicate);
+			andpredicate.setRight(parsePredicate());
+			return andpredicate;
+		} else if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.VERTICAL_BAR) && tokens.peek(2).getLexeme().equals(WaebricSymbol.VERTICAL_BAR)) {
+			Predicate.OrPredicate orpredicate = new Predicate.OrPredicate();
+			tokens.next(); tokens.next(); // Accept '||' tokens and jump to next predicate
+			orpredicate.setLeft(predicate);
+			orpredicate.setRight(parsePredicate());
+			return orpredicate;
+		}
+
+		return predicate;
 	}
 	
 	/**

@@ -1,6 +1,5 @@
 package org.cwi.waebric.scanner.token;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,13 +25,6 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 	
 	/**
-	 * Clone iterator
-	 */
-	public WaebricTokenIterator clone() {
-		return new WaebricTokenIterator(new ArrayList<WaebricToken>(collection));
-	}
-	
-	/**
 	 * Determine if iterator has next element
 	 */
 	public boolean hasNext() {
@@ -50,7 +42,9 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	}
 
 	/**
-	 * Retrieve next token and increment current position.
+	 * Retrieve next token by incrementing current position.
+	 * 
+	 * @return Next token
 	 */
 	public WaebricToken next() {
 		curr++; // Increment current position
@@ -62,11 +56,21 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 * are made to the current position of iterator.
 	 * 
 	 * @param k Lookahead
-	 * @return
+	 * @return Token at curr+k
 	 */
 	public WaebricToken peek(int k) {
 		if(! hasNext(k)) { return null; }
 		return collection.get(curr+k);
+	}
+	
+	/**
+	 * Retrieve current token, executing this function does not alter
+	 * the current position.
+	 * 
+	 * @return Current token
+	 */
+	public WaebricToken current() {
+		return collection.get(curr);
 	}
 
 	/**
@@ -97,7 +101,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	
 	@Override
 	public String toString() {
-		return "Position: " + curr + ", Collection: " + collection.toString();
+		return collection.toString();
 	}
 
 }

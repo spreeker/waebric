@@ -25,6 +25,8 @@ public class WaebricSymbol {
 	public static final char SEMICOLON = ';';
 	public static final char EQUAL_SIGN = '=';
 	public static final char QUESTION_SIGN = '?';
+	public static final char EXCLAMATION_SIGN = '!';
+	public static final char VERTICAL_BAR = '|';
 	
 	public static final char LPARANTHESIS = '(';
 	public static final char RPARANTHESIS = ')';

@@ -3,25 +3,16 @@ package org.cwi.waebric.parser.ast.predicates;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expressions.Expression;
 
 /**
- * Predicates are ...
+ * Predicates are conditions, used in various statement constructs.
  * 
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
 public abstract class Predicate extends AbstractSyntaxNode {
-
-	protected Expression expression;
-	
-	public Expression getExpression() {
-		return expression;
-	}
-
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
 
 	/**
 	 * Grammar:<br>
@@ -29,8 +20,18 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Expression -> Predicate
 	 * </code>
 	 */
-	public static class PredicateWithoutType extends Predicate {
+	public static class ExpressionPredicate extends Predicate {
 
+		protected Expression expression;
+		
+		public Expression getExpression() {
+			return expression;
+		}
+
+		public void setExpression(Expression expression) {
+			this.expression = expression;
+		}
+		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { expression };
 		}
@@ -43,7 +44,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Expression "." Type "?" -> Predicate
 	 * </code>
 	 */
-	public static class PredicateWithType extends Predicate {
+	public static class ExpressionTypePredicate extends ExpressionPredicate {
 
 		private Type type;
 		
@@ -61,6 +62,102 @@ public abstract class Predicate extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.PERIOD),
 				type,
 				new CharacterLiteral(WaebricSymbol.QUESTION_SIGN)
+			};
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"!" Predicate -> Predicate
+	 * </code>
+	 */
+	public static class NotPredicate extends Predicate {
+
+		private Predicate predicate;
+
+		public Predicate getPredicate() {
+			return predicate;
+		}
+
+		public void setPredicate(Predicate predicate) {
+			this.predicate = predicate;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				new CharacterLiteral('!'), predicate
+			};
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	Predicate "&&" Predicate -> Predicate
+	 * </code>
+	 */
+	public static class AndPredicate extends Predicate {
+
+		private Predicate left;
+		private Predicate right;
+		
+		public Predicate getLeft() {
+			return left;
+		}
+
+		public void setLeft(Predicate left) {
+			this.left = left;
+		}
+
+		public Predicate getRight() {
+			return right;
+		}
+
+		public void setRight(Predicate right) {
+			this.right = right;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				left, new StringLiteral("&&"), right
+			};
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	Predicate "||" Predicate -> Predicate
+	 * </code>
+	 */
+	public static class OrPredicate extends Predicate {
+
+		private Predicate left;
+		private Predicate right;
+		
+		public Predicate getLeft() {
+			return left;
+		}
+
+		public void setLeft(Predicate left) {
+			this.left = left;
+		}
+
+		public Predicate getRight() {
+			return right;
+		}
+
+		public void setRight(Predicate right) {
+			this.right = right;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				left, new StringLiteral("||"), right
 			};
 		}
 		
