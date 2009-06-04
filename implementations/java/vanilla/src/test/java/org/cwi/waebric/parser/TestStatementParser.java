@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +107,7 @@ public class TestStatementParser {
 		
 		Statement.EchoEmbeddingStatement statement = parser.parseEchoEmbeddingStatement();
 		assertEquals(0, exceptions.size());
-		assertEquals(Expression.NatExpression.class, statement.getEmbedding().getEmbed().getExpression().getClass());
+		assertNotNull(statement.getEmbedding());
 	}
 	
 	@Test

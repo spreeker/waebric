@@ -13,6 +13,8 @@ import org.cwi.waebric.parser.ast.embedding.MidText;
 import org.cwi.waebric.parser.ast.embedding.PostText;
 import org.cwi.waebric.parser.ast.embedding.PreText;
 import org.cwi.waebric.parser.ast.embedding.TextTail;
+import org.cwi.waebric.parser.ast.embedding.Embed.ExpressionEmbed;
+import org.cwi.waebric.parser.ast.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.ast.expressions.Expression;
@@ -52,7 +54,6 @@ public class TestEmbeddingParser {
 		Embedding simple = parser.parseEmbedding();
 		assertTrue(exceptions.size() == 0);
 		assertEquals("", simple.getPre().getText().toString());
-		assertEquals(Expression.NatExpression.class, simple.getEmbed().getExpression().getClass());
 		assertEquals(0, simple.getEmbed().getMarkupCount());
 		assertEquals(TextTail.PostTail.class, simple.getTail().getClass());
 		
@@ -62,7 +63,6 @@ public class TestEmbeddingParser {
 		Embedding extended = parser.parseEmbedding();
 		assertTrue(exceptions.size() == 0);
 		assertEquals("left", extended.getPre().getText().toString());
-		assertEquals(Expression.NatExpression.class, extended.getEmbed().getExpression().getClass());
 		assertEquals(1, extended.getEmbed().getMarkupCount());
 		assertEquals(Markup.MarkupWithArguments.class, extended.getEmbed().getMarkup(0).getClass());
 		assertEquals(TextTail.PostTail.class, extended.getTail().getClass());
@@ -74,7 +74,7 @@ public class TestEmbeddingParser {
 		iterator = TestScanner.quickScan("123");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
-		Embed simple = parser.parseEmbed();
+		Embed.ExpressionEmbed simple = (ExpressionEmbed) parser.parseEmbed();
 		assertTrue(exceptions.size() == 0);
 		assertEquals(Expression.NatExpression.class, simple.getExpression().getClass());
 		assertEquals(0, simple.getMarkupCount());
@@ -83,7 +83,7 @@ public class TestEmbeddingParser {
 		iterator = TestScanner.quickScan("func1 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
-		Embed diff = parser.parseEmbed();
+		Embed.ExpressionEmbed diff = (ExpressionEmbed) parser.parseEmbed();
 		assertTrue(exceptions.size() == 0);
 		assertEquals(Expression.NatExpression.class, diff.getExpression().getClass());
 		assertEquals(1, diff.getMarkupCount());
@@ -93,9 +93,19 @@ public class TestEmbeddingParser {
 		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
-		Embed diff2 = parser.parseEmbed();
+		Embed.ExpressionEmbed diff2 = (ExpressionEmbed) parser.parseEmbed();
 		assertTrue(exceptions.size() == 0);
 		assertEquals(Expression.NatExpression.class, diff2.getExpression().getClass());
+		assertEquals(2, diff2.getMarkupCount());
+		assertEquals(Markup.MarkupWithArguments.class, diff2.getMarkup(0).getClass());
+		assertEquals(Markup.MarkupWithoutArguments.class, diff2.getMarkup(1).getClass());
+		
+		// Embed Markup* Markup
+		iterator = TestScanner.quickScan("func1(arg1) func2 func3>");
+		parser = new EmbeddingParser(iterator, exceptions);
+		Embed.MarkupEmbed markupemb = (MarkupEmbed) parser.parseEmbed();
+		assertTrue(exceptions.size() == 0);
+		assertEquals(Markup.MarkupWithoutArguments.class, markupemb.getMarkup().getClass());
 		assertEquals(2, diff2.getMarkupCount());
 		assertEquals(Markup.MarkupWithArguments.class, diff2.getMarkup(0).getClass());
 		assertEquals(Markup.MarkupWithoutArguments.class, diff2.getMarkup(1).getClass());
@@ -126,7 +136,6 @@ public class TestEmbeddingParser {
 		TextTail.MidTail mid = (MidTail) parser.parseTextTail();
 		assertTrue(exceptions.size() == 0);
 		assertEquals("mid", mid.getMid().getText().toString());
-		assertEquals(Expression.NatExpression.class, mid.getEmbed().getExpression().getClass());
 		assertEquals(TextTail.PostTail.class, mid.getTail().getClass());
 	}
 	

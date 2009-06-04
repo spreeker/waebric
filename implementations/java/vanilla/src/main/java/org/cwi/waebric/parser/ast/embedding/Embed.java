@@ -6,18 +6,17 @@ import org.cwi.waebric.parser.ast.expressions.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
 /**
- * Markup* Expression -> Embed
+ * Embed
  * 
  * @author Jeroen van Schagen
  * @date 02-06-2009
  */
-public class Embed extends AbstractSyntaxNode {
+public abstract class Embed extends AbstractSyntaxNode {
 
-	private AbstractSyntaxNodeList<Markup> markups;
-	private Expression expression;
+	protected AbstractSyntaxNodeList<Markup> markups;
 	
-	public Embed() {
-		this.markups = new AbstractSyntaxNodeList<Markup>();
+	public Embed(AbstractSyntaxNodeList<Markup> markups) {
+		this.markups = markups;
 	}
 	
 	public Markup getMarkup(int index) {
@@ -28,20 +27,54 @@ public class Embed extends AbstractSyntaxNode {
 		return markups.size();
 	}
 	
-	public void addMarkup(Markup markup) {
-		markups.add(markup);
-	}
-	
-	public Expression getExpression() {
-		return expression;
-	}
-	
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
+	/**
+	 * Markup* Expression -> Embed
+	 */
+	public static class ExpressionEmbed extends Embed {
+		
+		public ExpressionEmbed(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { markups, expression };
+		private Expression expression;
+
+		public Expression getExpression() {
+			return expression;
+		}
+		
+		public void setExpression(Expression expression) {
+			this.expression = expression;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { markups, expression };
+		}
+		
+	}
+	
+	/**
+	 * Markup* Markup -> Embed
+	 */
+	public static class MarkupEmbed extends Embed {
+		
+		public MarkupEmbed(AbstractSyntaxNodeList<Markup> markups) {
+			super(markups);
+		}
+
+		private Markup markup;
+
+		public Markup getMarkup() {
+			return markup;
+		}
+
+		public void setMarkup(Markup markup) {
+			this.markup = markup;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { markups, markup };
+		}
+		
 	}
 
 }
