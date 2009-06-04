@@ -458,7 +458,19 @@ class StatementParser extends AbstractParser {
 				} else {
 					// Only remaining alternatives are expressions or statements
 					if(isStatement()) {
-						return parseStatementMarkupsStatement(markups);
+						MarkupsStatement.StatementMarkupsStatement statement = 
+							parseStatementMarkupsStatement(markups);
+						
+						// Statement markups statement cannot be followed by another markup+ statement
+						if(statement.getStatement() instanceof MarkupsStatement) {
+							reportUnexpectedToken(peek, "Statement markups statement", 
+								"A markups statement cannot be followed by another markups statement, " +
+								"use \";\" instead.");
+							
+							return null;
+						}
+						
+						return statement;
 					} else if(isExpression()) {
 						return parseExpressionMarkupsStatement(markups);
 					} else {
