@@ -16,8 +16,6 @@ import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
- * Module related parse functionality.
- * 
  * module languages/waebric/syntax/Modules
  * 
  * @author Jeroen van Schagen
@@ -28,6 +26,11 @@ class ModuleParser extends AbstractParser {
 	private final SiteParser siteParser;
 	private final FunctionParser functionParser;
 	
+	/**
+	 * Construct module parser
+	 * @param tokens
+	 * @param exceptions
+	 */
 	public ModuleParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		

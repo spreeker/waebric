@@ -19,8 +19,6 @@ import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
- * Site related parse functionality
- * 
  * module languages/waebric/syntax/Site
  * 
  * @see ModuleParser
@@ -31,6 +29,11 @@ class SiteParser extends AbstractParser {
 
 	private final MarkupParser markupParser;
 	
+	/**
+	 * Construct site parser
+	 * @param tokens
+	 * @param exceptions
+	 */
 	public SiteParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		

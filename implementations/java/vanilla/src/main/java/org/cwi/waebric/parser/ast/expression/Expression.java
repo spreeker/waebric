@@ -8,12 +8,16 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
 
+/**
+ * Expression
+ * 
+ * @author Jeroen van Schagen
+ * @date 25-05-2009
+ */
 public abstract class Expression extends AbstractSyntaxNode {
 
 	/**
 	 * Text -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class TextExpression extends Expression {
 
@@ -35,8 +39,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * Var -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class VarExpression extends Expression {
 
@@ -58,8 +60,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * SymbolCon -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class SymbolExpression extends Expression {
 
@@ -81,8 +81,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * NatCon -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class NatExpression extends Expression {
 
@@ -104,8 +102,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * Expression "." IdCon -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class IdConExpression extends Expression {
 
@@ -140,8 +136,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * "[" { Expression "," }* "]" -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class ListExpression extends Expression {
 
@@ -171,8 +165,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 	
 	/**
 	 * "{" { KeyValuePair "," }* "}" -> Expression
-	 * @author schagen
-	 *
 	 */
 	public static class RecordExpression extends Expression {
 

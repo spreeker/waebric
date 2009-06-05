@@ -56,13 +56,14 @@ public abstract class AbstractParser {
 	 * Compare current token to expected sort, when no current token is active
 	 * retrieve first token from stream.
 	 * @param sort Expected token sort
+	 * @param name Name of expected token, used for error reporting
 	 * @param syntax Syntax of expected token, used for error reporting
 	 * @throws MissingTokenException Token stream is empty, thus no current
 	 * @throws UnexpectedTokenException Unexpected token is found
 	 */
-	protected void current(WaebricTokenSort sort, String syntax) throws SyntaxException {
-		if(tokens.current() == null) { next(sort, syntax); }
-		else { expect(tokens.current(), sort, syntax); }
+	protected void current(WaebricTokenSort sort, String name, String syntax) throws SyntaxException {
+		if(tokens.current() == null) { next(sort, name, syntax); }
+		else { expect(tokens.current(), sort, name, syntax); }
 	}
 	
 	/**
@@ -84,12 +85,12 @@ public abstract class AbstractParser {
 	 * Check if token matches expected sort.
 	 * @param token Token to verify
 	 * @param sort Expected token sort
+	 * @param name Name of expected token
 	 * @param syntax Syntax of expected token, used for error reporting
 	 * @throws UnexpectedTokenException Unexpected token is found
 	 */
-	protected void expect(WaebricToken token, WaebricTokenSort sort, String syntax) 
+	protected void expect(WaebricToken token, WaebricTokenSort sort, String name, String syntax) 
 			throws UnexpectedTokenException {
-		String name = sort.name().toLowerCase();
 		if(token.getSort() != sort) {
 			reportUnexpectedToken(token, name, syntax);
 		}
@@ -125,12 +126,12 @@ public abstract class AbstractParser {
 	/**
 	 * Retrieve next token from iterator and check sort.
 	 * @param sort Expected token sort
+	 * @param name Name of expected token, used for error reporting
 	 * @param syntax Syntax of expected token, used for error reporting
 	 * @throws MissingTokenException No next token available
 	 * @throws UnexpectedTokenException Unexpected token is found
 	 */
-	protected void next(WaebricTokenSort sort, String syntax) throws SyntaxException {
-		String name = sort.name().toLowerCase();
+	protected void next(WaebricTokenSort sort, String name, String syntax) throws SyntaxException {
 		next(name, syntax);
 		expect(tokens.current(), sort, name, syntax);
 	}
