@@ -8,10 +8,12 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
+import org.cwi.waebric.scanner.validator.ILexicalValidator;
+import org.cwi.waebric.scanner.validator.LexicalException;
+import org.cwi.waebric.scanner.validator.RejectValidator;
 
 /**
  * The lexical analyzer, also known as a scanner, reads an input character stream
@@ -23,8 +25,24 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  */
 public class WaebricScanner implements Iterable<WaebricToken> {
 
-	private StreamTokenizer tokenizer;
+	/**
+	 * Stream tokenizer used for decomposing characters in tokens
+	 */
+	private final StreamTokenizer tokenizer;
+	
+	/**
+	 * Collection of token stream validators
+	 */
+	private List<ILexicalValidator> validators;
+	
+	/**
+	 * Collection of processed tokens
+	 */
 	private List<WaebricToken> tokens;
+	
+	/**
+	 * Current character
+	 */
 	private int current;
 	
 	/**
@@ -36,6 +54,9 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	public WaebricScanner(Reader reader) throws IOException {
 		tokenizer = new StreamTokenizer(reader);
 		tokens = new ArrayList<WaebricToken>();
+		
+		validators = new ArrayList<ILexicalValidator>();
+		validators.add(new RejectValidator());
 	}
 	
 	/**
@@ -45,27 +66,25 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @throws IOException Fired by next token procedure in stream tokenizer.
 	 * @see java.io.StreamTokenizer
 	 */
-	public List<ScannerException> tokenizeStream() throws IOException {
-		List<ScannerException> exceptions = new ArrayList<ScannerException>();
-		
+	public List<LexicalException> tokenizeStream() throws IOException {	
 		// Scan and store tokens
 		tokens.clear();
 		current = tokenizer.nextToken();
 		while(current != StreamTokenizer.END_OF_FILE) {
 			switch(current) {
 				case StreamTokenizer.WORD:
-					tokenizeWord(exceptions);
+					tokenizeWord();
 					break;
 				case StreamTokenizer.NUMBER:
-					tokenizeNumber(exceptions);
+					tokenizeNumber();
 					break;
 				case StreamTokenizer.CHARACTER:
 					if(tokenizer.getCharacterValue() == '\'') {
-						tokenizeSymbol(exceptions);
+						tokenizeSymbol();
 					} else if(tokenizer.getCharacterValue() == '"') {
-						tokenizeQuote(exceptions);
+						tokenizeQuote();
 					} else {
-						tokenizeCharacter(exceptions);
+						tokenizeCharacter();
 					} break;
 				case StreamTokenizer.LAYOUT: 
 					current = tokenizer.nextToken();
@@ -76,7 +95,11 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 			}
 		}
 		
-		// Report exceptions
+		// Scan for exceptions
+		List<LexicalException> exceptions = new ArrayList<LexicalException>();
+		for(ILexicalValidator validator : validators) {
+			validator.validate(tokens, exceptions);
+		}
 		return exceptions;
 	}
 
@@ -85,7 +108,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeWord(List<ScannerException> exceptions) throws IOException {
+	private void tokenizeWord() throws IOException {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
@@ -110,7 +133,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeNumber(List<ScannerException> exceptions) throws IOException {
+	private void tokenizeNumber() throws IOException {
 		WaebricToken number = new WaebricToken(
 				tokenizer.getIntegerValue(), WaebricTokenSort.NATCON, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
@@ -125,7 +148,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeCharacter(List<ScannerException> exceptions) throws IOException {
+	private void tokenizeCharacter() throws IOException {
 		WaebricToken character = new WaebricToken(
 				tokenizer.getCharacterValue(), WaebricTokenSort.CHARACTER, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
@@ -141,7 +164,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeQuote(List<ScannerException> exceptions) throws IOException {
+	private void tokenizeQuote() throws IOException {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
@@ -149,11 +172,10 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		
 		String data = "";
 		while(tokenizer.getCharacterValue() != '"') {
-			// End of file found before closing "
 			if(current < 0) {
+				// End of file found before closing ", store as separate tokens
 				WaebricScanner scanner = new WaebricScanner(new StringReader(data));
-				List<ScannerException> e = scanner.tokenizeStream();
-				exceptions.addAll(e);
+				scanner.tokenizeStream();
 				tokens.add(new WaebricToken(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
 				
 				// Attach quote start position to sub-token
@@ -181,7 +203,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeSymbol(List<ScannerException> exceptions) throws IOException {
+	private void tokenizeSymbol() throws IOException {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
