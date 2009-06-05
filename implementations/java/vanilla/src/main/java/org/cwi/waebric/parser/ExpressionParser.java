@@ -248,8 +248,7 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Var parseVar(String name, String syntax) {
 		if(next(name, syntax,WaebricTokenSort.IDCON)) {
-			Var var = new Var();
-			var.setIdentifier(new IdCon(current.getLexeme().toString()));
+			Var var = new Var(current.getLexeme().toString());
 			return var;
 		}
 		

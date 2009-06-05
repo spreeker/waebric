@@ -12,10 +12,10 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.exception.ScannerException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
+import org.cwi.waebric.scanner.validator.LexicalException;
 import org.junit.After;
 import org.junit.Test;
 
@@ -47,7 +47,7 @@ public class TestScanner {
 		Reader reader = new StringReader(data);
 		try {
 			WaebricScanner scanner = new WaebricScanner(reader);
-			List<ScannerException> exceptions = scanner.tokenizeStream();
+			List<LexicalException> exceptions = scanner.tokenizeStream();
 			assertNotNull(exceptions);
 			assertTrue(exceptions.size() == 0);
 			return scanner.iterator();

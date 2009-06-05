@@ -12,12 +12,16 @@ public class Var extends AbstractSyntaxNode {
 
 	private IdCon identifier;
 
+	public Var(String identifier) {
+		this(new IdCon(identifier));
+	}
+	
+	public Var(IdCon identifier) {
+		this.identifier = identifier;
+	}
+	
 	public IdCon getIdentifier() {
 		return identifier;
-	}
-
-	public void setIdentifier(IdCon identifier) {
-		this.identifier = identifier;
 	}
 	
 	public AbstractSyntaxNode[] getChildren() {

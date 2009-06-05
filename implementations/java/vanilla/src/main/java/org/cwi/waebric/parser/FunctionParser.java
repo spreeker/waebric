@@ -53,7 +53,7 @@ class FunctionParser extends AbstractParser {
 		
 		// Parse statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
-			Statement subStatement = parseStatement("function statement", "identifier formals? statements*");
+			Statement subStatement = parseStatement(def.getFormals());
 			def.addStatement(subStatement);
 		}
 		
@@ -77,8 +77,8 @@ class FunctionParser extends AbstractParser {
 	 * 
 	 * @param statement
 	 */
-	public Statement parseStatement(String name, String syntax) {
-		return statementParser.parseStatement(name, syntax);
+	public Statement parseStatement(Formals formals) {
+		return statementParser.parseStatement(formals);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Assignment;
@@ -25,6 +26,7 @@ import org.junit.Test;
 public class TestStatementParser {
 
 	private StatementParser parser;
+	private Formals formals;
 	
 	private List<ParserException> exceptions;
 	private WaebricTokenIterator iterator;
@@ -32,6 +34,8 @@ public class TestStatementParser {
 	@Before
 	public void setUp() {
 		exceptions = new ArrayList<ParserException>();
+		formals = new Formals();
+		formals.add(new Var("arg1"));
 	}
 	
 	@After
@@ -70,7 +74,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		Assignment.IdConAssignment assignment = parser.parseIdConAssignment();
+		Assignment.IdConAssignment assignment = parser.parseIdConAssignment(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals("identifier1", assignment.getIdentifier().getLiteral().toString());
 		assertEquals(2, assignment.getFormals().size());
@@ -84,7 +88,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("if(123) comment \"succes\"");
 		parser = new StatementParser(iterator, exceptions);
 		
-		IfStatement statement = parser.parseIfStatement();
+		IfStatement statement = parser.parseIfStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(Predicate.ExpressionPredicate.class, statement.getPredicate().getClass());
 		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
@@ -95,7 +99,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("if(123) comment \"succes\" else yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		IfElseStatement statement = (IfElseStatement) parser.parseIfStatement();
+		IfElseStatement statement = (IfElseStatement) parser.parseIfStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(Predicate.ExpressionPredicate.class, statement.getPredicate().getClass());
 		assertEquals(Statement.CommentStatement.class, statement.getStatement().getClass());
@@ -107,7 +111,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("echo \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EchoEmbeddingStatement statement = parser.parseEchoEmbeddingStatement();
+		EchoEmbeddingStatement statement = parser.parseEchoEmbeddingStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertNotNull(statement.getEmbedding());
 	}
@@ -117,7 +121,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EchoExpressionStatement statement = parser.parseEchoExpressionStatement();
+		EchoExpressionStatement statement = parser.parseEchoExpressionStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 	}
@@ -127,7 +131,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("each(var1:10) comment \"test\"");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EachStatement statement = parser.parseEachStatement();
+		EachStatement statement = parser.parseEachStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals("var1", statement.getVar().getIdentifier().getLiteral().toString());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
@@ -139,7 +143,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("let var=100 in comment \"test\" end");
 		parser = new StatementParser(iterator, exceptions);
 		
-		LetStatement statement = parser.parseLetStatement();
+		LetStatement statement = parser.parseLetStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(1, statement.getAssignmentCount());
 		assertEquals(Assignment.VarAssignment.class, statement.getAssignment(0).getClass());
@@ -152,7 +156,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("cdata 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		CDataStatement statement = parser.parseCDataStatement();
+		CDataStatement statement = parser.parseCDataStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 	}
@@ -162,7 +166,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("comment \"OH NOES TEH HAXZOR\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		CommentStatement statement = parser.parseCommentStatement();
+		CommentStatement statement = parser.parseCommentStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals("OH NOES TEH HAXZOR", statement.getComment().getLiteral().toString());
 	}
@@ -172,7 +176,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		parser.parseYieldStatement();
+		parser.parseYieldStatement(formals);
 		assertEquals(0, exceptions.size());
 	}
 	
@@ -181,7 +185,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupStatement statement = (MarkupStatement) parser.parseStatement("", "");
+		MarkupStatement statement = (MarkupStatement) parser.parseStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
 	}
@@ -191,7 +195,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1 123;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		ExpressionMarkupsStatement statement = (ExpressionMarkupsStatement) parser.parseStatement("", "");
+		ExpressionMarkupsStatement statement = (ExpressionMarkupsStatement) parser.parseStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(1, statement.getMarkupCount());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
@@ -202,7 +206,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1 \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EmbeddingMarkupsStatement statement = (EmbeddingMarkupsStatement) parser.parseStatement("", "");
+		EmbeddingMarkupsStatement statement = (EmbeddingMarkupsStatement) parser.parseStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(1, statement.getMarkupCount());
 		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
@@ -213,7 +217,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1 yield;;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		StatementMarkupsStatement statement = (StatementMarkupsStatement) parser.parseStatement("", "");
+		StatementMarkupsStatement statement = (StatementMarkupsStatement) parser.parseStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(1, statement.getMarkupCount());
 		assertEquals(Statement.YieldStatement.class, statement.getStatement().getClass());
@@ -224,7 +228,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1 func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupMarkupsStatement statement = (MarkupMarkupsStatement) parser.parseStatement("", "");
+		MarkupMarkupsStatement statement = (MarkupMarkupsStatement) parser.parseStatement(formals);
 		assertEquals(0, exceptions.size());
 		assertEquals(1, statement.getMarkupCount());
 		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
