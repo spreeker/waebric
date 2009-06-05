@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.exception.MissingTokenException;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -28,7 +28,7 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  */
 class ExpressionParser extends AbstractParser {
 
-	public ExpressionParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public ExpressionParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 	}
 	

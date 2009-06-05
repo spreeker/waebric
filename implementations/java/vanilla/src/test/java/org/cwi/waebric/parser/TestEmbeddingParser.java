@@ -19,7 +19,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed.ExpressionEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
@@ -30,12 +30,12 @@ public class TestEmbeddingParser {
 
 	private EmbeddingParser parser;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 	}
 	
 	@After

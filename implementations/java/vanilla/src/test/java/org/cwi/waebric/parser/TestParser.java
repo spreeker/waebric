@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.After;
 import org.junit.Test;
 
 public class TestParser {
 
-	private List<ParserException> exceptions = new ArrayList<ParserException>();
+	private List<SyntaxException> exceptions = new ArrayList<SyntaxException>();
 	
 	@After
 	public void tearDown() {

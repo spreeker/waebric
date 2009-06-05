@@ -16,7 +16,7 @@ import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
@@ -27,12 +27,12 @@ public class TestSiteParser {
 
 	private SiteParser parser;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 	}
 	
 	@After

@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
@@ -22,12 +22,12 @@ public class TestModuleParser {
 	
 	private ModuleParser parser;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 	}
 	
 	@After
@@ -39,7 +39,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testModuleId() {
+	public void testModuleId() throws SyntaxException {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -55,7 +55,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testModules() {
+	public void testModules() throws SyntaxException {
 		iterator = TestScanner.quickScan("module mymodule1\nmodule mymodule2");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -66,12 +66,10 @@ public class TestModuleParser {
 		assertEquals(2, modules.size());
 		assertEquals(Module.class, modules.getChildren()[0].getClass());
 		assertEquals(Module.class, modules.getChildren()[1].getClass());
-		
-		// TODO: Word outside module definition error
 	}
 	
 	@Test
-	public void testModule() {
+	public void testModule() throws SyntaxException {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule\nimport newmodule\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -88,7 +86,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testImport() {
+	public void testImport() throws SyntaxException {
 		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -98,8 +96,6 @@ public class TestModuleParser {
 		assertEquals(0, exceptions.size());
 		assertEquals("import", imprt.getChildren()[0].toString());
 		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
-		
-		// TODO: Invalid identifier
 	}
 
 }

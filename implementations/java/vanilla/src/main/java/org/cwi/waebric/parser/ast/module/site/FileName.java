@@ -4,6 +4,12 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
+/**
+ * PathElement "." FileExt -> FileName
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
 public class FileName extends AbstractSyntaxNode {
 
 	private PathElement name;

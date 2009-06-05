@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.Statement;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
@@ -24,7 +24,7 @@ class FunctionParser extends AbstractParser {
 
 	private final StatementParser statementParser;
 	
-	public FunctionParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public FunctionParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parser

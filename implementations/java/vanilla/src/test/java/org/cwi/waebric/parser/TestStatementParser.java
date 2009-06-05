@@ -18,7 +18,7 @@ import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Statement.*;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -32,12 +32,12 @@ public class TestStatementParser {
 	private StatementParser parser;
 	private Formals formals;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 		formals = new Formals();
 		formals.add(new Var("arg1"));
 	}

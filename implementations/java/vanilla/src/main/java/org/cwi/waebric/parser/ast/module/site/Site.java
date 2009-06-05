@@ -6,12 +6,7 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.module.ModuleElement;
 
 /**
- * Site<br><br>
- * 
- * Grammar:<br>
- * <code>
- * 	"site" Mappings "end" -> Site
- * </code>
+ * "site" Mappings "end" -> Site
  * 
  * @author Jeroen van Schagen
  * @date 20-05-2009

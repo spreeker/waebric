@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
@@ -19,12 +19,12 @@ public class TestExpressionParser {
 
 	private ExpressionParser parser;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 	}
 	
 	@After

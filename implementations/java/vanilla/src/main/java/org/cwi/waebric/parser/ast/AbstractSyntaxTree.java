@@ -30,4 +30,9 @@ public class AbstractSyntaxTree {
 		return root;
 	}
 	
+	@Override
+	public final String toString() {
+		return root.toString();
+	}
+	
 }

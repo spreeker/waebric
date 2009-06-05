@@ -7,14 +7,14 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 
 class PredicateParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
-	public PredicateParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public PredicateParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 //		if(tokens.current() == null && tokens.hasNext()) {

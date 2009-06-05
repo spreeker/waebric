@@ -16,7 +16,7 @@ import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Statement.*;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -37,7 +37,7 @@ class StatementParser extends AbstractParser {
 	private final PredicateParser predicateParser;
 	private final MarkupParser markupPaser;
 	
-	public StatementParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public StatementParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parsers
@@ -421,7 +421,7 @@ class StatementParser extends AbstractParser {
 	}
 	
 	private boolean isStatement(Formals formals) {
-		List<ParserException> e = new java.util.ArrayList<ParserException>();
+		List<SyntaxException> e = new java.util.ArrayList<SyntaxException>();
 		WaebricTokenIterator i = tokens.clone();
 		StatementParser p = new StatementParser(i, e);
 		p.parseStatement(formals);
@@ -429,7 +429,7 @@ class StatementParser extends AbstractParser {
 	}
 	
 	private boolean isExpression() {
-		List<ParserException> e = new java.util.ArrayList<ParserException>();
+		List<SyntaxException> e = new java.util.ArrayList<SyntaxException>();
 		WaebricTokenIterator i = tokens.clone();
 		ExpressionParser p = new ExpressionParser(i, e);
 		p.parseExpression("","");

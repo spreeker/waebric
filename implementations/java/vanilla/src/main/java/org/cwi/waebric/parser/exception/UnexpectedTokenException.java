@@ -2,16 +2,23 @@ package org.cwi.waebric.parser.exception;
 
 import org.cwi.waebric.scanner.token.WaebricToken;
 
-public class UnexpectedTokenException extends ParserException {
+/**
+ * Unexpected token exceptions are thrown when a coming
+ * token does not match the expected token.
+ * 
+ * @author Jeroen van Schagen
+ * @date 05-06-2009
+ */
+public class UnexpectedTokenException extends SyntaxException {
 
 	/**
 	 * Serial ID
 	 */
 	private static final long serialVersionUID = -3943077437342399851L;
 
-	public UnexpectedTokenException(WaebricToken found, String name, String expected) {
-		super("Unexpected token found: " + found.toString() + ". Was expecting a " + name +
-				", use the expected (" + expected + ")."); 
+	public UnexpectedTokenException(WaebricToken actual, String expected, String syntax) {
+		super("Unexpected token found: " + actual.toString() + ". Was expecting a " + expected +
+				", follow the specified syntax (" + syntax + ")."); 
 	}
 	
 }

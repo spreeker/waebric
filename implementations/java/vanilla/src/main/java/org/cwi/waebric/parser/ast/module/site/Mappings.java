@@ -4,7 +4,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 
 /**
- * Collection of Mapping objects.
+ * { Mapping ";" }* -> Mappings
  * 
  * @author Jeroen van Schagen
  * @date 19-05-2009

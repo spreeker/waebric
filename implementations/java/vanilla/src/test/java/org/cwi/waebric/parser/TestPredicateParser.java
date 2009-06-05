@@ -14,7 +14,7 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate.ExpressionTypePr
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.NotPredicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.OrPredicate;
 import org.cwi.waebric.parser.exception.MissingTokenException;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -26,12 +26,12 @@ public class TestPredicateParser {
 	
 	private PredicateParser parser;
 	
-	private List<ParserException> exceptions;
+	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
 	
 	@Before
 	public void setUp() {
-		exceptions = new ArrayList<ParserException>();
+		exceptions = new ArrayList<SyntaxException>();
 	}
 	
 	@After

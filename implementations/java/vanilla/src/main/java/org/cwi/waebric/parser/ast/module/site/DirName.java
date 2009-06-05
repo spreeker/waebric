@@ -2,6 +2,12 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 
+/**
+ * Directory -> DirName
+ * 
+ * @author Jeroen van Schagen
+ * @date 20-05-2009
+ */
 public class DirName extends AbstractSyntaxNode {
 
 	private Directory directory;

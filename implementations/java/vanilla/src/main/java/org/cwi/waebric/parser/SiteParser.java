@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.site.DirName;
 import org.cwi.waebric.parser.ast.module.site.Directory;
 import org.cwi.waebric.parser.ast.module.site.FileExt;
@@ -14,17 +13,17 @@ import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.PathElement;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.parser.exception.ParserException;
-import org.cwi.waebric.parser.exception.UnexpectedTokenException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
- * Site parser
+ * Site related parse functionality
  * 
  * module languages/waebric/syntax/Site
  * 
+ * @see ModuleParser
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
@@ -32,49 +31,45 @@ class SiteParser extends AbstractParser {
 
 	private final MarkupParser markupParser;
 	
-	public SiteParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public SiteParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Construct sub parser
+		// Initialize sub-parser
 		markupParser = new MarkupParser(tokens, exceptions);
 	}
 	
+
 	/**
-	 * @see Site
-	 * @param site
+	 * "site" Mapping "end" -> Site
+	 * @throws SyntaxException
 	 */
-	public Site parseSite() {
+	public Site parseSite() throws SyntaxException {
+		current(WaebricKeyword.SITE, "Site begin", "\"site\" Mapping \"end\"");
+		
 		Site site = new Site();
+		site.setMappings(parseMappings());
 		
-		// Parse mappings
-		Mappings mappings = parseMappings();
-		site.setMappings(mappings);
-		
-		if(! next("site end", "site mappings end", WaebricKeyword.END)) {
-			return null; // Incorrect site syntax, return empty node
-		}
+		next(WaebricKeyword.END, "Site end", "\"site\" Mapping \"end\"");
 		
 		return site;
 	}
 	
 	/**
-	 * @see Mappings
+	 * { Mapping ";" }* -> Mappings
 	 * @param mappings
 	 */
-	public Mappings parseMappings() {
+	public Mappings parseMappings() throws SyntaxException {
 		Mappings mappings = new Mappings();
 		
 		while(tokens.hasNext()) {
-			Mapping mapping = parseMapping();
-			mappings.add(mapping);
+			mappings.add(parseMapping());
 				
 			if(tokens.hasNext()) {
-				WaebricToken peek = tokens.peek(1);
-				if(peek.getLexeme().equals(WaebricKeyword.END)) {
+				if(tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
 					break; // End token reached, quit parsing mappings
 				} else {
 					// Expect mapping separator ";" between each mapping
-					next("mapping separator", "semicolon", WaebricSymbol.SEMICOLON);
+					next(WaebricSymbol.SEMICOLON, "Mapping separator \";\"", "Mapping \";\" Mapping");
 				}
 			}
 		}
@@ -83,134 +78,95 @@ class SiteParser extends AbstractParser {
 	}
 	
 	/**
-	 * @see Mapping
+	 * Path ":" Markup -> Mapping
 	 * @param mapping
 	 */
-	public Mapping parseMapping() {
+	public Mapping parseMapping() throws SyntaxException {
 		Mapping mapping = new Mapping();
-		
-		// Parse path
-		Path path = parsePath();
-		mapping.setPath(path);
-		
-		// Parse colon separator
-		if(! next("mapping separator", "path \":\" markup", WaebricSymbol.COLON)) {
-			return null; // Invalid mapping syntax, quit parsing
-		}
-		
-		Markup markup = parseMarkup();
-		mapping.setMarkup(markup);
-		
+		mapping.setPath(parsePath());
+		next(WaebricSymbol.COLON, "Mapping separator \":\"", "Path \":\" Markup");
+		mapping.setMarkup(markupParser.parseMarkup());
 		return mapping;
 	}
 	
 	/**
-	 * @see Path
-	 * @param path
+	 * DirName "/" FileName -> Path
+	 * FileName -> Path
+	 * @throws SyntaxException 
 	 */
-	public Path parsePath() {
+	public Path parsePath() throws SyntaxException {
 		Path path = null; // Determine path type based on look-ahead
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
-			// Parse directory name
-			DirName name = parseDirName();
-			path = new Path.PathWithDir(name);
+			path = new Path.PathWithDir(parseDirName());
 		} else {
 			path = new Path.PathWithoutDir();
 		}
 
-		// Parse filename
-		FileName file = parseFileName();
-		path.setFileName(file);
-		
+		path.setFileName(parseFileName());
 		return path;
 	}
 	
 	/**
-	 * @see DirName
-	 * @param Directory name
+	 * Directory -> DirName
+	 * @throws SyntaxException 
 	 */
-	public DirName parseDirName() {
+	public DirName parseDirName() throws SyntaxException {
 		DirName name = new DirName();
-		
-		// Parse directory
-		Directory directory = parseDirectory();
-		name.setDirectory(directory);
-		
+		name.setDirectory(parseDirectory());
 		return name;
 	}
 	
 	/**
-	 * @see Directory
-	 * @param directory
+	 * { PathElement "/" }+ -> Directory
+	 * @throws SyntaxException 
 	 */
-	public Directory parseDirectory() {
+	public Directory parseDirectory() throws SyntaxException {
 		Directory directory = new Directory();
 		
-		while(tokens.hasNext()) {
-			if(directory.getElements().length != 0) {
-				// Between each path element a slash is expected
-				next("directory separator", "slash", WaebricSymbol.SLASH);
-			}
-			
+		do {
 			// Detect period separator for potential file names
 			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.PERIOD)) {
 				break; // File name detected, break from directory parsing
 			}
 			
-			// Parse directory element
-			current = tokens.next();
-			if(isPathElement(current.getLexeme().toString())) {
-				directory.add(new PathElement(current.getLexeme().toString()));
+			WaebricToken element = tokens.next();
+			if(isPathElement(element.getLexeme().toString())) {
+				directory.add(new PathElement(element.getLexeme().toString()));
 			} else {
-				exceptions.add(new UnexpectedTokenException(current, " path element,", 
-						"identifier without white spaces, layout symbols, periods and backward slashes"));
+				reportUnexpectedToken(element, "Path element", "Identifier without layout");
 			}
-		}
+			
+			next(WaebricSymbol.SLASH, "Path separator \"/\"", "Path element \"/\" Path element");
+		} while(tokens.hasNext());
 		
 		return directory;
 	}
 	
 	/**
-	 * 
+	 * Check if a certain lexeme is a path element.
 	 * @param lexeme
-	 * @return
+	 * @return PathElement?
 	 */
 	public static boolean isPathElement(String lexeme) {
 		return ! lexeme.matches("(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)");
 	}
 	
 	/**
-	 * @see FileName
+	 * PathElement "." FileExt -> FileName
 	 * @param File name
 	 */
-	public FileName parseFileName() {
+	public FileName parseFileName() throws SyntaxException {
 		FileName name = new FileName();
 		
-		// Parse file name
-		if(next("file name", "name \".\" extension", WaebricTokenSort.IDCON)) {
-			name.setName(new PathElement(current.getLexeme().toString()));
-		}
+		next(WaebricTokenSort.IDCON, "File name", "Name \".\" Extension");
+		name.setName(new PathElement(tokens.current().getLexeme().toString()));
+
+		next(WaebricSymbol.PERIOD, "period", "name \".\" extension");
 		
-		// Parse period separator
-		next("period", "name \".\" extension", WaebricSymbol.PERIOD);
-		
-		// Parse file extension
-		if(next("file extension", "name \".\" extension", WaebricTokenSort.IDCON)) {
-			name.setExt(new FileExt(current.getLexeme().toString()));
-		}
+		next(WaebricTokenSort.IDCON, "File extension", "Name \".\" Extension");
+		name.setExt(new FileExt(tokens.current().getLexeme().toString()));
 		
 		return name;
-	}
-	
-	/**
-	 * @see Markup
-	 * @see org.cwi.waebric.parser.MarkupParser
-	 * @param name
-	 * @param syntax
-	 * @return Markup
-	 */
-	public Markup parseMarkup() {
-		return markupParser.parseMarkup();
 	}
 
 }

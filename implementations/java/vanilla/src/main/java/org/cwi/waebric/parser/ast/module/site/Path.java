@@ -14,27 +14,16 @@ public abstract class Path extends AbstractSyntaxNode {
 
 	protected FileName fileName;
 
-	/**
-	 * Retrieve file name
-	 * @return
-	 */
 	public FileName getFileName() {
 		return fileName;
 	}
 
-	/**
-	 * Store file name
-	 * @param file
-	 */
 	public void setFileName(FileName file) {
 		this.fileName = file;
 	}
 
 	/**
-	 * Grammar:<br>
-	 * <code>
-	 * 	Dirname "/" FileName -> Path
-	 * </code>
+	 * 	DirName "/" FileName -> Path
 	 */
 	public static class PathWithDir extends Path {
 		
@@ -44,14 +33,11 @@ public abstract class Path extends AbstractSyntaxNode {
 			this.dirName = dirName;
 		}
 		
-		/**
-		 * Retrieve directory name
-		 * @return
-		 */
 		public DirName getDirName() {
 			return dirName;
 		}
 		
+		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] {
 				dirName,
@@ -63,18 +49,11 @@ public abstract class Path extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * Grammar:<br>
-	 * <code>
-	 * 	Filename -> Path
-	 * </code>
+	 * FileName -> Path
 	 */
 	public static class PathWithoutDir extends Path {
 		
 		@Override
-		public boolean equals(Object obj) {
-			return fileName.equals(obj);
-		}
-		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { fileName };
 		}

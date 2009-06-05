@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 
@@ -20,7 +20,6 @@ import org.cwi.waebric.scanner.token.WaebricTokenIterator;
  */
 public class WaebricParser extends AbstractParser {
 
-	private final ModuleParser moduleParser;
 	private AbstractSyntaxTree tree;
 
 	/**
@@ -36,10 +35,7 @@ public class WaebricParser extends AbstractParser {
 	 * @param iterator
 	 */
 	public WaebricParser(WaebricTokenIterator iterator) {
-		super(iterator, new ArrayList<ParserException>());
-		
-		// Construct sub parser
-		moduleParser = new ModuleParser(tokens, exceptions);
+		super(iterator, new ArrayList<SyntaxException>());
 	}
 	
 	/**
@@ -47,13 +43,14 @@ public class WaebricParser extends AbstractParser {
 	 * 
 	 * @return Exceptions
 	 */
-	public List<ParserException> parseTokens() {
-		exceptions.clear();
+	public List<SyntaxException> parseTokens() {
+		exceptions.clear(); // Clear exceptions
 		
-		Modules modules = moduleParser.parseModules(); // Construct root node
+		ModuleParser parser = new ModuleParser(tokens, exceptions);
+		Modules modules = parser.parseModules(); // Parse root node
 		tree = new AbstractSyntaxTree(modules); // Construct AST
 		
-		return exceptions;
+		return exceptions; // Publish exceptions
 	}
 	
 	/**

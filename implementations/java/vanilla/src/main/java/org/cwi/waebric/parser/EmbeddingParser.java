@@ -15,7 +15,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.MidText;
 import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
-import org.cwi.waebric.parser.exception.ParserException;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -34,7 +34,7 @@ class EmbeddingParser extends AbstractParser {
 	private final MarkupParser markupParser;
 	private final ExpressionParser expressionParser;
 
-	public EmbeddingParser(WaebricTokenIterator tokens, List<ParserException> exceptions) {
+	public EmbeddingParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 
 		// Initiate sub-parsers
