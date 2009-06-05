@@ -57,9 +57,16 @@ class ExpressionParser extends AbstractParser {
 		} else if(peek.getSort().equals(WaebricTokenSort.IDCON)) {
 			// Variable expressions consist of variable
 			return parseVarExpression();
-		} else { // Identifier expressions are only remaining alternative
-			return parseIdConExpression();
+		} else if(peek.getSort() != WaebricTokenSort.KEYWORD) {
+			// Scan for invalid coming tokens, else you get stuck in infinite loop
+			if(peek.getSort() != WaebricTokenSort.CHARACTER || peek.getLexeme().equals('{') || peek.getLexeme().equals('(')) {
+					// Identifier expressions are only remaining alternative
+					return parseIdConExpression();
+			}
 		}
+
+		reportUnexpectedToken(peek, "expression", "expression");
+		return null;
 	}
 	
 	/**

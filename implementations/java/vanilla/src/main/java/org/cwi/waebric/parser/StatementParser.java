@@ -13,6 +13,7 @@ import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.Statement;
+import org.cwi.waebric.parser.ast.statement.Statement.*;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.exception.ParserException;
@@ -225,7 +226,7 @@ class StatementParser extends AbstractParser {
 		}
 		
 		// Parse sub-statements
-		while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
+		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
 			Statement subStatement = parseStatement(formals);
 			statement.addStatement(subStatement);
 		}
@@ -342,68 +343,71 @@ class StatementParser extends AbstractParser {
 	 * @return
 	 */
 	public Statement parseMarkupStatements(Formals formals) {
+		/**
+		 * PSEUDO IMPLEMENTATION
+		 * 
+		 * Parse: Markup+
+		 * while(current token is identifier and not var, and thus a markup)
+		 * 	identifier is var when it is contained in formals of related functiondef
+		 * add parse markup
+		 * 
+		 * Determine if next token is Statement, Expression, Embedding or Markup
+		 * if next is ; then previous token is markup
+		 * 	store markup and reduce markup list by 1
+		 * if next is quote and embedding "*\w<\w*>\w*"
+		 * 	parse embedding and store
+		 * check if statement parser can process token stream, then its statement
+		 * else check if expression parser can process etc..
+		 * else report unexpected token
+		 * 	
+		 */
+		
+		
 		Markup markup = parseMarkup(); // Retrieve mark-up
 		
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+			// Markup ";"
 			Statement.MarkupStatement statement = new Statement.MarkupStatement();
 			statement.setMarkup(markup);
 			return statement;
 		} else {
-			// Retrieve remaining mark-up tokens
+			// Retrieve remaining mark-up tokens (Markup+)
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
-			
-			/**
-			 * PSEUDO IMPLEMENTATION
-			 * 
-			 * Parse: Markup+
-			 * while(current token is identifier and not var, and thus a markup)
-			 * 	identifier is var when it is contained in formals of related functiondef
-			 * add parse markup
-			 * 
-			 * Determine if next token is Statement, Expression, Embedding or Markup
-			 * if next is ; then previous token is markup
-			 * 	store markup and reduce markup list by 1
-			 * if next is quote and embedding "*\w<\w*>\w*"
-			 * 	parse embedding and store
-			 * check if statement parser can process token stream, then its statement
-			 * else check if expression parser can process etc..
-			 * else report unexpected token
-			 * 	
-			 */
-			
-			while(isMarkup(tokens.current(), new Formals())) {
+			while(tokens.hasNext() && isMarkup(tokens.peek(1), formals)) {
 				markups.add(parseMarkup());
 			}
 			
 			if(tokens.hasNext()) {
-				WaebricToken peek = tokens.peek(1); // Determine mark-ups statement type
+				// Determine mark-ups statement type
+				WaebricToken peek = tokens.peek(1);
 				if(peek.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+					// Markup+ Markup ";"
 					Markup end = markups.remove(markups.size()-1);
 					Statement.MarkupMarkupsStatement statement = 
 						new Statement.MarkupMarkupsStatement(markups);
 					statement.setMarkup(end);
 					return statement;
-				} else if(peek.getSort() == WaebricTokenSort.IDCON) {
-					Statement.StatementMarkupsStatement statement = 
-						new Statement.StatementMarkupsStatement(markups);
-					statement.setStatement(parseStatement(formals));
-					next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
-					return statement;
 				} else if(peek.getSort() == WaebricTokenSort.QUOTE) {
-					return parseEmbeddingMarkupsStatement(markups);
+					// Markup+ Embedding TODO: Filter between text and embedding
+					EmbeddingMarkupsStatement statement = new EmbeddingMarkupsStatement(markups);
+					statement.setEmbedding(parseEmbedding());
+					next("Markup embedding closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
+					return statement;
 				} else {
-					// Only remaining alternatives are expressions or statements
-					if(isStatement(formals)) {
-						Statement.StatementMarkupsStatement statement = 
-							new Statement.StatementMarkupsStatement(markups);
-						statement.setStatement(parseStatement(formals));
-						next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
+					if(isExpression()) {
+						// Markup+ Expression
+						ExpressionMarkupsStatement statement = new ExpressionMarkupsStatement(markups);
+						statement.setExpression(parseExpression("Markup expression", "Markup+ Expression \";\""));
+						next("Markup expression closure ;", "Markup+ Expression \";\"", WaebricSymbol.SEMICOLON);
 						return statement;
-					} 
-					else if(isExpression()) {
-						return parseExpressionMarkupsStatement(markups);
+					} else if(isStatement(formals)) {
+						// Markup+ Statement ";"
+						StatementMarkupsStatement statement = new StatementMarkupsStatement(markups);
+						statement.setStatement(parseStatement(formals));
+						return statement;
 					} else {
+						// Unknown
 						reportUnexpectedToken(peek, "Markups statement", 
 								"Markup+ { Markup, Expression, Embedding or Statement }");
 					}
@@ -415,20 +419,6 @@ class StatementParser extends AbstractParser {
 		
 		return null;
 	}
-
-	/**
-	 * 
-	 * @param markups
-	 * @return
-	 */
-	private Statement.EmbeddingMarkupsStatement parseEmbeddingMarkupsStatement(
-			AbstractSyntaxNodeList<Markup> markups) {
-		Statement.EmbeddingMarkupsStatement statement = 
-			new Statement.EmbeddingMarkupsStatement(markups);
-		statement.setEmbedding(parseEmbedding());
-		next("Markup statement closure ;", "Markup+ Embedding \";\"", WaebricSymbol.SEMICOLON);
-		return statement;
-	}
 	
 	private boolean isStatement(Formals formals) {
 		List<ParserException> e = new java.util.ArrayList<ParserException>();
@@ -436,20 +426,6 @@ class StatementParser extends AbstractParser {
 		StatementParser p = new StatementParser(i, e);
 		p.parseStatement(formals);
 		return e.size() == 0;
-	}
-	
-	/**
-	 * 
-	 * @param markups
-	 * @return
-	 */
-	private Statement.ExpressionMarkupsStatement parseExpressionMarkupsStatement(
-			AbstractSyntaxNodeList<Markup> markups) {
-		Statement.ExpressionMarkupsStatement statement =
-			new Statement.ExpressionMarkupsStatement(markups);
-		statement.setExpression(parseExpression("Markup statement", "Markup+ Expression \";\""));
-		next("Markup statement closure ;", "Markup+ Expression \";\"", WaebricSymbol.SEMICOLON);
-		return statement;
 	}
 	
 	private boolean isExpression() {
@@ -460,7 +436,16 @@ class StatementParser extends AbstractParser {
 		return e.size() == 0;
 	}
 	
-	private boolean isVar(WaebricToken token, Formals formals) {
+	public static boolean isMarkup(WaebricToken token, Formals formals) {
+		if(token.getSort() == WaebricTokenSort.IDCON) {
+			// Check if token matches a specified variable
+			return ! isVar(token, formals);
+		}
+		
+		return false;
+	}
+	
+	private static boolean isVar(WaebricToken token, Formals formals) {
 		for(Var var: formals) {
 			String name = var.getIdentifier().getLiteral().toString();
 			if(token.getLexeme().equals(name)) { return true; }
@@ -468,17 +453,6 @@ class StatementParser extends AbstractParser {
 		
 		return false;
 	}
-	
-	private boolean isMarkup(WaebricToken token, Formals formals) {
-		if(isVar(token, formals)) { return false; } 
-		
-		List<ParserException> e = new java.util.ArrayList<ParserException>();
-		WaebricTokenIterator i = tokens.clone();
-		MarkupParser p = new MarkupParser(i, e);
-		p.parseMarkup();
-		return e.size() == 0;
-	}
-	
 	
 	/**
 	 * @see Assignment

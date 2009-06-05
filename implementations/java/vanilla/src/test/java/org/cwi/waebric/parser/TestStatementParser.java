@@ -1,7 +1,9 @@
 package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,9 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.exception.ParserException;
 import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -191,46 +195,63 @@ public class TestStatementParser {
 	}
 	
 	@Test
+	public void testIsMarkup() {
+		assertTrue(StatementParser.isMarkup(new WaebricToken("func1", WaebricTokenSort.IDCON, 0, 0), formals)); // Markup
+		assertFalse(StatementParser.isMarkup(new WaebricToken("arg1", WaebricTokenSort.IDCON, 0, 0), formals)); // Arg, part of formals
+		assertFalse(StatementParser.isMarkup(new WaebricToken(123, WaebricTokenSort.NATCON, 0, 0), formals)); // Natural
+	}
+	
+	@Test
 	public void testExpressionMarkupsStatement() {
-		iterator = TestScanner.quickScan("func1 123;");
+		// Natural expression (easy example)
+		iterator = TestScanner.quickScan("func1 func2 123;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		ExpressionMarkupsStatement statement = (ExpressionMarkupsStatement) parser.parseStatement(formals);
+		ExpressionMarkupsStatement natstm = (ExpressionMarkupsStatement) parser.parseMarkupStatements(formals);
 		assertEquals(0, exceptions.size());
-		assertEquals(1, statement.getMarkupCount());
-		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
+		assertEquals(2, natstm.getMarkupCount());
+		assertEquals(Expression.NatExpression.class, natstm.getExpression().getClass());
+		
+		// Var expression (resembles mark-up)
+		iterator = TestScanner.quickScan("func1 func2 arg1;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		ExpressionMarkupsStatement varstm = (ExpressionMarkupsStatement) parser.parseMarkupStatements(formals);
+		assertEquals(0, exceptions.size());
+		assertEquals(2, varstm.getMarkupCount());
+		assertEquals(Expression.VarExpression.class, varstm.getExpression().getClass());
 	}
 	
 	@Test
 	public void testEmbeddingMarkupsStatement() {
-		iterator = TestScanner.quickScan("func1 \"<123>\";");
+		iterator = TestScanner.quickScan("func1 func2 \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EmbeddingMarkupsStatement statement = (EmbeddingMarkupsStatement) parser.parseStatement(formals);
+		EmbeddingMarkupsStatement statement = (EmbeddingMarkupsStatement) parser.parseMarkupStatements(formals);
 		assertEquals(0, exceptions.size());
-		assertEquals(1, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkupCount());
 		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
 	}
 	
 	@Test
 	public void testStatementMarkupsStatement() {
-		iterator = TestScanner.quickScan("func1 yield;;");
+		iterator = TestScanner.quickScan("func1 func2 yield;;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		StatementMarkupsStatement statement = (StatementMarkupsStatement) parser.parseStatement(formals);
+		StatementMarkupsStatement statement = (StatementMarkupsStatement) parser.parseMarkupStatements(formals);
 		assertEquals(0, exceptions.size());
-		assertEquals(1, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkupCount());
 		assertEquals(Statement.YieldStatement.class, statement.getStatement().getClass());
 	}
 	
 	@Test
 	public void testMarkupMarkupsStatement() {
-		iterator = TestScanner.quickScan("func1 func1;");
+		iterator = TestScanner.quickScan("func1 func2 func3;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupMarkupsStatement statement = (MarkupMarkupsStatement) parser.parseStatement(formals);
+		MarkupMarkupsStatement statement = (MarkupMarkupsStatement) parser.parseMarkupStatements(formals);
 		assertEquals(0, exceptions.size());
-		assertEquals(1, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkupCount());
 		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
 	}
 

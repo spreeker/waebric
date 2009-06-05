@@ -189,6 +189,10 @@ public abstract class Statement extends AbstractSyntaxNode {
 
 		private AbstractSyntaxNodeList<Statement> statements;
 		
+		public StatementCollection() {
+			statements = new AbstractSyntaxNodeList<Statement>();
+		}
+		
 		public boolean addStatement(Statement statement) {
 			return statements.add(statement);
 		}
