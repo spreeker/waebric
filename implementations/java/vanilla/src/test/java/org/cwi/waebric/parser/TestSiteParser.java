@@ -45,7 +45,7 @@ public class TestSiteParser {
 	
 	@Test
 	public void testSite() throws SyntaxException {
-		iterator = TestScanner.quickScan("index1.html:function1(1);index2.html:function2 end");
+		iterator = TestScanner.quickScan("site index1.html:function1(1);index2.html:function2 end");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Site site = parser.parseSite();

@@ -55,12 +55,20 @@ public class TestMarkupParser {
 		assertNotNull(markup.getDesignator());
 		
 		// Mark-up with arguments
-		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
+		iterator = TestScanner.quickScan("myfunction (12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.MarkupWithArguments markupa = (MarkupWithArguments) parser.parseMarkup();
 		assertNotNull(markupa.getDesignator());
 		assertEquals(2, markupa.getArguments().size());
+		
+		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
+		parser = new MarkupParser(iterator, exceptions);
+		
+		Markup.MarkupWithArguments markupaa = (MarkupWithArguments) parser.parseMarkup();
+		assertNotNull(markupaa.getDesignator());
+		assertEquals(2, markupaa.getArguments().size());
+		assertEquals(2, markupaa.getArguments().size());
 	}
 	
 	@Test

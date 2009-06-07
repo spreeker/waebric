@@ -92,6 +92,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	 * @return Current token
 	 */
 	public WaebricToken current() {
+		if(curr == -1) { return null; }
 		return collection.get(curr);
 	}
 

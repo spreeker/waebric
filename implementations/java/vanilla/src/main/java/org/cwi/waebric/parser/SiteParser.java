@@ -127,21 +127,23 @@ class SiteParser extends AbstractParser {
 		Directory directory = new Directory();
 		
 		do {
+			if(directory.size() != 0) {
+				// Expect slash separator between each path element
+				next(WaebricSymbol.SLASH, "Path separator \"/\"", "Path element \"/\" Path element");
+			}
+			
 			// Detect period separator for potential file names
 			if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.PERIOD)) {
 				break; // File name detected, break from directory parsing
 			}
-			
-			
-			
-			WaebricToken element = tokens.next();
+
+			WaebricToken element = tokens.next(); // Retrieve next path element
 			if(isPathElement(element.getLexeme().toString())) {
 				directory.add(new PathElement(element.getLexeme().toString()));
 			} else {
+				// Token does not match path element syntax, thus directory is invalid
 				reportUnexpectedToken(element, "Path element", "Identifier without layout");
 			}
-			
-			next(WaebricSymbol.SLASH, "Path separator \"/\"", "Path element \"/\" Path element");
 		} while(tokens.hasNext());
 		
 		return directory;

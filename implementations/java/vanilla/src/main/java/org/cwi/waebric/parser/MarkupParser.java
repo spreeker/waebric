@@ -13,6 +13,7 @@ import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.SyntaxException;
+import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
@@ -67,8 +68,7 @@ class MarkupParser extends AbstractParser {
 		designator.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
 		
 		// Parse attributes
-		Attributes attributes = parseAttributes();
-		designator.setAttributes(attributes);
+		designator.setAttributes(parseAttributes());
 		
 		return designator;
 	}
@@ -80,10 +80,8 @@ class MarkupParser extends AbstractParser {
 	public Attributes parseAttributes() throws SyntaxException {
 		Attributes attributes = new Attributes();
 		
-		while(tokens.hasNext()) {
-			// Parse attribute
-			Attribute attribute = parseAttribute();
-			if(attribute != null) { attributes.add(attribute); }
+		while(tokens.hasNext() && isAttribute(tokens.peek(1))) {
+			attributes.add(parseAttribute());
 			
 			// Look-ahead for separator
 			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
@@ -95,6 +93,12 @@ class MarkupParser extends AbstractParser {
 		
 		return attributes;
 	}
+	
+	public static boolean isAttribute(WaebricToken token) {
+		if(token.getSort() != WaebricTokenSort.CHARACTER) { return false; }
+		char symbol = token.getLexeme().toString().charAt(0);
+		return symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':' || symbol == '@';
+	}
 
 	/**
 	 * @see Attribute
@@ -102,14 +106,14 @@ class MarkupParser extends AbstractParser {
 	 */
 	public Attribute parseAttribute() throws SyntaxException {
 		next(WaebricTokenSort.CHARACTER, "Attribute", "{ # . $ : @ } Identifier");
-		char c = tokens.current().getLexeme().toString().charAt(0);
+		char symbol = tokens.current().getLexeme().toString().charAt(0);
 		
-		if(c == '#' || c == '.' || c == '$' || c ==':') { // Identifier attribute
+		if(symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':') { // Identifier attribute
 			next(WaebricTokenSort.IDCON, "Identifier attribute", "{ # , $ : } Identifier");
-			Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(c);
+			Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(symbol);
 			attribute.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
 			return attribute;
-		} else if(c == '@') { // Natural attribute
+		} else if(symbol == '@') { // Natural attribute
 			next(WaebricTokenSort.NATCON, "Natural attribute", "@ Number");
 			NatCon number = new NatCon(tokens.current().getLexeme().toString());
 			
