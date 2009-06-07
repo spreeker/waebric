@@ -43,7 +43,6 @@ public class TestExpressionParser {
 		Expression expression = parser.parseExpression();
 		
 		// Assertions
-		assertEquals(0, exceptions.size());
 		assertEquals(Expression.VarExpression.class, expression.getClass());
 	}
 	
@@ -53,7 +52,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.VarExpression expression = parser.parseVarExpression();
-		assertEquals(0, exceptions.size());
 		assertEquals("variable1", expression.getVar().getIdentifier().getLiteral().toString());
 	}
 	
@@ -63,7 +61,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.IdConExpression expression = parser.parseIdConExpression();
-		assertTrue(exceptions.size() == 0);
 		assertEquals("identifier1", expression.getIdentifier().getLiteral().toString());
 		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
 	}
@@ -74,7 +71,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.SymbolExpression expression = parser.parseSymbolExpression();
-		assertTrue(exceptions.size() == 0);
 		assertEquals("abc", expression.getSymbol().getLiteral().toString());
 	}
 	
@@ -84,7 +80,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.NatExpression expression = parser.parseNatExpression();
-		assertTrue(exceptions.size() == 0);
 		assertEquals(123, expression.getNatural().getLiteral().toInteger());
 	}
 	
@@ -94,7 +89,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.TextExpression expression = parser.parseTextExpression();
-		assertTrue(exceptions.size() == 0);
 		assertEquals("bla", expression.getText().getLiteral().toString());
 	}
 	
@@ -104,7 +98,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.ListExpression expression = parser.parseListExpression();
-		assertTrue(exceptions.size() == 0);
 		assertTrue(expression.getElements().length == 2);
 		assertTrue(expression.getElements()[0] instanceof Expression.VarExpression);
 		assertTrue(expression.getElements()[1] instanceof Expression.VarExpression);
@@ -116,7 +109,6 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.RecordExpression expression = parser.parseRecordExpression();
-		assertTrue(exceptions.size() == 0);
 		assertTrue(expression.getElements().length == 2);
 		assertTrue(expression.getElements()[0] instanceof KeyValuePair);
 		assertTrue(expression.getElements()[1] instanceof KeyValuePair);

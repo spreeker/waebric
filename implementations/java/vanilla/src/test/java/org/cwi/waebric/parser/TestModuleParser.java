@@ -46,7 +46,6 @@ public class TestModuleParser {
 		ModuleId moduleId = parser.parseModuleId();
 		
 		// Assertions
-		assertEquals(0, exceptions.size());
 		assertEquals(7, moduleId.getChildren().length); // Four elements and three period separators
 		assertEquals("org", moduleId.get(0).getLiteral().toString());
 		assertEquals("cwi", moduleId.get(1).getLiteral().toString());
@@ -62,7 +61,6 @@ public class TestModuleParser {
 		Modules modules = parser.parseModules();
 		
 		// Assertions
-		assertEquals(0, exceptions.size());
 		assertEquals(2, modules.size());
 		assertEquals(Module.class, modules.getChildren()[0].getClass());
 		assertEquals(Module.class, modules.getChildren()[1].getClass());
@@ -76,7 +74,6 @@ public class TestModuleParser {
 		Module module = parser.parseModule();
 		
 		// Assertions
-		assertEquals(0, exceptions.size());
 		assertEquals("module", module.getChildren()[0].toString());
 		assertEquals(ModuleId.class, module.getChildren()[1].getClass());
 		assertEquals(3, module.getElements().length);
@@ -93,7 +90,6 @@ public class TestModuleParser {
 		Import imprt = parser.parseImport();
 		
 		// Assertions
-		assertEquals(0, exceptions.size());
 		assertEquals("import", imprt.getChildren()[0].toString());
 		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
 	}

@@ -45,10 +45,15 @@ public class WaebricParser extends AbstractParser {
 	 */
 	public List<SyntaxException> parseTokens() {
 		exceptions.clear(); // Clear exceptions
+
+		try {
+			ModuleParser parser = new ModuleParser(tokens, exceptions);
+			Modules modules = parser.parseModules(); // Parse root node
+			tree = new AbstractSyntaxTree(modules); // Construct AST
+		} catch (SyntaxException e) {
+			exceptions.add(e);
+		}
 		
-		ModuleParser parser = new ModuleParser(tokens, exceptions);
-		Modules modules = parser.parseModules(); // Parse root node
-		tree = new AbstractSyntaxTree(modules); // Construct AST
 		
 		return exceptions; // Publish exceptions
 	}
