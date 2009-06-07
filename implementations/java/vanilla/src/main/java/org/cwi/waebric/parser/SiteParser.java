@@ -132,6 +132,8 @@ class SiteParser extends AbstractParser {
 				break; // File name detected, break from directory parsing
 			}
 			
+			
+			
 			WaebricToken element = tokens.next();
 			if(isPathElement(element.getLexeme().toString())) {
 				directory.add(new PathElement(element.getLexeme().toString()));
