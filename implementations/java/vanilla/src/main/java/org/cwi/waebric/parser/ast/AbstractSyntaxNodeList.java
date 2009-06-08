@@ -65,7 +65,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	@Override
 	public AbstractSyntaxNodeList<E> clone() {
-		return new AbstractSyntaxNodeList<E>(list);
+		return new AbstractSyntaxNodeList<E>(new ArrayList<E>(list));
 	}
 	
 	@Override
@@ -245,7 +245,10 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 
 		@Override
 		public AbstractSeparatedSyntaxNodeList<E> clone() {
-			return new AbstractSeparatedSyntaxNodeList<E>(list, separator);
+			return new AbstractSeparatedSyntaxNodeList<E>(
+				new AbstractSyntaxNodeList<E>(new ArrayList<E>(list)), 
+				separator
+			);
 		}
 		
 		@Override
