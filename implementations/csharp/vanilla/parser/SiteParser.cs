@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Lexer.Tokenizer;
 
-namespace Parser.Ast
+namespace Parser
 {
-    class SiteParser : AbstractParser
+    /// <summary>
+    /// Parser which parses a site
+    /// </summary>
+    public class SiteParser : AbstractParser
     {
+        public SiteParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
+        {
+
+        }
     }
 }

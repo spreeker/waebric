@@ -110,14 +110,14 @@ namespace Parser
         }
 
         /// <summary>
-        /// Match two objects. Used for token matching during parsing.
+        /// Match two values. Used for token matching during parsing.
         /// </summary>
-        /// <param name="retrieved">Object retrieved from TokenStream</param>
-        /// <param name="expected">Object which is expected</param>
+        /// <param name="retrieved">String retrieved from TokenStream</param>
+        /// <param name="expected">String which is expected</param>
         /// <returns></returns>
-        protected bool Match(Object retrieved, Object expected)
+        protected bool MatchValue(String retrieved, String expected)
         {
-            return expected.Equals(retrieved);
+            return expected.ToUpper().Equals(retrieved.ToUpper());
         }
 
         #endregion

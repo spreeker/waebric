@@ -14,8 +14,8 @@ namespace Parser
     public class ModuleParser : AbstractParser
     {
         #region Private Members
-        
-        //HERE SHOULD ALL IMPORTS, MODULEELEMENTS AND MODULES BEING DECLARED
+
+        private SiteParser siteParser;
 
         #endregion
 
@@ -28,24 +28,26 @@ namespace Parser
         /// <param name="exceptionList"></param>
         public ModuleParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
         {
-            //Create parsers for other items, like site and so on
+            //Create parsers for sub elements in a module
+            siteParser = new SiteParser(tokenStream, exceptionList);
         }
 
         /// <summary>
         /// Parse more than one module
         /// </summary>
         /// <param name="modules">Modules to parse</param>
-        public void Parse(ModuleList modules)
+        public ModuleList ParseModules()
         {
+            ModuleList modules = new ModuleList();
+
             //Parse modules until no new modules are found
             while (TokenStream.HasNext())
             {
                 CurrentToken = TokenStream.NextToken();
-                if (Match(CurrentToken.GetValue(), Waebric.WaebricKeyword.MODULE))
+                if (MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.MODULE.ToString()))
                 {
                     //New module found so create new module object and start parsing it
-                    Module module = new Module();
-                    Parse(module);
+                    Module module = ParseModule();
                     modules.Add(module);
                 }
                 else
@@ -53,17 +55,18 @@ namespace Parser
                     //Exception handling here
                 }
             }
+            return modules;
         }
 
         /// <summary>
         /// Parse one module
         /// </summary>
         /// <param name="module">Module to parse</param>
-        public void Parse(Module module)
+        public Module ParseModule()
         {
+            Module module = new Module();
             //Parse first the identifier of the module and set it
-            ModuleId moduleIdentifier = new ModuleId();
-            Parse(moduleIdentifier);
+            ModuleId moduleIdentifier = ParseModuleId();
             module.SetIdentifier(moduleIdentifier);
             
             //Look for elements like SITE, DEF, etc
@@ -73,14 +76,14 @@ namespace Parser
 
                 CurrentToken = TokenStream.NextToken();
                 //Check for different elements which may appear in a module
-                if(Match(CurrentToken.GetValue(), Waebric.WaebricKeyword.DEF))
+                if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.DEF.ToString()))
                 {   //Function definition found
 
                 }
-                else if(Match(CurrentToken.GetValue(), Waebric.WaebricKeyword.SITE))
+                else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.SITE.ToString()))
                 {   //Site definition found
                 }
-                else if(Match(CurrentToken.GetValue(), Waebric.WaebricKeyword.IMPORT))
+                else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.IMPORT.ToString()))
                 {   //Imports found
 
                 }
@@ -91,22 +94,39 @@ namespace Parser
                             
             }
             //parse identifiers and so on
+
+            return module;
         }
 
         /// <summary>
         /// Parse a module identifier
         /// </summary>
         /// <param name="identifier">Identifier to parse</param>
-        public void Parse(ModuleId identifier)
+        public ModuleId ParseModuleId()
         {
+            ModuleId moduleId = new ModuleId();
             //parse single identifier
             if(NextToken("module identifier", "identifier", TokenType.IDENTIFIER))
             {
-                identifier.SetIdentifier(new IdentifierCon(CurrentToken.GetValue().ToString()));
+                moduleId.SetIdentifier(new IdentifierCon(CurrentToken.GetValue().ToString()));
             }
+
+            return moduleId;
         }
 
-        public void Parse(Im
+        /// <summary>
+        /// Parse import
+        /// </summary>
+        /// <returns></returns>
+        public Import ParseImport()
+        {
+            Import import = new Import();
+            if (NextToken("import identifier", "identifier", TokenType.IDENTIFIER))
+            {
+                import.SetIdentifier(new ModuleId(new IdentifierCon(CurrentToken.GetValue().ToString())));
+            }
+            return import;
+        }
 
         #endregion
 

@@ -41,11 +41,9 @@ namespace Parser
             //Clear exceptions before start parsing
             ExceptionList.Clear();
 
-            //Make new ModuleList to store modules in and add it to root of tree
-            ModuleList moduleList = new ModuleList();
+            //Parse waebric file
+            ModuleList moduleList = moduleParser.ParseModules();
             tree.SetRoot(moduleList);
-
-            //TODO: ModuleParser must called here
 
             return ExceptionList;
         }
