@@ -2,20 +2,17 @@ package org.cwi.waebric.scanner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
-import org.cwi.waebric.scanner.validator.LexicalException;
 import org.junit.After;
 import org.junit.Test;
 
@@ -47,9 +44,7 @@ public class TestScanner {
 		Reader reader = new StringReader(data);
 		try {
 			WaebricScanner scanner = new WaebricScanner(reader);
-			List<LexicalException> exceptions = scanner.tokenizeStream();
-			assertNotNull(exceptions);
-			assertTrue(exceptions.size() == 0);
+			scanner.tokenizeStream();
 			return scanner.iterator();
 		} catch(IOException e) {
 			fail(e.getMessage());

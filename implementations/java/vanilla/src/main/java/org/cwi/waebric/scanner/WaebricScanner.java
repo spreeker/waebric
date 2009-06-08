@@ -8,12 +8,12 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.scanner.processor.ILexicalProcessor;
+import org.cwi.waebric.scanner.processor.ImportProcessor;
+import org.cwi.waebric.scanner.processor.LexicalException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
-import org.cwi.waebric.scanner.validator.ILexicalValidator;
-import org.cwi.waebric.scanner.validator.LexicalException;
-import org.cwi.waebric.scanner.validator.RejectValidator;
 
 /**
  * The lexical analyzer, also known as a scanner, reads an input character stream
@@ -31,9 +31,9 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	private final StreamTokenizer tokenizer;
 	
 	/**
-	 * Collection of token stream validators
+	 * Collection of token stream processor
 	 */
-	private List<ILexicalValidator> validators;
+	private List<ILexicalProcessor> processors;
 	
 	/**
 	 * Collection of processed tokens
@@ -51,12 +51,17 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param reader Input character stream
 	 * @throws IOException 
 	 */
-	public WaebricScanner(Reader reader) throws IOException {
-		tokenizer = new StreamTokenizer(reader);
+	public WaebricScanner(Reader reader) {
+		try {
+			tokenizer = new StreamTokenizer(reader); 
+		} catch(IOException e) {
+			throw new InternalError(); // Should never occur
+		}
+		
 		tokens = new ArrayList<WaebricToken>();
 		
-		validators = new ArrayList<ILexicalValidator>();
-		validators.add(new RejectValidator());
+		processors = new ArrayList<ILexicalProcessor>();
+		processors.add(new ImportProcessor());
 	}
 	
 	/**
@@ -97,8 +102,8 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		
 		// Scan for exceptions
 		List<LexicalException> exceptions = new ArrayList<LexicalException>();
-		for(ILexicalValidator validator : validators) {
-			validator.validate(tokens, exceptions);
+		for(ILexicalProcessor processor : processors) {
+			processor.process(tokens, exceptions);
 		}
 		return exceptions;
 	}

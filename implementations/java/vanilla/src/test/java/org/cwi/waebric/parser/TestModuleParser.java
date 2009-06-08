@@ -68,7 +68,7 @@ public class TestModuleParser {
 	
 	@Test
 	public void testModule() throws SyntaxException {
-		iterator = TestScanner.quickScan("module org.cwi.waebric.mymodule\nimport newmodule\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
+		iterator = TestScanner.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Module module = parser.parseModule();

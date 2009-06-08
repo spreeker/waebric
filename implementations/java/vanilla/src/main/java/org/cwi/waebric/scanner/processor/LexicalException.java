@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner.validator;
+package org.cwi.waebric.scanner.processor;
 
 /**
  * Lexical exceptions occur when a token stream does not maintain
