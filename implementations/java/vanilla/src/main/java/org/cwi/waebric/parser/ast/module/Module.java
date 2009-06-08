@@ -67,5 +67,15 @@ public class Module extends AbstractSyntaxNode {
 			elements
 		};
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Module) {
+			Module module = (Module) obj;
+			return this.identifier.equals(module.getIdentifier());
+		}
+		
+		return false;
+	}
 
 }

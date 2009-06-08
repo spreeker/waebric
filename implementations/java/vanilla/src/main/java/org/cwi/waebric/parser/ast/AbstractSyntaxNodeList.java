@@ -91,6 +91,16 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	}
 	
 	@Override
+	public boolean equals(Object arg) {
+		if(arg instanceof AbstractSyntaxNodeList) {
+			AbstractSyntaxNodeList<?> nodeList = (AbstractSyntaxNodeList<?>) arg;
+			return this.getElements() == nodeList.getElements();
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		String name = "[";
 		
@@ -118,7 +128,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		/**
 		 * Separation character
 		 */
-		private final char separator;
+		public final char separator;
 		
 		public AbstractSeparatedSyntaxNodeList(char separator) {
 			this.separator = separator;
@@ -142,6 +152,16 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 			}
 
 			return children;
+		}
+		
+		@Override
+		public boolean equals(Object arg) {
+			if(arg instanceof AbstractSeparatedSyntaxNodeList) {
+				AbstractSeparatedSyntaxNodeList<?> nodeList = (AbstractSeparatedSyntaxNodeList<?>) arg;
+				return this.separator == nodeList.separator && super.equals(arg);
+			}
+			
+			return false;
 		}
 		
 	}
