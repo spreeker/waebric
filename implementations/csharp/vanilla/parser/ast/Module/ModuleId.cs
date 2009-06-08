@@ -20,6 +20,22 @@ namespace Parser.Ast.Module
         #region Public Methods
 
         /// <summary>
+        /// Create ModuleId with setting identifier
+        /// </summary>
+        /// <param name="identifier">Identifier to set</param>
+        public ModuleId(IdentifierCon identifier)
+        {
+            this.Identifier = identifier;
+        }
+
+        /// <summary>
+        /// Create ModuleId without setting identifier
+        /// </summary>
+        public ModuleId()
+        {
+        }
+
+        /// <summary>
         /// Get identifier
         /// </summary>
         /// <returns>Identifier</returns>
