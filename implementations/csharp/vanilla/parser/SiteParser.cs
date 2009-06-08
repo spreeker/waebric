@@ -14,7 +14,7 @@ namespace Parser
     {
         public SiteParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
         {
-
+            //Create markup parser here
         }
 
         /// <summary>
@@ -23,7 +23,12 @@ namespace Parser
         /// <returns></returns>
         public Site ParseSite()
         {
-            return null;
+            //One or more mappings separated by ;
+            Site site = new Site();
+            NextToken("Mapping", "mapping1;mapping2");
+            
+           
+            return site;
         }
 
         /// <summary>
@@ -32,7 +37,7 @@ namespace Parser
         /// </summary>
         public void ParseMappings()
         {
-
+            
         }
 
     }

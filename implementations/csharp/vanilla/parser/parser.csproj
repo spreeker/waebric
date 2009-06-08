@@ -67,6 +67,7 @@
     <Compile Include="Ast\Site\Markup.cs" />
     <Compile Include="Ast\Site\Path.cs" />
     <Compile Include="Ast\Site\Site.cs" />
+    <Compile Include="MarkupParser.cs" />
     <Compile Include="SiteParser.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
     <Compile Include="FunctionParser.cs" />

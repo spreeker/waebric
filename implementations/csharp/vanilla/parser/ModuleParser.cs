@@ -81,17 +81,17 @@ namespace Parser
 
                 }
                 else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.SITE.ToString()))
-                {   //Site definition found
+                {   //Site definition found, call siteparser
+                    module.SetElement(siteParser.ParseSite());
                 }
                 else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.IMPORT.ToString()))
                 {   //Imports found
-
+                    module.SetElement(ParseImport());
                 }
                 else
                 {
                     //Exception handling here
                 }
-                            
             }
             //parse identifiers and so on
 
