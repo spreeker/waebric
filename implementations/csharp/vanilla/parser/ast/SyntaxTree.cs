@@ -35,14 +35,22 @@ namespace Parser.Ast
             root = rootNode;
         }
 
+        /// <summary>
+        /// Get root of tree
+        /// </summary>
+        /// <returns>Root of tree</returns>
         public ISyntaxNode GetRoot()
         {
             return root;
         }
 
+        /// <summary>
+        /// Set root of tree
+        /// </summary>
+        /// <param name="rootNode">Node to set as root</param>
         public void SetRoot(ISyntaxNode rootNode)
         {
-            this.root = rootNode();
+            this.root = rootNode;
         }
 
         #endregion

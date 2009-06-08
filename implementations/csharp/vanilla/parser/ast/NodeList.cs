@@ -42,6 +42,10 @@ namespace Parser.Ast
             return list.ElementAt(index);
         }
 
+        /// <summary>
+        /// Get all elements of list as array of syntax nodes
+        /// </summary>
+        /// <returns>Array of ISyntaxNode</returns>
         public ISyntaxNode[] GetElements()
         {
             return list.ToArray();
