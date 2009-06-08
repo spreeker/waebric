@@ -43,69 +43,63 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testPredicateWithoutType() {
+	public void testPredicateWithoutType() throws SyntaxException {
 		iterator = TestScanner.quickScan("123");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate.ExpressionPredicate predicate = (ExpressionPredicate) parser.parsePredicate();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.ExpressionPredicate.class, predicate.getClass()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass());
 	}
 	
 	@Test
-	public void testPredicateWithType() {
+	public void testPredicateWithType() throws SyntaxException {
 		iterator = TestScanner.quickScan("123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate.ExpressionTypePredicate predicate = (ExpressionTypePredicate) parser.parsePredicate();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getClass()); // Correct type
 		assertEquals("string", predicate.getType().toString()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass());
 	}
 	
 	@Test
-	public void testNotPredicate() {
+	public void testNotPredicate() throws SyntaxException {
 		iterator = TestScanner.quickScan("!123");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate.NotPredicate predicate = (NotPredicate) parser.parsePredicate();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.ExpressionPredicate.class, predicate.getPredicate().getClass());
 	}
 	
 	@Test
-	public void testAndPredicate() {
+	public void testAndPredicate() throws SyntaxException {
 		iterator = TestScanner.quickScan("123&&123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate.AndPredicate predicate = (AndPredicate) parser.parsePredicate();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.ExpressionPredicate.class, predicate.getLeft().getClass());
 		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getRight().getClass());
 	}
 	
 	
 	@Test
-	public void testOrPredicate() {
+	public void testOrPredicate() throws SyntaxException {
 		iterator = TestScanner.quickScan("123||123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Predicate.OrPredicate predicate = (OrPredicate) parser.parsePredicate();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals(Predicate.ExpressionPredicate.class, predicate.getLeft().getClass());
 		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getRight().getClass());
 	}
 	
 	@Test
-	public void testCorrectType() {
+	public void testCorrectType() throws SyntaxException {
 		// Correct type
 		iterator = TestScanner.quickScan("string");
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Type type = parser.parseType();
-		assertEquals(0, exceptions.size()); // Error free
 		assertEquals("string", type.getType().toString()); // Correct literal stored
 	}
 	
@@ -115,9 +109,11 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("unknown");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		parser.parseType();
-		assertEquals(1, exceptions.size()); // Exception thrown
-		assertEquals(UnexpectedTokenException.class, exceptions.get(0).getClass()); // Correct exception throw
+		try {
+			parser.parseType();
+		} catch(Exception e) {
+			assertEquals(UnexpectedTokenException.class, e.getClass()); // Correct exception throw
+		}
 	}
 	
 	@Test
@@ -126,9 +122,11 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		parser.parseType();
-		assertEquals(1, exceptions.size()); // Exception thrown
-		assertEquals(MissingTokenException.class, exceptions.get(0).getClass()); // Correct exception thrown
+		try {
+			parser.parseType();
+		} catch(Exception e) {
+			assertEquals(MissingTokenException.class, e.getClass()); // Correct exception throw
+		}
 	}
 	
 }
