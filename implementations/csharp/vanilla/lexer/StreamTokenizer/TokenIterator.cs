@@ -32,6 +32,7 @@ namespace Lexer.Tokenizer
         /// <returns>Token if available, otherwise null value</returns>
         public Token NextToken()
         {
+            Index++;
             if (Index > TokenArray.Length)
             {
                 return null; //Index out of bound, end of array reached
@@ -39,7 +40,7 @@ namespace Lexer.Tokenizer
             else
             {
                 int itemIndex = Index;
-                Index++;
+                
                 return TokenArray[itemIndex];
             }
         }
@@ -60,7 +61,7 @@ namespace Lexer.Tokenizer
         /// <returns>True if token on index+offset, false if not</returns>
         public bool HasNext(int offset)
         {
-            return ((this.Index + offset) > TokenArray.Length);
+            return ((this.Index + offset) < TokenArray.Length);
         }
 
         /// <summary>
@@ -80,6 +81,15 @@ namespace Lexer.Tokenizer
             {
                 return null; //Index out of bound
             }
+        }
+
+        /// <summary>
+        /// Retrieve size of tokens in iteratorlist
+        /// </summary>
+        /// <returns></returns>
+        public int GetSize()
+        {
+            return TokenArray.Length;
         }
 
         #endregion
