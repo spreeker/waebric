@@ -32,7 +32,7 @@ public class IntegerLiteral extends AbstractSyntaxNode {
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return null;
+		return new AbstractSyntaxNode[] { /* Leaf node */ };
 	}
 	
 }

@@ -19,7 +19,7 @@ public class StringLiteral extends AbstractSyntaxNode {
 	}
 	
 	public AbstractSyntaxNode[] getChildren() {
-		return null;
+		return new AbstractSyntaxNode[] { /* Leaf node */ };
 	}
 	
 }
