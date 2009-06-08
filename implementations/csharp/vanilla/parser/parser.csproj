@@ -59,6 +59,14 @@
     <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
+    <Compile Include="Ast\Site\Directory.cs" />
+    <Compile Include="Ast\Site\DirName.cs" />
+    <Compile Include="Ast\Site\FileName.cs" />
+    <Compile Include="Ast\Site\Mapping.cs" />
+    <Compile Include="Ast\Site\MappingList.cs" />
+    <Compile Include="Ast\Site\Markup.cs" />
+    <Compile Include="Ast\Site\Path.cs" />
+    <Compile Include="Ast\Site\Site.cs" />
     <Compile Include="SiteParser.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
     <Compile Include="FunctionParser.cs" />
@@ -72,8 +80,8 @@
     <Folder Include="Ast\Functions\" />
     <Folder Include="Ast\Markup\" />
     <Folder Include="Ast\Predicates\" />
-    <Folder Include="Ast\Site\" />
     <Folder Include="Ast\Statements\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
