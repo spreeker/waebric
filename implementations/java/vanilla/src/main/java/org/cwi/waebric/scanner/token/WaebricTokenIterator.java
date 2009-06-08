@@ -124,7 +124,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 	
 	@Override
 	public String toString() {
-		return collection.toString();
+		return curr == -1 ? collection.toString() : current().toString();
 	}
 
 }

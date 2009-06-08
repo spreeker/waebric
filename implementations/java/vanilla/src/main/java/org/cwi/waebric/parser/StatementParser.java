@@ -353,7 +353,12 @@ class StatementParser extends AbstractParser {
 					next(WaebricSymbol.SEMICOLON, "Markup embedding closure ;", "Markup+ Embedding \";\"");
 					return statement;
 				} else {
-					if(ExpressionParser.isExpression(peek)) {
+					if(isMarkupFreeStatement(peek)) {
+						// Markup+ Statement ";"
+						StatementMarkupsStatement statement = new StatementMarkupsStatement(markups);
+						statement.setStatement(parseStatement(formals));
+						return statement;
+					} else if(ExpressionParser.isExpression(peek)) {
 						// Markup+ Expression
 						ExpressionMarkupsStatement statement = new ExpressionMarkupsStatement(markups);
 						try {
@@ -362,11 +367,6 @@ class StatementParser extends AbstractParser {
 							reportUnexpectedToken(tokens.current(), "Markup expression", "Markup+ Expression \";\"");
 						}
 						next(WaebricSymbol.SEMICOLON, "Markup expression closure ;", "Markup+ Expression \";\"");
-						return statement;
-					} else if(isMarkupFreeStatement(peek)) {
-						// Markup+ Statement ";"
-						StatementMarkupsStatement statement = new StatementMarkupsStatement(markups);
-						statement.setStatement(parseStatement(formals));
 						return statement;
 					} else {
 						reportUnexpectedToken(peek, "Markups statement", 

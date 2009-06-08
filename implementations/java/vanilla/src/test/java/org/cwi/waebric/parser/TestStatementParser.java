@@ -135,6 +135,18 @@ public class TestStatementParser {
 	}
 	
 	@Test
+	public void testStatementCollection() throws SyntaxException {
+		iterator = TestScanner.quickScan("{ yield; comment \"text\" markup1 markup2 var; }");
+		parser = new StatementParser(iterator, exceptions);
+		
+		StatementCollection statement = parser.parseStatementCollection(formals);
+		assertEquals(3, statement.getStatementCount());
+		assertEquals(Statement.YieldStatement.class, statement.getStatement(0).getClass());
+		assertEquals(Statement.CommentStatement.class, statement.getStatement(1).getClass());
+		assertEquals(Statement.ExpressionMarkupsStatement.class, statement.getStatement(2).getClass());
+	}
+	
+	@Test
 	public void testLetStatement() throws SyntaxException {
 		iterator = TestScanner.quickScan("let var=100 in comment \"test\" end");
 		parser = new StatementParser(iterator, exceptions);
@@ -234,6 +246,14 @@ public class TestStatementParser {
 		StatementMarkupsStatement statement = (StatementMarkupsStatement) parser.parseMarkupStatements(formals);
 		assertEquals(2, statement.getMarkupCount());
 		assertEquals(Statement.YieldStatement.class, statement.getStatement().getClass());
+		
+		// Markup statement collection
+		iterator = TestScanner.quickScan("markup { func1 func2 var; }");
+		parser = new StatementParser(iterator, exceptions);
+		
+		StatementMarkupsStatement cstatement = (StatementMarkupsStatement) parser.parseMarkupStatements(formals);
+		assertEquals(1, cstatement.getMarkupCount());
+		assertEquals(Statement.StatementCollection.class, cstatement.getStatement().getClass());
 	}
 	
 	@Test

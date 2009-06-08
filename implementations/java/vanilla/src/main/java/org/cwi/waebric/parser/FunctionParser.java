@@ -6,15 +6,11 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.FunctionDef;
-import org.cwi.waebric.parser.ast.statement.Formals;
-import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
- * Function parser
- * 
  * module languages/waebric/syntax/Functions
  * 
  * @author Jeroen van Schagen
@@ -33,52 +29,28 @@ class FunctionParser extends AbstractParser {
 
 	/**
 	 * @see FunctionDef
-	 * @param def
+	 * @return FunctionDef
+	 * @throws SyntaxException 
 	 */
-	public FunctionDef parseFunctionDef() {
+	public FunctionDef parseFunctionDef() throws SyntaxException {
 		FunctionDef def = new FunctionDef();
 		
-		// Parse function identifier
-		if(next("function identifier", "identifier", WaebricTokenSort.IDCON)) {
-			IdCon identifier = new IdCon(current.getLexeme().toString());
-			def.setIdentifier(identifier);
-		} else {
-			return null; // Invalid function syntax, quit parsing
-		}
+		// Parse identifier
+		next(WaebricTokenSort.IDCON, "Function identifier", "Identifier"); 
+		def.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
 		
 		// Parse formals (optional)
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			def.setFormals(parseFormals());
+			def.setFormals(statementParser.parseFormals());
 		}
 		
 		// Parse statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
-			Statement subStatement = parseStatement(def.getFormals());
-			def.addStatement(subStatement);
+			def.addStatement(statementParser.parseStatement(def.getFormals()));
 		}
 		
-		// Parse function closure
-		if(! next("function end", "end", WaebricKeyword.END)) {
-			return null; // Invalid function syntax, return empty node
-		}
-		
+		next(WaebricKeyword.END, "Function closure \"end\"", "end");
 		return def;
 	}
 	
-	/**
-	 * 
-	 * @param formals
-	 */
-	public Formals parseFormals() {
-		return statementParser.parseFormals();
-	}
-	
-	/**
-	 * 
-	 * @param statement
-	 */
-	public Statement parseStatement(Formals formals) {
-		return statementParser.parseStatement(formals);
-	}
-
 }
