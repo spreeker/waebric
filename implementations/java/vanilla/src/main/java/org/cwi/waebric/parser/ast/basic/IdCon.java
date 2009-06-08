@@ -23,7 +23,12 @@ public class IdCon extends AbstractSyntaxNode {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return literal.equals(obj);
+		if(obj instanceof IdCon) {
+			IdCon id = (IdCon) obj;
+			return literal.toString().equals(id.getLiteral().toString());
+		}
+		
+		return false;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
@@ -71,7 +72,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		Module module = parser.parseModule();
+		Module module = parser.parseModule(new Modules());
 		
 		// Assertions
 		assertEquals("module", module.getChildren()[0].toString());
@@ -92,6 +93,19 @@ public class TestModuleParser {
 		// Assertions
 		assertEquals("import", imprt.getChildren()[0].toString());
 		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
+	}
+	
+	@Test
+	public void testEqualModule() {
+		ModuleId id1 = new ModuleId();
+		id1.add(new IdCon("src"));
+		id1.add(new IdCon("mymodule"));
+		
+		ModuleId id2 = new ModuleId();
+		id2.add(new IdCon("src"));
+		id2.add(new IdCon("mymodule"));
+		
+		assertTrue(id1.equals(id2));
 	}
 
 }

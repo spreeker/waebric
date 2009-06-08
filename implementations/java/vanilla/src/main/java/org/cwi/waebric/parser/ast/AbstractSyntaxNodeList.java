@@ -40,6 +40,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	@Override
 	public boolean add(E element) {
 		if(element == null) { return false; }
+		if(this.contains(element)) { return false; }
 		return list.add(element);
 	}
 	
@@ -82,7 +83,12 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	public boolean equals(Object arg) {
 		if(arg instanceof AbstractSyntaxNodeList) {
 			AbstractSyntaxNodeList<?> nodeList = (AbstractSyntaxNodeList<?>) arg;
-			return this.getChildren() == nodeList.getChildren();
+			if(nodeList.size() != this.size()) { return false; }
+			for(int i = 0; i < this.size(); i++) {
+				if(! this.get(i).equals(nodeList.get(i))) { return false; }
+			}
+			
+			return true;
 		}
 		
 		return false;
@@ -252,16 +258,6 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		}
 		
 		@Override
-		public boolean equals(Object arg) {
-			if(arg instanceof AbstractSeparatedSyntaxNodeList) {
-				AbstractSeparatedSyntaxNodeList<?> nodeList = (AbstractSeparatedSyntaxNodeList<?>) arg;
-				return this.separator == nodeList.separator && super.equals(arg);
-			}
-			
-			return false;
-		}
-		
-		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			AbstractSyntaxNode[] elements = super.getChildren();
 			
@@ -279,6 +275,16 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 			}
 
 			return children;
+		}
+		
+		@Override
+		public boolean equals(Object arg) {
+			if(arg instanceof AbstractSeparatedSyntaxNodeList) {
+				AbstractSeparatedSyntaxNodeList<?> list = (AbstractSeparatedSyntaxNodeList<?>) arg;
+				return list.separator == this.separator && super.equals(arg);
+			}
+			
+			return false;
 		}
 
 	}
