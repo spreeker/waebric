@@ -56,7 +56,7 @@ public class Module extends AbstractSyntaxNode {
 	 * @return Module elements
 	 */
 	public AbstractSyntaxNode[] getElements() {
-		return elements.getElements();
+		return elements.toArray(new AbstractSyntaxNode[0]);
 	}
 	
 	@Override

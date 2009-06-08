@@ -125,12 +125,12 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		Directory directory = parser.parseDirectory();
-		assertEquals(5, directory.getElements().length);
-		assertEquals("org", directory.getElements()[0].toString());
-		assertEquals("cwi", directory.getElements()[1].toString());
-		assertEquals("waebric", directory.getElements()[2].toString());
-		assertEquals("java", directory.getElements()[3].toString());
-		assertEquals("vanilla", directory.getElements()[4].toString());
+		assertEquals(5, directory.size());
+		assertEquals("org", directory.get(0).toString());
+		assertEquals("cwi", directory.get(1).toString());
+		assertEquals("waebric", directory.get(2).toString());
+		assertEquals("java", directory.get(3).toString());
+		assertEquals("vanilla", directory.get(4).toString());
 	}
 	
 	@Test

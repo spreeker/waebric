@@ -25,16 +25,6 @@ public class TestSyntaxNodeList {
 	}
 	
 	@Test
-	public void testGetElements() {
-		assertNotNull(mappings.getElements());
-		assertTrue(mappings.getElements().length == 2);
-		
-		// Assert after inserting new element
-		mappings.add(new Mapping());
-		assertTrue(mappings.getElements().length == 3);	
-	}
-	
-	@Test
 	public void testGetChildren() {
 		assertNotNull(mappings.getChildren());
 		assertTrue(mappings.getChildren().length == 2);

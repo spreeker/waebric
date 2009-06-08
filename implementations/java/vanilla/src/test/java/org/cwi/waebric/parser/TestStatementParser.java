@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
@@ -30,7 +31,7 @@ import org.junit.Test;
 public class TestStatementParser {
 
 	private StatementParser parser;
-	private Formals formals;
+	private AbstractSyntaxNodeList<Var> formals;
 	
 	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
@@ -119,7 +120,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EchoExpressionStatement statement = parser.parseEchoExpressionStatement(formals);
+		EchoExpressionStatement statement = parser.parseEchoExpressionStatement();
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 	}
 	
@@ -163,7 +164,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("cdata 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		CDataStatement statement = parser.parseCDataStatement(formals);
+		CDataStatement statement = parser.parseCDataStatement();
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 	}
 	
@@ -172,7 +173,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("comment \"OH NOES TEH HAXZOR\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		CommentStatement statement = parser.parseCommentStatement(formals);
+		CommentStatement statement = parser.parseCommentStatement();
 		assertEquals("OH NOES TEH HAXZOR", statement.getComment().getLiteral().toString());
 	}
 	
@@ -181,7 +182,7 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		parser.parseYieldStatement(formals);
+		parser.parseYieldStatement();
 		assertEquals(0, exceptions.size());
 	}
 	

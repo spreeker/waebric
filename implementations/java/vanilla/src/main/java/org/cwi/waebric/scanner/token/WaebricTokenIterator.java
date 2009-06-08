@@ -1,5 +1,6 @@
 package org.cwi.waebric.scanner.token;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class WaebricTokenIterator implements Iterator<WaebricToken> {
+public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 
 	private List<WaebricToken> collection;
 	private int curr;
@@ -36,14 +37,9 @@ public class WaebricTokenIterator implements Iterator<WaebricToken> {
 		this.curr = curr;
 	}
 	
-	/**
-	 * Clone iterator by copying the collection and current position. When 
-	 * using the cloned iterator, no changes will be made to the original iterator.
-	 * 
-	 * @return Clone
-	 */
+	@Override
 	public WaebricTokenIterator clone() {
-		return new WaebricTokenIterator(new java.util.ArrayList<WaebricToken>(collection), curr);
+		return new WaebricTokenIterator(new ArrayList<WaebricToken>(collection), curr);
 	}
 	
 	/**

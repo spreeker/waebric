@@ -10,8 +10,11 @@ package org.cwi.waebric.parser.ast;
 public abstract class AbstractSyntaxNode {
 	
 	/**
-	 * Convert node to string, used for debugging.
+	 * Retrieve all children of abstract syntax nodes.
+	 * @return Children
 	 */
+	public abstract AbstractSyntaxNode[] getChildren();
+	
 	@Override
 	public String toString() {
 		String name = this.getClass().getSimpleName() + "(";
@@ -27,10 +30,4 @@ public abstract class AbstractSyntaxNode {
 		return name;
 	}
 
-	/**
-	 * Retrieve children nodes
-	 * @return
-	 */
-	public abstract AbstractSyntaxNode[] getChildren();
-	
 }

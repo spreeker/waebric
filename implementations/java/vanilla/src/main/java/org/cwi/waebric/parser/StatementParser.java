@@ -56,7 +56,7 @@ class StatementParser extends AbstractParser {
 	 * @return Statement
 	 * @throws SyntaxException 
 	 */
-	public Statement parseStatement(Formals formals) throws SyntaxException {
+	public Statement parseStatement(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		if(tokens.hasNext()) {
 			WaebricToken peek = tokens.peek(1); // Retrieve first token of statement
 			if(peek.getLexeme().equals(WaebricKeyword.IF)) {
@@ -73,21 +73,21 @@ class StatementParser extends AbstractParser {
 				return parseStatementCollection(formals);
 			} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
 				// Comment statements start with a comments keyword
-				return parseCommentStatement(formals);
+				return parseCommentStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
 				if(tokens.peek(2).getSort().equals(WaebricTokenSort.QUOTE)) {
 					// Embedding echo production is followed by a text
 					return parseEchoEmbeddingStatement(formals);
 				} else {
 					// Embedding echo production is followed by an expression
-					return parseEchoExpressionStatement(formals);
+					return parseEchoExpressionStatement();
 				}
 			} else if(peek.getLexeme().equals(WaebricKeyword.CDATA)) {
 				// CData statements start with a cdata keyword
-				return parseCDataStatement(formals);
+				return parseCDataStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.YIELD)) {
 				// Yield statements start with a yield keyword
-				return parseYieldStatement(formals);
+				return parseYieldStatement();
 			} else if(peek.getSort().equals(WaebricTokenSort.IDCON)) {
 				// Mark-up statements always begin with an identifier
 				return parseMarkupStatements(formals);
@@ -106,7 +106,7 @@ class StatementParser extends AbstractParser {
 	 * @return IfStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.IfStatement parseIfStatement(Formals formals) throws SyntaxException {
+	public Statement.IfStatement parseIfStatement(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		Statement.IfStatement statement; 
 		
 		next(WaebricKeyword.IF, "if keyword", "\"if\" \"(\"");
@@ -154,7 +154,7 @@ class StatementParser extends AbstractParser {
 	 * @return EachStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.EachStatement parseEachStatement(Formals formals) throws SyntaxException {
+	public Statement.EachStatement parseEachStatement(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		next(WaebricKeyword.EACH, "Each keyword", "\"each\"");
 		
 		Statement.EachStatement statement = new Statement.EachStatement();
@@ -174,7 +174,7 @@ class StatementParser extends AbstractParser {
 		
 		// Parse sub-statement
 		try {
-			statement.setStatement(parseStatement(formals));
+			statement.setStatement(parseStatement(formals.union(statement.getVar())));
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), "Each sub-statement", "each(Var:Expression) Statement");
 		}
@@ -187,7 +187,7 @@ class StatementParser extends AbstractParser {
 	 * @return LetStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.LetStatement parseLetStatement(Formals formals) throws SyntaxException {
+	public Statement.LetStatement parseLetStatement(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		next(WaebricKeyword.LET, "Let keyword", "\"let\"");
 
 		Statement.LetStatement statement = new Statement.LetStatement();
@@ -213,7 +213,7 @@ class StatementParser extends AbstractParser {
 	 * @return StatementCollection
 	 * @throws SyntaxException 
 	 */
-	public Statement.StatementCollection parseStatementCollection(Formals formals) throws SyntaxException {
+	public Statement.StatementCollection parseStatementCollection(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		next(WaebricSymbol.LCBRACKET, "Statement collection opening", "\"{\" Statement*");
 		
 		Statement.StatementCollection statement = new Statement.StatementCollection();
@@ -230,7 +230,7 @@ class StatementParser extends AbstractParser {
 	 * @return CommentStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.CommentStatement parseCommentStatement(Formals formals) throws SyntaxException {
+	public Statement.CommentStatement parseCommentStatement() throws SyntaxException {
 		next(WaebricKeyword.COMMENT, "Comment keyword", "\"comment\"");
 		
 		Statement.CommentStatement statement = new Statement.CommentStatement();
@@ -249,7 +249,7 @@ class StatementParser extends AbstractParser {
 	 * @return EchoEmbedding
 	 * @throws SyntaxException 
 	 */
-	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement(Formals formals) throws SyntaxException {
+	public Statement.EchoEmbeddingStatement parseEchoEmbeddingStatement(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		next(WaebricKeyword.ECHO, "Echo keyword", "\"echo\"");
 	
 		Statement.EchoEmbeddingStatement statement = new Statement.EchoEmbeddingStatement();
@@ -268,7 +268,7 @@ class StatementParser extends AbstractParser {
 	 * @return EchoExpressionStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.EchoExpressionStatement parseEchoExpressionStatement(Formals formals) throws SyntaxException {
+	public Statement.EchoExpressionStatement parseEchoExpressionStatement() throws SyntaxException {
 		next(WaebricKeyword.ECHO, "Echo keyword", "\"echo\"");
 		
 		Statement.EchoExpressionStatement statement = new Statement.EchoExpressionStatement();
@@ -287,7 +287,7 @@ class StatementParser extends AbstractParser {
 	 * @return CData collection
 	 * @throws SyntaxException 
 	 */
-	public Statement.CDataStatement parseCDataStatement(Formals formals) throws SyntaxException {
+	public Statement.CDataStatement parseCDataStatement() throws SyntaxException {
 		next(WaebricKeyword.CDATA, "Cdata keyword", "\"cdata\"");
 		
 		Statement.CDataStatement statement = new Statement.CDataStatement();
@@ -306,7 +306,7 @@ class StatementParser extends AbstractParser {
 	 * @return YieldStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.YieldStatement parseYieldStatement(Formals formals) throws SyntaxException {
+	public Statement.YieldStatement parseYieldStatement() throws SyntaxException {
 		Statement.YieldStatement statement = new Statement.YieldStatement();
 		next(WaebricKeyword.YIELD, "yield keyword", "\"yield\"");
 		next(WaebricSymbol.SEMICOLON, "yield closure", "\"yield\" \";\"");
@@ -318,7 +318,7 @@ class StatementParser extends AbstractParser {
 	 * @return MarkupsStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement parseMarkupStatements(Formals formals) throws SyntaxException {
+	public Statement parseMarkupStatements(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		Markup markup = markupParser.parseMarkup(); // Retrieve (first) mark-up
 		
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
@@ -404,7 +404,7 @@ class StatementParser extends AbstractParser {
 		return token.getSort() == WaebricTokenSort.QUOTE && token.getLexeme().toString().matches("\\w*<\\w*>\\w*");
 	}
 
-	public static boolean isMarkup(WaebricToken token, Formals formals) {
+	public static boolean isMarkup(WaebricToken token, AbstractSyntaxNodeList<Var> formals) {
 		if(token.getSort() == WaebricTokenSort.IDCON) {
 			// Check if token matches a specified variable
 			return ! isVar(token, formals);
@@ -413,7 +413,7 @@ class StatementParser extends AbstractParser {
 		return false;
 	}
 	
-	public static boolean isVar(WaebricToken token, Formals formals) {
+	public static boolean isVar(WaebricToken token, AbstractSyntaxNodeList<Var> formals) {
 		for(Var var: formals) {
 			String name = var.getIdentifier().getLiteral().toString();
 			if(token.getLexeme().equals(name)) { return true; }
@@ -427,7 +427,7 @@ class StatementParser extends AbstractParser {
 	 * @return Assignment
 	 * @throws SyntaxException 
 	 */
-	public Assignment parseAssignment(Formals formals) throws SyntaxException {
+	public Assignment parseAssignment(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		if(tokens.hasNext(1)) {
 			if(isVar(tokens.peek(1), formals)) {
 				return parseVarAssignment();
@@ -463,7 +463,7 @@ class StatementParser extends AbstractParser {
 	 * @return IdConAssignment
 	 * @throws SyntaxException 
 	 */
-	public Assignment.IdConAssignment parseIdConAssignment(Formals formals) throws SyntaxException {
+	public Assignment.IdConAssignment parseIdConAssignment(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
 		next(WaebricTokenSort.IDCON, "Assignment identifier", "Identifier");
 		
 		Assignment.IdConAssignment assignment = new Assignment.IdConAssignment();

@@ -150,7 +150,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getElements() {
-			return expressions.getElements();
+			return expressions.toArray(new AbstractSyntaxNode[0]);
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
@@ -179,7 +179,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getElements() {
-			return pairs.getElements();
+			return pairs.toArray(new AbstractSyntaxNode[0]);
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
