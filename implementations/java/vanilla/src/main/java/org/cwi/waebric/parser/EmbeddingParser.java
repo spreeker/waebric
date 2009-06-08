@@ -7,8 +7,8 @@ import java.util.List;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.MidText;
@@ -43,93 +43,81 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	/**
-	 * Convert embedded "quote" token to sub tokens.
-	 * 
-	 * @param lexeme
+	 * @see Embedding
+	 * @return Embedding
+	 * @throws SyntaxException 
 	 */
-	private void tokenizeEmbedding() {
-		try {		
-			current = tokens.next();
-			
-			// Convert text (including first " symbol) to new token stream
-			StringReader reader = new StringReader(current.getLexeme().toString());
-			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.tokenizeStream();
-			
-			// Retrieve token stream
-			List<WaebricToken> elements = scanner.getTokens();
-			
-			// Attach " symbols to stream
-			elements.add(0, new WaebricToken(
-					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-					current.getLine(), current.getCharacter()));
-			elements.add(new WaebricToken(
-					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-					current.getLine(), current.getCharacter()));
-			
-			// Change token location to absolute instead of relative
-			for(WaebricToken token : elements) {
-				token.setCharacter(token.getCharacter() + current.getCharacter());
-				token.setLine(token.getLine() + current.getLine());
-			}
-			
-			// Swap quote token with extended token collection
-			tokens.remove();
-			tokens.addAll(elements);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Embedding parseEmbedding() {
-		// Decompose stream when needed
+	public Embedding parseEmbedding(Formals formals) throws SyntaxException {
 		WaebricToken peek = tokens.peek(1);
 		if(peek.getSort() == WaebricTokenSort.QUOTE) {
+			// Decompose stream when first token is quote
 			tokenizeEmbedding();
 		}
 		
 		Embedding embedding = new Embedding();
 		embedding.setPre(parsePreText());
-		embedding.setEmbed(parseEmbed());
-		embedding.setTail(parseTextTail());
+		embedding.setEmbed(parseEmbed(formals));
+		embedding.setTail(parseTextTail(formals));
 		return embedding;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @see PreText
+	 * @return PreText
+	 * @throws SyntaxException 
 	 */
-	public Embed parseEmbed() {
+	public PreText parsePreText() throws SyntaxException {
+		next(WaebricSymbol.DQUOTE, "Embedding opening quote \"", "\" TextChars* <");
+		
+		// Parse text characters
+		PreText pre = new PreText();
+		pre.setText(parseTextChars());
+		
+		next(WaebricSymbol.LESS_THAN, "Embedding pre-text symbol <", "TextChars* < Embed");
+		return pre;
+	}
+	
+	/**
+	 * @see Embed
+	 * @return Embed
+	 * @throws SyntaxException 
+	 */
+	public Embed parseEmbed(Formals formals) throws SyntaxException {
 		// Parse mark-up tokens
 		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
-			markups.add(parseMarkup());
+			markups.add(markupParser.parseMarkup());
 		}
 		
 		// Determine type based on look-ahead information
-		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
-			// Mark-up always start with an identifier
+		if(tokens.hasNext() && StatementParser.isMarkup(tokens.peek(1), formals)) {
+			// Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
-			embed.setMarkup(parseMarkup());
+			try {
+				embed.setMarkup(markupParser.parseMarkup());
+			} catch(SyntaxException e) {
+				reportUnexpectedToken(tokens.current(), "Markup embedding", "Markup+ Markup");
+			}
 			return embed;
 		} else {
 			// Only remaining alternative is Markup* Expression -> Markup
 			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
-			embed.setExpression(parseExpression("embed", "< Markup* Expression >"));
+			try {
+				embed.setExpression(expressionParser.parseExpression());
+			} catch(SyntaxException e) {
+				reportUnexpectedToken(tokens.current(), "Expression embedding", "Markup+ Expression");
+			}
 			return embed;
 		}
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @see TextTail
+	 * @return TextTail
+	 * @throws SyntaxException 
 	 */
-	public TextTail parseTextTail() {
-		next("Embedding tailsymbol >", "Embed > TextChars*", WaebricSymbol.GREATER_THAN);
+	public TextTail parseTextTail(Formals formals) throws SyntaxException {
+		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
 		
 		// Parse text characters
 		StringLiteral text = parseTextChars();
@@ -144,19 +132,19 @@ class EmbeddingParser extends AbstractParser {
 				TextTail.PostTail tail = new TextTail.PostTail();
 				tail.setPost(post);
 				
-				tokens.next(); // Skip "
+				tokens.next(); // Accept " symbol and jump to next token
 				return tail;
 			} else {
 				// Only remaining alternative is MidText Embed TextTail -> TextTail
-				next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
+				next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
 				
 				MidText mid = new MidText();
 				mid.setText(text);
 
 				TextTail.MidTail tail = new TextTail.MidTail();
 				tail.setMid(mid);
-				tail.setEmbed(parseEmbed());
-				tail.setTail(parseTextTail());
+				tail.setEmbed(parseEmbed(formals));
+				tail.setTail(parseTextTail(formals));
 				
 				return tail;
 			}
@@ -166,49 +154,35 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @see PostText
+	 * @return PostText
+	 * @throws SyntaxException 
 	 */
-	public PreText parsePreText() {
-		next("Embedding opening quote \"", "\" TextChars* <", WaebricSymbol.DQUOTE);
-		
-		// Parse text characters
-		PreText pre = new PreText();
-		pre.setText(parseTextChars());
-		
-		next("Embedding pre-text symbol <", "TextChars* < Embed", WaebricSymbol.LESS_THAN);
-		
-		return pre;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public PostText parsePostText() {
-		next("Embedding post-text symbol >", "Embed > TextChars*", WaebricSymbol.GREATER_THAN);
+	public PostText parsePostText() throws SyntaxException {
+		next(WaebricSymbol.GREATER_THAN, "Embedding post-text symbol >", "Embed > TextChars*");
 		
 		// Parse text characters
 		PostText post = new PostText();
 		post.setText(parseTextChars());
 		
-		next("Embedding closure quote \"", "> TextChars* \"", WaebricSymbol.DQUOTE);
+		next(WaebricSymbol.DQUOTE, "Embedding closure quote \"", "> TextChars* \"");
 		
 		return post;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @see MidText
+	 * @return MidText
+	 * @throws SyntaxException 
 	 */
-	public MidText parseMidText() {
-		next("Embedding mid-text start symbol >", "> TextChars* <", WaebricSymbol.GREATER_THAN);
+	public MidText parseMidText() throws SyntaxException {
+		next(WaebricSymbol.GREATER_THAN, "Embedding mid-text start symbol >", "> TextChars* <");
 		
 		// Parse text characters
 		MidText mid = new MidText();
 		mid.setText(parseTextChars());
 		
-		next("Embedding mid-text end symbol <", "> TextChars* <", WaebricSymbol.LESS_THAN);
+		next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
 		
 		return mid;
 	}
@@ -226,29 +200,49 @@ class EmbeddingParser extends AbstractParser {
 				break; // No more text chars found, quit parse
 			} else {
 				data += peek; // Build string
-				current = tokens.next(); // Iterate to next token
+				tokens.next(); // Iterate to next token
 			}
 		}
 		
 		return new StringLiteral(data);
 	}
-
-	/**
-	 * 
-	 * @param name
-	 * @param syntax
-	 * @return
-	 */
-	public Expression parseExpression(String name, String syntax) {
-		return expressionParser.parseExpression(name, syntax);
-	}
 	
 	/**
-	 * 
-	 * @return
+	 * Convert next token to sub-tokens. For example:<br>
+	 * "<123>" is converted to [ ", <, 123, >, " ]
 	 */
-	public Markup parseMarkup() {
-		return markupParser.parseMarkup();
+	private void tokenizeEmbedding() {
+		try {		
+			tokens.next(); // Jump to next element
+			
+			// Convert text to new token stream
+			StringReader reader = new StringReader(tokens.current().getLexeme().toString());
+			WaebricScanner scanner = new WaebricScanner(reader);
+			scanner.tokenizeStream();
+			
+			// Retrieve token stream
+			List<WaebricToken> elements = scanner.getTokens();
+			
+			// Attach " symbols to stream
+			elements.add(0, new WaebricToken(
+					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+					tokens.current().getLine(), tokens.current().getCharacter()));
+			elements.add(new WaebricToken(
+					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+					tokens.current().getLine(), tokens.current().getCharacter()));
+			
+			// Change token location to absolute instead of relative
+			for(WaebricToken token : elements) {
+				token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
+				token.setLine(token.getLine() + tokens.current().getLine());
+			}
+			
+			// Swap quote token with extended token collection
+			tokens.remove();
+			tokens.addAll(elements);
+		} catch(IOException e) {
+			e.printStackTrace(); // Should never occur
+		}
 	}
 	
 }
