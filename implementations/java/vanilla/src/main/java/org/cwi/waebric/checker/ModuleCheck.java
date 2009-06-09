@@ -48,7 +48,8 @@ class ModuleCheck implements IWaebricCheck {
 			
 			// Check imported modules
 			for(int i = 0; i < module.getImportCount(); i++) {
-				checkModule(module.getImport(i).getIdentifier(), exceptions);
+				ModuleId identifier = module.getImport(i).getIdentifier();
+				if(! hasCached(identifier)) { checkModule(identifier, exceptions); }
 			}
 		}
 	}

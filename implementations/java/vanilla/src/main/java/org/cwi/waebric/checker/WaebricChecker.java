@@ -32,10 +32,12 @@ public class WaebricChecker {
 	 */
 	public WaebricChecker() {
 		this.moduleCache = new HashMap<ModuleId, Modules>();
-		
-		// Initiate checks
 		this.checks = new ArrayList<IWaebricCheck>();
-		checks.add(new ModuleCheck(moduleCache)); // Module check should be executed first, as it fills cache
+		
+		// Module check should be executed first, as it fills cache
+		checks.add(new ModuleCheck(moduleCache)); 
+		checks.add(new FunctionCheck());
+		checks.add(new VarCheck());
 	}
 	
 	public List<SemanticException> checkAST(Modules modules) {
@@ -48,7 +50,5 @@ public class WaebricChecker {
 
 		return exceptions;
 	}
-	
-	
-	
+
 }
