@@ -36,7 +36,7 @@ namespace Lexer.Tokenizer
 
 
         //Current token value
-        private int NumValue = 0; // Numeric value of token
+        private int NumValue = -1; // Numeric value of token
         private String TextValue = ""; // Text value of token    
         private char CharValue = '\0'; //Character value
 
@@ -124,6 +124,45 @@ namespace Lexer.Tokenizer
             return TextValue;
         }
 
+        /// <summary>
+        /// Get character value of last scanned token
+        /// </summary>
+        /// <returns>Character value</returns>
+        public char GetCharacterValue()
+        {
+            return CharValue;
+        }
+
+        /// <summary>
+        /// Peeks the next character from stream (not tokenized)
+        /// </summary>
+        /// <returns>Peeked character</returns>
+        public char PeekCharacter()
+        {
+            return (char) InputStream.Peek();
+        }
+
+        /// <summary>
+        /// Retrieves whatever the type the value as string
+        /// </summary>
+        /// <returns>String representation of tokenized value</returns>
+        public String ToString()
+        {
+            if (TextValue != "")
+            {
+                return TextValue;
+            }
+            else if(CharValue != '\0')
+            {
+                return CharValue.ToString();
+            }
+            else if(NumValue != -1)
+            {
+                return NumValue.ToString();
+            }
+            return null; //No value found
+        }
+
         #endregion
 
         #region Private Methods
@@ -136,7 +175,6 @@ namespace Lexer.Tokenizer
         {
             //Convert values to string and character
             CharValue = (char) CurrentCharacter;
-            TextValue = CurrentCharacter.ToString();
             Read(); //Buffer character ahead
             
             return CHARACTER;
@@ -185,7 +223,6 @@ namespace Lexer.Tokenizer
         private int LayoutToken()
         {
             CharValue = (char) CurrentCharacter;
-            TextValue = CurrentCharacter.ToString();
             
             Read();
 
@@ -238,7 +275,6 @@ namespace Lexer.Tokenizer
             else // We are dealing with a single / symbol
             {
                 CharValue = '/';
-                TextValue = "/";
                 
                 //No another read, we already read the next character
                 return CHARACTER;
