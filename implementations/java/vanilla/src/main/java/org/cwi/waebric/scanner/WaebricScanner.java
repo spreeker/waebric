@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.scanner.processor.ImportProcessor;
-import org.cwi.waebric.scanner.processor.LexicalException;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -25,11 +23,6 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
 public class WaebricScanner implements Iterable<WaebricToken> {
 
 	private final StreamTokenizer tokenizer;
-	
-	/**
-	 * Cached modules, stored to prevent duplicate parsing and infinite loops
-	 */
-	private List<String> cachedModules;
 	
 	/**
 	 * Currently processed tokens
@@ -53,18 +46,6 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param reader Input character stream
 	 */
 	public WaebricScanner(Reader reader) {
-		this(reader, new ArrayList<String>());
-	}
-	
-	/**
-	 * Construct scanner
-	 * 
-	 * @param reader Input character stream
-	 * @param cachedModules Modules already scanned
-	 */
-	public WaebricScanner(Reader reader, List<String> cachedModules) {
-		this.cachedModules = cachedModules;
-		
 		try {
 			tokenizer = new StreamTokenizer(reader); 
 		} catch(IOException e) {
@@ -72,9 +53,9 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		}
 		
 		tokens = new ArrayList<WaebricToken>();
-		exceptions = new ArrayList<LexicalException>();		
+		exceptions = new ArrayList<LexicalException>();
 	}
-	
+
 	/**
 	 * Convert character stream in token stream
 	 * 
@@ -82,10 +63,11 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @throws IOException Fired by next token procedure in stream tokenizer.
 	 * @see java.io.StreamTokenizer
 	 */
-	public List<LexicalException> tokenizeStream() throws IOException {	
+	public List<LexicalException> tokenizeStream() {
+		tokens.clear(); exceptions.clear(); // Reset
+		
 		// Scan and store tokens
-		tokens.clear(); exceptions.clear();
-		current = tokenizer.nextToken();
+		next();
 		while(current != StreamTokenizer.END_OF_FILE) {
 			switch(current) {
 				case StreamTokenizer.WORD:
@@ -103,16 +85,29 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 						tokenizeCharacter();
 					} break;
 				case StreamTokenizer.LAYOUT: 
-					current = tokenizer.nextToken();
+					next();
 					break; // Layout tokens will not be parsed
 				case StreamTokenizer.COMMENT: 
-					current = tokenizer.nextToken();
+					next();
 					break; // Comment tokens will not be parsed
 			}
 		}
 
-//		new ImportProcessor(cachedModules).process(tokens, exceptions);
 		return exceptions;
+	}
+	
+	/**
+	 * Retrieve next character and log any exceptions that occur.
+	 * @return
+	 */
+	private boolean next() {
+		try {
+			current = tokenizer.nextToken();
+			return true;
+		} catch (IOException e) {
+			exceptions.add(new LexicalException(e));
+			return false;
+		}
 	}
 
 	/**
@@ -120,14 +115,14 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeWord() throws IOException {
+	private void tokenizeWord() {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
 		String word = "";
 		while(current == StreamTokenizer.WORD || current == StreamTokenizer.NUMBER) {
 			word += tokenizer.getStringValue();
-			current = tokenizer.nextToken();
+			next();
 		}
 		
 		if(isKeyword(word)) {
@@ -145,14 +140,14 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeNumber() throws IOException {
+	private void tokenizeNumber() {
 		WaebricToken number = new WaebricToken(
 				tokenizer.getIntegerValue(), WaebricTokenSort.NATCON, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
 			); // Construct number token
 		
 		tokens.add(number);
-		current = tokenizer.nextToken(); // Jump to next token
+		next();
 	}
 	
 	/**
@@ -160,14 +155,14 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeCharacter() throws IOException {
+	private void tokenizeCharacter() {
 		WaebricToken character = new WaebricToken(
 				tokenizer.getCharacterValue(), WaebricTokenSort.CHARACTER, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
 			); // Construct token
 		
 		tokens.add(character);
-		current = tokenizer.nextToken(); // Jump to next token
+		next();
 	}
 	
 	/**
@@ -176,11 +171,11 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeQuote() throws IOException {
+	private void tokenizeQuote() {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
-		current = tokenizer.nextToken(); // Skip " opening character
+		next(); // Skip " opening character
 		
 		String data = "";
 		while(tokenizer.getCharacterValue() != '"') {
@@ -201,10 +196,10 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 			}
 			
 			data += tokenizer.toString(); // Build quote data
-			current = tokenizer.nextToken(); // Retrieve next token
+			next(); // Retrieve next token
 		}
 
-		current = tokenizer.nextToken(); // Skip " closure character
+		next(); // Skip " closure character
 		WaebricToken quote = new WaebricToken(data, WaebricTokenSort.QUOTE, lineno, charno);
 		tokens.add(quote);
 	}
@@ -215,16 +210,16 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeSymbol() throws IOException {
+	private void tokenizeSymbol() {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
-		current = tokenizer.nextToken(); // Skip ' opening character
+		next(); // Skip ' opening character
 		
 		String data = "";
 		while(isSymbolChars(tokenizer.toString())) {
 			data += tokenizer.toString();
-			current = tokenizer.nextToken();
+			next(); // Retrieve next char
 		}
 		
 		WaebricToken symbol = new WaebricToken(data, WaebricTokenSort.SYMBOLCON, lineno, charno);

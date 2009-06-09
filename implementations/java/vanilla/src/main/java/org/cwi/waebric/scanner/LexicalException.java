@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner.processor;
+package org.cwi.waebric.scanner;
 
 /**
  * Lexical are exceptions that occurred during reading of the
@@ -7,7 +7,7 @@ package org.cwi.waebric.scanner.processor;
  * @author Jeroen van Schagen
  * @date 05-06-2009
  */
-public abstract class LexicalException extends Exception {
+public class LexicalException extends Exception {
 
 	/**
 	 * Serial ID
@@ -16,11 +16,10 @@ public abstract class LexicalException extends Exception {
 
 	/**
 	 * Construct exception
-	 * 
-	 * @param msg Message
+	 * @param throwable
 	 */
-	public LexicalException(String msg) {
-		super(msg);
+	public LexicalException(Throwable t) {
+		super(t);
 	}
 	
 }

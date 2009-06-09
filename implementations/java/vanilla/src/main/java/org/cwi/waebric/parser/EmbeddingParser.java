@@ -1,6 +1,5 @@
 package org.cwi.waebric.parser;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -212,37 +211,33 @@ class EmbeddingParser extends AbstractParser {
 	 * "<123>" is converted to [ ", <, 123, >, " ]
 	 */
 	private void tokenizeEmbedding() {
-		try {		
-			tokens.next(); // Jump to next element
-			
-			// Convert text to new token stream
-			StringReader reader = new StringReader(tokens.current().getLexeme().toString());
-			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.tokenizeStream();
-			
-			// Retrieve token stream
-			List<WaebricToken> elements = scanner.getTokens();
-			
-			// Attach " symbols to stream
-			elements.add(0, new WaebricToken(
-					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-					tokens.current().getLine(), tokens.current().getCharacter()));
-			elements.add(new WaebricToken(
-					WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-					tokens.current().getLine(), tokens.current().getCharacter()));
-			
-			// Change token location to absolute instead of relative
-			for(WaebricToken token : elements) {
-				token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
-				token.setLine(token.getLine() + tokens.current().getLine());
-			}
-			
-			// Swap quote token with extended token collection
-			tokens.remove();
-			tokens.addAll(elements);
-		} catch(IOException e) {
-			e.printStackTrace(); // Should never occur
+		tokens.next(); // Jump to next element
+		
+		// Convert text to new token stream
+		StringReader reader = new StringReader(tokens.current().getLexeme().toString());
+		WaebricScanner scanner = new WaebricScanner(reader);
+		scanner.tokenizeStream();
+		
+		// Retrieve token stream
+		List<WaebricToken> elements = scanner.getTokens();
+		
+		// Attach " symbols to stream
+		elements.add(0, new WaebricToken(
+				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+				tokens.current().getLine(), tokens.current().getCharacter()));
+		elements.add(new WaebricToken(
+				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+				tokens.current().getLine(), tokens.current().getCharacter()));
+		
+		// Change token location to absolute instead of relative
+		for(WaebricToken token : elements) {
+			token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
+			token.setLine(token.getLine() + tokens.current().getLine());
 		}
+		
+		// Swap quote token with extended token collection
+		tokens.remove();
+		tokens.addAll(elements);
 	}
 	
 }

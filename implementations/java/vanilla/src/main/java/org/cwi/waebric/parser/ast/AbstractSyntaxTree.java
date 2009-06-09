@@ -1,23 +1,25 @@
 package org.cwi.waebric.parser.ast;
 
+import org.cwi.waebric.parser.ast.module.Modules;
+
 /**
  * The abstract syntax tree (AST) provides an intermediate form for storing 
- * programs. All language processors such as, compilers and interpreters
- * work with the AST for completing their processes.
+ * Waebric programs. All further language processes, e.g. checker, compiler
+ * and interpreter interface with the AST.
  * 
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
 public class AbstractSyntaxTree {
 
-	private final AbstractSyntaxNode root;
+	private final Modules root;
 	
 	/**
 	 * Initialize abstract syntax tree.
 	 * 
 	 * @param root Start of tree
 	 */
-	public AbstractSyntaxTree(AbstractSyntaxNode root) {
+	public AbstractSyntaxTree(Modules root) {
 		this.root = root;
 	}
 	
@@ -26,7 +28,7 @@ public class AbstractSyntaxTree {
 	 * 
 	 * @return
 	 */
-	public final AbstractSyntaxNode getRoot() {
+	public final Modules getRoot() {
 		return root;
 	}
 	

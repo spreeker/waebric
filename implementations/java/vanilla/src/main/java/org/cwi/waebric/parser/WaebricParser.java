@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,15 +24,18 @@ public class WaebricParser extends AbstractParser {
 	private AbstractSyntaxTree tree;
 
 	/**
-	 * 
+	 * Construct parser based on scanner, this construction calls 
+	 * the tokenize stream function automatically.
 	 * @param scanner
+	 * @throws IOException 
 	 */
-	public WaebricParser(WaebricScanner scanner) {
+	public WaebricParser(WaebricScanner scanner) throws IOException {
 		this(scanner.iterator());
+		scanner.tokenizeStream();
 	}
 	
 	/**
-	 * 
+	 * Construct parser based on iterator.
 	 * @param iterator
 	 */
 	public WaebricParser(WaebricTokenIterator iterator) {

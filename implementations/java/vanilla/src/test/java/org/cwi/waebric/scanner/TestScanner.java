@@ -3,7 +3,6 @@ package org.cwi.waebric.scanner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -42,14 +41,9 @@ public class TestScanner {
 	 */
 	public static WaebricTokenIterator quickScan(String data) {
 		Reader reader = new StringReader(data);
-		try {
-			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.tokenizeStream();
-			return scanner.iterator();
-		} catch(IOException e) {
-			fail(e.getMessage());
-			return null;
-		}
+		WaebricScanner scanner = new WaebricScanner(reader);
+		scanner.tokenizeStream();
+		return scanner.iterator();
 	}
 	
 	@Test

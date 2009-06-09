@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.exception.SyntaxException;
+import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.processor.LexicalException;
 
 public class MyWaebricCompiler {
 	
@@ -29,7 +29,7 @@ public class MyWaebricCompiler {
 				long scan_time = System.currentTimeMillis() - curr;
 				System.out.println("Scanned in " + scan_time + "ms, with " + le.size() + " lexical exceptions.");
 				
-				WaebricParser parser = new WaebricParser(scanner);
+				WaebricParser parser = new WaebricParser(scanner.iterator());
 				
 				curr = System.currentTimeMillis();
 				List<SyntaxException> se = parser.parseTokens();

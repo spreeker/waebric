@@ -256,7 +256,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 				separator
 			);
 		}
-		
+
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			AbstractSyntaxNode[] elements = super.getChildren();
