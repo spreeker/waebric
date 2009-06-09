@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.scanner.processor.ILexicalProcessor;
 import org.cwi.waebric.scanner.processor.ImportProcessor;
 import org.cwi.waebric.scanner.processor.LexicalException;
 import org.cwi.waebric.scanner.token.WaebricToken;
@@ -25,33 +24,47 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  */
 public class WaebricScanner implements Iterable<WaebricToken> {
 
-	/**
-	 * Stream tokenizer used for decomposing characters in tokens
-	 */
 	private final StreamTokenizer tokenizer;
 	
 	/**
-	 * Collection of token stream processor
+	 * Cached modules, stored to prevent duplicate parsing and infinite loops
 	 */
-	private List<ILexicalProcessor> processors;
+	private List<String> cachedModules;
 	
 	/**
-	 * Collection of processed tokens
+	 * Currently processed tokens
 	 */
 	private List<WaebricToken> tokens;
 	
 	/**
-	 * Current character
+	 * Currently occurred exceptions, stored instead of thrown to detect multiple 
+	 * exceptions at once.
+	 */
+	private List<LexicalException> exceptions;
+	
+	/**
+	 * Current character being processed
 	 */
 	private int current;
 	
 	/**
-	 * Initialize scanner
+	 * Construct scanner
 	 * 
 	 * @param reader Input character stream
-	 * @throws IOException 
 	 */
 	public WaebricScanner(Reader reader) {
+		this(reader, new ArrayList<String>());
+	}
+	
+	/**
+	 * Construct scanner
+	 * 
+	 * @param reader Input character stream
+	 * @param cachedModules Modules already scanned
+	 */
+	public WaebricScanner(Reader reader, List<String> cachedModules) {
+		this.cachedModules = cachedModules;
+		
 		try {
 			tokenizer = new StreamTokenizer(reader); 
 		} catch(IOException e) {
@@ -59,9 +72,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		}
 		
 		tokens = new ArrayList<WaebricToken>();
-		
-		processors = new ArrayList<ILexicalProcessor>();
-		processors.add(new ImportProcessor());
+		exceptions = new ArrayList<LexicalException>();		
 	}
 	
 	/**
@@ -73,7 +84,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 */
 	public List<LexicalException> tokenizeStream() throws IOException {	
 		// Scan and store tokens
-		tokens.clear();
+		tokens.clear(); exceptions.clear();
 		current = tokenizer.nextToken();
 		while(current != StreamTokenizer.END_OF_FILE) {
 			switch(current) {
@@ -99,12 +110,8 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 					break; // Comment tokens will not be parsed
 			}
 		}
-		
-		// Scan for exceptions
-		List<LexicalException> exceptions = new ArrayList<LexicalException>();
-		for(ILexicalProcessor processor : processors) {
-			processor.process(tokens, exceptions);
-		}
+
+		new ImportProcessor(cachedModules).process(tokens, exceptions);
 		return exceptions;
 	}
 

@@ -19,22 +19,29 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  */
 public class ImportProcessor implements ILexicalProcessor {
 
+	private List<String> cachedModules;
+	
+	public ImportProcessor(List<String> cachedModules) {
+		this.cachedModules = cachedModules;
+	}
+	
 	@Override
 	public void process(List<WaebricToken> tokens, List<LexicalException> exceptions) {
 		for(int index = 0; index < tokens.size(); index++) {
 			if(tokens.get(index).getLexeme().equals(WaebricKeyword.IMPORT)) {
 				final String path = getPath(tokens, index);
-
-				try {
-					// Convert imported module to token stream
-					FileReader reader = new FileReader(path);
-					WaebricScanner scanner = new WaebricScanner(reader);
-					exceptions.addAll(scanner.tokenizeStream());
-					tokens.addAll(scanner.getTokens());
-				} catch (FileNotFoundException e) {
-					exceptions.add(new InvalidModuleException(path));
-				} catch (IOException e) {
-					throw new InternalError(); // Should never occur
+				if(! cachedModules.contains(path)) {
+					try {
+						// Convert imported module to token stream
+						FileReader reader = new FileReader(path);
+						WaebricScanner scanner = new WaebricScanner(reader);
+						exceptions.addAll(scanner.tokenizeStream());
+						tokens.addAll(scanner.getTokens());
+					} catch (FileNotFoundException e) {
+						exceptions.add(new InvalidModuleException(path));
+					} catch (IOException e) {
+						throw new InternalError(); // Should never occur
+					}
 				}
 			}
 		}

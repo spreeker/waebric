@@ -49,7 +49,7 @@ class ModuleParser extends AbstractParser {
 		// Parse Module*
 		while(tokens.hasNext()) {
 			next(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
-			Module module = parseModule(modules);
+			Module module = parseModule();
 			modules.add(module);
 		}
 		
@@ -61,18 +61,11 @@ class ModuleParser extends AbstractParser {
 	 * "module" ModuleId ModuleElement* -> Module
 	 * @throws SyntaxException
 	 */
-	public Module parseModule(Modules modules) throws SyntaxException {
+	public Module parseModule() throws SyntaxException {
 		current(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
 		
 		Module module = new Module();
 		module.setIdentifier(parseModuleId());
-		
-		// Check if module has already been parsed
-		if(modules.contains(module)) {
-			while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.MODULE)) {
-				tokens.next(); // Iterate to next module
-			}
-		}
 		
 		// ModuleElement*
 		while(tokens.hasNext()) {

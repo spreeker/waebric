@@ -72,7 +72,7 @@ public class TestModuleParser {
 		iterator = TestScanner.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
-		Module module = parser.parseModule(new Modules());
+		Module module = parser.parseModule();
 		
 		// Assertions
 		assertEquals("module", module.getChildren()[0].toString());
