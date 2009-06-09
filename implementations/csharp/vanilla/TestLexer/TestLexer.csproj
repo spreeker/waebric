@@ -51,22 +51,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TokenIteratorTest.cs" />
+    <Compile Include="Tokenizer\StreamTokenizerTest.cs" />
+    <Compile Include="Tokenizer\TokenIteratorTest.cs" />
     <Compile Include="UnitTest1.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ManualTest1.mht">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AuthoringTests.txt" />
+    <Compile Include="WaebricLexerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lexer\Lexer.csproj">
       <Project>{E9AB8C47-6F18-444E-81CD-9A932E751CE4}</Project>
       <Name>Lexer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test References\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
