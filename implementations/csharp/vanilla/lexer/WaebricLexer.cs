@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Lexer.Tokenizer;
+using System.Text;
 
 namespace Lexer
 {
@@ -11,7 +12,9 @@ namespace Lexer
 
         private TextReader Stream; // Stream to read from
         private List<Token> TokenStream = new List<Token>();
+        private StreamTokenizer tokenizer;
 
+        private int CurrentToken;
         #endregion
 
         #region Public Methods
@@ -30,51 +33,42 @@ namespace Lexer
         /// </summary>
         public void LexicalizeStream()
         {
-            StreamTokenizer tokenizer = new StreamTokenizer(Stream);
+            tokenizer = new StreamTokenizer(Stream);
 
             TokenStream.Clear(); //Clean stream before inserting items
             
-            int token;
-            token = tokenizer.NextToken();
-            while (token != StreamTokenizer.EOF)
+            CurrentToken = tokenizer.NextToken();
+            while (CurrentToken != StreamTokenizer.EOF)
             {
-                switch (token)
+                switch (CurrentToken)
                 {
                     case StreamTokenizer.LAYOUT: // ignore layout
                         break;
+                    case StreamTokenizer.COMMENT: // ignore comments
+                        break;
                     case StreamTokenizer.WORD: // check word to determine type
-                        if (IsKeyword(tokenizer.GetTextValue())) // Is keyword
-                        {
-                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.KEYWORD, tokenizer.GetScannedLines()));
-                        }
-                        else if (IsIdentifier(tokenizer.GetTextValue()))
-                        {
-                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.IDENTIFIER, tokenizer.GetScannedLines()));
-                        }
-                        else
-                        {
-                            throw new StreamTokenizerException("Invalid token: " + token, tokenizer.GetScannedLines());
-                        }   
+                        LexicalizeWord();
                         break;
                     case StreamTokenizer.NUMBER: // numeric value
-                        TokenStream.Add(new Token(tokenizer.GetNumericValue(), TokenType.NUMBER, tokenizer.GetScannedLines()));
+                        LexicalizeNumber();
                         break;
-                    default: //other token types need to be handled
-                        if (token == '\"')
-                        {   //quote, so text
-                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.TEXT, tokenizer.GetScannedLines()));
-                        }
-                        else if (IsSymbol((char)token))
+                    case StreamTokenizer.CHARACTER: // Character
+                        if (CurrentToken == '"') // Possible a quote
                         {
-                            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.SYMBOL, tokenizer.GetScannedLines()));
+                            LexicalizeQuote();
+                        }
+                        else if (CurrentToken == '\'') //Waebric Symbol ('symbol ) 
+                        {
+                            LexicalizeSymbol();
                         }
                         else
-                        {
-                            throw new StreamTokenizerException("Invalid token: " + token, tokenizer.GetScannedLines());
+                        {   // Just an character
+                            LexicalizeCharacter();
                         }
+                    default: //Other tokens are not correct
+                        throw new StreamTokenizerException("Invalid token: " + CurrentToken, tokenizer.GetScannedLines());
                         break;
                 }
-                token = tokenizer.NextToken();
             }
         }
 
@@ -97,6 +91,90 @@ namespace Lexer
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Lexicalizes a word type
+        /// </summary>
+        private void LexicalizeWord()
+        {
+            if (IsKeyword(tokenizer.GetTextValue())) // Is probably keyword
+            {
+                //Check for symbols directly after keyword
+                if(IsSymbol(tokenizer.PeekCharacter()))
+                {   //It is not a keyword, followed directly by symbol, so maybe a path, etc.
+                    LexicalizeIdentifier();
+                }
+                else
+                {   // We are dealing with an keyword
+                    TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.KEYWORD, tokenizer.GetScannedLines()));
+                }
+            }
+            else if (IsIdentifier(tokenizer.GetTextValue()))
+            {
+                LexicalizeIdentifier();
+                
+            }
+            else
+            {
+                throw new StreamTokenizerException("Invalid token: " + CurrentToken, tokenizer.GetScannedLines());
+            }
+
+            CurrentToken = tokenizer.NextToken();
+        }
+
+        /// <summary>
+        /// Lexicalizes a numeric value
+        /// </summary>
+        private void LexicalizeNumber()
+        {
+            TokenStream.Add(new Token(tokenizer.GetNumericValue(), TokenType.NUMBER, tokenizer.GetScannedLines()));
+            CurrentToken = tokenizer.NextToken();
+        }
+
+        /// <summary>
+        /// Lexicalizes a character
+        /// </summary>
+        private void LexicalizeCharacter()
+        {
+            TokenStream.Add(new Token(tokenizer.GetCharacterValue(), TokenType.SYMBOL, tokenizer.GetScannedLines()));
+            CurrentToken = tokenizer.NextToken();
+        }
+
+        /// <summary>
+        /// Lexicalizes a quote
+        /// </summary>
+        private void LexicalizeQuote()
+        {
+
+        }
+
+        /// <summary>
+        /// Lexicalizes a waebric symbol
+        /// </summary>
+        private void LexicalizeSymbol()
+        {
+            //Create a string with symbol
+            StringBuilder stringBuilder = new StringBuilder();
+            CurrentToken = tokenizer.NextToken(); //Get next part of symbol after '
+
+            while(IsWaebricSymbol(tokenizer.ToString())) 
+            {
+                stringBuilder.Append(tokenizer.ToString());
+                CurrentToken = tokenizer.NextToken();
+            }
+
+            //TODO Redefine TokenType and move namespace. Also add newer specific waebric types
+            TokenStream.Add(new Token(tokenizer.ToString(), TokenType.SYMBOL, tokenizer.GetScannedLines()));
+        }
+
+        /// <summary>
+        /// Lexicalizes an identifier
+        /// </summary>
+        private void LexicalizeIdentifier()
+        {
+            TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.IDENTIFIER, tokenizer.GetScannedLines()));
+            CurrentToken = tokenizer.NextToken();
+        }
 
         /// <summary>
         /// Checks if token is a keyword
@@ -128,6 +206,31 @@ namespace Lexer
                     return false;
                 }
             }
+            return true;
+        }
+
+        /// <summary>
+        /// Check for a specified string if it contains only symbols
+        /// </summary>
+        /// <param name="possibleSymbol">String to check</param>
+        /// <returns>True if string contains only symbols, otherwise false</returns>
+        private bool IsWaebricSymbol(String possibleSymbol)
+        {
+            if (possibleSymbol == null)
+            {
+                return false;
+            }
+            
+            //Check out all characters
+            char[] possibleSymbolCharacters = possibleSymbol.ToCharArray();
+            for(int i = 0; i < (possibleSymbol.Length - 1); i++)
+            {
+                if (!IsSymbol(possibleSymbol[i]))
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
