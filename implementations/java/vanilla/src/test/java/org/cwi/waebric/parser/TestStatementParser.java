@@ -128,7 +128,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Each statement = parser.parseEachStatement(formals);
-		assertEquals("var1", statement.getVar().getIdentifier().getLiteral().toString());
+		assertEquals("var1", statement.getVar().getLiteral().toString());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
 	}

@@ -6,9 +6,9 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
@@ -87,19 +87,19 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 
 	/**
-	 * "each" "(" Var ":" Expression ")" Statement -> Statement
+	 * "each" "(" IdCon ":" Expression ")" Statement -> Statement
 	 */
 	public static class Each extends Statement {
 
-		private Var var;
+		private IdCon var;
 		private Expression expression;
 		private Statement statement;
 		
-		public Var getVar() {
+		public IdCon getVar() {
 			return var;
 		}
 
-		public void setVar(Var var) {
+		public void setVar(IdCon var) {
 			this.var = var;
 		}
 

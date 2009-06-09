@@ -38,17 +38,17 @@ public abstract class Expression extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * Var -> Expression
+	 * IdCon -> Expression
 	 */
 	public static class VarExpression extends Expression {
 
-		private Var var;
+		private IdCon var;
 		
-		public Var getVar() {
+		public IdCon getVar() {
 			return var;
 		}
 
-		public void setVar(Var var) {
+		public void setVar(IdCon var) {
 			this.var = var;
 		}
 
@@ -96,40 +96,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { natural };
-		}
-		
-	}
-	
-	/**
-	 * Expression "." IdCon -> Expression
-	 */
-	public static class IdConExpression extends Expression {
-
-		private Expression expression;
-		private IdCon identifier;
-		
-		public Expression getExpression() {
-			return expression;
-		}
-
-		public void setExpression(Expression expression) {
-			this.expression = expression;
-		}
-
-		public IdCon getIdentifier() {
-			return identifier;
-		}
-
-		public void setIdentifier(IdCon identifier) {
-			this.identifier = identifier;
-		}
-
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				expression,
-				new CharacterLiteral(WaebricSymbol.PERIOD),
-				identifier
-			};
 		}
 		
 	}
@@ -187,6 +153,74 @@ public abstract class Expression extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.LCBRACKET),
 				pairs,
 				new CharacterLiteral(WaebricSymbol.RCBRACKET)
+			};
+		}
+		
+	}
+	
+	/**
+	 * Expression "." IdCon -> Expression
+	 */
+	public static class Field extends Expression {
+
+		private Expression expression;
+		private IdCon identifier;
+		
+		public Expression getExpression() {
+			return expression;
+		}
+
+		public void setExpression(Expression expression) {
+			this.expression = expression;
+		}
+
+		public IdCon getIdentifier() {
+			return identifier;
+		}
+
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
+		}
+
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] {
+				expression,
+				new CharacterLiteral(WaebricSymbol.PERIOD),
+				identifier
+			};
+		}
+		
+	}
+	
+	/**
+	 * Expression "+" Expression -> Expression
+	 */
+	public static class Cat extends Expression {
+		
+		private Expression left;
+		private Expression right;
+		
+		public Expression getLeft() {
+			return left;
+		}
+		
+		public void setLeft(Expression left) {
+			this.left = left;
+		}
+		
+		public Expression getRight() {
+			return right;
+		}
+		
+		public void setRight(Expression right) {
+			this.right = right;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+				left,
+				new CharacterLiteral(WaebricSymbol.PLUS),
+				right
 			};
 		}
 		

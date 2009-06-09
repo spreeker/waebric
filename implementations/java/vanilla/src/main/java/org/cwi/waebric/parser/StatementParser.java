@@ -160,7 +160,8 @@ class StatementParser extends AbstractParser {
 
 		// Parse "(" Var ":" Expression ")"
 		next(WaebricSymbol.LPARANTHESIS, "Each opening", "\"each\" \"(\" Var");
-		statement.setVar(expressionParser.parseVar());
+		next(WaebricTokenSort.IDCON, "Variable", "var \":\" Expression");
+		statement.setVar(new IdCon(tokens.current().getLexeme().toString()));
 		next(WaebricSymbol.COLON, "Each colon separator", "var \":\" Expression");
 		
 		try {

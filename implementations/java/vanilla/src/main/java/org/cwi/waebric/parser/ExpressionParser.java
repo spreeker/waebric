@@ -10,7 +10,6 @@ import org.cwi.waebric.parser.ast.basic.SymbolCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Text;
-import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricToken;
@@ -40,34 +39,49 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression parseExpression() throws SyntaxException {
 		if(tokens.hasNext()) {
-			WaebricToken peek = tokens.peek(1);
+			Expression expression = null;
 			
 			// Determine expression type based on look-ahead
-			if(peek.getSort() == WaebricTokenSort.SYMBOLCON) {
+			if(tokens.peek(1).getSort() == WaebricTokenSort.SYMBOLCON) {
 				// Symbol expressions consist of a symbol
-				return parseSymbolExpression();
-			} else if(peek.getSort() == WaebricTokenSort.NATCON) {
+				expression = parseSymbolExpression();
+			} else if(tokens.peek(1).getSort() == WaebricTokenSort.NATCON) {
 				// Natural expressions consist of a natural
-				return parseNatExpression();
-			} else if(peek.getSort() == WaebricTokenSort.QUOTE) {
+				expression =  parseNatExpression();
+			} else if(tokens.peek(1).getSort() == WaebricTokenSort.QUOTE) {
 				// Textual expressions consist of a text
-				return parseTextExpression();
-			} else if(peek.getSort() == WaebricTokenSort.IDCON) {
+				expression =  parseTextExpression();
+			} else if(tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
 				// Variable expressions consist of variable
-				return parseVarExpression();
-			} if(peek.getLexeme().equals(WaebricSymbol.LBRACKET)) {
+				expression = parseVarExpression();
+			} else if(tokens.peek(1).getLexeme().equals(WaebricSymbol.LBRACKET)) {
 				// List expressions start with a [
-				return parseListExpression();
-			} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
+				expression = parseListExpression();
+			} else if(tokens.peek(1).getLexeme().equals(WaebricSymbol.LCBRACKET)) {
 				// Record expressions start with a {
-				return parseRecordExpression();
-			} else if(isExpression(peek)) {
-				// Only remaining alternative
-				return parseIdConExpression();
-			} else {
-				// Invalid token
-				reportUnexpectedToken(peek, "expression", "expression");
+				expression = parseRecordExpression();
+			} 
+			
+			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				// Parse field expression
+				Expression.Field field = new Expression.Field();
+				field.setExpression(expression);
+				next(WaebricSymbol.PERIOD, "Period separator", "Expression \".\" IdCon -> Expression");
+				next(WaebricTokenSort.IDCON, "Identifier", "Expression \".\" IdCon -> Expression");
+				field.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+				return field; // Return field
+			} else if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PLUS)) {
+				// Parse cat expression
+				Expression.Cat cat = new Expression.Cat();
+				cat.setLeft(expression); // Store parsed expression
+				tokens.next(); // Accept '+' and go to next token
+				cat.setRight(parseExpression()); // Parse right expression
+				return cat; // Return cat expression
 			}
+			
+			// Verify that a valid expression has been parsed
+			if(expression == null) { reportUnexpectedToken(tokens.peek(1), "expression", "expression"); } 
+			return expression; // Return "simple" expression
 		}
 		
 		return null;
@@ -99,7 +113,8 @@ class ExpressionParser extends AbstractParser {
 		Expression.VarExpression expression = new Expression.VarExpression();
 		
 		try {
-			expression.setVar(parseVar());
+			next(WaebricTokenSort.IDCON, "Variable", "Var -> Expression");
+			expression.setVar(new IdCon(tokens.current().getLexeme().toString()));
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), 
 					"Var expression", "Var -> Expression");
@@ -146,26 +161,6 @@ class ExpressionParser extends AbstractParser {
 		Expression.SymbolExpression expression = new Expression.SymbolExpression();
 		SymbolCon symbol = new SymbolCon(new StringLiteral(tokens.current().getLexeme().toString()));
 		expression.setSymbol(symbol);
-		return expression;
-	}
-	
-	/**
-	 * @throws SyntaxException 
-	 * @see Expression.IdConExpression
-	 */
-	public Expression.IdConExpression parseIdConExpression() throws SyntaxException {
-		Expression.IdConExpression expression = new Expression.IdConExpression();
-		
-		try {
-			expression.setExpression(parseExpression());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), 
-					"Expression", "Expression \".\" IdCon -> Expression");
-		}
-
-		next(WaebricSymbol.PERIOD, "Period separator", "Expression \".\" IdCon -> Expression");
-		next(WaebricTokenSort.IDCON, "Identifier", "Expression \".\" IdCon -> Expression");
-		expression.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
 		return expression;
 	}
 	
@@ -256,13 +251,4 @@ class ExpressionParser extends AbstractParser {
 		return pair;
 	}
 	
-	/**
-	 * @see Var
-	 * @param var
-	 */
-	public Var parseVar() throws SyntaxException {
-		next(WaebricTokenSort.IDCON, "Variable", "IdCon -> Var");
-		return new Var(tokens.current().getLexeme().toString());
-	}
-
 }

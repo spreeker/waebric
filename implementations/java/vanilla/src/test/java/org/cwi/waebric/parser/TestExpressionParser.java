@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
+import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -34,16 +35,25 @@ public class TestExpressionParser {
 		parser = null;
 		iterator = null;
 	}
-	
+
 	@Test
 	public void testParseExpression() throws SyntaxException {
 		iterator = TestScanner.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression expression = parser.parseExpression();
-		
-		// Assertions
 		assertEquals(Expression.VarExpression.class, expression.getClass());
+	}
+	
+	@Test
+	public void testCat() throws SyntaxException {
+		iterator = TestScanner.quickScan("var+my.field");
+		parser = new ExpressionParser(iterator, exceptions);
+		
+		// Class type is checked in cast
+		Expression.Cat expression = (Expression.Cat) parser.parseExpression();
+		assertEquals(Expression.VarExpression.class, expression.getLeft().getClass());
+		assertEquals(Expression.Field.class, expression.getRight().getClass());
 	}
 	
 	@Test
@@ -52,7 +62,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.VarExpression expression = parser.parseVarExpression();
-		assertEquals("variable1", expression.getVar().getIdentifier().getLiteral().toString());
+		assertEquals("variable1", expression.getVar().getLiteral().toString());
 	}
 	
 	@Test
@@ -60,7 +70,7 @@ public class TestExpressionParser {
 		iterator = TestScanner.quickScan("variable1.identifier1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
-		Expression.IdConExpression expression = parser.parseIdConExpression();
+		Expression.Field expression = (Field) parser.parseExpression();
 		assertEquals("identifier1", expression.getIdentifier().getLiteral().toString());
 		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
 	}
