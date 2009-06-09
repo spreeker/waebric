@@ -12,7 +12,13 @@ import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.scanner.WaebricScanner;
 
-public class ModuleCheck implements IWaebricCheck {
+/**
+ * Check module nodes for semantic violations.
+ * @see NonExistingModuleException
+ * @author Jeroen van Schagen
+ * @date 09-06-2009
+ */
+class ModuleCheck implements IWaebricCheck {
 
 	/**
 	 * Cache of dependent module(s)
@@ -29,7 +35,6 @@ public class ModuleCheck implements IWaebricCheck {
 		this.moduleCache = moduleCache;
 	}
 	
-	@Override
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
 		for(Module module: modules) {
 			// Check module definition

@@ -1,9 +1,25 @@
 package org.cwi.waebric.checker;
 
+import java.util.List;
+
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.FunctionDef;
+import org.cwi.waebric.parser.ast.module.Modules;
 
-public class FunctionCheck {
+/**
+ * Check function definition nodes for semantic violations.
+ * @see ArityMismatchException
+ * @see DuplicateFunctionDefinition
+ * @see UndefinedFunctionException
+ * @author Jeroen van Schagen
+ * @date 09-06-2009
+ */
+class FunctionCheck implements IWaebricCheck {
+	
+	public void checkAST(Modules modules, List<SemanticException> exceptions) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 * If a function is called with an incorrect number of arguments 

@@ -1,8 +1,22 @@
 package org.cwi.waebric.checker;
 
-import org.cwi.waebric.parser.ast.basic.IdCon;
+import java.util.List;
 
-public class VarCheck {
+import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.module.Modules;
+
+/**
+ * Check variables for semantic violations.
+ * @see UndefinedVariableException
+ * @author Jeroen van Schagen
+ * @date 09-06-2009
+ */
+class VarCheck implements IWaebricCheck {
+	
+	public void checkAST(Modules modules, List<SemanticException> exceptions) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 * If a variable reference x cannot be traced back to an enclosing 
@@ -24,5 +38,5 @@ public class VarCheck {
 		}
 		
 	}
-	
+
 }
