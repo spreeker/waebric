@@ -59,7 +59,7 @@ public abstract class Markup extends AbstractSyntaxNode {
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
-	public static class Tag extends Markup {
+	public static class Regular extends Markup {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { designator };

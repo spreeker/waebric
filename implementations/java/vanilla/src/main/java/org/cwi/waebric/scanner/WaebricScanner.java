@@ -111,7 +111,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 			}
 		}
 
-		new ImportProcessor(cachedModules).process(tokens, exceptions);
+//		new ImportProcessor(cachedModules).process(tokens, exceptions);
 		return exceptions;
 	}
 

@@ -47,7 +47,7 @@ class MarkupParser extends AbstractParser {
 			Arguments arguments = parseArguments();
 			markup = new Markup.Call(arguments);
 		} else {
-			markup = new Markup.Tag();
+			markup = new Markup.Regular();
 		}
 
 		// Store designator

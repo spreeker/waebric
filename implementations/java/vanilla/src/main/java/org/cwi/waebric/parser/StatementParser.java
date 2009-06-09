@@ -199,6 +199,7 @@ class StatementParser extends AbstractParser {
 		} while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.IN));
 
 		next(WaebricKeyword.IN, "Let-in keyword", "Assignment+ \"in\" Statement*");
+		// TODO: Add var assignments to extended formals
 		
 		// Parse sub-statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
