@@ -1,4 +1,4 @@
-package org.cwi.waebric.checker.module;
+package org.cwi.waebric.checker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,8 +6,6 @@ import java.io.FileReader;
 import java.util.List;
 import java.util.Map;
 
-import org.cwi.waebric.checker.IWaebricCheck;
-import org.cwi.waebric.checker.SemanticException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
