@@ -7,7 +7,6 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.MidText;
@@ -40,13 +39,13 @@ class EmbeddingParser extends AbstractParser {
 		markupParser = new MarkupParser(tokens, exceptions);
 		expressionParser = new ExpressionParser(tokens, exceptions);
 	}
-	
+
 	/**
 	 * @see Embedding
 	 * @return Embedding
 	 * @throws SyntaxException 
 	 */
-	public Embedding parseEmbedding(Formals formals) throws SyntaxException {
+	public Embedding parseEmbedding() throws SyntaxException {
 		WaebricToken peek = tokens.peek(1);
 		if(peek.getSort() == WaebricTokenSort.QUOTE) {
 			// Decompose stream when first token is quote
@@ -55,8 +54,8 @@ class EmbeddingParser extends AbstractParser {
 		
 		Embedding embedding = new Embedding();
 		embedding.setPre(parsePreText());
-		embedding.setEmbed(parseEmbed(formals));
-		embedding.setTail(parseTextTail(formals));
+		embedding.setEmbed(parseEmbed());
+		embedding.setTail(parseTextTail());
 		return embedding;
 	}
 	
@@ -81,7 +80,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @return Embed
 	 * @throws SyntaxException 
 	 */
-	public Embed parseEmbed(Formals formals) throws SyntaxException {
+	public Embed parseEmbed() throws SyntaxException {
 		// Parse mark-up tokens
 		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
@@ -89,24 +88,31 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		// Determine type based on look-ahead information
-		if(tokens.hasNext() && StatementParser.isMarkup(tokens.peek(1), formals)) {
+		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON && isMarkup()) {
 			// Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
+			
 			try {
 				embed.setMarkup(markupParser.parseMarkup());
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "Markup embedding", "Markup+ Markup");
 			}
+			
 			return embed;
-		} else {
-			// Only remaining alternative is Markup* Expression -> Markup
+		} else if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
+			// Markup* Expression -> Markup
 			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
+			
 			try {
 				embed.setExpression(expressionParser.parseExpression());
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "Expression embedding", "Markup+ Expression");
 			}
+			
 			return embed;
+		} else {
+			reportUnexpectedToken(tokens.peek(1), "Embed", "Markup* Markup or Markup* Expression");
+			return null;
 		}
 	}
 	
@@ -115,7 +121,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @return TextTail
 	 * @throws SyntaxException 
 	 */
-	public TextTail parseTextTail(Formals formals) throws SyntaxException {
+	public TextTail parseTextTail() throws SyntaxException {
 		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
 		
 		// Parse text characters
@@ -142,8 +148,8 @@ class EmbeddingParser extends AbstractParser {
 
 				TextTail.MidTail tail = new TextTail.MidTail();
 				tail.setMid(mid);
-				tail.setEmbed(parseEmbed(formals));
-				tail.setTail(parseTextTail(formals));
+				tail.setEmbed(parseEmbed());
+				tail.setTail(parseTextTail());
 				
 				return tail;
 			}
@@ -238,6 +244,35 @@ class EmbeddingParser extends AbstractParser {
 		// Swap quote token with extended token collection
 		tokens.remove();
 		tokens.addAll(elements);
+	}
+	
+	/**
+	 * Determine if next token is mark-up.
+	 * @return Markup?
+	 */
+	public boolean isMarkup() {
+		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
+			if(tokens.hasNext(3) // Parentheses can be used to force an identifier as mark-up
+					&& tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
+					&& tokens.peek(3).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+				return true;
+			} else if(tokens.hasNext(2) && tokens.peek(2).getSort() != WaebricTokenSort.IDCON) {
+				return false; // Final identifier in a string is seen as variable
+			}
+		}
+		
+		// All identifiers not at tail are seen as mark-up
+		return true;
+	}
+	
+	/**
+	 * Determine if specified token is embedding
+	 * @param token Token
+	 * @return Embedding?
+	 */
+	public static boolean isEmbedding(WaebricToken token) {
+		return token.getSort() == WaebricTokenSort.QUOTE 
+			&& token.getLexeme().toString().matches("\\w*<\\w*>\\w*");
 	}
 	
 }

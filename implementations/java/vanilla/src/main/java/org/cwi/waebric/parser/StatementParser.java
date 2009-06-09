@@ -55,28 +55,28 @@ class StatementParser extends AbstractParser {
 	 * @return Statement
 	 * @throws SyntaxException 
 	 */
-	public Statement parseStatement(Formals formals) throws SyntaxException {
+	public Statement parseStatement() throws SyntaxException {
 		if(tokens.hasNext()) {
 			WaebricToken peek = tokens.peek(1); // Retrieve first token of statement
 			if(peek.getLexeme().equals(WaebricKeyword.IF)) {
 				// If(-else) statements start with an if keyword
-				return parseIfStatement(formals);
+				return parseIfStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.EACH)) {
 				// Each statements start with an each keyword
-				return parseEachStatement(formals);
+				return parseEachStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.LET)) {
 				// Let statements start with a let keyword
-				return parseLetStatement(formals);
+				return parseLetStatement();
 			} else if(peek.getLexeme().equals(WaebricSymbol.LCBRACKET)) {
 				// Statement collections start with a {
-				return parseStatementCollection(formals);
+				return parseStatementCollection();
 			} else if(peek.getLexeme().equals(WaebricKeyword.COMMENT)) {
 				// Comment statements start with a comments keyword
 				return parseCommentStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
 				if(tokens.peek(2).getSort().equals(WaebricTokenSort.QUOTE)) {
 					// Embedding echo production is followed by a text
-					return parseEchoEmbeddingStatement(formals);
+					return parseEchoEmbeddingStatement();
 				} else {
 					// Embedding echo production is followed by an expression
 					return parseEchoExpressionStatement();
@@ -89,7 +89,7 @@ class StatementParser extends AbstractParser {
 				return parseYieldStatement();
 			} else if(peek.getSort().equals(WaebricTokenSort.IDCON)) {
 				// Mark-up statements always begin with an identifier
-				return parseMarkupStatements(formals);
+				return parseMarkupStatements();
 			} else {
 				reportUnexpectedToken(tokens.current(), "statement", 
 						"\"if\", \"each\", \"let\", \"{\", \"comment\", " +
@@ -105,7 +105,7 @@ class StatementParser extends AbstractParser {
 	 * @return IfStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.If parseIfStatement(Formals formals) throws SyntaxException {
+	public Statement.If parseIfStatement() throws SyntaxException {
 		Statement.If statement; 
 		
 		next(WaebricKeyword.IF, "if keyword", "\"if\" \"(\"");
@@ -123,7 +123,7 @@ class StatementParser extends AbstractParser {
 		// Parse "true" sub-statement
 		Statement trueStatement = null;
 		try {
-			trueStatement = parseStatement(formals);
+			trueStatement = parseStatement();
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), "True statement", "\"if(args)\" Statement");
 		}
@@ -134,7 +134,7 @@ class StatementParser extends AbstractParser {
 			Statement elseStatement = null;
 			try {
 				// Parse "false" sub-statement
-				elseStatement = parseStatement(formals);
+				elseStatement = parseStatement();
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "False statement", "\"else\" Statement");
 			}
@@ -153,7 +153,7 @@ class StatementParser extends AbstractParser {
 	 * @return EachStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.Each parseEachStatement(Formals formals) throws SyntaxException {
+	public Statement.Each parseEachStatement() throws SyntaxException {
 		next(WaebricKeyword.EACH, "Each keyword", "\"each\"");
 		
 		Statement.Each statement = new Statement.Each();
@@ -174,8 +174,7 @@ class StatementParser extends AbstractParser {
 		
 		// Parse sub-statement
 		try {
-			Formals extendedFormals = new Formals.Regular(formals.getIdentifiers());
-			statement.setStatement(parseStatement(extendedFormals));
+			statement.setStatement(parseStatement());
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), "Each sub-statement", "each(Var:Expression) Statement");
 		}
@@ -188,22 +187,21 @@ class StatementParser extends AbstractParser {
 	 * @return LetStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement.Let parseLetStatement(Formals formals) throws SyntaxException {
+	public Statement.Let parseLetStatement() throws SyntaxException {
 		next(WaebricKeyword.LET, "Let keyword", "\"let\"");
 
 		Statement.Let statement = new Statement.Let();
 			
 		// Parse assignments
 		do {
-			statement.addAssignment(parseAssignment(formals));
+			statement.addAssignment(parseAssignment());
 		} while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.IN));
 
 		next(WaebricKeyword.IN, "Let-in keyword", "Assignment+ \"in\" Statement*");
-		// TODO: Add var assignments to extended formals
 		
 		// Parse sub-statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
-			statement.addStatement(parseStatement(formals));
+			statement.addStatement(parseStatement());
 		}
 		
 		next(WaebricKeyword.END, "Let-end keyword", "\"in\" Statement* \"end\"");
@@ -215,12 +213,12 @@ class StatementParser extends AbstractParser {
 	 * @return StatementCollection
 	 * @throws SyntaxException 
 	 */
-	public Statement.Block parseStatementCollection(Formals formals) throws SyntaxException {
+	public Statement.Block parseStatementCollection() throws SyntaxException {
 		next(WaebricSymbol.LCBRACKET, "Statement collection opening", "\"{\" Statement*");
 		
 		Statement.Block statement = new Statement.Block();
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
-			statement.addStatement(parseStatement(formals));
+			statement.addStatement(parseStatement());
 		}
 		
 		next(WaebricSymbol.RCBRACKET, "Statement collection closure", "statement* \"}\"");
@@ -251,12 +249,12 @@ class StatementParser extends AbstractParser {
 	 * @return EchoEmbedding
 	 * @throws SyntaxException 
 	 */
-	public Statement.EchoEmbedding parseEchoEmbeddingStatement(Formals formals) throws SyntaxException {
+	public Statement.EchoEmbedding parseEchoEmbeddingStatement() throws SyntaxException {
 		next(WaebricKeyword.ECHO, "Echo keyword", "\"echo\"");
 	
 		Statement.EchoEmbedding statement = new Statement.EchoEmbedding();
 		try {
-			statement.setEmbedding(embeddingParser.parseEmbedding(formals));
+			statement.setEmbedding(embeddingParser.parseEmbedding());
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), "Embedding echo", "\"echo\" Embedding");
 		}
@@ -320,7 +318,7 @@ class StatementParser extends AbstractParser {
 	 * @return MarkupsStatement
 	 * @throws SyntaxException 
 	 */
-	public Statement parseMarkupStatements(Formals formals) throws SyntaxException {
+	public Statement parseMarkupStatements() throws SyntaxException {
 		Markup markup = markupParser.parseMarkup(); // Retrieve (first) mark-up
 		
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
@@ -332,7 +330,7 @@ class StatementParser extends AbstractParser {
 			// Retrieve remaining mark-up tokens (Markup+)
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
-			while(tokens.hasNext() && isMarkup(tokens.peek(1), formals)) {
+			while(tokens.hasNext() && isMarkup(1)) {
 				markups.add(markupParser.parseMarkup());
 			}
 			
@@ -345,20 +343,20 @@ class StatementParser extends AbstractParser {
 					Statement.MarkupMarkup statement = new Statement.MarkupMarkup(markups);
 					statement.setMarkup(end);
 					return statement;
-				} else if(isEmbedding(peek)) {
+				} else if(EmbeddingParser.isEmbedding(peek)) {
 					MarkupEmbedding statement = new MarkupEmbedding(markups);
 					try {
-						statement.setEmbedding(embeddingParser.parseEmbedding(formals));
+						statement.setEmbedding(embeddingParser.parseEmbedding());
 					} catch(Exception e) {
 						reportUnexpectedToken(tokens.current(), "Embedding statement", "Markup+ Embedding");
 					}
 					next(WaebricSymbol.SEMICOLON, "Markup embedding closure ;", "Markup+ Embedding \";\"");
 					return statement;
 				} else {
-					if(isMarkupFreeStatement(peek)) {
+					if(StatementParser.isMarkupFreeStatement(peek)) {
 						// Markup+ Statement ";"
 						MarkupStat statement = new MarkupStat(markups);
-						statement.setStatement(parseStatement(formals));
+						statement.setStatement(parseStatement());
 						return statement;
 					} else if(ExpressionParser.isExpression(peek)) {
 						// Markup+ Expression
@@ -385,64 +383,57 @@ class StatementParser extends AbstractParser {
 	}
 	
 	/**
-	 * Check if token is a non mark-up related statement.
+	 * Check if next token is mark-up.
 	 * @param token
 	 * @return
 	 */
+	public boolean isMarkup(int k) {
+		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			if(tokens.hasNext(k+2) // Parentheses can be used to force an identifier as mark-up
+					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
+					&& tokens.peek(k+2).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+				return true;
+			} else if(! tokens.hasNext(k+1) || tokens.peek(k+1).getSort() != WaebricTokenSort.IDCON) {
+				// Final identifier of string is variable by default, unless it is a single identifier
+				WaebricToken previous = tokens.peek(k-1);
+				return previous == null 
+					|| previous.getSort() != WaebricTokenSort.IDCON;
+			}
+		}
+		
+		// All identifiers not at tail are seen as mark-up
+		return true;
+	}
+	
+	/**
+	 * Check if token is a mark-up free statement.
+	 * @param token
+	 * @return Statement?
+	 */
 	public static boolean isMarkupFreeStatement(WaebricToken token) {
 		if(token.getSort() == WaebricTokenSort.KEYWORD) {
-			return token.getLexeme().equals(WaebricKeyword.IF) ||
-				   token.getLexeme().equals(WaebricKeyword.CDATA) ||
-				   token.getLexeme().equals(WaebricKeyword.COMMENT) ||
-				   token.getLexeme().equals(WaebricKeyword.EACH) ||
-				   token.getLexeme().equals(WaebricKeyword.LET) ||
-				   token.getLexeme().equals(WaebricKeyword.YIELD);
+			return token.getLexeme().equals(WaebricKeyword.IF) 
+				|| token.getLexeme().equals(WaebricKeyword.CDATA)
+				|| token.getLexeme().equals(WaebricKeyword.COMMENT)
+				|| token.getLexeme().equals(WaebricKeyword.EACH)
+				|| token.getLexeme().equals(WaebricKeyword.LET)
+				|| token.getLexeme().equals(WaebricKeyword.YIELD);
 		}
 		
 		return token.getLexeme().equals(WaebricSymbol.LCBRACKET);
 	}
-	
-	public static boolean isEmbedding(WaebricToken token) {
-		return token.getSort() == WaebricTokenSort.QUOTE && token.getLexeme().toString().matches("\\w*<\\w*>\\w*");
-	}
 
-	public static boolean isMarkup(WaebricToken token, Formals formals) {
-		if(token.getSort() == WaebricTokenSort.IDCON) {
-			// Check if token matches a specified variable
-			return ! isVar(token, formals);
-		}
-		
-		return false;
-	}
-	
-	public static boolean isVar(WaebricToken token, Formals formals) {
-		for(IdCon identifier: formals.getIdentifiers()) {
-			String name = identifier.getLiteral().toString();
-			if(token.getLexeme().equals(name)) { return true; }
-		}
-		
-		return false;
-	}
-	
 	/**
 	 * @see Assignment
 	 * @return Assignment
 	 * @throws SyntaxException 
 	 */
-	public Assignment parseAssignment(Formals formals) throws SyntaxException {
-		if(tokens.hasNext(1)) {
-			if(isVar(tokens.peek(1), formals)) {
-				return parseVarAssignment();
-			} else if(tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
-				return parseIdConAssignment(formals);
-			} else {
-				reportUnexpectedToken(tokens.peek(2), "Assignment", "Var \"=\" Expression or Identifier \"=\" Statement \"(\"");
-				return null;
-			}
+	public Assignment parseAssignment() throws SyntaxException {
+		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
+			return parseIdConAssignment();
+		} else {
+			return parseVarAssignment();
 		}
-			
-		reportMissingToken(tokens.current(), "Assignment", "Var \"=\" Expression or Identifier \"=\" Statement \"(\"");
-		return null;
 	}
 	
 	/**
@@ -466,7 +457,7 @@ class StatementParser extends AbstractParser {
 	 * @return IdConAssignment
 	 * @throws SyntaxException 
 	 */
-	public Assignment.FuncBind parseIdConAssignment(Formals formals) throws SyntaxException {
+	public Assignment.FuncBind parseIdConAssignment() throws SyntaxException {
 		Assignment.FuncBind assignment = new Assignment.FuncBind();
 		
 		// Parse identifier
@@ -492,7 +483,7 @@ class StatementParser extends AbstractParser {
 		next(WaebricSymbol.EQUAL_SIGN, "Identifier assignment \"=\"", "Formals \"=\" Statement");
 		
 		// Parse sub-statement
-		assignment.setStatement(parseStatement(formals));
+		assignment.setStatement(parseStatement());
 		return assignment;
 	}
 	

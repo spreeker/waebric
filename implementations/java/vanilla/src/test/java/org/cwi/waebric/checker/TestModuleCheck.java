@@ -81,4 +81,12 @@ public class TestModuleCheck {
 		assertEquals(ModuleCheck.NonExistingModuleException.class, exceptions.get(0).getClass());
 	}
 	
+	@Test
+	public void testInfiniteImportLoop() throws FileNotFoundException {
+		Modules modules = quickParse("src/test/waebric/mod/mymodule.wae");
+		check.checkAST(modules, exceptions);
+		assertEquals(0, exceptions.size()); // No faults
+		assertTrue(check.hasCached(modules.get(0).getIdentifier())); // Module cached
+	}
+	
 }

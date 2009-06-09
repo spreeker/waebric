@@ -72,7 +72,8 @@ class ModuleCheck implements IWaebricCheck {
 			
 			// Retrieve modules
 			Modules modules = parser.getAbstractSyntaxTree().getRoot();
-			moduleCache.put(identifier, modules); // Cache parsed module
+			moduleCache.put(identifier, modules); // Cache dependent modules
+			checkAST(modules, exceptions); // Check dependent modules
 		} catch(FileNotFoundException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
 			moduleCache.put(identifier, new Modules()); // Cache non-existing module as empty modules node

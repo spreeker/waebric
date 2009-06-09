@@ -43,7 +43,7 @@ class FunctionParser extends AbstractParser {
 		
 		// Parse statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {
-			def.addStatement(statementParser.parseStatement(def.getFormals()));
+			def.addStatement(statementParser.parseStatement());
 		}
 		
 		next(WaebricKeyword.END, "Function closure \"end\"", "end");
