@@ -8,11 +8,11 @@ import java.util.List;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate.AndPredicate;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate.ExpressionPredicate;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate.ExpressionTypePredicate;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate.NotPredicate;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate.OrPredicate;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate.And;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate.RegularPredicate;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Is;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Not;
+import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Or;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
@@ -47,8 +47,8 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("123");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate.ExpressionPredicate predicate = (ExpressionPredicate) parser.parsePredicate();
-		assertEquals(Predicate.ExpressionPredicate.class, predicate.getClass()); // Correct type
+		Predicate.RegularPredicate predicate = (RegularPredicate) parser.parsePredicate();
+		assertEquals(Predicate.RegularPredicate.class, predicate.getClass()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass());
 	}
 	
@@ -57,8 +57,8 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate.ExpressionTypePredicate predicate = (ExpressionTypePredicate) parser.parsePredicate();
-		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getClass()); // Correct type
+		Predicate.Is predicate = (Is) parser.parsePredicate();
+		assertEquals(Predicate.Is.class, predicate.getClass()); // Correct type
 		assertEquals("string", predicate.getType().toString()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass());
 	}
@@ -68,8 +68,8 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("!123");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate.NotPredicate predicate = (NotPredicate) parser.parsePredicate();
-		assertEquals(Predicate.ExpressionPredicate.class, predicate.getPredicate().getClass());
+		Predicate.Not predicate = (Not) parser.parsePredicate();
+		assertEquals(Predicate.RegularPredicate.class, predicate.getPredicate().getClass());
 	}
 	
 	@Test
@@ -77,9 +77,9 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("123&&123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate.AndPredicate predicate = (AndPredicate) parser.parsePredicate();
-		assertEquals(Predicate.ExpressionPredicate.class, predicate.getLeft().getClass());
-		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getRight().getClass());
+		Predicate.And predicate = (And) parser.parsePredicate();
+		assertEquals(Predicate.RegularPredicate.class, predicate.getLeft().getClass());
+		assertEquals(Predicate.Is.class, predicate.getRight().getClass());
 	}
 	
 	
@@ -88,9 +88,9 @@ public class TestPredicateParser {
 		iterator = TestScanner.quickScan("123||123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
-		Predicate.OrPredicate predicate = (OrPredicate) parser.parsePredicate();
-		assertEquals(Predicate.ExpressionPredicate.class, predicate.getLeft().getClass());
-		assertEquals(Predicate.ExpressionTypePredicate.class, predicate.getRight().getClass());
+		Predicate.Or predicate = (Or) parser.parsePredicate();
+		assertEquals(Predicate.RegularPredicate.class, predicate.getLeft().getClass());
+		assertEquals(Predicate.Is.class, predicate.getRight().getClass());
 	}
 	
 	@Test

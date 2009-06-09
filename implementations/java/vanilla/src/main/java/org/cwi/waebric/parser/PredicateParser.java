@@ -43,7 +43,7 @@ class PredicateParser extends AbstractParser {
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.EXCLAMATION_SIGN)) {
 			// Parse "!" predicates
 			tokens.next(); // Accept "!" and move to next token
-			Predicate.NotPredicate notpredicate = new Predicate.NotPredicate();
+			Predicate.Not notpredicate = new Predicate.Not();
 			notpredicate.setPredicate(parsePredicate()); // Parse sub-predicate
 			predicate = notpredicate;
 		} else {
@@ -52,27 +52,27 @@ class PredicateParser extends AbstractParser {
 			
 			// Determine predicate type based on lookahead
 			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
-				Predicate.ExpressionTypePredicate exppredicate = new Predicate.ExpressionTypePredicate();
+				Predicate.Is exppredicate = new Predicate.Is();
 				exppredicate.setExpression(expression);
 				tokens.next(); // Accept "." and move to next token
 				exppredicate.setType(parseType()); // Parse type
 				next(WaebricSymbol.QUESTION_SIGN, "Type", "\".\" Type \"?\"");
 				predicate = exppredicate;
 			} else {
-				Predicate.ExpressionPredicate exptpredicate = new Predicate.ExpressionPredicate();
+				Predicate.RegularPredicate exptpredicate = new Predicate.RegularPredicate();
 				exptpredicate.setExpression(expression); // Store expression
 				predicate = exptpredicate; // Return predicate without type
 			}
 		}
 		
 		if(tokens.hasNext(2) && tokens.peek(1).getLexeme().equals(WaebricSymbol.AMPERSAND) && tokens.peek(2).getLexeme().equals(WaebricSymbol.AMPERSAND)) {
-			Predicate.AndPredicate andpredicate = new Predicate.AndPredicate();
+			Predicate.And andpredicate = new Predicate.And();
 			tokens.next(); tokens.next(); // Accept '&&' tokens and jump to next predicate
 			andpredicate.setLeft(predicate);
 			andpredicate.setRight(parsePredicate());
 			return andpredicate;
 		} else if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.VERTICAL_BAR) && tokens.peek(2).getLexeme().equals(WaebricSymbol.VERTICAL_BAR)) {
-			Predicate.OrPredicate orpredicate = new Predicate.OrPredicate();
+			Predicate.Or orpredicate = new Predicate.Or();
 			tokens.next(); tokens.next(); // Accept '||' tokens and jump to next predicate
 			orpredicate.setLeft(predicate);
 			orpredicate.setRight(parsePredicate());

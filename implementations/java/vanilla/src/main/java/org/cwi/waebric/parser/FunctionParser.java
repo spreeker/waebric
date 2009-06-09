@@ -3,7 +3,6 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.exception.SyntaxException;
@@ -39,10 +38,8 @@ class FunctionParser extends AbstractParser {
 		next(WaebricTokenSort.IDCON, "Function identifier", "Identifier"); 
 		def.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
 		
-		// Parse formals (optional)
-		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			def.setFormals(statementParser.parseFormals());
-		}
+		// Parse formals
+		def.setFormals(statementParser.parseFormals());
 		
 		// Parse statements
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricKeyword.END)) {

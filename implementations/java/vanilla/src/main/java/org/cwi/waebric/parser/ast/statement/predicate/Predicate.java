@@ -20,7 +20,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Expression -> Predicate
 	 * </code>
 	 */
-	public static class ExpressionPredicate extends Predicate {
+	public static class RegularPredicate extends Predicate {
 
 		protected Expression expression;
 		
@@ -44,7 +44,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Expression "." Type "?" -> Predicate
 	 * </code>
 	 */
-	public static class ExpressionTypePredicate extends ExpressionPredicate {
+	public static class Is extends RegularPredicate {
 
 		private Type type;
 		
@@ -73,7 +73,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	"!" Predicate -> Predicate
 	 * </code>
 	 */
-	public static class NotPredicate extends Predicate {
+	public static class Not extends Predicate {
 
 		private Predicate predicate;
 
@@ -99,7 +99,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Predicate "&&" Predicate -> Predicate
 	 * </code>
 	 */
-	public static class AndPredicate extends Predicate {
+	public static class And extends Predicate {
 
 		private Predicate left;
 		private Predicate right;
@@ -134,7 +134,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	 * 	Predicate "||" Predicate -> Predicate
 	 * </code>
 	 */
-	public static class OrPredicate extends Predicate {
+	public static class Or extends Predicate {
 
 		private Predicate left;
 		private Predicate right;

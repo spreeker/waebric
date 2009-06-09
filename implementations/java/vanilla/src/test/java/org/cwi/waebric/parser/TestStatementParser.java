@@ -90,7 +90,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		If statement = parser.parseIfStatement(formals);
-		assertEquals(Predicate.ExpressionPredicate.class, statement.getPredicate().getClass());
+		assertEquals(Predicate.RegularPredicate.class, statement.getPredicate().getClass());
 		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
 	}
 	
@@ -100,7 +100,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		IfElse statement = (IfElse) parser.parseIfStatement(formals);
-		assertEquals(Predicate.ExpressionPredicate.class, statement.getPredicate().getClass());
+		assertEquals(Predicate.RegularPredicate.class, statement.getPredicate().getClass());
 		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
 		assertEquals(Statement.Yield.class, statement.getElseStatement().getClass());
 	}
