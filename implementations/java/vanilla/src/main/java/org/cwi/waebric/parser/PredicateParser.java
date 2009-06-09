@@ -2,6 +2,7 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
+import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -9,6 +10,7 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * module languages/Waebric/syntax/Predicate
@@ -88,12 +90,12 @@ class PredicateParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Type parseType() throws SyntaxException {
-		next("Predicate type definition", "Predicate \".\" Type \"?\"");
+		next(WaebricTokenSort.KEYWORD, "Predicate type definition", "Predicate \".\" Type \"?\"");
 
-		final String lexeme = tokens.current().getLexeme().toString();
-		if(lexeme.equals("list") || lexeme.equals("record") || lexeme.equals("string")) {
+		final WaebricKeyword lexeme = (WaebricKeyword) tokens.current().getLexeme();
+		if(lexeme == WaebricKeyword.LIST || lexeme == WaebricKeyword.RECORD || lexeme == WaebricKeyword.STRING) {
 			Type type = new Type();
-			type.setType(new StringLiteral(lexeme));
+			type.setType(new StringLiteral(WaebricKeyword.getLiteral(lexeme)));
 			return type;
 		} else {
 			reportUnexpectedToken(tokens.current(), "Type definition", "\"list\", \"record\" or \"string\"");

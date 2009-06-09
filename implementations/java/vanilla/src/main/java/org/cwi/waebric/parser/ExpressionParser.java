@@ -62,7 +62,9 @@ class ExpressionParser extends AbstractParser {
 				expression = parseRecordExpression();
 			} 
 			
-			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+			if(tokens.hasNext(2) 
+					&& tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD) 
+					&& tokens.peek(2).getSort() == WaebricTokenSort.IDCON) {
 				// Parse field expression
 				Expression.Field field = new Expression.Field();
 				field.setExpression(expression);
