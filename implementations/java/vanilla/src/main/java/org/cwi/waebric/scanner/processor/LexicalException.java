@@ -1,8 +1,8 @@
 package org.cwi.waebric.scanner.processor;
 
 /**
- * Lexical exceptions occur when a token stream does not maintain
- * its restrictions as specified in the language grammar.
+ * Lexical are exceptions that occurred during reading of the
+ * character stream(s).
  * 
  * @author Jeroen van Schagen
  * @date 05-06-2009

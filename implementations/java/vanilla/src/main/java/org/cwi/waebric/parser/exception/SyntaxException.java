@@ -14,6 +14,10 @@ public abstract class SyntaxException extends Exception {
 	 */
 	private static final long serialVersionUID = -4642489292667119148L;
 
+	/**
+	 * Construct exception based on message.
+	 * @param message
+	 */
 	public SyntaxException(String message) {
 		super(message);
 	}

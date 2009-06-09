@@ -5,7 +5,8 @@ import java.util.List;
 import org.cwi.waebric.scanner.token.WaebricToken;
 
 /**
- * Lexical processor processes token streams.
+ * Lexical processors read a token stream and execute various
+ * pre/post processing activities on this stream.
  * 
  * @author Jeroen van Schagen
  * @date 05-06-2009
