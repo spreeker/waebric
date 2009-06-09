@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
@@ -31,7 +31,7 @@ import org.junit.Test;
 public class TestEmbeddingParser {
 
 	private EmbeddingParser parser;
-	private Formals formals;
+	private Formals.Regular formals;
 	
 	private List<SyntaxException> exceptions;
 	private WaebricTokenIterator iterator;
@@ -39,8 +39,8 @@ public class TestEmbeddingParser {
 	@Before
 	public void setUp() {
 		exceptions = new ArrayList<SyntaxException>();
-		formals = new Formals();
-		formals.add(new Var("args1"));
+		formals = new Formals.Regular();
+		formals.addIdentifier(new IdCon("args1"));
 	}
 	
 	@After

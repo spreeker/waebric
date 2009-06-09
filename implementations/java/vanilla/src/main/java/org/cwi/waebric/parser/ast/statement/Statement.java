@@ -24,7 +24,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "if" "(" Predicate ")" Statement NoElseMayFollow -> Statement
 	 */
-	public static class IfStatement extends Statement {
+	public static class If extends Statement {
 		
 		protected Predicate predicate;
 		protected Statement statement;
@@ -60,11 +60,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "if" "(" Predicate ")" Statement "else" Statement -> Statement
 	 */
-	public static class IfElseStatement extends IfStatement {
+	public static class IfElse extends If {
 		
 		private Statement elseStatement;
 		
-		public IfElseStatement(Statement elseStatement) {
+		public IfElse(Statement elseStatement) {
 			this.elseStatement = elseStatement;
 		}
 		
@@ -89,7 +89,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "each" "(" Var ":" Expression ")" Statement -> Statement
 	 */
-	public static class EachStatement extends Statement {
+	public static class Each extends Statement {
 
 		private Var var;
 		private Expression expression;
@@ -136,12 +136,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "let" Assignment+ "in" Statement* "end" -> Statement
 	 */
-	public static class LetStatement extends Statement {
+	public static class Let extends Statement {
 
 		private AbstractSyntaxNodeList<Assignment> assignments;
 		private AbstractSyntaxNodeList<Statement> statements;
 		
-		public LetStatement() {
+		public Let() {
 			assignments = new AbstractSyntaxNodeList<Assignment>();
 			statements = new AbstractSyntaxNodeList<Statement>();
 		}
@@ -185,11 +185,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "{" Statement* "}"
 	 */
-	public static class StatementCollection extends Statement {
+	public static class Block extends Statement {
 
 		private AbstractSyntaxNodeList<Statement> statements;
 		
-		public StatementCollection() {
+		public Block() {
 			statements = new AbstractSyntaxNodeList<Statement>();
 		}
 		
@@ -218,7 +218,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "comment" StrCon ";" -> Statement
 	 */
-	public static class CommentStatement extends Statement {
+	public static class Comment extends Statement {
 
 		private StrCon comment;
 
@@ -243,7 +243,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "echo" Expression ";" -> Statement
 	 */
-	public static class EchoExpressionStatement extends Statement {
+	public static class Echo extends Statement {
 		
 		private Expression expression;
 
@@ -268,7 +268,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "echo" Embedding ";" -> Statement
 	 */
-	public static class EchoEmbeddingStatement extends Statement {
+	public static class EchoEmbedding extends Statement {
 		
 		private Embedding embedding;
 
@@ -293,7 +293,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "cdata" Expression ";" -> Statement
 	 */
-	public static class CDataStatement extends Statement {
+	public static class CData extends Statement {
 
 		private Expression expression;
 		
@@ -318,7 +318,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * "yield" ";" -> Statement
 	 */
-	public static class YieldStatement extends Statement {
+	public static class Yield extends Statement {
 		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] {
@@ -332,7 +332,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup ";" -> Statement
 	 */
-	public static class MarkupStatement extends Statement {
+	public static class SingleMarkupStatement extends Statement {
 		
 		private Markup markup;
 
@@ -360,11 +360,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 * @author Jeroen van Schagen
 	 * @date 05-06-2009
 	 */
-	public abstract static class MarkupsStatement extends Statement {
+	public abstract static class AbstractMarkupStatement extends Statement {
 		
 		protected AbstractSyntaxNodeList<Markup> markups;
 		
-		public MarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public AbstractMarkupStatement(AbstractSyntaxNodeList<Markup> markups) {
 			this.markups = markups;
 		}
 		
@@ -381,9 +381,9 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Markup ";" -> Statement
 	 */
-	public static class MarkupMarkupsStatement extends MarkupsStatement {
+	public static class MarkupMarkup extends AbstractMarkupStatement {
 
-		public MarkupMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupMarkup(AbstractSyntaxNodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -410,11 +410,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Statement ";" -> Statement
 	 */
-	public static class StatementMarkupsStatement extends MarkupsStatement {
+	public static class MarkupStat extends AbstractMarkupStatement {
 		
 		private Statement statement;
 		
-		public StatementMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupStat(AbstractSyntaxNodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -439,11 +439,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Expression ";" -> Statement
 	 */
-	public static class ExpressionMarkupsStatement extends MarkupsStatement {
+	public static class MarkupExp extends AbstractMarkupStatement {
 
 		private Expression expression;
 		
-		public ExpressionMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupExp(AbstractSyntaxNodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -468,11 +468,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Embedding ";" -> Statement
 	 */
-	public static class EmbeddingMarkupsStatement extends MarkupsStatement {
+	public static class MarkupEmbedding extends AbstractMarkupStatement {
 		
 		private Embedding embedding;
 		
-		public EmbeddingMarkupsStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupEmbedding(AbstractSyntaxNodeList<Markup> markups) {
 			super(markups);
 		}
 

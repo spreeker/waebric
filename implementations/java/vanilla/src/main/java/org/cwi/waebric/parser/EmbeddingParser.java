@@ -7,8 +7,8 @@ import java.util.List;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.MidText;
@@ -47,7 +47,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @return Embedding
 	 * @throws SyntaxException 
 	 */
-	public Embedding parseEmbedding(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
+	public Embedding parseEmbedding(Formals formals) throws SyntaxException {
 		WaebricToken peek = tokens.peek(1);
 		if(peek.getSort() == WaebricTokenSort.QUOTE) {
 			// Decompose stream when first token is quote
@@ -82,7 +82,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @return Embed
 	 * @throws SyntaxException 
 	 */
-	public Embed parseEmbed(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
+	public Embed parseEmbed(Formals formals) throws SyntaxException {
 		// Parse mark-up tokens
 		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
@@ -116,7 +116,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @return TextTail
 	 * @throws SyntaxException 
 	 */
-	public TextTail parseTextTail(AbstractSyntaxNodeList<Var> formals) throws SyntaxException {
+	public TextTail parseTextTail(Formals formals) throws SyntaxException {
 		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
 		
 		// Parse text characters

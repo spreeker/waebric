@@ -40,9 +40,9 @@ public class TestFunctionParser {
 		parser = new FunctionParser(iterator, exceptions);
 		
 		FunctionDef def = parser.parseFunctionDef();
-		assertEquals(2, def.getFormals().size());
+		assertEquals(2, def.getFormals().getIdentifiers().size());
 		assertEquals(1, def.getStatementCount());
-		assertEquals(Statement.CommentStatement.class, def.getStatement(0).getClass());
+		assertEquals(Statement.Comment.class, def.getStatement(0).getClass());
 	}
 	
 }

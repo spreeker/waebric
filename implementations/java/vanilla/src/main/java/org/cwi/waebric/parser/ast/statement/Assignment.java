@@ -3,9 +3,9 @@ package org.cwi.waebric.parser.ast.statement;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Var;
 
 /**
  * Assignments
@@ -16,15 +16,22 @@ import org.cwi.waebric.parser.ast.expression.Var;
 public abstract class Assignment extends AbstractSyntaxNode {
 
 	/**
-	 * IdCon Formals "=" Statement -> Assignment
+	 * IdCon "(" {IdCon ","}* ")"  "=" Statement -> Assignment
 	 * @author Jeroen van Schagen
 	 * @date 26-05-2009
 	 */
-	public static class IdConAssignment extends Assignment {
+	public static class FuncBind extends Assignment {
 	
 		private IdCon identifier;
-		private Formals formals;
+		private AbstractSeparatedSyntaxNodeList<IdCon> identifiers;
 		private Statement statement;
+		
+		/**
+		 * Construct default function binding.
+		 */
+		public FuncBind() {
+			identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(',');
+		}
 		
 		public IdCon getIdentifier() {
 			return identifier;
@@ -34,12 +41,16 @@ public abstract class Assignment extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 	
-		public Formals getFormals() {
-			return formals;
+		public IdCon getIdentifier(int index) {
+			return identifiers.get(index);
 		}
 	
-		public void setFormals(Formals formals) {
-			this.formals = formals;
+		public void addIdentifier(IdCon identifier) {
+			identifiers.add(identifier);
+		}
+		
+		public int getIdentifierCount() {
+			return identifiers.size();
 		}
 	
 		public Statement getStatement() {
@@ -53,7 +64,9 @@ public abstract class Assignment extends AbstractSyntaxNode {
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] {
 				identifier,
-				formals,
+				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
+				identifiers,
+				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
 				new CharacterLiteral(WaebricSymbol.EQUAL_SIGN),
 				statement
 			};
@@ -62,21 +75,21 @@ public abstract class Assignment extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * Var "=" Expression -> Assignment
+	 * IdCon "=" Expression -> Assignment
 	 * @author Jeroen van Schagen
 	 * @date 26-05-2009
 	 */
-	public static class VarAssignment extends Assignment {
+	public static class VarBind extends Assignment {
 		
-		private Var var;
+		private IdCon identifier;
 		private Expression expression;
 		
-		public Var getVar() {
-			return var;
+		public IdCon getIdentifier() {
+			return identifier;
 		}
 		
-		public void setVar(Var var) {
-			this.var = var;
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
 		}
 		
 		public Expression getExpression() {
@@ -89,7 +102,7 @@ public abstract class Assignment extends AbstractSyntaxNode {
 		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] {
-				var,
+				identifier,
 				new CharacterLiteral('='),
 				expression
 			};
