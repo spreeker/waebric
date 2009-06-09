@@ -29,7 +29,7 @@ public class WaebricParser extends AbstractParser {
 	 * @param scanner
 	 * @throws IOException 
 	 */
-	public WaebricParser(WaebricScanner scanner) throws IOException {
+	public WaebricParser(WaebricScanner scanner) {
 		this(scanner.iterator());
 		scanner.tokenizeStream();
 	}

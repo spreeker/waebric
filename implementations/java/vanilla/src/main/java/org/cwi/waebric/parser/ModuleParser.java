@@ -76,13 +76,13 @@ class ModuleParser extends AbstractParser {
 			tokens.next(); // Set current to first module element
 			if(tokens.current().getLexeme() == WaebricKeyword.IMPORT) {
 				Import imprt = parseImport();
-				module.addElement(imprt);
+				module.addImport(imprt);
 			} else if(tokens.current().getLexeme() == WaebricKeyword.SITE) {
 				Site site = siteParser.parseSite();
-				module.addElement(site);
+				module.addSite(site);
 			} else if(tokens.current().getLexeme() == WaebricKeyword.DEF) {
 				FunctionDef def = functionParser.parseFunctionDef();
-				module.addElement(def);
+				module.addFunctionDef(def);
 			} else {
 				reportUnexpectedToken(tokens.current(), 
 					"Module element", "\"import\", \"site\" or \"def\"");

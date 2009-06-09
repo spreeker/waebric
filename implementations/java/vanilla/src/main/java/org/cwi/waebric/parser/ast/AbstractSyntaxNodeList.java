@@ -266,11 +266,9 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 			
 			for(int i = 0; i < children.length; i++) {
 				if(i % 2 == 0) {
-					// Even index are reserved to elements
-					children[i] = elements[i/2];
+					children[i] = elements[i/2]; // Even index are reserved to elements
 				} else {
-					// Uneven index are for separators
-					children[i] = new CharacterLiteral(separator);
+					children[i] = new CharacterLiteral(separator); // Uneven index are for separators
 				}
 			}
 

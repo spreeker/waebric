@@ -1,16 +1,13 @@
 package org.cwi.waebric.checker;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.checker.module.ModuleCheck;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.scanner.WaebricScanner;
+import org.cwi.waebric.parser.ast.module.Modules;
 
 /**
  * Verify the semantics of an abstract syntax tree.
@@ -19,11 +16,6 @@ import org.cwi.waebric.scanner.WaebricScanner;
  * @date 09-06-2009
  */
 public class WaebricChecker {
-
-	/**
-	 * Modules being checked
-	 */
-	private final Modules modules;
 	
 	/**
 	 * Cache of dependent module(s)
@@ -31,42 +23,33 @@ public class WaebricChecker {
 	private final Map<ModuleId, Modules> moduleCache;
 	
 	/**
+	 * Checker instances
+	 */
+	private final List<IWaebricCheck> checks;
+	
+	/**
 	 * Construct checker best on modules instance.
 	 * @param modules Modules being checked
 	 */
-	public WaebricChecker(Modules modules) {
-		this.modules = modules;
+	public WaebricChecker() {
 		this.moduleCache = new HashMap<ModuleId, Modules>();
+		
+		// Initiate checks
+		this.checks = new ArrayList<IWaebricCheck>();
+		checks.add(new ModuleCheck(moduleCache)); // Module check should be executed first, as it fills cache
 	}
 	
-	public List<SemanticException> checkAST() {
+	public List<SemanticException> checkAST(Modules modules) {
 		List<SemanticException> exceptions = new ArrayList<SemanticException>();
-		// TODO
+		
+		// Perform all checks
+		for(IWaebricCheck check : checks) {
+			check.checkAST(modules, exceptions);
+		}
+
 		return exceptions;
 	}
 	
-	private boolean cacheModule(ModuleId identifier, List<SemanticException> exceptions) {
-		if(identifier.size() == 0) { return false; }
-		
-		// Construct path, based on module identifier.
-		String path = "";
-		for(int i = 0; i < identifier.size(); i++) {
-			if(i > 0) { path += "/"; }
-			path += identifier.get(i).getLiteral().toString();
-		}
-		path += ".wae";
-		
-		// Attempt to parse file
-		try {
-			FileReader reader = new FileReader(path);
-			WaebricScanner scanner = new WaebricScanner(reader);
-		} catch(FileNotFoundException e) {
-			// Invalid file found
-		}
-		
-		// TODO: try { parse file }, store modules
-		// TODO: catch file not found, return non-existing-module, store new Modules()
-		return true;
-	}
+	
 	
 }

@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.module;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.module.site.Site;
 
 /**
  * "module" ModuleId ModuleElement* -> Module
@@ -13,13 +14,17 @@ import org.cwi.waebric.parser.ast.StringLiteral;
 public class Module extends AbstractSyntaxNode {
 
 	private ModuleId identifier;
-	private AbstractSyntaxNodeList<ModuleElement> elements;
+	private AbstractSyntaxNodeList<Import> imports;
+	private AbstractSyntaxNodeList<Site> sites;
+	private AbstractSyntaxNodeList<FunctionDef> defs;
 	
 	/**
 	 * Construct module
 	 */
 	public Module() {
-		elements = new AbstractSyntaxNodeList<ModuleElement>();
+		imports = new AbstractSyntaxNodeList<Import>();
+		sites = new AbstractSyntaxNodeList<Site>();
+		defs = new AbstractSyntaxNodeList<FunctionDef>();
 	}
 	
 	/**
@@ -40,23 +45,40 @@ public class Module extends AbstractSyntaxNode {
 		this.identifier = identifier;
 	}
 	
-	/**
-	 * Attach module element
-	 * @see ModuleElement
-	 * @param element ModuleElement
-	 * @return Success?
-	 */
-	public boolean addElement(ModuleElement element) {
-		return elements.add(element);
+	public boolean addImport(Import imprt) {
+		return imports.add(imprt);
 	}
 	
-	/**
-	 * Retrieve module elements
-	 * @see ModuleElement
-	 * @return Module elements
-	 */
-	public AbstractSyntaxNode[] getElements() {
-		return elements.toArray(new AbstractSyntaxNode[0]);
+	public boolean addSite(Site site) {
+		return sites.add(site);
+	}
+	
+	public boolean addFunctionDef(FunctionDef def) {
+		return defs.add(def);
+	}
+	
+	public Import getImport(int index) {
+		return imports.get(index);
+	}
+	
+	public Site getSite(int index) {
+		return sites.get(index);
+	}
+	
+	public FunctionDef getFunctionDef(int index) {
+		return defs.get(index);
+	}
+	
+	public int getImportCount() {
+		return imports.size();
+	}
+	
+	public int getSiteCount() {
+		return sites.size();
+	}
+	
+	public int getFunctionDefCount() {
+		return defs.size();
 	}
 	
 	@Override
@@ -64,7 +86,9 @@ public class Module extends AbstractSyntaxNode {
 		return new AbstractSyntaxNode[] {
 			new StringLiteral("module"),
 			identifier,
-			elements
+			imports,
+			sites,
+			defs
 		};
 	}
 	

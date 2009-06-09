@@ -1,17 +1,16 @@
 package org.cwi.waebric.parser;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -77,10 +76,9 @@ public class TestModuleParser {
 		// Assertions
 		assertEquals("module", module.getChildren()[0].toString());
 		assertEquals(ModuleId.class, module.getChildren()[1].getClass());
-		assertEquals(3, module.getElements().length);
-		assertEquals(Import.class, module.getElements()[0].getClass());
-		assertEquals(Site.class, module.getElements()[1].getClass());
-		assertEquals(FunctionDef.class, module.getElements()[2].getClass());
+		assertEquals(1, module.getImportCount());
+		assertEquals(1, module.getSiteCount());
+		assertEquals(1, module.getFunctionDefCount());
 	}
 	
 	@Test

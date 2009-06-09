@@ -1,5 +1,6 @@
-package org.cwi.waebric.checker;
+package org.cwi.waebric.checker.module;
 
+import org.cwi.waebric.checker.SemanticException;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 
 /**
