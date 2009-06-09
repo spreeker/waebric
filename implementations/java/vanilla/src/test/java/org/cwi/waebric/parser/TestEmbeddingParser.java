@@ -67,7 +67,7 @@ public class TestEmbeddingParser {
 		Embedding extended = parser.parseEmbedding(formals);
 		assertEquals("left", extended.getPre().getText().toString());
 		assertEquals(1, extended.getEmbed().getMarkupCount());
-		assertEquals(Markup.MarkupWithArguments.class, extended.getEmbed().getMarkup(0).getClass());
+		assertEquals(Markup.Call.class, extended.getEmbed().getMarkup(0).getClass());
 		assertEquals(TextTail.PostTail.class, extended.getTail().getClass());
 	}
 	
@@ -88,7 +88,6 @@ public class TestEmbeddingParser {
 		Embed.ExpressionEmbed diff = (ExpressionEmbed) parser.parseEmbed(formals);
 		assertEquals(Expression.NatExpression.class, diff.getExpression().getClass());
 		assertEquals(1, diff.getMarkupCount());
-		assertEquals(Markup.MarkupWithoutArguments.class, diff.getMarkup(0).getClass());
 		
 		// Embed with multiple mark-up
 		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
@@ -97,17 +96,14 @@ public class TestEmbeddingParser {
 		Embed.ExpressionEmbed diff2 = (ExpressionEmbed) parser.parseEmbed(formals);
 		assertEquals(Expression.NatExpression.class, diff2.getExpression().getClass());
 		assertEquals(2, diff2.getMarkupCount());
-		assertEquals(Markup.MarkupWithArguments.class, diff2.getMarkup(0).getClass());
-		assertEquals(Markup.MarkupWithoutArguments.class, diff2.getMarkup(1).getClass());
+		assertEquals(Markup.Call.class, diff2.getMarkup(0).getClass());
 		
 		// Embed Markup* Markup
 		iterator = TestScanner.quickScan("func1(arg1) func2 func3>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		Embed.MarkupEmbed markupemb = (MarkupEmbed) parser.parseEmbed(formals);
-		assertEquals(Markup.MarkupWithoutArguments.class, markupemb.getMarkup().getClass());
-		assertEquals(2, diff2.getMarkupCount());
-		assertEquals(Markup.MarkupWithArguments.class, diff2.getMarkup(0).getClass());
-		assertEquals(Markup.MarkupWithoutArguments.class, diff2.getMarkup(1).getClass());
+		assertEquals(2, markupemb.getMarkupCount());
+		assertEquals(Markup.Call.class, markupemb.getMarkup(0).getClass());
 	}
 	
 	@Test

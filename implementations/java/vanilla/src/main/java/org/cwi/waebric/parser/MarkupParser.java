@@ -5,7 +5,6 @@ import java.util.List;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
-import org.cwi.waebric.parser.ast.expression.Var;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
@@ -46,9 +45,9 @@ class MarkupParser extends AbstractParser {
 		Markup markup = null;
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
 			Arguments arguments = parseArguments();
-			markup = new Markup.MarkupWithArguments(arguments);
+			markup = new Markup.Call(arguments);
 		} else {
-			markup = new Markup.MarkupWithoutArguments();
+			markup = new Markup.Tag();
 		}
 
 		// Store designator
@@ -173,13 +172,13 @@ class MarkupParser extends AbstractParser {
 		Argument argument = null;
 		
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
-			// Argument with variable recognized (=)
-			Var var = expressionParser.parseVar();
-			argument = new Argument.ArgumentWithVar(var);
+			// Argument with variable recognised (=)
+			next(WaebricTokenSort.IDCON, "Attr identifier", "IdCon \"=\" Expression");
+			argument = new Argument.Attr(new IdCon(tokens.current().getLexeme().toString()));
 			tokens.next(); // Skip equals sign
 		} else {
 			// Regular expression-based argument
-			argument = new Argument.ArgumentWithoutVar();
+			argument = new Argument.Regular();
 		}
 		
 		// Parse expression

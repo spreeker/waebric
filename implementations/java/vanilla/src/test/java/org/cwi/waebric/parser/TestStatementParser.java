@@ -11,7 +11,6 @@ import java.util.List;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
-import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.Statement;
@@ -190,8 +189,8 @@ public class TestStatementParser {
 		iterator = TestScanner.quickScan("func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		SingleMarkupStatement statement = (SingleMarkupStatement) parser.parseStatement(formals);
-		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
+		RegularMarkupStatement statement = (RegularMarkupStatement) parser.parseStatement(formals);
+		assertEquals("func1", statement.getMarkup().getDesignator().getIdentifier().getLiteral().toString());
 	}
 	
 	@Test
@@ -263,7 +262,6 @@ public class TestStatementParser {
 		
 		MarkupMarkup statement = (MarkupMarkup) parser.parseMarkupStatements(formals);
 		assertEquals(2, statement.getMarkupCount());
-		assertEquals(Markup.MarkupWithoutArguments.class, statement.getMarkup().getClass());
 	}
 
 }

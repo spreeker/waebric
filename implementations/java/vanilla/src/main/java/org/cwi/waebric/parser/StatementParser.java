@@ -323,7 +323,7 @@ class StatementParser extends AbstractParser {
 		
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 			// Markup ";"
-			Statement.SingleMarkupStatement statement = new Statement.SingleMarkupStatement();
+			Statement.RegularMarkupStatement statement = new Statement.RegularMarkupStatement();
 			statement.setMarkup(markup);
 			return statement;
 		} else {

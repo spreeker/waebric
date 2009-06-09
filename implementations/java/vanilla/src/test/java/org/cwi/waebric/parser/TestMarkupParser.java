@@ -12,12 +12,12 @@ import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.markup.Argument.ArgumentWithVar;
-import org.cwi.waebric.parser.ast.markup.Argument.ArgumentWithoutVar;
+import org.cwi.waebric.parser.ast.markup.Argument.Attr;
+import org.cwi.waebric.parser.ast.markup.Argument.Regular;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
-import org.cwi.waebric.parser.ast.markup.Markup.MarkupWithArguments;
+import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -58,14 +58,14 @@ public class TestMarkupParser {
 		iterator = TestScanner.quickScan("myfunction (12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Markup.MarkupWithArguments markupa = (MarkupWithArguments) parser.parseMarkup();
+		Markup.Call markupa = (Call) parser.parseMarkup();
 		assertNotNull(markupa.getDesignator());
 		assertEquals(2, markupa.getArguments().size());
 		
 		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Markup.MarkupWithArguments markupaa = (MarkupWithArguments) parser.parseMarkup();
+		Markup.Call markupaa = (Call) parser.parseMarkup();
 		assertNotNull(markupaa.getDesignator());
 		assertEquals(2, markupaa.getArguments().size());
 		assertEquals(2, markupaa.getArguments().size());
@@ -124,8 +124,8 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Arguments arguments = parser.parseArguments();
-		assertEquals(Argument.ArgumentWithVar.class, arguments.get(0).getClass());
-		assertEquals(Argument.ArgumentWithoutVar.class, arguments.get(1).getClass());
+		assertEquals(Argument.Attr.class, arguments.get(0).getClass());
+		assertEquals(Argument.Regular.class, arguments.get(1).getClass());
 	}
 	
 	@Test
@@ -134,15 +134,15 @@ public class TestMarkupParser {
 		iterator = TestScanner.quickScan("var1=12");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Argument.ArgumentWithVar argumentv = (ArgumentWithVar) parser.parseArgument();
-		assertEquals("var1", argumentv.getVar().getIdentifier().getLiteral().toString());
+		Argument.Attr argumentv = (Attr) parser.parseArgument();
+		assertEquals("var1", argumentv.getIdentifier().getLiteral().toString());
 		assertEquals(Expression.NatExpression.class, argumentv.getExpression().getClass());
 		
 		// Plain argument
 		iterator = TestScanner.quickScan("12");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Argument.ArgumentWithoutVar argument = (ArgumentWithoutVar) parser.parseArgument();
+		Argument.Regular argument = (Regular) parser.parseArgument();
 		assertEquals(Expression.NatExpression.class, argument.getExpression().getClass());
 	}
 

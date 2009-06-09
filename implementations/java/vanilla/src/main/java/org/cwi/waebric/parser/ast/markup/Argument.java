@@ -3,9 +3,14 @@ package org.cwi.waebric.parser.ast.markup;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Var;
 
+/**
+ * Argument
+ * @author Jeroen van Schagen
+ * @date 22-06-2009
+ */
 public abstract class Argument extends AbstractSyntaxNode {
 
 	protected Expression expression;
@@ -19,29 +24,25 @@ public abstract class Argument extends AbstractSyntaxNode {
 	}
 
 	/**
-	 * Var "=" Expression -> Argument
-	 * @author schagen
-	 *
+	 * IdCon "=" Expression -> Argument
+	 * @author Jeroen van Schagen
+	 * @date 22-06-2009
 	 */
-	public static class ArgumentWithVar extends Argument {
+	public static class Attr extends Argument {
 
-		private Var var;
-
-		public ArgumentWithVar(Var var) {
-			this.var = var;
+		private IdCon identifier;
+		
+		public Attr(IdCon identifier) {
+			this.identifier = identifier;
 		}
 		
-		public Var getVar() {
-			return var;
-		}
-
-		public void setVar(Var var) {
-			this.var = var;
+		public IdCon getIdentifier() {
+			return identifier;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { 
-				var,
+				identifier,
 				new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
 				expression
 			};
@@ -50,12 +51,12 @@ public abstract class Argument extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * Expression -> Var
-	 * @author schagen
-	 *
+	 * Expression -> Argument
+	 * @author Jeroen van Schagen
+	 * @date 22-06-2009
 	 */
-	public static class ArgumentWithoutVar extends Argument {
-
+	public static class Regular extends Argument {
+		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { expression };
 		}

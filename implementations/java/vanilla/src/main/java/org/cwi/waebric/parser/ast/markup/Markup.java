@@ -4,12 +4,11 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 
 /**
  * Markup
- * 
  * @author Jeroen van Schagen
- * @date 20-05-2009
+ * @date 22-05-2009
  */
 public abstract class Markup extends AbstractSyntaxNode {
-
+	
 	protected Designator designator;
 	
 	/**
@@ -30,15 +29,14 @@ public abstract class Markup extends AbstractSyntaxNode {
 
 	/**
 	 * Designator Arguments -> Markup
-	 * 
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
-	public static class MarkupWithArguments extends Markup {
+	public static class Call extends Markup {
 
 		protected Arguments arguments;
 
-		public MarkupWithArguments(Arguments arguments) {
+		public Call(Arguments arguments) {
 			this.arguments = arguments;
 		}
 		
@@ -59,9 +57,9 @@ public abstract class Markup extends AbstractSyntaxNode {
 	/**
 	 * Designator -> Argument
 	 * @author Jeroen van Schagen
-	 * @date 22-05-2009
+	 * @date 20-05-2009
 	 */
-	public static class MarkupWithoutArguments extends Markup {
+	public static class Tag extends Markup {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { designator };

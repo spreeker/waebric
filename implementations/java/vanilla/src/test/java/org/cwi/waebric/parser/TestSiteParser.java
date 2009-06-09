@@ -71,7 +71,7 @@ public class TestSiteParser {
 		
 		mapping = parser.parseMapping();
 		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
-		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithArguments);
+		assertTrue(mapping.getMarkup() instanceof Markup.Call);
 		
 		// Path without directory, mapping without arguments
 		iterator = TestScanner.quickScan("index.html: home");
@@ -79,7 +79,6 @@ public class TestSiteParser {
 		
 		mapping = parser.parseMapping();
 		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
-		assertTrue(mapping.getMarkup() instanceof Markup.MarkupWithoutArguments);
 	}
 	
 	@Test

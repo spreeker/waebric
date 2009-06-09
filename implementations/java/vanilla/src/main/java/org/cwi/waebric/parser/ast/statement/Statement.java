@@ -332,7 +332,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup ";" -> Statement
 	 */
-	public static class SingleMarkupStatement extends Statement {
+	public static class RegularMarkupStatement extends Statement {
 		
 		private Markup markup;
 
