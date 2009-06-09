@@ -15,5 +15,5 @@ public class ModuleId extends AbstractSeparatedSyntaxNodeList<IdCon> {
 	public ModuleId() {
 		super(WaebricSymbol.PERIOD);
 	}
-
+	
 }

@@ -60,7 +60,7 @@ class ModuleCheck implements IWaebricCheck {
 	 */
 	public void checkModule(ModuleId identifier, List<SemanticException> exceptions) {
 		if(identifier.size() == 0) { return; } // Invalid identifier, quit cache for efficiency
-		if(moduleCache.containsKey(identifier)) { return; } // Already checked module.
+		if(hasCached(identifier)) { return; } // Already checked module.
 
 		try {
 			// Attempt to process file
@@ -79,9 +79,18 @@ class ModuleCheck implements IWaebricCheck {
 	}
 	
 	/**
+	 * Check if module has already been cached.
+	 * @param identifier Module identifier
+	 * @return Cached?
+	 */
+	public boolean hasCached(ModuleId identifier) {
+		return moduleCache.containsKey(identifier);
+	}
+	
+	/**
 	 * Construct path, based on module identifier.
-	 * @param identifier
-	 * @return
+	 * @param identifier Module identifier
+	 * @return Path
 	 */
 	public String getPath(ModuleId identifier) {
 		String path = "";
@@ -92,7 +101,7 @@ class ModuleCheck implements IWaebricCheck {
 		path += ".wae";
 		return path;
 	}
-	
+
 	/**
 	 * If for an import directive import m no corresponding file m.wae 
 	 * can be found, this a an error. [The import directive is skipped]

@@ -100,7 +100,7 @@ class ModuleParser extends AbstractParser {
 		ModuleId moduleId = new ModuleId();
 		
 		do {
-			next(WaebricTokenSort.IDCON, "Module identifier", "Identifier");
+			next(WaebricTokenSort.IDCON, "Module identifier", "head:[azAZ] body:[azAZ09]");
 			moduleId.add(new IdCon(tokens.current().getLexeme().toString()));
 			
 			// Parse potential separator
