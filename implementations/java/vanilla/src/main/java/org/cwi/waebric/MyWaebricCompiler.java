@@ -6,6 +6,7 @@ import java.util.List;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
+import org.cwi.waebric.scanner.processor.LexicalException;
 
 public class MyWaebricCompiler {
 	
@@ -19,23 +20,27 @@ public class MyWaebricCompiler {
 		} else {
 			try {
 				System.out.println("Compiling " + args[0] + "...");
-				
-				long curr = System.currentTimeMillis();
-				
+
 				FileReader reader = new FileReader(args[0]);
 				WaebricScanner scanner = new WaebricScanner(reader);
-				scanner.tokenizeStream();
+				
+				long curr = System.currentTimeMillis();
+				List<LexicalException> le = scanner.tokenizeStream();
+				long scan_time = System.currentTimeMillis() - curr;
+				System.out.println("Scanned in " + scan_time + "ms, with " + le.size() + " lexical exceptions.");
 				
 				WaebricParser parser = new WaebricParser(scanner);
+				
+				curr = System.currentTimeMillis();
 				List<SyntaxException> se = parser.parseTokens();
-				
-				curr = System.currentTimeMillis() - curr;
-				
-				System.out.println("Executed in " + curr + "ms, with " + se.size() + " exceptions.");
-				
+				long parse_time = System.currentTimeMillis() - curr;
+				System.out.println("Parsed in " + parse_time + "ms, with " + se.size() + " syntax exceptions.");
+
 				if(se.size() == 0) {
+					System.out.println("Abstract syntax tree:");
 					System.out.println(parser.getAbstractSyntaxTree().toString());
 				} else {
+					System.out.println("Exceptions:");
 					for(SyntaxException exception : se) {
 						exception.printStackTrace();
 					}
