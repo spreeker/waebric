@@ -25,7 +25,7 @@ namespace Lexer.Tokenizer
             int type = Tokenizer.NextToken();
 
             //Test type and token value for correctness
-            Assert.IsTrue(StreamTokenizer.ST_WORD.Equals(type));
+            Assert.IsTrue(StreamTokenizer.WORD.Equals(type));
             Assert.IsTrue(testString.Equals(Tokenizer.GetTextValue()));
         }
 
@@ -37,7 +37,7 @@ namespace Lexer.Tokenizer
             Tokenizer = new StreamTokenizer(Reader);
             int type = Tokenizer.NextToken();
 
-            Assert.IsTrue(StreamTokenizer.ST_NUMBER.Equals(type));
+            Assert.IsTrue(StreamTokenizer.NUMBER.Equals(type));
             Assert.IsTrue(number.Equals(Tokenizer.GetNumericValue()));
         }
 
@@ -60,16 +60,14 @@ namespace Lexer.Tokenizer
             String testString = "test test2 test3 test4";
             Reader = new StringReader(testString);
             Tokenizer = new StreamTokenizer(Reader);
-            int[] whitespaceChars = {' ', '\t'};
-            
-            Tokenizer.WhitespaceChars(whitespaceChars);
+
             int type = Tokenizer.NextToken();
             String[] tokens = testString.Split(' ');
             int nr = 0;
-            while (type != StreamTokenizer.ST_EOF)
+            while (type != StreamTokenizer.EOF)
             {
                 //Check if the string is tokenized on a right way
-                Assert.IsTrue(StreamTokenizer.ST_WORD.Equals(type));
+                Assert.IsTrue(StreamTokenizer.WORD.Equals(type));
                 Assert.IsTrue(tokens[nr].Equals(Tokenizer.GetTextValue()));
                 nr++;
                 type = Tokenizer.NextToken();
@@ -82,9 +80,7 @@ namespace Lexer.Tokenizer
             String testString = "\"quoted text\"";
             Reader = new StringReader(testString);
             Tokenizer = new StreamTokenizer(Reader);
-            int[] whitespaceChars = { ' ', '\t' };
 
-            Tokenizer.WhitespaceChars(whitespaceChars);
             int type = Tokenizer.NextToken();
             String value = Tokenizer.GetTextValue();
 
@@ -100,7 +96,7 @@ namespace Lexer.Tokenizer
             Reader = new StringReader(testString);
             Tokenizer = new StreamTokenizer(Reader);
             int type = Tokenizer.NextToken();
-            while (type != StreamTokenizer.ST_EOF)
+            while (type != StreamTokenizer.EOF)
             {
                 type = Tokenizer.NextToken();
             }

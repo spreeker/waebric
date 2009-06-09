@@ -11,26 +11,34 @@ namespace Lexer.Tokenizer
     /// <summary>
     /// StreamTokenizer class tokenizes an StreamReader input
     /// </summary>
-    class StreamTokenizer
+    public class StreamTokenizer
     {
         #region Constants
 
-        //Constants
-        public const int ST_EOF = 1200; //End of file
-        public const int ST_EOL = 254; //End of line
-        public const int ST_NUMBER = 253; //Numeric token
-        public const int ST_WORD = 252; //Word token
-        public const int ST_OTHER = 251; //Other tokens like symbols, etc
+        //Constants for types of tokens
+        public const int EOF = -1;      //End of file
+        public const int LAYOUT = 1;    //Layout (like newlines, tabs, etc)
+        public const int NUMBER = 2;    //Integer value (floats not supported)
+        public const int WORD = 3;      //String value
+        public const int CHARACTER = 4; //Character value (like symbol, etc)
+        public const int COMMENT = 5;   //Comment (like //test /*test*/)
 
         #endregion
 
         #region Private Members
+        
+        //Common members
+        private TextReader InputStream; // Inputstream to read from
+        private int CurrentCharacter;  // Current character
 
-        private double NumValue = 0.0; // Numeric value of token
-        private String TextValue = ""; // Text value of token
-        private TextReader InputStream;
+        //Current character value
         private int LineNumber = 1; // Linenumber of stream
-        private int[] WhitespaceCharacters; // Array of Whitespace characters
+
+
+        //Current token value
+        private int NumValue = 0; // Numeric value of token
+        private String TextValue = ""; // Text value of token    
+        private char CharValue = '\0'; //Character value
 
         #endregion
 
@@ -42,18 +50,13 @@ namespace Lexer.Tokenizer
         /// <param name="inputStream">InputStream to tokenize</param>
         public StreamTokenizer(TextReader inputStream)
         {
+            if (inputStream == null)
+            {
+                throw new NullReferenceException();
+            }
             this.InputStream = inputStream;
+            Read();
         }
-
-        /// <summary>
-        /// Set whitespacecharacters to ignore
-        /// </summary>
-        /// <param name="WhitespaceChars">Array of whitespace characters</param>
-        public void WhitespaceChars(int[] WhitespaceChars)
-        {
-            this.WhitespaceCharacters = WhitespaceChars;
-        }
-
 
         /// <summary>
         /// Retrieves NextToken from stream
@@ -62,105 +65,37 @@ namespace Lexer.Tokenizer
         public int NextToken()
         {
             //Reset all values
-            NumValue = 0.0;
+            NumValue = 0;
             TextValue = "";
-            char peek = (char)InputStream.Peek();
-            int status = InputStream.Read();
-            while (status != -1) //Read tokens until end of stream has reached
-            {
-                if (IsWhitespace(peek)) //Ignore whitespace
-                {
-                    continue;
-                }
-                else if (peek == '\n') //Newline hit
-                {
-                    LineNumber++;
-                    return ST_EOL;
-                }
-                else
-                {
-                    break; //We found something interesting so analyze it
-                }
-            }
-            if (status == -1)
-            {
-                return ST_EOF; //End of stream reached
-            }
-            if (Char.IsDigit(peek)) //We are dealing with a numeric value
-            {
-                double v = 0;
-                do
-                {
-                    v = 10 * v + Char.GetNumericValue(peek);
-                    peek = (char)InputStream.Peek();
-                    InputStream.Read();
-                } while (Char.IsDigit(peek));
-                if (peek != '.') //end of number so return number
-                {
-                    NumValue = v;
-                    return ST_NUMBER;
-                }
-                // we have an floating point value
-                double x = v; double d = 10;
-                for (; ; )
-                {
-                    peek = (char)InputStream.Peek();
-                    InputStream.Read();
-                    if (!Char.IsDigit(peek))
-                    {
-                        break; //read complete number
-                    }
-                    x = x + Char.GetNumericValue(peek) / d;
-                    d = d * 10;                    
-                }
-                NumValue = v;
-                return ST_NUMBER; 
-            }
+            CharValue = '\0';
 
-            if (Char.IsLetter(peek)) //We are dealing with a letter
+            //Determine token type
+            if (CurrentCharacter < 0) //End of stream
             {
-                StringBuilder buffer = new StringBuilder();
-                do
-                { //Create string while we are dealing with letters or digits
-                    buffer.Append(peek);
-                    peek = (char)InputStream.Peek();
-                    InputStream.Read();
-                } while (Char.IsLetterOrDigit(peek));
-
-                TextValue = buffer.ToString();
-                return ST_WORD;
+                return EOF;
             }
-
-            if(peek == '\"') // Is a quote
-            { 
-                StringBuilder buffer = new StringBuilder();
-                //Get all text before new quote sign has been detected
-                //TODO: Implement escape characters
-                do
-                {
-                    buffer.Append(peek);
-                    peek = (char)InputStream.Peek();
-                    InputStream.Read();
-
-                } while (Char.IsLetterOrDigit(peek) || IsWhitespace(peek) || IsNonQuoteSymbol(peek));
-                if (peek == '\"') //Quote found
-                {
-                    buffer.Append(peek);
-                }
-                else
-                {
-                    //throw new Exception("No end of quote found at line " + LineNumber);
-                }
-                TextValue = buffer.ToString();
-                return '\"';
-            }
-            if(IsSymbol(peek)) //other symbol
+            else if (CurrentCharacter == '/') //Possible a comment
             {
-                TextValue = peek.ToString();
-                return peek;
+                return CommentToken();
             }
-            throw new StreamTokenizerException("Token cannot being matched: " + peek, LineNumber);
+            else if (IsLayout(CurrentCharacter)) //Layout token
+            {
+                return LayoutToken();
+            }
+            else if (IsNumeric(CurrentCharacter)) //Numeric token
+            {
+                return NumericToken();
+            }
+            else if (IsLetter(CurrentCharacter)) //Textual token
+            {
+                return LetterToken();
+            }
+            else //We are dealing with a character
+            {
+                return CharacterToken();
+            }
         }
+
 
         /// <summary>
         /// Get number of scanned lines of stream
@@ -194,44 +129,168 @@ namespace Lexer.Tokenizer
         #region Private Methods
 
         /// <summary>
-        /// Checks if character is a whitespace character
+        /// Tokenize character token and return type
         /// </summary>
-        /// <param name="c">Character to check</param>
-        /// <returns>True if character is a whitespace character, otherwise false</returns>
-        private bool IsWhitespace(char c)
+        /// <returns>Type</returns>
+        private int CharacterToken()
         {
-            if (WhitespaceCharacters == null)
-            {
-                return false;
-            }
-            for(int i = 0; i < WhitespaceCharacters.Length; i++)
-            {
-                if (c == (char)WhitespaceCharacters[i])
-                {
-                    return true;
-                }
-            }
-            return false;
+            //Convert values to string and character
+            CharValue = (char) CurrentCharacter;
+            TextValue = CurrentCharacter.ToString();
+            Read(); //Buffer character ahead
+            
+            return CHARACTER;
         }
 
         /// <summary>
-        /// Checks if character is a symbol
+        /// Tokenize letter/word token and return type
         /// </summary>
-        /// <param name="c">Character to check</param>
-        /// <returns>True if character is symbol, otherwise false</returns>
-        private bool IsSymbol(char c) 
+        /// <returns>Type</returns>
+        private int LetterToken()
         {
-            return c > (int)32 && c < (int)126;
+            //Build word until seperator found
+            StringBuilder stringBuilder = new StringBuilder();
+            do {
+                stringBuilder.Append((char)CurrentCharacter);
+                Read();
+            } while (IsLetter(CurrentCharacter) || IsNumeric(CurrentCharacter));
+            TextValue = stringBuilder.ToString();
+
+            return WORD;
         }
 
         /// <summary>
-        /// Looks up if this character is a symbol but not a " character (used for quote detection)
+        /// Tokenize numeric token and return type
+        /// </summary>
+        /// <returns>Type</returns>
+        private int NumericToken()
+        {
+            //Calculate integer value of token
+            int value = System.Convert.ToInt32(CurrentCharacter.ToString(), 10);
+            do {
+                value*= 10;
+                value+= System.Convert.ToInt32(CurrentCharacter.ToString(), 10);
+                Read();
+            } while(IsNumeric(CurrentCharacter));
+            
+            NumValue = value;
+            
+            return NUMBER;
+        }
+
+        /// <summary>
+        /// Tokenize layout token and return type
+        /// </summary>
+        /// <returns>Type</returns>
+        private int LayoutToken()
+        {
+            CharValue = (char) CurrentCharacter;
+            TextValue = CurrentCharacter.ToString();
+            
+            Read();
+
+            return LAYOUT;
+        }
+
+        /// <summary>
+        /// Tokenize possible comment token and return type
+        /// </summary>
+        /// <returns>Type</returns>
+        private int CommentToken()
+        {
+            Read(); //Read one ahead to determine we are dealing with comments
+
+            if(CurrentCharacter == '/') // Single line comment
+            {
+                //Build string to store comment as string
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append('/'); //Add already scanned /
+                do {
+                    stringBuilder.Append((char)CurrentCharacter);
+                    Read();
+                } while (CurrentCharacter != '\n'); //Read until linefeed
+
+                TextValue = stringBuilder.ToString();
+
+                return COMMENT;
+            }
+            else if (CurrentCharacter == '*') // Multiple line comment /* */
+            {
+                int previousCharacter;
+                //Build string to store comment as string
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append('/');
+                
+                do {
+                    previousCharacter = CurrentCharacter;
+                    stringBuilder.Append((char) CurrentCharacter);
+                    Read();
+                } while (!(previousCharacter == '*' && CurrentCharacter == '/')); //Read until */ found
+                //Risc: endless loop when incorrect termination of */
+                
+                //Buffer new character and write complete string back
+                stringBuilder.Append('/');
+                Read();
+                TextValue = stringBuilder.ToString();
+
+                return COMMENT;
+            }
+            else // We are dealing with a single / symbol
+            {
+                CharValue = '/';
+                TextValue = "/";
+                
+                //No another read, we already read the next character
+                return CHARACTER;
+            }
+        }
+
+        /// <summary>
+        /// Determines if the character is a Layout Character
+        /// Layout is whitespace, newline, tab, carriage return
         /// </summary>
         /// <param name="c">Character to check</param>
-        /// <returns>True if character is a symbol and not a ", otherwise false</returns>
-        private bool IsNonQuoteSymbol(char c)
+        /// <returns>IsLayout</returns>
+        private bool IsLayout(int c)
         {
-            return c > (int)32 && c < (int)126 && c != '\"';
+            return c == ' ' || c == '\n' || c == '\t' || c == '\r';
+        }
+
+        /// <summary>
+        /// Determine if the character is a Letter character
+        /// Letters are [a-z][A-Z]
+        /// </summary>
+        /// <param name="c">Character to check</param>
+        /// <returns>IsLetter</returns>
+        private bool IsLetter(int c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        }
+
+        /// <summary>
+        /// Determine if the character is a Numeric character
+        /// Numeric is [0-9]
+        /// </summary>
+        /// <param name="c">Character to check</param>
+        /// <returns>IsNumeric</returns>
+        private bool IsNumeric(int c)
+        {
+            return c >= '0' && c <= '9';
+        }
+
+
+
+        /// <summary>
+        /// Reads next character from stream
+        /// </summary>
+        private void Read()
+        {
+            CurrentCharacter = InputStream.Read();
+            //Check for newline
+            if (CurrentCharacter == '\n')
+            {
+                LineNumber++;
+            }
         }
 
         #endregion
