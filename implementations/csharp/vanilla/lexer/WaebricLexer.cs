@@ -34,18 +34,15 @@ namespace Lexer
 
             TokenStream.Clear(); //Clean stream before inserting items
             
-            // TODO: Fix whitespace hard coding on this way
-            int[] whitespaces = { '\t', ' ' };
-            tokenizer.WhitespaceChars(whitespaces);
             int token;
             token = tokenizer.NextToken();
-            while (token != StreamTokenizer.ST_EOF)
+            while (token != StreamTokenizer.EOF)
             {
                 switch (token)
                 {
-                    case StreamTokenizer.ST_EOL: // ignore EOL
+                    case StreamTokenizer.LAYOUT: // ignore layout
                         break;
-                    case StreamTokenizer.ST_WORD: // check word to determine type
+                    case StreamTokenizer.WORD: // check word to determine type
                         if (IsKeyword(tokenizer.GetTextValue())) // Is keyword
                         {
                             TokenStream.Add(new Token(tokenizer.GetTextValue(), TokenType.KEYWORD, tokenizer.GetScannedLines()));
@@ -57,9 +54,9 @@ namespace Lexer
                         else
                         {
                             throw new StreamTokenizerException("Invalid token: " + token, tokenizer.GetScannedLines());
-                        }
+                        }   
                         break;
-                    case StreamTokenizer.ST_NUMBER: // numeric value
+                    case StreamTokenizer.NUMBER: // numeric value
                         TokenStream.Add(new Token(tokenizer.GetNumericValue(), TokenType.NUMBER, tokenizer.GetScannedLines()));
                         break;
                     default: //other token types need to be handled
