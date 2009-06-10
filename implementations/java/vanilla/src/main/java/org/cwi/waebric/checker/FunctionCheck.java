@@ -1,10 +1,19 @@
 package org.cwi.waebric.checker;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.module.Import;
+import org.cwi.waebric.parser.ast.module.Module;
+import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.parser.ast.module.site.Mapping;
+import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
  * Check function definition nodes for semantic violations.
@@ -16,9 +25,94 @@ import org.cwi.waebric.parser.ast.module.function.FunctionDef;
  */
 class FunctionCheck implements IWaebricCheck {
 	
+	/**
+	 * Checker instance.
+	 */
+	private final WaebricChecker checker;
+	
+	/**
+	 * Construct function check component based on checker instance,
+	 * using the checker cached modules can be retrieved. The function
+	 * checker only functions correctly if all related modules have
+	 * been cached.
+	 * @param checker
+	 */
+	public FunctionCheck(WaebricChecker checker) {
+		this.checker = checker;
+	}
+	
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
-		// TODO Auto-generated method stub
+		for(Module module : modules) {
+			// Retrieve function definitions
+			Collection<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
+			
+			for(Site site: module.getSites()) {
+				for(Mapping mapping: site.getMappings()) {
+					// Check all calls made from site mappings
+					checkCalls(mapping.getMarkup(), definitions, exceptions);
+				}
+			}
+			
+			for(FunctionDef def: module.getFunctionDefinitions()) {
+				for(Statement statement: def.getStatements()) {
+					// Check all calls made within function statements
+					checkCalls(statement, definitions, exceptions);
+				}
+			}
+		}
+	}
+	
+	public void checkCalls(AbstractSyntaxNode node, Collection<FunctionDef> definitions, 
+			List<SemanticException> exceptions) {
+		if(node instanceof Markup.Call) {
+			
+		}
+	}
+	
+	/**
+	 * Retrieve function definitions of module and all related modules.
+	 * @param module Root module
+	 * @param exceptions Exceptions
+	 * @return
+	 */
+	public Collection<FunctionDef> getFunctionDefinitions(Module module, List<SemanticException> exceptions) {
+		List<ModuleId> collected = new ArrayList<ModuleId>();
+		return getFunctionDefinitions(module, collected, exceptions);
+	}
+	
+	/**
+	 * Retrieve function definitions of module and all related modules.
+	 * @param module Root module
+	 * @param collected List of already collected modules
+	 * @param exceptions Exceptions
+	 * @return
+	 */
+	public Collection<FunctionDef> getFunctionDefinitions(Module module, 
+			List<ModuleId> collected, List<SemanticException> exceptions) {
+		Collection<FunctionDef> definitions = new ArrayList<FunctionDef>();
 		
+		// Attach function definitions to collection
+		for(FunctionDef def : module.getFunctionDefinitions()) {
+			if(! definitions.contains(def)) {
+				definitions.add(def);
+			} else {
+				exceptions.add(new DuplicateFunctionDefinition(def));
+			}
+		}
+		
+		// Retrieve functions from dependent modules
+		for(Import imprt : module.getImports()) {
+			// Check if module functions have been collected
+			if(! collected.contains(imprt.getIdentifier())) {
+				// Retrieve module contents from cache
+				for(Module sub : checker.requestModule(imprt.getIdentifier())) {
+					collected.add(sub.getIdentifier());
+					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
+				}
+			}
+		}
+		
+		return definitions;
 	}
 
 	/**

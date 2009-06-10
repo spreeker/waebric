@@ -6,37 +6,33 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-
 import org.junit.After;
 import org.junit.Test;
 
 public class TestModuleCheck {
 	
 	private ModuleCheck check;
-	private Map<ModuleId, Modules> cache;
+	private WaebricChecker checker;
 	private List<SemanticException> exceptions;
 	
 	public TestModuleCheck() {
 		exceptions = new ArrayList<SemanticException>();
-		cache = new HashMap<ModuleId, Modules>();
-		check = new ModuleCheck(cache);
+		checker = new WaebricChecker();
+		check = new ModuleCheck(checker);
 	}
 	
 	@After
 	public void tearDown() {
 		exceptions.clear();
-		cache.clear();
+		checker.cleanCache();
 	}
 	
 	public static Modules quickParse(String path) throws FileNotFoundException {
@@ -57,9 +53,9 @@ public class TestModuleCheck {
 		
 		assertEquals(0, exceptions.size()); // No faults
 		for(Module module : modules) { // All related modules cached
-			assertTrue(check.hasCached(module.getIdentifier()));
+			assertTrue(checker.hasCached(module.getIdentifier()));
 			for(Import imprt : module.getImports()) {
-				assertTrue(check.hasCached(imprt.getIdentifier()));
+				assertTrue(checker.hasCached(imprt.getIdentifier()));
 			}
 		}	
 	}
@@ -85,7 +81,7 @@ public class TestModuleCheck {
 		Modules modules = quickParse("src/test/waebric/mod/mymodule.wae");
 		check.checkAST(modules, exceptions);
 		assertEquals(0, exceptions.size()); // No faults
-		assertTrue(check.hasCached(modules.get(0).getIdentifier())); // Module cached
+		assertTrue(checker.hasCached(modules.get(0).getIdentifier())); // Module cached
 	}
 	
 }

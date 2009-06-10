@@ -17,26 +17,25 @@ import org.cwi.waebric.parser.ast.module.Modules;
 public class WaebricChecker {
 	
 	/**
-	 * Cache of dependent module(s)
+	 * Collection of cached modules.
 	 */
 	private final Map<ModuleId, Modules> moduleCache;
 	
 	/**
-	 * Checker instances
+	 * Checker components.
 	 */
 	private final List<IWaebricCheck> checks;
 	
 	/**
-	 * Construct checker best on modules instance.
-	 * @param modules Modules being checked
+	 * Construct checker.
 	 */
 	public WaebricChecker() {
 		this.moduleCache = new HashMap<ModuleId, Modules>();
 		this.checks = new ArrayList<IWaebricCheck>();
 		
 		// Module check should be executed first, as it fills cache
-		checks.add(new ModuleCheck(moduleCache)); 
-		checks.add(new FunctionCheck());
+		checks.add(new ModuleCheck(this)); 
+		checks.add(new FunctionCheck(this));
 		checks.add(new VarCheck());
 	}
 	
@@ -49,6 +48,40 @@ public class WaebricChecker {
 		}
 
 		return exceptions;
+	}
+	
+	/**
+	 * Check if cache already contains module with specified identifier.
+	 * @param identifier Module identifier
+	 * @return
+	 */
+	public boolean hasCached(ModuleId identifier) {
+		return moduleCache.containsKey(identifier);
+	}
+	
+	/**
+	 * Store module in cache, so it doesn't have to be parsed again.
+	 * @param identifier Module identifier
+	 * @param modules Module contents
+	 */
+	public void cacheModule(ModuleId identifier, Modules modules) {
+		moduleCache.put(identifier, modules);
+	}
+	
+	/**
+	 * Retrieve module from cache.
+	 * @param identifier
+	 * @return Module contents
+	 */
+	public Modules requestModule(ModuleId identifier) {
+		return moduleCache.get(identifier);
+	}
+	
+	/**
+	 * Clear module cache.
+	 */
+	public void cleanCache() {
+		moduleCache.clear();
 	}
 
 }

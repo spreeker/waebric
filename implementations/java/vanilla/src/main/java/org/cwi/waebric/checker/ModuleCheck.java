@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
-import java.util.Map;
 
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.module.Import;
@@ -22,18 +21,17 @@ import org.cwi.waebric.scanner.WaebricScanner;
 class ModuleCheck implements IWaebricCheck {
 
 	/**
-	 * Cache of dependent module(s)
+	 * Checker instance.
 	 */
-	private final Map<ModuleId, Modules> moduleCache;
+	private final WaebricChecker checker;
 	
 	/**
-	 * Construct module check and store memory address for
-	 * module cache map, in which modules can be stored
-	 * during their check.
-	 * @param moduleCache
+	 * Construct function check component based on checker instance,
+	 * using the checker modules can be cached for faster performance.
+	 * @param checker
 	 */
-	public ModuleCheck(Map<ModuleId, Modules> moduleCache) {
-		this.moduleCache = moduleCache;
+	public ModuleCheck(WaebricChecker checker) {
+		this.checker = checker;
 	}
 	
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
@@ -45,11 +43,11 @@ class ModuleCheck implements IWaebricCheck {
 				exceptions.add(new NonExistingModuleException(module.getIdentifier()));
 			}
 			
-			moduleCache.put(module.getIdentifier(), modules); // Cache module
+			checker.cacheModule(module.getIdentifier(), modules); // Cache module
 			
 			// Check imported modules
 			for(Import imprt: module.getImports()) {
-				if(! hasCached(imprt.getIdentifier())) {
+				if(! checker.hasCached(imprt.getIdentifier())) {
 					// Only check modules that havn't been cached yet
 					checkModule(imprt.getIdentifier(), exceptions);
 				}
@@ -64,7 +62,7 @@ class ModuleCheck implements IWaebricCheck {
 	 */
 	public void checkModule(ModuleId identifier, List<SemanticException> exceptions) {
 		if(identifier.size() == 0) { return; } // Invalid identifier, quit cache for efficiency
-		if(hasCached(identifier)) { return; } // Already checked module.
+		if(checker.hasCached(identifier)) { return; } // Already checked module.
 
 		try {
 			// Attempt to process file
@@ -75,21 +73,12 @@ class ModuleCheck implements IWaebricCheck {
 			
 			// Retrieve modules
 			Modules modules = parser.getAbstractSyntaxTree().getRoot();
-			moduleCache.put(identifier, modules); // Cache dependent modules
+			checker.cacheModule(identifier, modules); // Cache dependent modules
 			checkAST(modules, exceptions); // Check dependent modules
 		} catch(FileNotFoundException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
-			moduleCache.put(identifier, new Modules()); // Cache non-existing module as empty modules node
+			checker.cacheModule(identifier, new Modules()); // Cache non-existing module as empty modules node
 		}
-	}
-	
-	/**
-	 * Check if module has already been cached.
-	 * @param identifier Module identifier
-	 * @return Cached?
-	 */
-	public boolean hasCached(ModuleId identifier) {
-		return moduleCache.containsKey(identifier);
 	}
 	
 	/**

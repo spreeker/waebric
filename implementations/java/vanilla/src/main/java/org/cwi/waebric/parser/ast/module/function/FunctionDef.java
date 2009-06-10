@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.module.function;
 
+import java.util.List;
+
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
@@ -43,16 +45,22 @@ public class FunctionDef extends ModuleElement {
 		this.formals = formals;
 	}
 
-	public Statement getStatement(int index) {
-		return statements.get(index);
-	}
-
 	public boolean addStatement(Statement statement) {
 		return statements.add(statement);
 	}
 	
-	public int getStatementCount() {
-		return statements.size();
+	public List<Statement> getStatements() {
+		return statements;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof FunctionDef) {
+			FunctionDef def = (FunctionDef) obj;
+			return this.identifier.equals(def.getIdentifier());
+		}
+		
+		return false;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {

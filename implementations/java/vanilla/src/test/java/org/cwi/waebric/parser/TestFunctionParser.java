@@ -41,8 +41,8 @@ public class TestFunctionParser {
 		
 		FunctionDef def = parser.parseFunctionDef();
 		assertEquals(2, def.getFormals().getIdentifiers().size());
-		assertEquals(1, def.getStatementCount());
-		assertEquals(Statement.Comment.class, def.getStatement(0).getClass());
+		assertEquals(1, def.getStatements().size());
+		assertEquals(Statement.Comment.class, def.getStatements().get(0).getClass());
 	}
 	
 }
