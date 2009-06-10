@@ -13,7 +13,7 @@ import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Argument.Attr;
-import org.cwi.waebric.parser.ast.markup.Argument.Regular;
+import org.cwi.waebric.parser.ast.markup.Argument.RegularArgument;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
@@ -125,7 +125,7 @@ public class TestMarkupParser {
 		
 		Arguments arguments = parser.parseArguments();
 		assertEquals(Argument.Attr.class, arguments.get(0).getClass());
-		assertEquals(Argument.Regular.class, arguments.get(1).getClass());
+		assertEquals(Argument.RegularArgument.class, arguments.get(1).getClass());
 	}
 	
 	@Test
@@ -142,7 +142,7 @@ public class TestMarkupParser {
 		iterator = TestScanner.quickScan("12");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Argument.Regular argument = (Regular) parser.parseArgument();
+		Argument.RegularArgument argument = (RegularArgument) parser.parseArgument();
 		assertEquals(Expression.NatExpression.class, argument.getExpression().getClass());
 	}
 

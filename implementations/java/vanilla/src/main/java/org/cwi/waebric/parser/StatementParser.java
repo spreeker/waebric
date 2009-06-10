@@ -8,8 +8,8 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.statement.Assignment;
-import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
@@ -495,7 +495,7 @@ class StatementParser extends AbstractParser {
 	 */
 	public Formals parseFormals() throws SyntaxException {
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			Formals.Regular formals = new Formals.Regular();
+			Formals.RegularFormal formals = new Formals.RegularFormal();
 			tokens.next(); // Accept '(' and go to next symbol
 
 			// Parse variables
@@ -517,7 +517,7 @@ class StatementParser extends AbstractParser {
 			next(WaebricSymbol.RPARANTHESIS, "Formals closing parenthesis", "\")\"");
 			return formals;
 		} else {
-			return new Formals.Empty();
+			return new Formals.EmptyFormal();
 		}
 	}
 

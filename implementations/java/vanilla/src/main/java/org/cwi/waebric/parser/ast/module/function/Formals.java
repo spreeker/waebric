@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.ast.statement;
+package org.cwi.waebric.parser.ast.module.function;
 
 import java.util.List;
 
@@ -25,14 +25,14 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 * @author Jeroen van Schagen
 	 * @date 26-05-2009
 	 */
-	public static class Regular extends Formals {
+	public static class RegularFormal extends Formals {
 		
 		private AbstractSeparatedSyntaxNodeList<IdCon> identifiers;
 		
 		/**
 		 * Construct regular formal
 		 */
-		public Regular() {
+		public RegularFormal() {
 			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
 		}
 		
@@ -40,7 +40,7 @@ public abstract class Formals extends AbstractSyntaxNode {
 		 * Construct regular formal and attach identifier element
 		 * @param identifier
 		 */
-		public Regular(IdCon identifier) {
+		public RegularFormal(IdCon identifier) {
 			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
 			this.identifiers.add(identifier);
 		}
@@ -49,7 +49,7 @@ public abstract class Formals extends AbstractSyntaxNode {
 		 * Construct regular formal and attach identifier collection
 		 * @param identifiers
 		 */
-		public Regular(List<IdCon> identifiers) {
+		public RegularFormal(List<IdCon> identifiers) {
 			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
 			this.identifiers.addAll(identifiers);
 		}
@@ -86,7 +86,7 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public static class Empty extends Formals {
+	public static class EmptyFormal extends Formals {
 		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[]{};

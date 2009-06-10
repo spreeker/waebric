@@ -47,7 +47,7 @@ class MarkupParser extends AbstractParser {
 			Arguments arguments = parseArguments();
 			markup = new Markup.Call(arguments);
 		} else {
-			markup = new Markup.Regular();
+			markup = new Markup.Tag();
 		}
 
 		// Store designator
@@ -178,7 +178,7 @@ class MarkupParser extends AbstractParser {
 			tokens.next(); // Skip equals sign
 		} else {
 			// Regular expression-based argument
-			argument = new Argument.Regular();
+			argument = new Argument.RegularArgument();
 		}
 		
 		// Parse expression

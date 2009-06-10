@@ -22,7 +22,20 @@ public abstract class Argument extends AbstractSyntaxNode {
 	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
-
+	
+	/**
+	 * Expression -> Argument
+	 * @author Jeroen van Schagen
+	 * @date 22-06-2009
+	 */
+	public static class RegularArgument extends Argument {
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { expression };
+		}
+		
+	}
+	
 	/**
 	 * IdCon "=" Expression -> Argument
 	 * @author Jeroen van Schagen
@@ -46,19 +59,6 @@ public abstract class Argument extends AbstractSyntaxNode {
 				new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
 				expression
 			};
-		}
-		
-	}
-	
-	/**
-	 * Expression -> Argument
-	 * @author Jeroen van Schagen
-	 * @date 22-06-2009
-	 */
-	public static class Regular extends Argument {
-		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression };
 		}
 		
 	}

@@ -51,7 +51,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		// Class type is checked in cast
-		Expression.Cat expression = (Expression.Cat) parser.parseExpression();
+		Expression.CatExpression expression = (Expression.CatExpression) parser.parseExpression();
 		assertEquals(Expression.VarExpression.class, expression.getLeft().getClass());
 		assertEquals(Expression.Field.class, expression.getRight().getClass());
 	}

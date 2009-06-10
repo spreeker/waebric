@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.FunctionDef;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;

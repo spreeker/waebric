@@ -159,6 +159,40 @@ public abstract class Expression extends AbstractSyntaxNode {
 	}
 	
 	/**
+	 * Expression "+" Expression -> Expression
+	 */
+	public static class CatExpression extends Expression {
+		
+		private Expression left;
+		private Expression right;
+		
+		public Expression getLeft() {
+			return left;
+		}
+		
+		public void setLeft(Expression left) {
+			this.left = left;
+		}
+		
+		public Expression getRight() {
+			return right;
+		}
+		
+		public void setRight(Expression right) {
+			this.right = right;
+		}
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+				left,
+				new CharacterLiteral(WaebricSymbol.PLUS),
+				right
+			};
+		}
+		
+	}
+	
+	/**
 	 * Expression "." IdCon -> Expression
 	 */
 	public static class Field extends Expression {
@@ -187,40 +221,6 @@ public abstract class Expression extends AbstractSyntaxNode {
 				expression,
 				new CharacterLiteral(WaebricSymbol.PERIOD),
 				identifier
-			};
-		}
-		
-	}
-	
-	/**
-	 * Expression "+" Expression -> Expression
-	 */
-	public static class Cat extends Expression {
-		
-		private Expression left;
-		private Expression right;
-		
-		public Expression getLeft() {
-			return left;
-		}
-		
-		public void setLeft(Expression left) {
-			this.left = left;
-		}
-		
-		public Expression getRight() {
-			return right;
-		}
-		
-		public void setRight(Expression right) {
-			this.right = right;
-		}
-		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-				left,
-				new CharacterLiteral(WaebricSymbol.PLUS),
-				right
 			};
 		}
 		

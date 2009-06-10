@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
+import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.statement.Assignment;
-import org.cwi.waebric.parser.ast.statement.Formals;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Statement.Block;
 import org.cwi.waebric.parser.ast.statement.Statement.CData;

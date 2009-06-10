@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.module;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
 
 /**
@@ -56,7 +57,7 @@ public class Module extends AbstractSyntaxNode {
 	public boolean addFunctionDef(FunctionDef def) {
 		return defs.add(def);
 	}
-	
+
 	public Import getImport(int index) {
 		return imports.get(index);
 	}

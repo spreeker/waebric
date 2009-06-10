@@ -74,7 +74,7 @@ class ExpressionParser extends AbstractParser {
 				return field; // Return field
 			} else if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PLUS)) {
 				// Parse cat expression
-				Expression.Cat cat = new Expression.Cat();
+				Expression.CatExpression cat = new Expression.CatExpression();
 				cat.setLeft(expression); // Store parsed expression
 				tokens.next(); // Accept '+' and go to next token
 				cat.setRight(parseExpression()); // Parse right expression

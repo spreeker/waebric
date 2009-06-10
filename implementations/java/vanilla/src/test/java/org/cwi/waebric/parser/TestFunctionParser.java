@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.module.FunctionDef;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.TestScanner;

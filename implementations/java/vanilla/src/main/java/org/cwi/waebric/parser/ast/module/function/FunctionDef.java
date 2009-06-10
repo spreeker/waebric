@@ -1,11 +1,11 @@
-package org.cwi.waebric.parser.ast.module;
+package org.cwi.waebric.parser.ast.module.function;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.statement.Formals;
+import org.cwi.waebric.parser.ast.module.ModuleElement;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**

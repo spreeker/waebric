@@ -3,8 +3,8 @@ package org.cwi.waebric.checker;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.module.FunctionDef;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 
 /**
  * Check function definition nodes for semantic violations.
