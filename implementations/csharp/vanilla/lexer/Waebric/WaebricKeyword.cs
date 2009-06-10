@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Waebric
 {
-    public enum WaebricKeyword
+    public enum  WaebricKeyword
     {
         IF, COMMENT, ECHO, CDATA, EACH, LET, YIELD, MODULE, IMPORT, DEF, END, SITE,
     };

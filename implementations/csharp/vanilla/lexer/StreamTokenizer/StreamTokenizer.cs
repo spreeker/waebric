@@ -139,7 +139,7 @@ namespace Lexer.Tokenizer
         /// <returns>Peeked character</returns>
         public char PeekCharacter()
         {
-            return (char) InputStream.Peek();
+            return (char) CurrentCharacter;
         }
 
         /// <summary>
