@@ -15,7 +15,6 @@ import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
@@ -92,9 +91,6 @@ class FunctionCheck implements IWaebricCheck {
 			} else { // Called function is undefined
 				exceptions.add(new UndefinedFunctionException(call));
 			}
-		} else if(node instanceof Assignment.FuncBind) {
-			Assignment.FuncBind bind = (Assignment.FuncBind) node;
-			definitions.add(toFunctionDefinition(bind)); // Convert bind to plain definition
 		}
 		
 		// Recursively check children of node
@@ -169,24 +165,6 @@ class FunctionCheck implements IWaebricCheck {
 		}
 		
 		return null;
-	}
-	
-	/**
-	 * Convert function binding to plain function definition, with no statements.
-	 * This function is purely used to allow storage of function bindings in
-	 * the definition collection.
-	 * @param bind
-	 * @return
-	 */
-	private FunctionDef toFunctionDefinition(Assignment.FuncBind bind) {
-		FunctionDef function = new FunctionDef();
-		function.setIdentifier(bind.getIdentifier());
-		if(bind.getVariables().size() == 0) {
-			function.setFormals(new Formals.EmptyFormal());
-		} else {
-			function.setFormals(new Formals.RegularFormal(bind.getVariables()));
-		}
-		return function;
 	}
 
 	/**

@@ -11,6 +11,7 @@ import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Assignment;
+import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
  * Check variables for semantic violations.
@@ -42,14 +43,22 @@ class VarCheck implements IWaebricCheck {
 			if(! vars.contains(expr.getVar())) {
 				exceptions.add(new UndefinedVariableException(expr.getVar()));
 			}
-		} else if(node instanceof Formals.RegularFormal) {
-			// Attach variables defined in function formals
-			Formals.RegularFormal formals = (Formals.RegularFormal) node;
-			vars.addAll(formals.getIdentifiers());
-		} else if(node instanceof Assignment.VarBind) {
-			// Attach variables bound in let assignments
-			Assignment.VarBind bind = (Assignment.VarBind) node;
-			vars.add(bind.getIdentifier());
+		} else if(node instanceof FunctionDef) {
+			FunctionDef def = (FunctionDef) node;
+			if(def.getFormals() instanceof Formals.RegularFormal) {
+				// Attach variables defined in function formals
+				Formals.RegularFormal formals = (Formals.RegularFormal) def.getFormals();
+				vars.addAll(formals.getIdentifiers());
+			}
+		} else if(node instanceof Statement.Let) {
+			Statement.Let stm = (Statement.Let) node;
+			for(Assignment assignment: stm.getAssignments()) {
+				if(assignment instanceof Assignment.VarBind) {
+					// Attach variables bound in let assignments
+					Assignment.VarBind bind = (Assignment.VarBind) assignment;
+					vars.add(bind.getIdentifier());
+				}
+			}
 		}
 		
 		// Recursively check children of node
