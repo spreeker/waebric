@@ -81,7 +81,7 @@ class FunctionCheck implements IWaebricCheck {
 	 * @param exceptions Exceptions
 	 * @return
 	 */
-	public Collection<FunctionDef> getFunctionDefinitions(Module module, List<SemanticException> exceptions) {
+	public List<FunctionDef> getFunctionDefinitions(Module module, List<SemanticException> exceptions) {
 		List<ModuleId> collected = new ArrayList<ModuleId>();
 		return getFunctionDefinitions(module, collected, exceptions);
 	}
@@ -93,9 +93,9 @@ class FunctionCheck implements IWaebricCheck {
 	 * @param exceptions Exceptions
 	 * @return
 	 */
-	public Collection<FunctionDef> getFunctionDefinitions(Module module, 
+	public List<FunctionDef> getFunctionDefinitions(Module module, 
 			List<ModuleId> collected, List<SemanticException> exceptions) {
-		Collection<FunctionDef> definitions = new ArrayList<FunctionDef>();
+		List<FunctionDef> definitions = new ArrayList<FunctionDef>();
 		
 		// Attach function definitions to collection
 		for(FunctionDef def : module.getFunctionDefinitions()) {
