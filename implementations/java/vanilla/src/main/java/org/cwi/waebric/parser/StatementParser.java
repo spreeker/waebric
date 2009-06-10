@@ -393,16 +393,18 @@ class StatementParser extends AbstractParser {
 					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
 					&& tokens.peek(k+2).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				return true;
-			} else if(! tokens.hasNext(k+1) || tokens.peek(k+1).getSort() != WaebricTokenSort.IDCON) {
+			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 				// Final identifier of string is variable by default, unless it is a single identifier
 				WaebricToken previous = tokens.peek(k-1);
 				return previous == null 
 					|| previous.getSort() != WaebricTokenSort.IDCON;
+			} else {
+				// All identifiers not at tail are seen as mark-up
+				return true;
 			}
 		}
 		
-		// All identifiers not at tail are seen as mark-up
-		return true;
+		return false;
 	}
 	
 	/**
