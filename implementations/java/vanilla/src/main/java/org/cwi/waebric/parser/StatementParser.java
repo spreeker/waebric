@@ -330,7 +330,7 @@ class StatementParser extends AbstractParser {
 			// Retrieve remaining mark-up tokens (Markup+)
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
-			while(tokens.hasNext() && isMarkup(1)) {
+			while(isMarkup(1)) {
 				markups.add(markupParser.parseMarkup());
 			}
 			
@@ -395,9 +395,8 @@ class StatementParser extends AbstractParser {
 				return true;
 			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 				// Final identifier of string is variable by default, unless it is a single identifier
-				WaebricToken previous = tokens.peek(k-1);
-				return previous == null 
-					|| previous.getSort() != WaebricTokenSort.IDCON;
+				return ! tokens.hasNext(k-1)
+					|| tokens.peek(k-1).getSort() != WaebricTokenSort.IDCON;
 			} else {
 				// All identifiers not at tail are seen as mark-up
 				return true;

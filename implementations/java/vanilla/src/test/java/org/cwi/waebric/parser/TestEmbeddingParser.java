@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -154,6 +155,29 @@ public class TestEmbeddingParser {
 		StringLiteral text = parser.parseTextChars();
 		assertTrue(exceptions.size() == 0);
 		assertEquals("left", text.toString());
+	}
+	
+	@Test
+	public void testCaveat() {
+		// Mark-up
+		parser = new EmbeddingParser(TestScanner.quickScan("p;"), exceptions);
+		assertFalse(parser.isMarkup(1));
+		
+		// Mark-up, variable
+		parser = new EmbeddingParser(TestScanner.quickScan("p p;"), exceptions);
+		assertTrue(parser.isMarkup(1));
+		assertFalse(parser.isMarkup(2));
+		
+		// Mark-up, mark-up
+		parser = new EmbeddingParser(TestScanner.quickScan("p p();"), exceptions);
+		assertTrue(parser.isMarkup(1));
+		assertTrue(parser.isMarkup(2));
+		
+		// Markup, mark-up, natural
+		parser = new EmbeddingParser(TestScanner.quickScan("p p 123;"), exceptions);
+		assertTrue(parser.isMarkup(1));
+		assertTrue(parser.isMarkup(2));
+		assertFalse(parser.isMarkup(3));
 	}
 
 }

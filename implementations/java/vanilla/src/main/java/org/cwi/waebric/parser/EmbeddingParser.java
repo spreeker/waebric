@@ -88,8 +88,7 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		// Determine type based on look-ahead information
-		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON && isMarkup()) {
-			// Markup* Markup -> Markup
+		if(isMarkup(1)) { // Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
 			
 			try {
@@ -99,8 +98,7 @@ class EmbeddingParser extends AbstractParser {
 			}
 			
 			return embed;
-		} else if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
-			// Markup* Expression -> Markup
+		} else { // Markup* Expression -> Markup
 			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
 			
 			try {
@@ -110,9 +108,6 @@ class EmbeddingParser extends AbstractParser {
 			}
 			
 			return embed;
-		} else {
-			reportUnexpectedToken(tokens.peek(1), "Embed", "Markup* Markup or Markup* Expression");
-			return null;
 		}
 	}
 	
@@ -247,22 +242,26 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	/**
-	 * Determine if next token is mark-up.
-	 * @return Markup?
+	 * Check if next token is mark-up.
+	 * @param token
+	 * @return
 	 */
-	public boolean isMarkup() {
-		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
-			if(tokens.hasNext(3) // Parentheses can be used to force an identifier as mark-up
-					&& tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
-					&& tokens.peek(3).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
+	public boolean isMarkup(int k) {
+		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			if(tokens.hasNext(k+2) // Parentheses can be used to force an identifier as mark-up
+					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
+					&& tokens.peek(k+2).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				return true;
-			} else if(tokens.hasNext(2) && tokens.peek(2).getSort() != WaebricTokenSort.IDCON) {
-				return false; // Final identifier in a string is seen as variable
+			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+				// Final identifier of string is variable by default
+				return false;
+			} else {
+				// All identifiers not at tail are seen as mark-up
+				return true;
 			}
 		}
 		
-		// All identifiers not at tail are seen as mark-up
-		return true;
+		return false;
 	}
 	
 	/**
