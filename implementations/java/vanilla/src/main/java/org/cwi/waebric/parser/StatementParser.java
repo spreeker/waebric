@@ -325,6 +325,7 @@ class StatementParser extends AbstractParser {
 			// Markup ";"
 			Statement.RegularMarkupStatement statement = new Statement.RegularMarkupStatement();
 			statement.setMarkup(markup);
+			tokens.next(); // Accept ; and jump to next token
 			return statement;
 		} else {
 			// Retrieve remaining mark-up tokens (Markup+)

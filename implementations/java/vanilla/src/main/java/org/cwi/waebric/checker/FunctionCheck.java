@@ -1,15 +1,16 @@
 package org.cwi.waebric.checker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
@@ -44,7 +45,7 @@ class FunctionCheck implements IWaebricCheck {
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
 		for(Module module : modules) {
 			// Retrieve function definitions
-			Collection<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
+			List<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
 			
 			for(Site site: module.getSites()) {
 				for(Mapping mapping: site.getMappings()) {
@@ -68,10 +69,32 @@ class FunctionCheck implements IWaebricCheck {
 	 * @param definitions Defined functions
 	 * @param exceptions Exceptions
 	 */
-	public void checkCalls(AbstractSyntaxNode node, Collection<FunctionDef> definitions, 
+	public void checkCalls(AbstractSyntaxNode node, List<FunctionDef> definitions, 
 			List<SemanticException> exceptions) {
 		if(node instanceof Markup.Call) {
-			
+			Markup.Call call = (Markup.Call) node; // Cast node to correct type
+			if(containsFunction(call.getDesignator().getIdentifier(), definitions)) {
+				FunctionDef definition = getFunction(call.getDesignator().getIdentifier(), definitions);
+				
+				// Compare arguments
+				int expectedArguments = 0; // Determine expected formals
+				if(definition.getFormals() instanceof Formals.RegularFormal) {
+					Formals.RegularFormal formals = (Formals.RegularFormal) definition.getFormals();
+					expectedArguments = formals.getIdentifiers().size();
+				}
+				
+				if(call.getArguments().size() != expectedArguments) {
+					// Call refers to argument with different amount of arguments
+					exceptions.add(new ArityMismatchException(call));
+				}
+			} else {
+				// Call refers to undefined function
+				exceptions.add(new UndefinedFunctionException(call));
+			}
+		}
+		
+		for(AbstractSyntaxNode child: node.getChildren()) {
+			checkCalls(child, definitions, exceptions); // Also check children nodes
 		}
 	}
 	
@@ -99,7 +122,7 @@ class FunctionCheck implements IWaebricCheck {
 		
 		// Attach function definitions to collection
 		for(FunctionDef function : module.getFunctionDefinitions()) {
-			if(isDuplicate(function, definitions)) {
+			if(containsFunction(function.getIdentifier(), definitions)) {
 				exceptions.add(new DuplicateFunctionDefinition(function));
 			} else {
 				definitions.add(function);
@@ -123,18 +146,28 @@ class FunctionCheck implements IWaebricCheck {
 	
 	/**
 	 * Check if a function with the same identifier is already defined.
-	 * @param function Function
+	 * @param identifier Function name
 	 * @param definitions Collection of definitions
 	 * @return
 	 */
-	private boolean isDuplicate(FunctionDef function, List<FunctionDef> definitions) {
+	private boolean containsFunction(IdCon identifier, List<FunctionDef> definitions) {
+		return getFunction(identifier, definitions) != null;
+	}
+	
+	/**
+	 * Retrieve function based on identifier.
+	 * @param identifier Function name
+	 * @param definitions Collection of definitions
+	 * @return
+	 */
+	private FunctionDef getFunction(IdCon identifier, List<FunctionDef> definitions) {
 		for(FunctionDef def : definitions) {
-			if(def.getIdentifier().equals(function.getIdentifier())) {
-				return true;
+			if(def.getIdentifier().equals(identifier)) {
+				return def;
 			}
 		}
 		
-		return false;
+		return null;
 	}
 
 	/**

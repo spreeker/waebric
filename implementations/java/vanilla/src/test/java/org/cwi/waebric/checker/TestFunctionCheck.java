@@ -51,13 +51,23 @@ public class TestFunctionCheck {
 	}
 	
 	@Test
-	public void testArityMismatch() {
-		
+	public void testArityMismatch() throws FileNotFoundException {
+		Modules modules = TestUtilities.quickParse("src/test/waebric/func/aritymm.wae");
+		new ModuleCheck(checker).checkAST(modules, exceptions); // Cache related modules
+		check.checkAST(modules, exceptions); // Perform function check
+		assertEquals(2, exceptions.size()); // No faults
+		assertEquals(FunctionCheck.ArityMismatchException.class, exceptions.get(0).getClass());
+		assertEquals(FunctionCheck.ArityMismatchException.class, exceptions.get(1).getClass());
 	}
 	
 	@Test
-	public void testUndefinedFunction() {
-		
+	public void testUndefinedFunction() throws FileNotFoundException {
+		Modules modules = TestUtilities.quickParse("src/test/waebric/func/undeffunc.wae");
+		new ModuleCheck(checker).checkAST(modules, exceptions); // Cache related modules
+		check.checkAST(modules, exceptions); // Perform function check
+		assertEquals(2, exceptions.size()); // No faults
+		assertEquals(FunctionCheck.UndefinedFunctionException.class, exceptions.get(0).getClass());
+		assertEquals(FunctionCheck.UndefinedFunctionException.class, exceptions.get(1).getClass());
 	}
 	
 }

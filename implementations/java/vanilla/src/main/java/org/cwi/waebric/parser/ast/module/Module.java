@@ -53,7 +53,7 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	public List<Import> getImports() {
-		return imports;
+		return imports.clone();
 	}
 	
 	public boolean addSite(Site site) {
@@ -61,7 +61,7 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	public List<Site> getSites() {
-		return sites;
+		return sites.clone();
 	}
 	
 	public boolean addFunctionDef(FunctionDef def) {
@@ -69,7 +69,7 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	public List<FunctionDef> getFunctionDefinitions() {
-		return defs;
+		return defs.clone();
 	}
 	
 	@Override

@@ -50,7 +50,7 @@ public class FunctionDef extends ModuleElement {
 	}
 	
 	public List<Statement> getStatements() {
-		return statements;
+		return statements.clone();
 	}
 
 	public AbstractSyntaxNode[] getChildren() {

@@ -35,40 +35,13 @@ public abstract class Formals extends AbstractSyntaxNode {
 		public RegularFormal() {
 			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
 		}
-		
-		/**
-		 * Construct regular formal and attach identifier element
-		 * @param identifier
-		 */
-		public RegularFormal(IdCon identifier) {
-			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
-			this.identifiers.add(identifier);
-		}
-		
-		/**
-		 * Construct regular formal and attach identifier collection
-		 * @param identifiers
-		 */
-		public RegularFormal(List<IdCon> identifiers) {
-			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
-			this.identifiers.addAll(identifiers);
-		}
-		
+
 		public boolean addIdentifier(IdCon identifier) {
 			return identifiers.add(identifier);
 		}
 		
-		public IdCon getIdentifier(int index) {
-			return identifiers.get(index);
-		}
-		
-		public int getIdentifierCount() {
-			return identifiers.size();
-		}
-		
-		@Override
 		public List<IdCon> getIdentifiers() {
-			return identifiers;
+			return identifiers.clone();
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
