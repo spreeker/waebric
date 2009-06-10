@@ -1,5 +1,6 @@
 package org.cwi.waebric.interpreter;
 
+import org.cwi.waebric.ModuleCache;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 
 /**
@@ -12,7 +13,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 public class WaebricInterpreter {
 
 	public void interpretProgram(AbstractSyntaxTree tree) {
-		
+		ModuleCache.getInstance().loadDependancies(tree); // Retrieve all dependent modules
 	}
 	
 }

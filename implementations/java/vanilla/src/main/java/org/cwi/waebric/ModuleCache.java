@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
+import org.cwi.waebric.parser.ast.module.Import;
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.scanner.WaebricScanner;
 
@@ -81,6 +83,25 @@ public class ModuleCache {
 	 */
 	public AbstractSyntaxTree requestModule(ModuleId identifier) {
 		return cache.get(identifier);
+	}
+	
+	/**
+	 * Load all modules dependent to the contents of an abstract
+	 * syntax tree. Modules can be made dependent to each other
+	 * using of the import directive.
+	 * @param ast Abstract Syntax Tree
+	 */
+	public void loadDependancies(AbstractSyntaxTree ast) {
+		for(Module module: ast.getRoot()) {
+			for(Import dependancy: module.getImports()) {
+				try {
+					AbstractSyntaxTree sub = ModuleCache.getInstance().cacheModule(dependancy.getIdentifier());
+					ast.getRoot().addAll(sub.getRoot()); // Attach dependent AST to specified AST
+				} catch (FileNotFoundException e) {
+					// Skip invalid import directives
+				}
+			}
+		}
 	}
 	
 	/**
