@@ -13,7 +13,7 @@ import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
 
-public class MyWaebricCompiler {
+public class CommandLineCompiler {
 	
 	/**
 	 * 

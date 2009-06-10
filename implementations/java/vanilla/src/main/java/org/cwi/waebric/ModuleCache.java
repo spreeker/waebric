@@ -35,7 +35,7 @@ public class ModuleCache {
 	}
 	
 	/**
-	 * Attempt to cache a module based on its identifier.
+	 * Attempt to parse and cache a module based on its identifier.
 	 * @param identifier Module identifier, maps on relative file position.
 	 * @throws FileNotFoundException Invalid file
 	 */
@@ -57,7 +57,7 @@ public class ModuleCache {
 	}
 	
 	/**
-	 * Store module in cache.
+	 * Store a module and its abstract syntax tree in cache.
 	 * @param identifier Module identifier
 	 * @param ast Abstract syntax tree
 	 */

@@ -1,5 +1,6 @@
 package org.cwi.waebric.checker;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
@@ -27,20 +27,20 @@ import org.cwi.waebric.parser.ast.statement.Statement;
  * @date 09-06-2009
  */
 class FunctionCheck implements IWaebricCheck {
-	
+
 	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
 		for(Module module : tree.getRoot()) {
-			// Retrieve all function definitions
+			// Retrieve all defined functions
 			List<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
 			
-			// Check all calls made from site mappings
+			// Check mapping calls
 			for(Site site: module.getSites()) {
 				for(Mapping mapping: site.getMappings()) {
 					checkCall(mapping.getMarkup(), definitions, exceptions);
 				}
 			}
 			
-			// Check all calls made within function statements
+			// Check statement calls
 			for(FunctionDef def: module.getFunctionDefinitions()) {
 				for(Statement statement: def.getStatements()) {
 					checkCall(statement, definitions, exceptions);
@@ -58,27 +58,29 @@ class FunctionCheck implements IWaebricCheck {
 	public void checkCall(AbstractSyntaxNode node, List<FunctionDef> definitions, 
 			List<SemanticException> exceptions) {
 		if(node instanceof Markup.Call) {
-			Markup.Call call = (Markup.Call) node; // Cast node to correct type
+			Markup.Call call = (Markup.Call) node;
+			
+			// Check if call is made to a defined function
 			if(containsFunction(call.getDesignator().getIdentifier(), definitions)) {
 				FunctionDef definition = getFunction(call.getDesignator().getIdentifier(), definitions);
 				
-				// Compare arguments
-				int expectedArguments = 0; // Determine expected formals
+				// Determine expected arguments
+				int expectedArguments = 0;
 				if(definition.getFormals() instanceof Formals.RegularFormal) {
 					Formals.RegularFormal formals = (Formals.RegularFormal) definition.getFormals();
 					expectedArguments = formals.getIdentifiers().size();
 				}
 				
-				// Function call has an invalid amount of arguments
+				// Compare call arguments to expectation
 				if(call.getArguments().size() != expectedArguments) {
 					exceptions.add(new ArityMismatchException(call));
 				}
-			} else { // Called function is undefined
+			} else {
 				exceptions.add(new UndefinedFunctionException(call));
 			}
 		}
 		
-		// Recursively check children of node
+		// Recursively check node children
 		for(AbstractSyntaxNode child: node.getChildren()) {
 			checkCall(child, new ArrayList<FunctionDef>(definitions), exceptions);
 		}
@@ -104,9 +106,8 @@ class FunctionCheck implements IWaebricCheck {
 	 */
 	public List<FunctionDef> getFunctionDefinitions(Module module, 
 			List<ModuleId> collected, List<SemanticException> exceptions) {
+		// Collection function definitions
 		List<FunctionDef> definitions = new ArrayList<FunctionDef>();
-		
-		// Attach module's function definitions to list
 		for(FunctionDef function : module.getFunctionDefinitions()) {
 			if(containsFunction(function.getIdentifier(), definitions)) {
 				exceptions.add(new DuplicateFunctionDefinition(function));
@@ -115,13 +116,17 @@ class FunctionCheck implements IWaebricCheck {
 			}
 		}
 		
-		// Retrieve function definitions from imported module
+		// Recursively retrieve function definitions of imported modules
 		for(Import imprt : module.getImports()) {
 			if(! collected.contains(imprt.getIdentifier())) {
-				AbstractSyntaxTree ast = ModuleCache.getInstance().requestModule(imprt.getIdentifier());
-				for(Module sub : ast.getRoot()) {
-					collected.add(sub.getIdentifier());
-					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
+				try {
+					AbstractSyntaxTree ast = ModuleCache.getInstance().cacheModule(imprt.getIdentifier());
+					for(Module sub : ast.getRoot()) {
+						collected.add(sub.getIdentifier());
+						definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
+					}
+				} catch (FileNotFoundException e) {
+					// Invalid file name, these are checked by module check
 				}
 			}
 		}
@@ -166,15 +171,9 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -954167103131401047L;
-		private Call call;
 
 		public ArityMismatchException(Markup.Call call) {
 			super(call.toString() + " is an arity mismatch");
-			this.call = call;
-		}
-		
-		public Call getCall() {
-			return call;
 		}
 		
 	}
@@ -191,15 +190,9 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -8833578229100261366L;
-		private FunctionDef def;
 
 		public DuplicateFunctionDefinition(FunctionDef def) {
 			super(def.toString() + " is a duplicate function definition");
-			this.def = def;
-		}
-		
-		public FunctionDef getFunctionDef() {
-			return def;
 		}
 		
 	}
@@ -220,15 +213,9 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -4467095005921534334L;
-		private Call call;
 
 		public UndefinedFunctionException(Markup.Call call) {
 			super(call.toString() + " is an undefined function.");
-			this.call = call;
-		}
-		
-		public Call getCall() {
-			return call;
 		}
 		
 	}
