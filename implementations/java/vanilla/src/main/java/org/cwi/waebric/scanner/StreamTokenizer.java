@@ -131,7 +131,7 @@ public class StreamTokenizer {
 				sval += (char) current;
 				previous = (char) current;
 				read(); // Retrieve next comment character
-			} while(!(previous == '*' && current == '/'));
+			} while(!(previous == '*' && current == '/') && current > 0);
 			
 			read(); // Retrieve next character
 			return COMMENT;
@@ -142,7 +142,7 @@ public class StreamTokenizer {
 			do {
 				sval += (char) current;
 				read(); // Retrieve next comment character
-			} while(current != '\n');
+			} while(current != '\n'  && current > 0);
 			
 			read(); // Retrieve next character
 			return COMMENT;

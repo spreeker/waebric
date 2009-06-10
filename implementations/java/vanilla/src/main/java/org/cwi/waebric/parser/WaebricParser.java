@@ -31,7 +31,6 @@ public class WaebricParser extends AbstractParser {
 	 */
 	public WaebricParser(WaebricScanner scanner) {
 		this(scanner.iterator());
-		scanner.tokenizeStream();
 	}
 	
 	/**

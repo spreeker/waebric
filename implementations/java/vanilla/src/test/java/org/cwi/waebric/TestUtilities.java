@@ -26,6 +26,7 @@ public class TestUtilities {
 	public static Modules quickParse(String path) throws FileNotFoundException {
 		FileReader reader = new FileReader(path);
 		WaebricScanner scanner = new WaebricScanner(reader);
+		scanner.tokenizeStream();
 		WaebricParser parser = new WaebricParser(scanner);
 		List<SyntaxException> e = parser.parseTokens();
 		assertEquals(0, e.size());

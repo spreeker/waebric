@@ -20,7 +20,7 @@ public class TestTokenizer {
 	
 	@Test
 	public void testSingleLineComments() throws IOException {
-		StringReader reader = new StringReader("// Single line comments\n");
+		StringReader reader = new StringReader("// Single line comments");
 		StreamTokenizer tokenizer = new StreamTokenizer(reader);
 		
 		int sort = tokenizer.nextToken();

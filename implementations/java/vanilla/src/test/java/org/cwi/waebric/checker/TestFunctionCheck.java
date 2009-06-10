@@ -41,8 +41,13 @@ public class TestFunctionCheck {
 	}
 	
 	@Test
-	public void testDuplicateFunction() {
-		
+	public void testDuplicateFunction() throws FileNotFoundException {
+		Modules modules = TestUtilities.quickParse("src/test/waebric/func/duplicate.wae");
+		new ModuleCheck(checker).checkAST(modules, exceptions); // Cache related modules
+		check.checkAST(modules, exceptions); // Perform function check
+		assertEquals(2, exceptions.size()); // No faults
+		assertEquals(FunctionCheck.DuplicateFunctionDefinition.class, exceptions.get(0).getClass());
+		assertEquals(FunctionCheck.DuplicateFunctionDefinition.class, exceptions.get(1).getClass());
 	}
 	
 	@Test

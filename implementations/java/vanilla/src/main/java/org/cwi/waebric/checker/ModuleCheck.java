@@ -68,6 +68,7 @@ class ModuleCheck implements IWaebricCheck {
 			// Attempt to process file
 			FileReader reader = new FileReader(getPath(identifier));
 			WaebricScanner scanner = new WaebricScanner(reader);
+			scanner.tokenizeStream(); // Tokenize stream
 			WaebricParser parser = new WaebricParser(scanner);
 			parser.parseTokens(); // Parse file
 			
