@@ -161,7 +161,7 @@ public class TestStatementParser {
 		assertEquals(1, statement.getAssignments().size());
 		assertEquals(Assignment.VarBind.class, statement.getAssignments().get(0).getClass());
 		assertEquals(1, statement.getAssignments().size());
-		assertEquals(Statement.Comment.class, statement.getAssignments().get(0).getClass());
+		assertEquals(Statement.Comment.class, statement.getStatements().get(0).getClass());
 	}
 	
 	@Test
