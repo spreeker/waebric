@@ -42,9 +42,9 @@ public class ModuleCache {
 	 * @throws FileNotFoundException Invalid file
 	 */
 	public AbstractSyntaxTree cacheModule(ModuleId identifier) throws FileNotFoundException {
-		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
-		
+		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
+
 		// Attempt to process file
 		FileReader reader = new FileReader(getPath(identifier));
 		WaebricScanner scanner = new WaebricScanner(reader);
