@@ -76,9 +76,9 @@ public class TestModuleParser {
 		// Assertions
 		assertEquals("module", module.getChildren()[0].toString());
 		assertEquals(ModuleId.class, module.getChildren()[1].getClass());
-		assertEquals(1, module.getImportCount());
-		assertEquals(1, module.getSiteCount());
-		assertEquals(1, module.getFunctionDefCount());
+		assertEquals(1, module.getImports().size());
+		assertEquals(1, module.getSites().size());
+		assertEquals(1, module.getFunctionDefinitions().size());
 	}
 	
 	@Test

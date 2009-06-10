@@ -58,8 +58,7 @@ public class TestModuleCheck {
 		assertEquals(0, exceptions.size()); // No faults
 		for(Module module : modules) { // All related modules cached
 			assertTrue(check.hasCached(module.getIdentifier()));
-			for(int i = 0; i < module.getImportCount(); i++) {
-				Import imprt = module.getImport(i);
+			for(Import imprt : module.getImports()) {
 				assertTrue(check.hasCached(imprt.getIdentifier()));
 			}
 		}	

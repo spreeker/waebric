@@ -27,20 +27,26 @@ public class MyWaebricCompiler {
 				long curr = System.currentTimeMillis();
 				List<LexicalException> le = scanner.tokenizeStream();
 				long scan_time = System.currentTimeMillis() - curr;
-				System.out.println("Scanned in " + scan_time + "ms, with " + le.size() + " lexical exceptions.");
+				System.out.println("\nScanned in " + scan_time + "ms, with " + le.size() + " lexical exceptions.");
+				
+				if(le.size() == 0) {
+					System.out.println(scanner.getTokens().toString());
+				} else {
+					for(LexicalException exception : le) {
+						exception.printStackTrace();
+					}
+				}
 				
 				WaebricParser parser = new WaebricParser(scanner.iterator());
 				
 				curr = System.currentTimeMillis();
 				List<SyntaxException> se = parser.parseTokens();
 				long parse_time = System.currentTimeMillis() - curr;
-				System.out.println("Parsed in " + parse_time + "ms, with " + se.size() + " syntax exceptions.");
+				System.out.println("\nParsed in " + parse_time + "ms, with " + se.size() + " syntax exceptions.");
 
 				if(se.size() == 0) {
-					System.out.println("Abstract syntax tree:");
 					System.out.println(parser.getAbstractSyntaxTree().toString());
 				} else {
-					System.out.println("Exceptions:");
 					for(SyntaxException exception : se) {
 						exception.printStackTrace();
 					}

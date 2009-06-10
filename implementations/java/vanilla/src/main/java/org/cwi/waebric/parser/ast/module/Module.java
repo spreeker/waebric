@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
+import java.util.Collection;
+
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
@@ -50,36 +52,24 @@ public class Module extends AbstractSyntaxNode {
 		return imports.add(imprt);
 	}
 	
+	public Collection<Import> getImports() {
+		return imports;
+	}
+	
 	public boolean addSite(Site site) {
 		return sites.add(site);
+	}
+	
+	public Collection<Site> getSites() {
+		return sites;
 	}
 	
 	public boolean addFunctionDef(FunctionDef def) {
 		return defs.add(def);
 	}
-
-	public Import getImport(int index) {
-		return imports.get(index);
-	}
 	
-	public Site getSite(int index) {
-		return sites.get(index);
-	}
-	
-	public FunctionDef getFunctionDef(int index) {
-		return defs.get(index);
-	}
-	
-	public int getImportCount() {
-		return imports.size();
-	}
-	
-	public int getSiteCount() {
-		return sites.size();
-	}
-	
-	public int getFunctionDefCount() {
-		return defs.size();
+	public Collection<FunctionDef> getFunctionDefinitions() {
+		return defs;
 	}
 	
 	@Override

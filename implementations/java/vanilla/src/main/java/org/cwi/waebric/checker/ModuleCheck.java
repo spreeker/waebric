@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cwi.waebric.parser.WaebricParser;
+import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
@@ -47,9 +48,11 @@ class ModuleCheck implements IWaebricCheck {
 			moduleCache.put(module.getIdentifier(), modules); // Cache module
 			
 			// Check imported modules
-			for(int i = 0; i < module.getImportCount(); i++) {
-				ModuleId identifier = module.getImport(i).getIdentifier();
-				if(! hasCached(identifier)) { checkModule(identifier, exceptions); }
+			for(Import imprt: module.getImports()) {
+				if(! hasCached(imprt.getIdentifier())) {
+					// Only check modules that havn't been cached yet
+					checkModule(imprt.getIdentifier(), exceptions);
+				}
 			}
 		}
 	}
