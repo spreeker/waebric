@@ -23,7 +23,7 @@ public class MyWaebricCompiler {
 		String path = "";
 		if(args.length == 0) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			System.out.print("Enter file path: ");
+			System.out.println("Enter file path: ");
 			try {
 				path = br.readLine();
 			} catch (IOException e) {
@@ -33,7 +33,7 @@ public class MyWaebricCompiler {
 		} else if(args.length == 1) {
 			path = args[0]; // Retrieve path from arguments
 		} else {
-			System.err.println("Usage:\tparser -path");
+			System.err.println("Usage:\tparser || parser -path");
 			System.exit(1);
 		}
 
