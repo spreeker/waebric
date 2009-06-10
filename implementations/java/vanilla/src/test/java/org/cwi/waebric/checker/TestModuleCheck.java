@@ -4,16 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.WaebricParser;
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.After;
 import org.junit.Test;
 
@@ -34,21 +31,10 @@ public class TestModuleCheck {
 		exceptions.clear();
 		checker.cleanCache();
 	}
-	
-	public static Modules quickParse(String path) throws FileNotFoundException {
-		FileReader reader = new FileReader(path);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		WaebricParser parser = new WaebricParser(scanner);
-		List<SyntaxException> e = parser.parseTokens();
-		assertEquals(0, e.size());
-
-		// Retrieve root node
-		return parser.getAbstractSyntaxTree().getRoot();
-	}
 
 	@Test
 	public void testImport() throws FileNotFoundException {
-		Modules modules = quickParse("src/test/waebric/mod/mymodule.wae");
+		Modules modules = TestUtilities.quickParse("src/test/waebric/mod/mymodule.wae");
 		check.checkAST(modules, exceptions);
 		
 		assertEquals(0, exceptions.size()); // No faults
@@ -62,7 +48,7 @@ public class TestModuleCheck {
 	
 	@Test
 	public void testInvalidModuleDec() throws FileNotFoundException {
-		Modules modules = quickParse("src/test/waebric/mod/invalidmodule.wae");
+		Modules modules = TestUtilities.quickParse("src/test/waebric/mod/invalidmodule.wae");
 		check.checkAST(modules, exceptions);
 		assertEquals(1, exceptions.size());
 		assertEquals(ModuleCheck.NonExistingModuleException.class, exceptions.get(0).getClass());
@@ -70,7 +56,7 @@ public class TestModuleCheck {
 	
 	@Test
 	public void testInvalidImport() throws FileNotFoundException {
-		Modules modules = quickParse("src/test/waebric/mod/invalidimport.wae");
+		Modules modules = TestUtilities.quickParse("src/test/waebric/mod/invalidimport.wae");
 		check.checkAST(modules, exceptions);
 		assertEquals(1, exceptions.size());
 		assertEquals(ModuleCheck.NonExistingModuleException.class, exceptions.get(0).getClass());
@@ -78,7 +64,7 @@ public class TestModuleCheck {
 	
 	@Test
 	public void testInfiniteImportLoop() throws FileNotFoundException {
-		Modules modules = quickParse("src/test/waebric/mod/mymodule.wae");
+		Modules modules = TestUtilities.quickParse("src/test/waebric/mod/mymodule.wae");
 		check.checkAST(modules, exceptions);
 		assertEquals(0, exceptions.size()); // No faults
 		assertTrue(checker.hasCached(modules.get(0).getIdentifier())); // Module cached

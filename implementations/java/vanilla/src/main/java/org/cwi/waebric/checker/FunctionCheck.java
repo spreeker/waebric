@@ -62,6 +62,12 @@ class FunctionCheck implements IWaebricCheck {
 		}
 	}
 	
+	/**
+	 * Check a mark-up call based on a collection of function definitions.
+	 * @param node Mark-up call
+	 * @param definitions Defined functions
+	 * @param exceptions Exceptions
+	 */
 	public void checkCalls(AbstractSyntaxNode node, Collection<FunctionDef> definitions, 
 			List<SemanticException> exceptions) {
 		if(node instanceof Markup.Call) {

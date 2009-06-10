@@ -30,7 +30,7 @@ import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testFormals() throws SyntaxException {
-		iterator = TestScanner.quickScan("(var1,var2)");
+		iterator = TestUtilities.quickScan("(var1,var2)");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Formals formals = parser.parseFormals();
@@ -69,7 +69,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testVarAssignment() throws SyntaxException {
-		iterator = TestScanner.quickScan("var=100");
+		iterator = TestUtilities.quickScan("var=100");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Assignment.VarBind assignment = parser.parseVarAssignment();
@@ -79,7 +79,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testIdConAssignment() throws SyntaxException {
-		iterator = TestScanner.quickScan("identifier1(var1,var2) = yield;");
+		iterator = TestUtilities.quickScan("identifier1(var1,var2) = yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Assignment.FuncBind assignment = parser.parseIdConAssignment();
@@ -92,7 +92,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testIfStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("if(123) comment \"succes\"");
+		iterator = TestUtilities.quickScan("if(123) comment \"succes\"");
 		parser = new StatementParser(iterator, exceptions);
 		
 		If statement = parser.parseIfStatement();
@@ -102,7 +102,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testIfElseStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("if(123) comment \"succes\" else yield;");
+		iterator = TestUtilities.quickScan("if(123) comment \"succes\" else yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		IfElse statement = (IfElse) parser.parseIfStatement();
@@ -113,7 +113,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEchoEmbeddingStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("echo \"<123>\";");
+		iterator = TestUtilities.quickScan("echo \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		EchoEmbedding statement = parser.parseEchoEmbeddingStatement();
@@ -122,7 +122,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEchoExpressionStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("echo 10;");
+		iterator = TestUtilities.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Echo statement = parser.parseEchoExpressionStatement();
@@ -131,7 +131,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEachStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("each(var1:10) comment \"test\"");
+		iterator = TestUtilities.quickScan("each(var1:10) comment \"test\"");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Each statement = parser.parseEachStatement();
@@ -142,7 +142,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testStatementCollection() throws SyntaxException {
-		iterator = TestScanner.quickScan("{ yield; comment \"text\" markup1 markup2 var; }");
+		iterator = TestUtilities.quickScan("{ yield; comment \"text\" markup1 markup2 var; }");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Block statement = parser.parseStatementCollection();
@@ -154,7 +154,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testLetStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("let var=100 in comment \"test\" end");
+		iterator = TestUtilities.quickScan("let var=100 in comment \"test\" end");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Let statement = parser.parseLetStatement();
@@ -166,7 +166,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testCDataStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("cdata 10;");
+		iterator = TestUtilities.quickScan("cdata 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		CData statement = parser.parseCDataStatement();
@@ -175,7 +175,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testCommentStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("comment \"OH NOES TEH HAXZOR\";");
+		iterator = TestUtilities.quickScan("comment \"OH NOES TEH HAXZOR\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Comment statement = parser.parseCommentStatement();
@@ -184,7 +184,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testYieldStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("yield;");
+		iterator = TestUtilities.quickScan("yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		parser.parseYieldStatement();
@@ -193,7 +193,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testMarkupStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("func1;");
+		iterator = TestUtilities.quickScan("func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		RegularMarkupStatement statement = (RegularMarkupStatement) parser.parseStatement();
@@ -208,7 +208,7 @@ public class TestStatementParser {
 	@Test
 	public void testExpressionMarkupsStatement() throws SyntaxException {
 		// Natural expression (easy example)
-		iterator = TestScanner.quickScan("func1 func2 123;");
+		iterator = TestUtilities.quickScan("func1 func2 123;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp natstm = (MarkupExp) parser.parseMarkupStatements();
@@ -216,7 +216,7 @@ public class TestStatementParser {
 		assertEquals(Expression.NatExpression.class, natstm.getExpression().getClass());
 		
 		// Var expression (resembles mark-up)
-		iterator = TestScanner.quickScan("func1 func2 var;");
+		iterator = TestUtilities.quickScan("func1 func2 var;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp varstm = (MarkupExp) parser.parseMarkupStatements();
@@ -224,7 +224,7 @@ public class TestStatementParser {
 		assertEquals(Expression.VarExpression.class, varstm.getExpression().getClass());
 		
 		// Text expression
-		iterator = TestScanner.quickScan("func1 func2 \"123\";");
+		iterator = TestUtilities.quickScan("func1 func2 \"123\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp estatement = (MarkupExp) parser.parseMarkupStatements();
@@ -234,7 +234,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEmbeddingMarkupsStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("func1 func2 \"<123>\";");
+		iterator = TestUtilities.quickScan("func1 func2 \"<123>\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupEmbedding statement = (MarkupEmbedding) parser.parseMarkupStatements();
@@ -244,7 +244,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testStatementMarkupsStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("func1 func2 yield;;");
+		iterator = TestUtilities.quickScan("func1 func2 yield;;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupStat statement = (MarkupStat) parser.parseMarkupStatements();
@@ -252,7 +252,7 @@ public class TestStatementParser {
 		assertEquals(Statement.Yield.class, statement.getStatement().getClass());
 		
 		// Markup statement collection
-		iterator = TestScanner.quickScan("markup { func1 func2 var; }");
+		iterator = TestUtilities.quickScan("markup { func1 func2 var; }");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupStat cstatement = (MarkupStat) parser.parseMarkupStatements();
@@ -262,7 +262,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testMarkupMarkupsStatement() throws SyntaxException {
-		iterator = TestScanner.quickScan("func1 func2 func3();");
+		iterator = TestUtilities.quickScan("func1 func2 func3();");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupMarkup statement = (MarkupMarkup) parser.parseMarkupStatements();
@@ -272,21 +272,21 @@ public class TestStatementParser {
 	@Test
 	public void testCaveat() {
 		// Mark-up
-		parser = new StatementParser(TestScanner.quickScan("p;"), exceptions);
+		parser = new StatementParser(TestUtilities.quickScan("p;"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		
 		// Mark-up, variable
-		parser = new StatementParser(TestScanner.quickScan("p p;"), exceptions);
+		parser = new StatementParser(TestUtilities.quickScan("p p;"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertFalse(parser.isMarkup(2));
 		
 		// Mark-up, mark-up
-		parser = new StatementParser(TestScanner.quickScan("p p();"), exceptions);
+		parser = new StatementParser(TestUtilities.quickScan("p p();"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertTrue(parser.isMarkup(2));
 		
 		// Markup, mark-up, natural
-		parser = new StatementParser(TestScanner.quickScan("p p 123;"), exceptions);
+		parser = new StatementParser(TestUtilities.quickScan("p p 123;"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertTrue(parser.isMarkup(2));
 		assertFalse(parser.isMarkup(3));

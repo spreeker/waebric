@@ -17,7 +17,7 @@ import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class TestSiteParser {
 	
 	@Test
 	public void testSite() throws SyntaxException {
-		iterator = TestScanner.quickScan("site index1.html:function1(1);index2.html:function2 end");
+		iterator = TestUtilities.quickScan("site index1.html:function1(1);index2.html:function2 end");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Site site = parser.parseSite();
@@ -54,7 +54,7 @@ public class TestSiteParser {
 	
 	@Test
 	public void testMappings() throws SyntaxException {
-		iterator = TestScanner.quickScan("index1.html:function1(1);index2.html:function2");
+		iterator = TestUtilities.quickScan("index1.html:function1(1);index2.html:function2");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Mappings mappings = parser.parseMappings();
@@ -66,7 +66,7 @@ public class TestSiteParser {
 		Mapping mapping = null;
 		
 		// Path with directory, mapping with arguments
-		iterator = TestScanner.quickScan("home/index.html: home(\"Hello world!\")");
+		iterator = TestUtilities.quickScan("home/index.html: home(\"Hello world!\")");
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = parser.parseMapping();
@@ -74,7 +74,7 @@ public class TestSiteParser {
 		assertTrue(mapping.getMarkup() instanceof Markup.Call);
 		
 		// Path without directory, mapping without arguments
-		iterator = TestScanner.quickScan("index.html: home");
+		iterator = TestUtilities.quickScan("index.html: home");
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = parser.parseMapping();
@@ -84,7 +84,7 @@ public class TestSiteParser {
 	@Test
 	public void testPath() throws SyntaxException {
 		// Path with directory
-		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla/myfile.wae");
+		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla/myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Path.PathWithDir pathdf = (Path.PathWithDir) parser.parsePath();
@@ -92,7 +92,7 @@ public class TestSiteParser {
 		assertNotNull(pathdf.getFileName());
 		
 		// Path without directory
-		iterator = TestScanner.quickScan("myfile.wae");
+		iterator = TestUtilities.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Path.PathWithoutDir pathf = (Path.PathWithoutDir) parser.parsePath();
@@ -101,7 +101,7 @@ public class TestSiteParser {
 	
 	@Test
 	public void testDirName() throws SyntaxException {
-		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
+		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
 		DirName dirName = parser.parseDirName();
@@ -110,7 +110,7 @@ public class TestSiteParser {
 
 	@Test
 	public void testFileName() throws SyntaxException {
-		iterator = TestScanner.quickScan("myfile.wae");
+		iterator = TestUtilities.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
 		FileName name = parser.parseFileName();
@@ -120,7 +120,7 @@ public class TestSiteParser {
 	
 	@Test
 	public void testDirectory() throws SyntaxException {
-		iterator = TestScanner.quickScan("org/cwi/waebric/java/vanilla");
+		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
 		Directory directory = parser.parseDirectory();

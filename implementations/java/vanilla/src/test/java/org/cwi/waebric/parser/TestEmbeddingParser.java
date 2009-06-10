@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
@@ -21,7 +22,6 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testEmbedding() throws SyntaxException {
-		iterator = TestScanner.quickScan("\"<123>\"");
+		iterator = TestUtilities.quickScan("\"<123>\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding simple = parser.parseEmbedding();
@@ -57,7 +57,7 @@ public class TestEmbeddingParser {
 		assertEquals(0, simple.getEmbed().getMarkupCount());
 		assertEquals(TextTail.PostTail.class, simple.getTail().getClass());
 		
-		iterator = TestScanner.quickScan("\"left<func1() 123>right\"");
+		iterator = TestUtilities.quickScan("\"left<func1() 123>right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding extended = parser.parseEmbedding();
@@ -70,7 +70,7 @@ public class TestEmbeddingParser {
 	@Test
 	public void testEmbed() throws SyntaxException {
 		// Expression only embed
-		iterator = TestScanner.quickScan("123");
+		iterator = TestUtilities.quickScan("123");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed.ExpressionEmbed simple = (ExpressionEmbed) parser.parseEmbed();
@@ -78,7 +78,7 @@ public class TestEmbeddingParser {
 		assertEquals(0, simple.getMarkupCount());
 		
 		// Embed with single mark-up
-		iterator = TestScanner.quickScan("func1 123>");
+		iterator = TestUtilities.quickScan("func1 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed.ExpressionEmbed diff = (ExpressionEmbed) parser.parseEmbed();
@@ -86,7 +86,7 @@ public class TestEmbeddingParser {
 		assertEquals(1, diff.getMarkupCount());
 		
 		// Embed with multiple mark-up
-		iterator = TestScanner.quickScan("func1(arg1) func2 123>");
+		iterator = TestUtilities.quickScan("func1(arg1) func2 123>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embed.ExpressionEmbed diff2 = (ExpressionEmbed) parser.parseEmbed();
@@ -95,7 +95,7 @@ public class TestEmbeddingParser {
 		assertEquals(Markup.Call.class, diff2.getMarkup(0).getClass());
 		
 		// Embed Markup* Markup
-		iterator = TestScanner.quickScan("func1(arg1) func2 func3>");
+		iterator = TestUtilities.quickScan("func1(arg1) func2 func3>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		Embed.MarkupEmbed markupemb = (MarkupEmbed) parser.parseEmbed();
 		assertEquals(2, markupemb.getMarkupCount());
@@ -104,7 +104,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPreText() throws SyntaxException {
-		iterator = TestScanner.quickScan("\"left<");
+		iterator = TestUtilities.quickScan("\"left<");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		PreText text = parser.parsePreText();
@@ -113,13 +113,13 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextTail() throws SyntaxException {
-		iterator = TestScanner.quickScan(">right\"");
+		iterator = TestUtilities.quickScan(">right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		TextTail.PostTail post = (PostTail) parser.parseTextTail();
 		assertEquals("right", post.getPost().getText().toString());
 		
-		iterator = TestScanner.quickScan(">mid<123>\"");
+		iterator = TestUtilities.quickScan(">mid<123>\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		TextTail.MidTail mid = (MidTail) parser.parseTextTail();
@@ -129,7 +129,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPostTest() throws SyntaxException {
-		iterator = TestScanner.quickScan(">right\"");
+		iterator = TestUtilities.quickScan(">right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		PostText text = parser.parsePostText();
@@ -139,7 +139,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testMidText() throws SyntaxException {
-		iterator = TestScanner.quickScan(">mid<");
+		iterator = TestUtilities.quickScan(">mid<");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		MidText text = parser.parseMidText();
@@ -149,7 +149,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextChars() {
-		iterator = TestScanner.quickScan("left<");
+		iterator = TestUtilities.quickScan("left<");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		StringLiteral text = parser.parseTextChars();
@@ -160,21 +160,21 @@ public class TestEmbeddingParser {
 	@Test
 	public void testCaveat() {
 		// Mark-up
-		parser = new EmbeddingParser(TestScanner.quickScan("p;"), exceptions);
+		parser = new EmbeddingParser(TestUtilities.quickScan("p;"), exceptions);
 		assertFalse(parser.isMarkup(1));
 		
 		// Mark-up, variable
-		parser = new EmbeddingParser(TestScanner.quickScan("p p;"), exceptions);
+		parser = new EmbeddingParser(TestUtilities.quickScan("p p;"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertFalse(parser.isMarkup(2));
 		
 		// Mark-up, mark-up
-		parser = new EmbeddingParser(TestScanner.quickScan("p p();"), exceptions);
+		parser = new EmbeddingParser(TestUtilities.quickScan("p p();"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertTrue(parser.isMarkup(2));
 		
 		// Markup, mark-up, natural
-		parser = new EmbeddingParser(TestScanner.quickScan("p p 123;"), exceptions);
+		parser = new EmbeddingParser(TestUtilities.quickScan("p p 123;"), exceptions);
 		assertTrue(parser.isMarkup(1));
 		assertTrue(parser.isMarkup(2));
 		assertFalse(parser.isMarkup(3));

@@ -4,10 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.WaebricToken;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -27,28 +24,9 @@ public class TestScanner {
 		current = null;
 	}
 	
-	/**
-	 * Quickly perform scan based on raw string data,
-	 * use this method to make tests smaller and easier
-	 * to understand.
-	 * 
-	 * During the scan multiple assertions are done,
-	 * assuring that zero exceptions are caught.
-	 * 
-	 * @param data
-	 * @return iterator
-	 * @throws IOException
-	 */
-	public static WaebricTokenIterator quickScan(String data) {
-		Reader reader = new StringReader(data);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream();
-		return scanner.iterator();
-	}
-	
 	@Test
 	public void testScanNumber() {
-		iterator = quickScan("1 2 3 99 9999 123 456");
+		iterator = TestUtilities.quickScan("1 2 3 99 9999 123 456");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertEquals(current.getLexeme().toString(), WaebricTokenSort.NATCON, current.getSort());
@@ -57,7 +35,7 @@ public class TestScanner {
 	
 	@Test
 	public void testScanIdentifier() {
-		iterator = quickScan("identifier1abc html identifier2");
+		iterator = TestUtilities.quickScan("identifier1abc html identifier2");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(WaebricTokenSort.IDCON));
@@ -66,7 +44,7 @@ public class TestScanner {
 	
 	@Test
 	public void testScanKeyword() {
-		iterator = quickScan("module site import def end");
+		iterator = TestUtilities.quickScan("module site import def end");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(WaebricTokenSort.KEYWORD));
@@ -76,14 +54,14 @@ public class TestScanner {
 	
 	@Test
 	public void testScanCharacter() {
-		iterator = quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? / .");
+		iterator = TestUtilities.quickScan("! @ # $ % ^ & * ( ) { } [ ] , < > ? / .");
 		while(iterator.hasNext()) {
 			current = iterator.next();
 			assertTrue(current.getSort().equals(WaebricTokenSort.CHARACTER));
 		}
 		
 		// Symbols as separator
-		iterator = quickScan("@attribute");
+		iterator = TestUtilities.quickScan("@attribute");
 		
 		current = iterator.next(); // Dot symbol
 		assertTrue(current.getLexeme().equals('@'));
@@ -96,17 +74,17 @@ public class TestScanner {
 
 	@Test
 	public void testScanQuote() {
-		iterator = quickScan("\"text\" \"123\"");
+		iterator = TestUtilities.quickScan("\"text\" \"123\"");
 		assertEquals("text", iterator.next().getLexeme());
 		assertEquals("123", iterator.next().getLexeme());
 		
-		iterator = quickScan("\"text 123 '@@");
+		iterator = TestUtilities.quickScan("\"text 123 '@@");
 		assertEquals('"', iterator.next().getLexeme());
 	}
 	
 	@Test
 	public void testScanSymbol() {
-		iterator = quickScan("'abc '123 '@@@ 'abc123@@@");
+		iterator = TestUtilities.quickScan("'abc '123 '@@@ 'abc123@@@");
 		assertEquals("abc", iterator.next().getLexeme());
 		assertEquals("123", iterator.next().getLexeme());
 		assertEquals("@@@", iterator.next().getLexeme());

@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class TestModuleParser {
 	
 	@Test
 	public void testModuleId() throws SyntaxException {
-		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
+		iterator = TestUtilities.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		ModuleId moduleId = parser.parseModuleId();
@@ -55,7 +55,7 @@ public class TestModuleParser {
 	
 	@Test
 	public void testModules() throws SyntaxException {
-		iterator = TestScanner.quickScan("module mymodule1\nmodule mymodule2");
+		iterator = TestUtilities.quickScan("module mymodule1\nmodule mymodule2");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Modules modules = parser.parseModules();
@@ -68,7 +68,7 @@ public class TestModuleParser {
 	
 	@Test
 	public void testModule() throws SyntaxException {
-		iterator = TestScanner.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
+		iterator = TestUtilities.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Module module = parser.parseModule();
@@ -83,7 +83,7 @@ public class TestModuleParser {
 	
 	@Test
 	public void testImport() throws SyntaxException {
-		iterator = TestScanner.quickScan("org.cwi.waebric.mymodule");
+		iterator = TestUtilities.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
 		Import imprt = parser.parseImport();

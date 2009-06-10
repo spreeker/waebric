@@ -19,7 +19,7 @@ import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
 import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -48,21 +48,21 @@ public class TestMarkupParser {
 	@Test
 	public void testMarkup() throws SyntaxException {
 		// Regular mark-up
-		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup markup = parser.parseMarkup();
 		assertNotNull(markup.getDesignator());
 		
 		// Mark-up with arguments
-		iterator = TestScanner.quickScan("myfunction (12,\"text!\")");
+		iterator = TestUtilities.quickScan("myfunction (12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.Call markupa = (Call) parser.parseMarkup();
 		assertNotNull(markupa.getDesignator());
 		assertEquals(2, markupa.getArguments().size());
 		
-		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
+		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.Call markupaa = (Call) parser.parseMarkup();
@@ -73,7 +73,7 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testDesignator() throws SyntaxException {
-		iterator = TestScanner.quickScan("myfunction @99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Designator designator = parser.parseDesignator();
@@ -83,7 +83,7 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testAttributes() throws SyntaxException {
-		iterator = TestScanner.quickScan("@99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("@99,#myattribute,@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attributes attributes = parser.parseAttributes();
@@ -96,21 +96,21 @@ public class TestMarkupParser {
 	@Test
 	public void testAttribute() throws SyntaxException {
 		// Identifier attribute
-		iterator = TestScanner.quickScan("#myattribute");
+		iterator = TestUtilities.quickScan("#myattribute");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.AttributeIdCon attributei = (AttributeIdCon) parser.parseAttribute();
 		assertEquals("myattribute", attributei.getIdentifier().getLiteral().toString());
 		
 		// Regular natural attribute
-		iterator = TestScanner.quickScan("@99");
+		iterator = TestUtilities.quickScan("@99");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.AttributeNatCon attributen = (AttributeNatCon) parser.parseAttribute();
 		assertEquals(99, attributen.getNumber().getLiteral().toInteger());
 		
 		// Double natural attribute
-		iterator = TestScanner.quickScan("@99%12");
+		iterator = TestUtilities.quickScan("@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.AttributeDoubleNatCon attributedn = (AttributeDoubleNatCon) parser.parseAttribute();
@@ -120,7 +120,7 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testArguments() throws SyntaxException {
-		iterator = TestScanner.quickScan("(var1=argument1,argument2)");
+		iterator = TestUtilities.quickScan("(var1=argument1,argument2)");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Arguments arguments = parser.parseArguments();
@@ -131,7 +131,7 @@ public class TestMarkupParser {
 	@Test
 	public void testArgument() throws SyntaxException {
 		// Variable argument
-		iterator = TestScanner.quickScan("var1=12");
+		iterator = TestUtilities.quickScan("var1=12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Argument.Attr argumentv = (Attr) parser.parseArgument();
@@ -139,7 +139,7 @@ public class TestMarkupParser {
 		assertEquals(Expression.NatExpression.class, argumentv.getExpression().getClass());
 		
 		// Plain argument
-		iterator = TestScanner.quickScan("12");
+		iterator = TestUtilities.quickScan("12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Argument.RegularArgument argument = (RegularArgument) parser.parseArgument();

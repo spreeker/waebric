@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.TestScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class TestFunctionParser {
 	
 	@Test
 	public void testFunctionDef() throws SyntaxException {
-		iterator = TestScanner.quickScan("home(var1,var2) comment \"lol\" end");
+		iterator = TestUtilities.quickScan("home(var1,var2) comment \"lol\" end");
 		parser = new FunctionParser(iterator, exceptions);
 		
 		FunctionDef def = parser.parseFunctionDef();
