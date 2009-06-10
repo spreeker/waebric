@@ -52,16 +52,6 @@ public class FunctionDef extends ModuleElement {
 	public List<Statement> getStatements() {
 		return statements;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(obj instanceof FunctionDef) {
-			FunctionDef def = (FunctionDef) obj;
-			return this.identifier.equals(def.getIdentifier());
-		}
-		
-		return false;
-	}
 
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {

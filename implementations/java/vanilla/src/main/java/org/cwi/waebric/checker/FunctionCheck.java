@@ -98,11 +98,11 @@ class FunctionCheck implements IWaebricCheck {
 		List<FunctionDef> definitions = new ArrayList<FunctionDef>();
 		
 		// Attach function definitions to collection
-		for(FunctionDef def : module.getFunctionDefinitions()) {
-			if(! definitions.contains(def)) {
-				definitions.add(def);
+		for(FunctionDef function : module.getFunctionDefinitions()) {
+			if(isDuplicate(function, definitions)) {
+				exceptions.add(new DuplicateFunctionDefinition(function));
 			} else {
-				exceptions.add(new DuplicateFunctionDefinition(def));
+				definitions.add(function);
 			}
 		}
 		
@@ -119,6 +119,22 @@ class FunctionCheck implements IWaebricCheck {
 		}
 		
 		return definitions;
+	}
+	
+	/**
+	 * Check if a function with the same identifier is already defined.
+	 * @param function Function
+	 * @param definitions Collection of definitions
+	 * @return
+	 */
+	private boolean isDuplicate(FunctionDef function, List<FunctionDef> definitions) {
+		for(FunctionDef def : definitions) {
+			if(def.getIdentifier().equals(function.getIdentifier())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
