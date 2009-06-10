@@ -3,6 +3,7 @@ package org.cwi.waebric.checker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.ModuleCache;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -26,22 +27,6 @@ import org.cwi.waebric.parser.ast.statement.Statement;
  * @date 09-06-2009
  */
 class FunctionCheck implements IWaebricCheck {
-	
-	/**
-	 * Checker instance.
-	 */
-	private final WaebricChecker checker;
-	
-	/**
-	 * Construct function check component based on checker instance,
-	 * using the checker cached modules can be retrieved. The function
-	 * checker only functions correctly if all related modules have
-	 * been cached.
-	 * @param checker
-	 */
-	public FunctionCheck(WaebricChecker checker) {
-		this.checker = checker;
-	}
 	
 	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
 		for(Module module : tree.getRoot()) {
@@ -133,7 +118,8 @@ class FunctionCheck implements IWaebricCheck {
 		// Retrieve function definitions from imported module
 		for(Import imprt : module.getImports()) {
 			if(! collected.contains(imprt.getIdentifier())) {
-				for(Module sub : checker.requestModule(imprt.getIdentifier())) {
+				AbstractSyntaxTree ast = ModuleCache.getInstance().requestModule(imprt.getIdentifier());
+				for(Module sub : ast.getRoot()) {
 					collected.add(sub.getIdentifier());
 					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
 				}

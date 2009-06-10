@@ -15,25 +15,22 @@ import org.junit.Test;
 public class TestFunctionCheck {
 
 	private List<SemanticException> exceptions;
-	private WaebricChecker checker;
 	private FunctionCheck check;
 	
 	public TestFunctionCheck() {
 		exceptions = new ArrayList<SemanticException>();
-		checker = new WaebricChecker();
-		check = new FunctionCheck(checker);
+		check = new FunctionCheck();
 	}
 	
 	@After
 	public void tearDown() {
 		exceptions.clear();
-		checker.clearCache();
 	}
 	
 	@Test
 	public void testGetFunctionDefinition() throws FileNotFoundException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/mymodule.wae");
-		new ModuleCheck(checker).checkAST(ast, exceptions); // Cache related modules
+		new ModuleCheck().checkAST(ast, exceptions); // Cache related modules
 		List<FunctionDef> defs = check.getFunctionDefinitions(ast.getRoot().get(0), exceptions);
 		assertEquals(0, exceptions.size()); // No faults
 		assertEquals(2, defs.size()); // One definition found (test)
@@ -44,7 +41,6 @@ public class TestFunctionCheck {
 	@Test
 	public void testDuplicateFunction() throws FileNotFoundException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/duplicate.wae");
-		new ModuleCheck(checker).checkAST(ast, exceptions); // Cache related modules
 		check.checkAST(ast, exceptions); // Perform function check
 		assertEquals(2, exceptions.size());
 		assertEquals(FunctionCheck.DuplicateFunctionDefinition.class, exceptions.get(0).getClass());
@@ -54,7 +50,6 @@ public class TestFunctionCheck {
 	@Test
 	public void testArityMismatch() throws FileNotFoundException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/aritymm.wae");
-		new ModuleCheck(checker).checkAST(ast, exceptions); // Cache related modules
 		check.checkAST(ast, exceptions); // Perform function check
 		assertEquals(2, exceptions.size());
 		assertEquals(FunctionCheck.ArityMismatchException.class, exceptions.get(0).getClass());
@@ -64,7 +59,6 @@ public class TestFunctionCheck {
 	@Test
 	public void testUndefinedFunction() throws FileNotFoundException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/undeffunc.wae");
-		new ModuleCheck(checker).checkAST(ast, exceptions); // Cache related modules
 		check.checkAST(ast, exceptions); // Perform function check
 		assertEquals(2, exceptions.size());
 		assertEquals(FunctionCheck.UndefinedFunctionException.class, exceptions.get(0).getClass());

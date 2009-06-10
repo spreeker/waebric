@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.ModuleCache;
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
@@ -17,19 +18,17 @@ import org.junit.Test;
 public class TestModuleCheck {
 	
 	private List<SemanticException> exceptions;
-	private WaebricChecker checker;
 	private ModuleCheck check;
 	
 	public TestModuleCheck() {
 		exceptions = new ArrayList<SemanticException>();
-		checker = new WaebricChecker();
-		check = new ModuleCheck(checker);
+		check = new ModuleCheck();
 	}
 	
 	@After
 	public void tearDown() {
 		exceptions.clear();
-		checker.clearCache();
+		ModuleCache.getInstance().clearCache();
 	}
 
 	@Test
@@ -39,9 +38,9 @@ public class TestModuleCheck {
 		
 		assertEquals(0, exceptions.size()); // No faults
 		for(Module module: ast.getRoot()) { // All related modules cached
-			assertTrue(checker.hasCached(module.getIdentifier()));
+			assertTrue(ModuleCache.getInstance().hasCached(module.getIdentifier()));
 			for(Import imprt: module.getImports()) {
-				assertTrue(checker.hasCached(imprt.getIdentifier()));
+				assertTrue(ModuleCache.getInstance().hasCached(imprt.getIdentifier()));
 			}
 		}	
 	}
@@ -67,7 +66,7 @@ public class TestModuleCheck {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/mymodule.wae");
 		check.checkAST(ast, exceptions);
 		assertEquals(0, exceptions.size()); // No faults
-		assertTrue(checker.hasCached(ast.getRoot().get(0).getIdentifier())); // Module cached
+		assertTrue(ModuleCache.getInstance().hasCached(ast.getRoot().get(0).getIdentifier())); // Module cached
 	}
 	
 }

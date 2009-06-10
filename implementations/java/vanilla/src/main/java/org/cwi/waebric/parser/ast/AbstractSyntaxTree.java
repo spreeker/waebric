@@ -15,17 +15,23 @@ public class AbstractSyntaxTree {
 	private final Modules root;
 	
 	/**
-	 * Initialize abstract syntax tree.
-	 * 
+	 * Construct AST with empty root node.
 	 * @param root Start of tree
+	 */
+	public AbstractSyntaxTree() {
+		this(new Modules());
+	}
+	
+	/**
+	 * Construct AST based on root node.
+	 * @param root Modules
 	 */
 	public AbstractSyntaxTree(Modules root) {
 		this.root = root;
 	}
 	
 	/**
-	 * Retrieve root node.
-	 * 
+	 * Retrieve root node. 
 	 * @return
 	 */
 	public final Modules getRoot() {
