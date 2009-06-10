@@ -9,7 +9,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.cwi.waebric.parser.WaebricParser;
-import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.WaebricTokenIterator;
@@ -23,7 +23,7 @@ public class TestUtilities {
 		return scanner.iterator();
 	}
 	
-	public static Modules quickParse(String path) throws FileNotFoundException {
+	public static AbstractSyntaxTree quickParse(String path) throws FileNotFoundException {
 		FileReader reader = new FileReader(path);
 		WaebricScanner scanner = new WaebricScanner(reader);
 		scanner.tokenizeStream();
@@ -32,7 +32,7 @@ public class TestUtilities {
 		assertEquals(0, e.size());
 
 		// Retrieve root node
-		return parser.getAbstractSyntaxTree().getRoot();
+		return parser.getAbstractSyntaxTree();
 	}
 	
 }

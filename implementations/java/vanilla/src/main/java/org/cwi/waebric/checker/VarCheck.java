@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Assignment;
@@ -21,8 +21,8 @@ import org.cwi.waebric.parser.ast.statement.Statement;
  */
 class VarCheck implements IWaebricCheck {
 	
-	public void checkAST(Modules modules, List<SemanticException> exceptions) {
-		for(Module module: modules) {
+	public void checkAST(AbstractSyntaxTree ast, List<SemanticException> exceptions) {
+		for(Module module: ast.getRoot()) {
 			for(FunctionDef function: module.getFunctionDefinitions()) {
 				checkVar(function, new ArrayList<IdCon>(), exceptions);
 			}

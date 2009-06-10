@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.util.List;
 
 import org.cwi.waebric.parser.WaebricParser;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
@@ -34,8 +35,8 @@ class ModuleCheck implements IWaebricCheck {
 		this.checker = checker;
 	}
 	
-	public void checkAST(Modules modules, List<SemanticException> exceptions) {
-		for(Module module: modules) {
+	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
+		for(Module module: tree.getRoot()) {
 			// Check module definition
 			String path = getPath(module.getIdentifier());
 			File file = new File(path);
@@ -43,7 +44,7 @@ class ModuleCheck implements IWaebricCheck {
 				exceptions.add(new NonExistingModuleException(module.getIdentifier()));
 			}
 			
-			checker.cacheModule(module.getIdentifier(), modules); // Cache module
+			checker.cacheModule(module.getIdentifier(), tree.getRoot()); // Cache module
 			
 			// Check imported modules
 			for(Import imprt: module.getImports()) {
@@ -73,9 +74,9 @@ class ModuleCheck implements IWaebricCheck {
 			parser.parseTokens(); // Parse file
 			
 			// Retrieve modules
-			Modules modules = parser.getAbstractSyntaxTree().getRoot();
-			checker.cacheModule(identifier, modules); // Cache dependent modules
-			checkAST(modules, exceptions); // Check dependent modules
+			AbstractSyntaxTree tree = parser.getAbstractSyntaxTree();
+			checker.cacheModule(identifier, tree.getRoot()); // Cache dependent modules
+			checkAST(tree, exceptions); // Check dependent modules
 		} catch(FileNotFoundException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
 			checker.cacheModule(identifier, new Modules()); // Cache non-existing module as empty modules node

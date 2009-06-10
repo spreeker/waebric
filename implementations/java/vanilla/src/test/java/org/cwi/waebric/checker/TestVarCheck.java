@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.junit.After;
 import org.junit.Test;
 
@@ -28,14 +28,14 @@ public class TestVarCheck {
 	
 	@Test
 	public void testVarCheck() throws FileNotFoundException {
-		Modules modules = TestUtilities.quickParse("src/test/waebric/var/correctvar.wae");
+		AbstractSyntaxTree modules = TestUtilities.quickParse("src/test/waebric/var/correctvar.wae");
 		check.checkAST(modules, exceptions); // Perform variable check
 		assertEquals(0, exceptions.size()); // No faults
 	}
 	
 	@Test
 	public void testUndefinedVar() throws FileNotFoundException {
-		Modules modules = TestUtilities.quickParse("src/test/waebric/var/undefinedvar.wae");
+		AbstractSyntaxTree modules = TestUtilities.quickParse("src/test/waebric/var/undefinedvar.wae");
 		check.checkAST(modules, exceptions); // Perform variable check
 		assertEquals(2, exceptions.size());
 		assertEquals(VarCheck.UndefinedVariableException.class, exceptions.get(0).getClass());

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 
@@ -28,6 +29,7 @@ public class WaebricChecker {
 	
 	/**
 	 * Construct checker.
+	 * @param ast Abstract syntax tree
 	 */
 	public WaebricChecker() {
 		this.moduleCache = new HashMap<ModuleId, Modules>();
@@ -39,12 +41,12 @@ public class WaebricChecker {
 		checks.add(new VarCheck());
 	}
 	
-	public List<SemanticException> checkAST(Modules modules) {
+	public List<SemanticException> checkAST(AbstractSyntaxTree ast) {
 		List<SemanticException> exceptions = new ArrayList<SemanticException>();
-		
+
 		// Perform all checks
 		for(IWaebricCheck check : checks) {
-			check.checkAST(modules, exceptions);
+			check.checkAST(ast, exceptions);
 		}
 
 		return exceptions;
@@ -80,7 +82,7 @@ public class WaebricChecker {
 	/**
 	 * Clear module cache.
 	 */
-	public void cleanCache() {
+	public void clearCache() {
 		moduleCache.clear();
 	}
 

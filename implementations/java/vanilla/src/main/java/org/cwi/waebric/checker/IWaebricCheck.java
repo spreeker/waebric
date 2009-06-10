@@ -2,7 +2,7 @@ package org.cwi.waebric.checker;
 
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 
 /**
  * Checks are components of the Waebric checker, which each check
@@ -17,6 +17,6 @@ public interface IWaebricCheck {
 	 * @param modules Root of abstract syntax tree
 	 * @param exceptions Collection of semantic violations
 	 */
-	public void checkAST(Modules modules, List<SemanticException> exceptions);
+	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions);
 	
 }

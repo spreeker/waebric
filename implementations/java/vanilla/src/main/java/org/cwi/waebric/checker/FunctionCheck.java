@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
@@ -43,8 +43,8 @@ class FunctionCheck implements IWaebricCheck {
 		this.checker = checker;
 	}
 	
-	public void checkAST(Modules modules, List<SemanticException> exceptions) {
-		for(Module module : modules) {
+	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
+		for(Module module : tree.getRoot()) {
 			// Retrieve all function definitions
 			List<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
 			
