@@ -38,6 +38,10 @@ namespace TestLexer
 
         #endregion
 
+        /// <summary>
+        /// This test tests an specific part of waebric
+        /// with all types of tokens
+        /// </summary>
         [TestMethod]
         public void TestWaebricInput()
         {
@@ -56,19 +60,45 @@ namespace TestLexer
                 }
                 switch (position)
                 {
-                    case 1:
+                    case 1: //module
                         Assert.AreEqual("module", Tokenizer.GetTextValue());
                         break;
-                    case 2:
+                    case 2: //test
                         Assert.AreEqual("test", Tokenizer.GetTextValue());
                         break;
-                    case 3:
+                    case 3: //site
                         Assert.AreEqual("site", Tokenizer.GetTextValue());
                         break;
-                    case 4:
+                    case 4: //site
                         Assert.AreEqual("site", Tokenizer.GetTextValue());
                         break;
-
+                    case 5: // /
+                        Assert.AreEqual('/', Tokenizer.GetCharacterValue());
+                        break;
+                    case 6: //index
+                        Assert.AreEqual("index", Tokenizer.GetTextValue());
+                        break;
+                    case 7: //.
+                        Assert.AreEqual('.', Tokenizer.GetCharacterValue());
+                        break;
+                    case 8: //html
+                        Assert.AreEqual("html", Tokenizer.GetTextValue());
+                        break;
+                    case 9: //:
+                        Assert.AreEqual(':', Tokenizer.GetCharacterValue());
+                        break;
+                    case 10: //home
+                        Assert.AreEqual("home", Tokenizer.GetTextValue());
+                        break;
+                    case 11: //(
+                        Assert.AreEqual('(', Tokenizer.GetCharacterValue());
+                        break;
+                    case 12: //)
+                        Assert.AreEqual(')', Tokenizer.GetCharacterValue());
+                        break;
+                    case 13: //end
+                        Assert.AreEqual("end", Tokenizer.GetTextValue());
+                        break;
                 }
                 position++;
                 current = Tokenizer.NextToken();

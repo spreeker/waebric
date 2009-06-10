@@ -69,6 +69,8 @@ namespace TestLexer
         {
             WaebricLexer lexer = new WaebricLexer(new StringReader("module test\n\nsite site/index.html : home()\nend"));
             lexer.LexicalizeStream();
+
+            Assert.IsTrue(lexer.GetTokenList().Count == 13);
         }
     }
 }
