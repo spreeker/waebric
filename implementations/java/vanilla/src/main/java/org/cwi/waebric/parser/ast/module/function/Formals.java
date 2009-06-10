@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast.module.function;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
@@ -29,11 +30,13 @@ public abstract class Formals extends AbstractSyntaxNode {
 		
 		private AbstractSeparatedSyntaxNodeList<IdCon> identifiers;
 		
-		/**
-		 * Construct regular formal
-		 */
 		public RegularFormal() {
 			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
+		}
+		
+		public RegularFormal(Collection<IdCon> args) {
+			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
+			this.identifiers.addAll(args);
 		}
 
 		public boolean addIdentifier(IdCon identifier) {

@@ -84,9 +84,9 @@ public class TestStatementParser {
 		
 		Assignment.FuncBind assignment = parser.parseIdConAssignment();
 		assertEquals("identifier1", assignment.getIdentifier().getLiteral().toString());
-		assertEquals(2, assignment.getIdentifierCount());
-		assertEquals("var1", assignment.getIdentifier(0).getLiteral().toString());
-		assertEquals("var2", assignment.getIdentifier(1).getLiteral().toString());
+		assertEquals(2, assignment.getVariables().size());
+		assertEquals("var1", assignment.getVariables().get(0).getLiteral().toString());
+		assertEquals("var2", assignment.getVariables().get(1).getLiteral().toString());
 		assertEquals(Statement.Yield.class, assignment.getStatement().getClass());
 	}
 	
@@ -158,10 +158,10 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Let statement = parser.parseLetStatement();
-		assertEquals(1, statement.getAssignmentCount());
-		assertEquals(Assignment.VarBind.class, statement.getAssignment(0).getClass());
-		assertEquals(1, statement.getStatementCount());
-		assertEquals(Statement.Comment.class, statement.getStatement(0).getClass());
+		assertEquals(1, statement.getAssignments().size());
+		assertEquals(Assignment.VarBind.class, statement.getAssignments().get(0).getClass());
+		assertEquals(1, statement.getAssignments().size());
+		assertEquals(Statement.Comment.class, statement.getAssignments().get(0).getClass());
 	}
 	
 	@Test

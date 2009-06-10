@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.statement;
 
+import java.util.List;
+
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
@@ -150,24 +152,16 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return assignments.add(assignment);
 		}
 		
-		public Assignment getAssignment(int index) {
-			return assignments.get(index);
-		}
-		
-		public int getAssignmentCount() {
-			return assignments.size();
+		public List<Assignment> getAssignments() {
+			return assignments.clone();
 		}
 		
 		public boolean addStatement(Statement statement) {
 			return statements.add(statement);
 		}
 		
-		public Statement getStatement(int index) {
-			return statements.get(index);
-		}
-		
-		public int getStatementCount() {
-			return statements.size();
+		public List<Statement> getStatements() {
+			return statements.clone();
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {

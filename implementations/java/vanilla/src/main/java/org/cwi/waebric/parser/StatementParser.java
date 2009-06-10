@@ -474,7 +474,7 @@ class StatementParser extends AbstractParser {
 			}
 			
 			next(WaebricTokenSort.IDCON, "Function binding identifier", "\"(\" { Identifier, \",\" }* \")\"");
-			assignment.addIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+			assignment.addVariable(new IdCon(tokens.current().getLexeme().toString()));
 			
 			// While not end of formals, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {

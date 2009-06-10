@@ -1,9 +1,16 @@
 package org.cwi.waebric.checker;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.module.function.Formals;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.parser.ast.statement.Assignment;
 
 /**
  * Check variables for semantic violations.
@@ -14,8 +21,41 @@ import org.cwi.waebric.parser.ast.module.Modules;
 class VarCheck implements IWaebricCheck {
 	
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
-		// TODO Auto-generated method stub
+		for(Module module: modules) {
+			for(FunctionDef function: module.getFunctionDefinitions()) {
+				checkVar(function, new ArrayList<IdCon>(), exceptions);
+			}
+		}
+	}
+	
+	/**
+	 * Walk threw AST and determine if each variable expression uses a
+	 * variables defined in its parents function definition or let-statement.
+	 * @param node Node being checked
+	 * @param vars Collection of defined variables
+	 * @param exceptions Exceptions currently occurred
+	 */
+	public void checkVar(AbstractSyntaxNode node, List<IdCon> vars, List<SemanticException> exceptions) {
+		if(node instanceof Expression.VarExpression) {
+			// Check if expressed variable is defined
+			Expression.VarExpression expr = (Expression.VarExpression) node;
+			if(! vars.contains(expr.getVar())) {
+				exceptions.add(new UndefinedVariableException(expr.getVar()));
+			}
+		} else if(node instanceof Formals.RegularFormal) {
+			// Attach variables defined in function formals
+			Formals.RegularFormal formals = (Formals.RegularFormal) node;
+			vars.addAll(formals.getIdentifiers());
+		} else if(node instanceof Assignment.VarBind) {
+			// Attach variables bound in let assignments
+			Assignment.VarBind bind = (Assignment.VarBind) node;
+			vars.add(bind.getIdentifier());
+		}
 		
+		// Recursively check children of node
+		for(AbstractSyntaxNode child: node.getChildren()) {
+			checkVar(child, new ArrayList<IdCon>(vars), exceptions);
+		}
 	}
 
 	/**

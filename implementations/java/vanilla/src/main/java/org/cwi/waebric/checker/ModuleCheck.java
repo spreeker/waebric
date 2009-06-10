@@ -49,7 +49,7 @@ class ModuleCheck implements IWaebricCheck {
 			for(Import imprt: module.getImports()) {
 				if(! checker.hasCached(imprt.getIdentifier())) {
 					// Only check modules that havn't been cached yet
-					checkModule(imprt.getIdentifier(), exceptions);
+					checkModuleId(imprt.getIdentifier(), exceptions);
 				}
 			}
 		}
@@ -60,7 +60,7 @@ class ModuleCheck implements IWaebricCheck {
 	 * @param identifier
 	 * @param exceptions
 	 */
-	public void checkModule(ModuleId identifier, List<SemanticException> exceptions) {
+	public void checkModuleId(ModuleId identifier, List<SemanticException> exceptions) {
 		if(identifier.size() == 0) { return; } // Invalid identifier, quit cache for efficiency
 		if(checker.hasCached(identifier)) { return; } // Already checked module.
 

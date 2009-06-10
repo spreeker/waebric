@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.statement;
 
+import java.util.List;
+
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
@@ -23,14 +25,14 @@ public abstract class Assignment extends AbstractSyntaxNode {
 	public static class FuncBind extends Assignment {
 	
 		private IdCon identifier;
-		private AbstractSeparatedSyntaxNodeList<IdCon> identifiers;
+		private AbstractSeparatedSyntaxNodeList<IdCon> variables;
 		private Statement statement;
 		
 		/**
 		 * Construct default function binding.
 		 */
 		public FuncBind() {
-			identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(',');
+			variables = new AbstractSeparatedSyntaxNodeList<IdCon>(',');
 		}
 		
 		public IdCon getIdentifier() {
@@ -41,16 +43,12 @@ public abstract class Assignment extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 	
-		public IdCon getIdentifier(int index) {
-			return identifiers.get(index);
+		public boolean addVariable(IdCon variable) {
+			return variables.add(variable);
 		}
 	
-		public void addIdentifier(IdCon identifier) {
-			identifiers.add(identifier);
-		}
-		
-		public int getIdentifierCount() {
-			return identifiers.size();
+		public List<IdCon> getVariables() {
+			return variables.clone();
 		}
 	
 		public Statement getStatement() {
@@ -65,7 +63,7 @@ public abstract class Assignment extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] {
 				identifier,
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
-				identifiers,
+				variables,
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
 				new CharacterLiteral(WaebricSymbol.EQUAL_SIGN),
 				statement

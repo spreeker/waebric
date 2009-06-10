@@ -6,6 +6,7 @@ import java.util.List;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
@@ -14,6 +15,7 @@ import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
@@ -44,20 +46,20 @@ class FunctionCheck implements IWaebricCheck {
 	
 	public void checkAST(Modules modules, List<SemanticException> exceptions) {
 		for(Module module : modules) {
-			// Retrieve function definitions
+			// Retrieve all function definitions
 			List<FunctionDef> definitions = getFunctionDefinitions(module, exceptions);
 			
+			// Check all calls made from site mappings
 			for(Site site: module.getSites()) {
 				for(Mapping mapping: site.getMappings()) {
-					// Check all calls made from site mappings
-					checkCalls(mapping.getMarkup(), definitions, exceptions);
+					checkCall(mapping.getMarkup(), definitions, exceptions);
 				}
 			}
 			
+			// Check all calls made within function statements
 			for(FunctionDef def: module.getFunctionDefinitions()) {
 				for(Statement statement: def.getStatements()) {
-					// Check all calls made within function statements
-					checkCalls(statement, definitions, exceptions);
+					checkCall(statement, definitions, exceptions);
 				}
 			}
 		}
@@ -69,7 +71,7 @@ class FunctionCheck implements IWaebricCheck {
 	 * @param definitions Defined functions
 	 * @param exceptions Exceptions
 	 */
-	public void checkCalls(AbstractSyntaxNode node, List<FunctionDef> definitions, 
+	public void checkCall(AbstractSyntaxNode node, List<FunctionDef> definitions, 
 			List<SemanticException> exceptions) {
 		if(node instanceof Markup.Call) {
 			Markup.Call call = (Markup.Call) node; // Cast node to correct type
@@ -83,25 +85,28 @@ class FunctionCheck implements IWaebricCheck {
 					expectedArguments = formals.getIdentifiers().size();
 				}
 				
+				// Function call has an invalid amount of arguments
 				if(call.getArguments().size() != expectedArguments) {
-					// Call refers to argument with different amount of arguments
 					exceptions.add(new ArityMismatchException(call));
 				}
-			} else {
-				// Call refers to undefined function
+			} else { // Called function is undefined
 				exceptions.add(new UndefinedFunctionException(call));
 			}
+		} else if(node instanceof Assignment.FuncBind) {
+			Assignment.FuncBind bind = (Assignment.FuncBind) node;
+			definitions.add(toFunctionDefinition(bind)); // Convert bind to plain definition
 		}
 		
+		// Recursively check children of node
 		for(AbstractSyntaxNode child: node.getChildren()) {
-			checkCalls(child, definitions, exceptions); // Also check children nodes
+			checkCall(child, new ArrayList<FunctionDef>(definitions), exceptions);
 		}
 	}
 	
 	/**
 	 * Retrieve function definitions of module and all related modules.
 	 * @param module Root module
-	 * @param exceptions Exceptions
+	 * @param exceptions Currently occurred exceptions
 	 * @return
 	 */
 	public List<FunctionDef> getFunctionDefinitions(Module module, List<SemanticException> exceptions) {
@@ -113,14 +118,14 @@ class FunctionCheck implements IWaebricCheck {
 	 * Retrieve function definitions of module and all related modules.
 	 * @param module Root module
 	 * @param collected List of already collected modules
-	 * @param exceptions Exceptions
+	 * @param exceptions Currently occurred exceptions
 	 * @return
 	 */
 	public List<FunctionDef> getFunctionDefinitions(Module module, 
 			List<ModuleId> collected, List<SemanticException> exceptions) {
 		List<FunctionDef> definitions = new ArrayList<FunctionDef>();
 		
-		// Attach function definitions to collection
+		// Attach module's function definitions to list
 		for(FunctionDef function : module.getFunctionDefinitions()) {
 			if(containsFunction(function.getIdentifier(), definitions)) {
 				exceptions.add(new DuplicateFunctionDefinition(function));
@@ -129,11 +134,9 @@ class FunctionCheck implements IWaebricCheck {
 			}
 		}
 		
-		// Retrieve functions from dependent modules
+		// Retrieve function definitions from imported module
 		for(Import imprt : module.getImports()) {
-			// Check if module functions have been collected
 			if(! collected.contains(imprt.getIdentifier())) {
-				// Retrieve module contents from cache
 				for(Module sub : checker.requestModule(imprt.getIdentifier())) {
 					collected.add(sub.getIdentifier());
 					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
@@ -162,12 +165,28 @@ class FunctionCheck implements IWaebricCheck {
 	 */
 	private FunctionDef getFunction(IdCon identifier, List<FunctionDef> definitions) {
 		for(FunctionDef def : definitions) {
-			if(def.getIdentifier().equals(identifier)) {
-				return def;
-			}
+			if(def.getIdentifier().equals(identifier)) { return def; }
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Convert function binding to plain function definition, with no statements.
+	 * This function is purely used to allow storage of function bindings in
+	 * the definition collection.
+	 * @param bind
+	 * @return
+	 */
+	private FunctionDef toFunctionDefinition(Assignment.FuncBind bind) {
+		FunctionDef function = new FunctionDef();
+		function.setIdentifier(bind.getIdentifier());
+		if(bind.getVariables().size() == 0) {
+			function.setFormals(new Formals.EmptyFormal());
+		} else {
+			function.setFormals(new Formals.RegularFormal(bind.getVariables()));
+		}
+		return function;
 	}
 
 	/**
@@ -183,9 +202,15 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -954167103131401047L;
+		private Call call;
 
 		public ArityMismatchException(Markup.Call call) {
 			super(call.toString() + " is an arity mismatch");
+			this.call = call;
+		}
+		
+		public Call getCall() {
+			return call;
 		}
 		
 	}
@@ -202,9 +227,15 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -8833578229100261366L;
+		private FunctionDef def;
 
 		public DuplicateFunctionDefinition(FunctionDef def) {
 			super(def.toString() + " is a duplicate function definition");
+			this.def = def;
+		}
+		
+		public FunctionDef getFunctionDef() {
+			return def;
 		}
 		
 	}
@@ -225,9 +256,15 @@ class FunctionCheck implements IWaebricCheck {
 		 * Generated serial ID
 		 */
 		private static final long serialVersionUID = -4467095005921534334L;
+		private Call call;
 
 		public UndefinedFunctionException(Markup.Call call) {
 			super(call.toString() + " is an undefined function.");
+			this.call = call;
+		}
+		
+		public Call getCall() {
+			return call;
 		}
 		
 	}
