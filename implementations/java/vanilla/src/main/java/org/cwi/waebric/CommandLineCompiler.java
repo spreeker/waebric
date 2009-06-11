@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.cwi.waebric.checker.SemanticException;
 import org.cwi.waebric.checker.WaebricChecker;
+import org.cwi.waebric.interpreter.WaebricInterpreter;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.LexicalException;
@@ -91,6 +92,9 @@ public class CommandLineCompiler {
 				
 				return; // Quit application
 			}
+			
+			WaebricInterpreter interpreter = new WaebricInterpreter();
+			interpreter.interpretProgram(parser.getAbstractSyntaxTree());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

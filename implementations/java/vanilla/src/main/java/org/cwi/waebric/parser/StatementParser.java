@@ -371,12 +371,12 @@ class StatementParser extends AbstractParser {
 						return statement;
 					} else {
 						reportUnexpectedToken(peek, "Markups statement", 
-								"Markup+ { Markup, Expression, Embedding or Statement }");
+								"Markup+ { Markup, Expression, Embedding or Statement } \";\"");
 					}
 				}
 			} else {
 				reportMissingToken(tokens.current(), "Markups statement", 
-						"Markup+ { Markup, Expression, Embedding or Statement }");
+						"Markup+ { Markup, Expression, Embedding or Statement } \";\"");
 			}
 		}
 		
