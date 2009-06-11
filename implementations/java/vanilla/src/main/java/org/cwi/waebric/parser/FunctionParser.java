@@ -6,7 +6,7 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -19,7 +19,7 @@ class FunctionParser extends AbstractParser {
 
 	private final StatementParser statementParser;
 	
-	public FunctionParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public FunctionParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parser
@@ -36,7 +36,7 @@ class FunctionParser extends AbstractParser {
 		
 		// Parse identifier
 		next(WaebricTokenSort.IDCON, "Function identifier", "Identifier"); 
-		def.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+		def.setIdentifier(new IdCon(tokens.current()));
 		
 		// Parse formals
 		def.setFormals(statementParser.parseFormals());

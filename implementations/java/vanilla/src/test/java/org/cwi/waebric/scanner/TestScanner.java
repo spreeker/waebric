@@ -6,16 +6,16 @@ import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 import org.junit.After;
 import org.junit.Test;
 
 public class TestScanner {
 
-	private WaebricTokenIterator iterator;
-	private WaebricToken current;
+	private TokenIterator iterator;
+	private Token current;
 	
 	@After
 	public void tearDown() {

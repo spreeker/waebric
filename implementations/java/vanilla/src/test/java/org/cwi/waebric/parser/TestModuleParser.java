@@ -1,19 +1,17 @@
 package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +21,7 @@ public class TestModuleParser {
 	private ModuleParser parser;
 	
 	private List<SyntaxException> exceptions;
-	private WaebricTokenIterator iterator;
+	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() {
@@ -47,10 +45,10 @@ public class TestModuleParser {
 		
 		// Assertions
 		assertEquals(7, moduleId.getChildren().length); // Four elements and three period separators
-		assertEquals("org", moduleId.get(0).getLiteral().toString());
-		assertEquals("cwi", moduleId.get(1).getLiteral().toString());
-		assertEquals("waebric", moduleId.get(2).getLiteral().toString());
-		assertEquals("mymodule", moduleId.get(3).getLiteral().toString());
+		assertEquals("org", moduleId.get(0).getToken().getLexeme().toString());
+		assertEquals("cwi", moduleId.get(1).getToken().getLexeme().toString());
+		assertEquals("waebric", moduleId.get(2).getToken().getLexeme().toString());
+		assertEquals("mymodule", moduleId.get(3).getToken().getLexeme().toString());
 	}
 	
 	@Test
@@ -91,19 +89,6 @@ public class TestModuleParser {
 		// Assertions
 		assertEquals("import", imprt.getChildren()[0].toString());
 		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
-	}
-	
-	@Test
-	public void testEqualModule() {
-		ModuleId id1 = new ModuleId();
-		id1.add(new IdCon("src"));
-		id1.add(new IdCon("mymodule"));
-		
-		ModuleId id2 = new ModuleId();
-		id2.add(new IdCon("src"));
-		id2.add(new IdCon("mymodule"));
-		
-		assertTrue(id1.equals(id2));
 	}
 
 }

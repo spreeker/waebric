@@ -20,7 +20,7 @@ import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class TestMarkupParser {
 	private MarkupParser parser;
 	
 	private List<SyntaxException> exceptions;
-	private WaebricTokenIterator iterator;
+	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() {
@@ -77,7 +77,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Designator designator = parser.parseDesignator();
-		assertEquals("myfunction", designator.getIdentifier().getLiteral().toString());
+		assertEquals("myfunction", designator.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(3, designator.getAttributes().size());
 	}
 	
@@ -100,7 +100,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.AttributeIdCon attributei = (AttributeIdCon) parser.parseAttribute();
-		assertEquals("myattribute", attributei.getIdentifier().getLiteral().toString());
+		assertEquals("myattribute", attributei.getIdentifier().getToken().getLexeme().toString());
 		
 		// Regular natural attribute
 		iterator = TestUtilities.quickScan("@99");
@@ -135,7 +135,7 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Argument.Attr argumentv = (Attr) parser.parseArgument();
-		assertEquals("var1", argumentv.getIdentifier().getLiteral().toString());
+		assertEquals("var1", argumentv.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(Expression.NatExpression.class, argumentv.getExpression().getClass());
 		
 		// Plain argument

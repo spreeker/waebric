@@ -34,8 +34,8 @@ public class TestFunctionCheck {
 		List<FunctionDef> defs = check.getFunctionDefinitions(ast.getRoot().get(0), exceptions);
 		assertEquals(0, exceptions.size()); // No faults
 		assertEquals(2, defs.size()); // One definition found (test)
-		assertEquals("main", defs.get(0).getIdentifier().getLiteral().toString());
-		assertEquals("test", defs.get(1).getIdentifier().getLiteral().toString());
+		assertEquals("main", defs.get(0).getIdentifier().getToken().getLexeme().toString());
+		assertEquals("test", defs.get(1).getIdentifier().getToken().getLexeme().toString());
 	}
 	
 	@Test

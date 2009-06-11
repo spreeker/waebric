@@ -83,7 +83,9 @@ class VarCheck implements IWaebricCheck {
 		private static final long serialVersionUID = 3043727441105977011L;
 
 		public UndefinedVariableException(IdCon var) {
-			super(var.toString() + " is not defined.");
+			super("Variable \"" + var.getToken().getLexeme().toString()
+					+ "\" at line " + var.getToken().getLine()
+					+ " is not defined.");
 		}
 		
 	}

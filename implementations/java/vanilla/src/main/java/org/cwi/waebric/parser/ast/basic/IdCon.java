@@ -1,7 +1,8 @@
 package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.TokenNode;
+import org.cwi.waebric.scanner.token.Token;
 
 /**
  * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}
@@ -11,28 +12,28 @@ import org.cwi.waebric.parser.ast.StringLiteral;
  */
 public class IdCon extends AbstractSyntaxNode {
 
-	private StringLiteral literal;
+	private TokenNode node;
 	
-	public IdCon(String identifier) {
-		this.literal = new StringLiteral(identifier);
+	public IdCon(Token token) {
+		this.node = new TokenNode(token);
 	}
 	
-	public StringLiteral getLiteral() {
-		return literal;
+	public Token getToken() {
+		return node.getToken();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof IdCon) {
 			IdCon id = (IdCon) obj;
-			return literal.toString().equals(id.getLiteral().toString());
+			return node.getToken().getLexeme().equals(id.getToken().getLexeme());
 		}
 		
 		return false;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return new StringLiteral[] { literal };
+		return new AbstractSyntaxNode[] { node };
 	}
 
 }

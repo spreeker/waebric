@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -31,7 +31,7 @@ class ModuleParser extends AbstractParser {
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public ModuleParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public ModuleParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Initialize sub-parsers
@@ -101,7 +101,7 @@ class ModuleParser extends AbstractParser {
 		
 		do {
 			next(WaebricTokenSort.IDCON, "Module identifier", "head:[azAZ] body:[azAZ09]");
-			moduleId.add(new IdCon(tokens.current().getLexeme().toString()));
+			moduleId.add(new IdCon(tokens.current()));
 			
 			// Parse potential separator
 			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {

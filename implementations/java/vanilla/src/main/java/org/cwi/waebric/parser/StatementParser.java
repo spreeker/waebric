@@ -17,8 +17,8 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -39,7 +39,7 @@ class StatementParser extends AbstractParser {
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public StatementParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public StatementParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parsers
@@ -57,7 +57,7 @@ class StatementParser extends AbstractParser {
 	 */
 	public Statement parseStatement() throws SyntaxException {
 		if(tokens.hasNext()) {
-			WaebricToken peek = tokens.peek(1); // Retrieve first token of statement
+			Token peek = tokens.peek(1); // Retrieve first token of statement
 			if(peek.getLexeme().equals(WaebricKeyword.IF)) {
 				// If(-else) statements start with an if keyword
 				return parseIfStatement();
@@ -161,7 +161,7 @@ class StatementParser extends AbstractParser {
 		// Parse "(" Var ":" Expression ")"
 		next(WaebricSymbol.LPARANTHESIS, "Each opening", "\"each\" \"(\" Var");
 		next(WaebricTokenSort.IDCON, "Variable", "var \":\" Expression");
-		statement.setVar(new IdCon(tokens.current().getLexeme().toString()));
+		statement.setVar(new IdCon(tokens.current()));
 		next(WaebricSymbol.COLON, "Each colon separator", "var \":\" Expression");
 		
 		try {
@@ -337,7 +337,7 @@ class StatementParser extends AbstractParser {
 			
 			if(tokens.hasNext()) {
 				// Determine mark-ups statement type
-				WaebricToken peek = tokens.peek(1);
+				Token peek = tokens.peek(1);
 				if(peek.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 					// Markup+ Markup ";"
 					Markup end = markups.remove(markups.size()-1);
@@ -412,7 +412,7 @@ class StatementParser extends AbstractParser {
 	 * @param token
 	 * @return Statement?
 	 */
-	public static boolean isMarkupFreeStatement(WaebricToken token) {
+	public static boolean isMarkupFreeStatement(Token token) {
 		if(token.getSort() == WaebricTokenSort.KEYWORD) {
 			return token.getLexeme().equals(WaebricKeyword.IF) 
 				|| token.getLexeme().equals(WaebricKeyword.CDATA)
@@ -447,7 +447,7 @@ class StatementParser extends AbstractParser {
 		Assignment.VarBind assignment = new Assignment.VarBind();
 		
 		next(WaebricTokenSort.IDCON, "Variable binding identifier", "IdCon \"=\"");
-		assignment.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+		assignment.setIdentifier(new IdCon(tokens.current()));
 		next(WaebricSymbol.EQUAL_SIGN, "Variable binding \"=\"", "IdCon \"=\"");
 		assignment.setExpression(expressionParser.parseExpression());
 		
@@ -464,7 +464,7 @@ class StatementParser extends AbstractParser {
 		
 		// Parse identifier
 		next(WaebricTokenSort.IDCON, "Assignment identifier", "Identifier");
-		assignment.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+		assignment.setIdentifier(new IdCon(tokens.current()));
 		
 		// Parse "(" { IdCon "," }* ")" "="
 		next(WaebricSymbol.LPARANTHESIS, "Function binding opening parenthesis", "\"(\" IdCon");
@@ -474,7 +474,7 @@ class StatementParser extends AbstractParser {
 			}
 			
 			next(WaebricTokenSort.IDCON, "Function binding identifier", "\"(\" { Identifier, \",\" }* \")\"");
-			assignment.addVariable(new IdCon(tokens.current().getLexeme().toString()));
+			assignment.addVariable(new IdCon(tokens.current()));
 			
 			// While not end of formals, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
@@ -506,7 +506,7 @@ class StatementParser extends AbstractParser {
 				}
 				
 				next(WaebricTokenSort.IDCON, "Formals identifier", "\"(\" { Identifier, \",\" }* \")\"");
-				formals.addIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+				formals.addIdentifier(new IdCon(tokens.current()));
 				
 				// While not end of formals, comma separator is expected
 				if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {

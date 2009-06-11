@@ -31,7 +31,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestStatementParser {
 	private StatementParser parser;
 	
 	private List<SyntaxException> exceptions;
-	private WaebricTokenIterator iterator;
+	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() {
@@ -63,8 +63,8 @@ public class TestStatementParser {
 		
 		Formals formals = parser.parseFormals();
 		assertEquals(2, formals.getIdentifiers().size());
-		assertEquals("var1", formals.getIdentifiers().get(0).getLiteral().toString());
-		assertEquals("var2", formals.getIdentifiers().get(1).getLiteral().toString());
+		assertEquals("var1", formals.getIdentifiers().get(0).getToken().getLexeme().toString());
+		assertEquals("var2", formals.getIdentifiers().get(1).getToken().getLexeme().toString());
 	}
 	
 	@Test
@@ -73,7 +73,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Assignment.VarBind assignment = parser.parseVarAssignment();
-		assertEquals("var", assignment.getIdentifier().getLiteral().toString());
+		assertEquals("var", assignment.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(NatExpression.class, assignment.getExpression().getClass());
 	}
 	
@@ -83,10 +83,10 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Assignment.FuncBind assignment = parser.parseIdConAssignment();
-		assertEquals("identifier1", assignment.getIdentifier().getLiteral().toString());
+		assertEquals("identifier1", assignment.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(2, assignment.getVariables().size());
-		assertEquals("var1", assignment.getVariables().get(0).getLiteral().toString());
-		assertEquals("var2", assignment.getVariables().get(1).getLiteral().toString());
+		assertEquals("var1", assignment.getVariables().get(0).getToken().getLexeme().toString());
+		assertEquals("var2", assignment.getVariables().get(1).getToken().getLexeme().toString());
 		assertEquals(Statement.Yield.class, assignment.getStatement().getClass());
 	}
 	
@@ -135,7 +135,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Each statement = parser.parseEachStatement();
-		assertEquals("var1", statement.getVar().getLiteral().toString());
+		assertEquals("var1", statement.getVar().getToken().getLexeme().toString());
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
 	}
@@ -197,7 +197,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		RegularMarkupStatement statement = (RegularMarkupStatement) parser.parseStatement();
-		assertEquals("func1", statement.getMarkup().getDesignator().getIdentifier().getLiteral().toString());
+		assertEquals("func1", statement.getMarkup().getDesignator().getIdentifier().getToken().getLexeme().toString());
 	}
 	
 	@Test

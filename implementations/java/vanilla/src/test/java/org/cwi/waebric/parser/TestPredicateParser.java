@@ -17,7 +17,7 @@ import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class TestPredicateParser {
 	private PredicateParser parser;
 	
 	private List<SyntaxException> exceptions;
-	private WaebricTokenIterator iterator;
+	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() {

@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class TestExpressionParser {
 	private ExpressionParser parser;
 	
 	private List<SyntaxException> exceptions;
-	private WaebricTokenIterator iterator;
+	private TokenIterator iterator;
 	
 	@Before
 	public void setUp() {
@@ -62,7 +62,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.VarExpression expression = parser.parseVarExpression();
-		assertEquals("variable1", expression.getVar().getLiteral().toString());
+		assertEquals("variable1", expression.getVar().getToken().getLexeme().toString());
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.Field expression = (Field) parser.parseExpression();
-		assertEquals("identifier1", expression.getIdentifier().getLiteral().toString());
+		assertEquals("identifier1", expression.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
 	}
 	

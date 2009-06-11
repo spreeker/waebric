@@ -12,11 +12,11 @@ import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 
 public class TestUtilities {
 	
-	public static WaebricTokenIterator quickScan(String data) {
+	public static TokenIterator quickScan(String data) {
 		Reader reader = new StringReader(data);
 		WaebricScanner scanner = new WaebricScanner(reader);
 		scanner.tokenizeStream();

@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.exception;
 
-import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.Token;
 
 /**
  * Missing token exceptions are thrown when the token stream ends prematurely.
@@ -21,7 +21,7 @@ public class MissingTokenException extends SyntaxException {
 	 * @param name
 	 * @param formula
 	 */
-	public MissingTokenException(WaebricToken previous, String name, String formula) {
+	public MissingTokenException(Token previous, String name, String formula) {
 		super("Missing '" + name + "' token after: " + previous.toString() + ", " +
 				"attach the expected: (" + formula + ").");
 	}

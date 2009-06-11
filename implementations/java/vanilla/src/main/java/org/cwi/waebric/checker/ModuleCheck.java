@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.cwi.waebric.ModuleCache;
+import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
@@ -21,17 +21,17 @@ class ModuleCheck implements IWaebricCheck {
 	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
 		for(Module module: tree.getRoot()) {
 			// Check and cache module definition
-			String path = ModuleCache.getPath(module.getIdentifier());
+			String path = ModuleRegister.getPath(module.getIdentifier());
 			File file = new File(path);
 			if(! file.isFile()) { // Check of expected file exists
 				exceptions.add(new NonExistingModuleException(module.getIdentifier()));
 			}
 			
-			ModuleCache.getInstance().cacheModule(module.getIdentifier(), tree);
+			ModuleRegister.getInstance().cacheModule(module.getIdentifier(), tree);
 			
 			// Apply recursion on all, not cached, transitive imported modules
 			for(Import imprt: module.getImports()) {
-				if(! ModuleCache.getInstance().hasCached(imprt.getIdentifier())) {
+				if(! ModuleRegister.getInstance().hasCached(imprt.getIdentifier())) {
 					checkModuleId(imprt.getIdentifier(), exceptions);
 				}
 			}
@@ -46,11 +46,11 @@ class ModuleCheck implements IWaebricCheck {
 	public void checkModuleId(ModuleId identifier, List<SemanticException> exceptions) {
 		try {
 			// Attempt to process file
-			AbstractSyntaxTree tree = ModuleCache.getInstance().cacheModule(identifier);
+			AbstractSyntaxTree tree = ModuleRegister.getInstance().cacheModule(identifier);
 			checkAST(tree, exceptions); // Check dependent modules
 		} catch(FileNotFoundException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
-			ModuleCache.getInstance().cacheModule(identifier, new AbstractSyntaxTree());
+			ModuleRegister.getInstance().cacheModule(identifier, new AbstractSyntaxTree());
 		}
 	}
 
@@ -69,7 +69,9 @@ class ModuleCheck implements IWaebricCheck {
 		private static final long serialVersionUID = -4503945323554024642L;
 
 		public NonExistingModuleException(ModuleId id) {
-			super(id.toString() + " is a non-existing module.");
+			super("Module identifier \"" + id.toString() 
+					+ "\" at line " + id.get(0).getToken().getLine()
+					+ ", refers to a non-existing module.");
 		}
 		
 	}

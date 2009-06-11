@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.ModuleCache;
+import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -119,7 +119,7 @@ class FunctionCheck implements IWaebricCheck {
 		// Recursively retrieve function definitions of imported modules
 		for(Import imprt : module.getImports()) {
 			try {
-				AbstractSyntaxTree ast = ModuleCache.getInstance().cacheModule(imprt.getIdentifier());
+				AbstractSyntaxTree ast = ModuleRegister.getInstance().cacheModule(imprt.getIdentifier());
 				for(Module sub : ast.getRoot()) {
 					collected.add(sub.getIdentifier());
 					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
@@ -171,7 +171,9 @@ class FunctionCheck implements IWaebricCheck {
 		private static final long serialVersionUID = -954167103131401047L;
 
 		public ArityMismatchException(Markup.Call call) {
-			super(call.toString() + " is an arity mismatch");
+			super("Call \"" + call.getDesignator().getIdentifier().getToken().getLexeme().toString()
+					+ "\" at line " + call.getDesignator().getIdentifier().getToken().getLine()
+					+ ", is an arity mismatch.");
 		}
 		
 	}
@@ -190,7 +192,9 @@ class FunctionCheck implements IWaebricCheck {
 		private static final long serialVersionUID = -8833578229100261366L;
 
 		public DuplicateFunctionDefinition(FunctionDef def) {
-			super(def.toString() + " is a duplicate function definition");
+			super("Function \"" + def.getIdentifier().getToken().getLexeme().toString()
+					+ "\" at line " + def.getIdentifier().getToken().getLine()
+					+ " has a duplicate definition.");
 		}
 		
 	}
@@ -213,7 +217,9 @@ class FunctionCheck implements IWaebricCheck {
 		private static final long serialVersionUID = -4467095005921534334L;
 
 		public UndefinedFunctionException(Markup.Call call) {
-			super(call.toString() + " is an undefined function.");
+			super("Call \"" + call.getDesignator().getIdentifier().getToken().getLexeme().toString()
+					+ "\" at line " + call.getDesignator().getIdentifier().getToken().getLine()
+					+ ", is made to an undefined function.");
 		}
 		
 	}

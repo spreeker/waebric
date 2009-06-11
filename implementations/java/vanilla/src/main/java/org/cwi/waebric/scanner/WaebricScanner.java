@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -20,14 +20,14 @@ import org.cwi.waebric.scanner.token.WaebricTokenSort;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class WaebricScanner implements Iterable<WaebricToken> {
+public class WaebricScanner implements Iterable<Token> {
 
 	private final StreamTokenizer tokenizer;
 	
 	/**
 	 * Currently processed tokens
 	 */
-	private List<WaebricToken> tokens;
+	private List<Token> tokens;
 	
 	/**
 	 * Currently occurred exceptions, stored instead of thrown to detect multiple 
@@ -52,7 +52,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 			throw new InternalError(); // Should never occur
 		}
 		
-		tokens = new ArrayList<WaebricToken>();
+		tokens = new ArrayList<Token>();
 		exceptions = new ArrayList<LexicalException>();
 	}
 
@@ -127,10 +127,10 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		
 		if(isKeyword(word)) {
 			WaebricKeyword type = WaebricKeyword.valueOf(word.toUpperCase());
-			WaebricToken keyword = new WaebricToken(type, WaebricTokenSort.KEYWORD, lineno, charno);
+			Token keyword = new Token(type, WaebricTokenSort.KEYWORD, lineno, charno);
 			tokens.add(keyword);
 		} else {
-			WaebricToken identifier = new WaebricToken(word, WaebricTokenSort.IDCON, lineno, charno);
+			Token identifier = new Token(word, WaebricTokenSort.IDCON, lineno, charno);
 			tokens.add(identifier);
 		}
 	}
@@ -141,7 +141,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @throws IOException
 	 */
 	private void tokenizeNumber() {
-		WaebricToken number = new WaebricToken(
+		Token number = new Token(
 				tokenizer.getIntegerValue(), WaebricTokenSort.NATCON, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
 			); // Construct number token
@@ -156,7 +156,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @throws IOException
 	 */
 	private void tokenizeCharacter() {
-		WaebricToken character = new WaebricToken(
+		Token character = new Token(
 				tokenizer.getCharacterValue(), WaebricTokenSort.CHARACTER, 
 				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
 			); // Construct token
@@ -183,10 +183,10 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 				// End of file found before closing ", store as separate tokens
 				WaebricScanner scanner = new WaebricScanner(new StringReader(data));
 				scanner.tokenizeStream();
-				tokens.add(new WaebricToken(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
+				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
 				
 				// Attach quote start position to sub-token
-				for(WaebricToken token: scanner.getTokens()) {
+				for(Token token: scanner.getTokens()) {
 					token.setLine(lineno + token.getLine() - 1);
 					token.setCharacter(charno + token.getCharacter());
 					tokens.add(token);
@@ -200,7 +200,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 		}
 
 		next(); // Skip " closure character
-		WaebricToken quote = new WaebricToken(data, WaebricTokenSort.QUOTE, lineno, charno);
+		Token quote = new Token(data, WaebricTokenSort.QUOTE, lineno, charno);
 		tokens.add(quote);
 	}
 	
@@ -222,7 +222,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 			next(); // Retrieve next char
 		}
 		
-		WaebricToken symbol = new WaebricToken(data, WaebricTokenSort.SYMBOLCON, lineno, charno);
+		Token symbol = new Token(data, WaebricTokenSort.SYMBOLCON, lineno, charno);
 		tokens.add(symbol);
 	}
 
@@ -232,7 +232,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * @param index Token index in structured text
 	 * @return token
 	 */
-	public WaebricToken getToken(int index) {
+	public Token getToken(int index) {
 		return tokens.get(index);
 	}
 	
@@ -250,7 +250,7 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * 
 	 * @return
 	 */
-	public List<WaebricToken> getTokens() {
+	public List<Token> getTokens() {
 		return tokens;
 	}
 	
@@ -259,8 +259,8 @@ public class WaebricScanner implements Iterable<WaebricToken> {
 	 * 
 	 * @return iterator
 	 */
-	public WaebricTokenIterator iterator() {
-		return new WaebricTokenIterator(tokens);
+	public TokenIterator iterator() {
+		return new TokenIterator(tokens);
 	}
 	
 	/**

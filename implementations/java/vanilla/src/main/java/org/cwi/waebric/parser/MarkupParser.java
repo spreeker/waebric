@@ -12,8 +12,8 @@ import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -26,7 +26,7 @@ class MarkupParser extends AbstractParser {
 
 	private final ExpressionParser expressionParser;
 	
-	public MarkupParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public MarkupParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Construct sub parsers
@@ -64,7 +64,7 @@ class MarkupParser extends AbstractParser {
 		
 		// Parse identifier
 		next(WaebricTokenSort.IDCON, "designator identifier", "identifier");
-		designator.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+		designator.setIdentifier(new IdCon(tokens.current()));
 		
 		// Parse attributes
 		designator.setAttributes(parseAttributes());
@@ -93,7 +93,7 @@ class MarkupParser extends AbstractParser {
 		return attributes;
 	}
 	
-	public static boolean isAttribute(WaebricToken token) {
+	public static boolean isAttribute(Token token) {
 		if(token.getSort() != WaebricTokenSort.CHARACTER) { return false; }
 		char symbol = token.getLexeme().toString().charAt(0);
 		return symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':' || symbol == '@';
@@ -110,7 +110,7 @@ class MarkupParser extends AbstractParser {
 		if(symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':') { // Identifier attribute
 			next(WaebricTokenSort.IDCON, "Identifier attribute", "{ # , $ : } Identifier");
 			Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(symbol);
-			attribute.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+			attribute.setIdentifier(new IdCon(tokens.current()));
 			return attribute;
 		} else if(symbol == '@') { // Natural attribute
 			next(WaebricTokenSort.NATCON, "Natural attribute", "@ Number");
@@ -174,7 +174,7 @@ class MarkupParser extends AbstractParser {
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.EQUAL_SIGN)) {
 			// Argument with variable recognised (=)
 			next(WaebricTokenSort.IDCON, "Attr identifier", "IdCon \"=\" Expression");
-			argument = new Argument.Attr(new IdCon(tokens.current().getLexeme().toString()));
+			argument = new Argument.Attr(new IdCon(tokens.current()));
 			tokens.next(); // Skip equals sign
 		} else {
 			// Regular expression-based argument

@@ -11,9 +11,9 @@ import java.util.List;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
+public class TokenIterator implements Iterator<Token>, Cloneable {
 
-	private List<WaebricToken> collection;
+	private List<Token> collection;
 	private int curr;
 	
 	/**
@@ -22,7 +22,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * 
 	 * @param collection
 	 */
-	public WaebricTokenIterator(List<WaebricToken> collection) {
+	public TokenIterator(List<Token> collection) {
 		this(collection, -1);
 	}
 	
@@ -32,14 +32,14 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * @param collection
 	 * @param curr
 	 */
-	public WaebricTokenIterator(List<WaebricToken> collection, int curr) {
+	public TokenIterator(List<Token> collection, int curr) {
 		this.collection = collection;
 		this.curr = curr;
 	}
 	
 	@Override
-	public WaebricTokenIterator clone() {
-		return new WaebricTokenIterator(new ArrayList<WaebricToken>(collection), curr);
+	public TokenIterator clone() {
+		return new TokenIterator(new ArrayList<Token>(collection), curr);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * 
 	 * @return Token at current+1
 	 */
-	public WaebricToken next() {
+	public Token next() {
 		curr++; // Increment current position
 		return collection.get(curr);
 	}
@@ -77,7 +77,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * @param k Lookahead
 	 * @return Token at current+k
 	 */
-	public WaebricToken peek(int k) {
+	public Token peek(int k) {
 		if(! hasNext(k)) { return null; }
 		return collection.get(curr+k);
 	}
@@ -87,7 +87,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * 
 	 * @return Current token
 	 */
-	public WaebricToken current() {
+	public Token current() {
 		if(curr == -1) { return null; }
 		return collection.get(curr);
 	}
@@ -105,7 +105,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * 
 	 * @param token Token
 	 */
-	public void add(WaebricToken token) {
+	public void add(Token token) {
 		collection.add(curr+1, token);
 	}
 	
@@ -114,7 +114,7 @@ public class WaebricTokenIterator implements Iterator<WaebricToken>, Cloneable {
 	 * 
 	 * @param tokens Collection of tokens
 	 */
-	public void addAll(List<? extends WaebricToken> tokens) {
+	public void addAll(List<? extends Token> tokens) {
 		collection.addAll(curr+1, tokens);
 	}
 	

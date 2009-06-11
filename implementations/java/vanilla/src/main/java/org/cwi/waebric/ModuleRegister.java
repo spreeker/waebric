@@ -17,12 +17,12 @@ import org.cwi.waebric.scanner.WaebricScanner;
  * @author Jeroen van Schagen
  * @date 10-06-2009
  */
-public class ModuleCache {
+public class ModuleRegister {
 	
 	/**
 	 * Instance
 	 */
-	private static ModuleCache instance;
+	private static ModuleRegister instance;
 
 	/**
 	 * Cached modules
@@ -32,7 +32,7 @@ public class ModuleCache {
 	/**
 	 * Construct cache.
 	 */
-	private ModuleCache() {
+	private ModuleRegister() {
 		cache = new HashMap<ModuleId, AbstractSyntaxTree>();
 	}
 	
@@ -95,7 +95,7 @@ public class ModuleCache {
 		for(Module module: ast.getRoot()) {
 			for(Import dependancy: module.getImports()) {
 				try {
-					AbstractSyntaxTree sub = ModuleCache.getInstance().cacheModule(dependancy.getIdentifier());
+					AbstractSyntaxTree sub = ModuleRegister.getInstance().cacheModule(dependancy.getIdentifier());
 					ast.getRoot().addAll(sub.getRoot()); // Attach dependent AST to specified AST
 				} catch (FileNotFoundException e) {
 					// Skip invalid import directives
@@ -120,7 +120,7 @@ public class ModuleCache {
 		String path = "";
 		for(int i = 0; i < identifier.size(); i++) {
 			if(i > 0) { path += "/"; }
-			path += identifier.get(i).getLiteral().toString();
+			path += identifier.get(i).getToken().getLexeme().toString();
 		}
 		path += ".wae";
 		return path;
@@ -131,8 +131,8 @@ public class ModuleCache {
 	 * @see <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton pattern</a>
 	 * @return Default instance
 	 */
-	public static ModuleCache getInstance() {
-		if(instance == null) { instance = new ModuleCache(); }
+	public static ModuleRegister getInstance() {
+		if(instance == null) { instance = new ModuleRegister(); }
 		return instance;
 	}
 	
@@ -140,8 +140,8 @@ public class ModuleCache {
 	 * Retrieve new instance of module cache.
 	 * @return New instance
 	 */
-	public static ModuleCache newInstance() {
-		return new ModuleCache();
+	public static ModuleRegister newInstance() {
+		return new ModuleRegister();
 	}
 
 }

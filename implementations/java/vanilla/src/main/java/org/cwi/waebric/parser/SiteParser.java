@@ -14,8 +14,8 @@ import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.PathElement;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -34,7 +34,7 @@ class SiteParser extends AbstractParser {
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public SiteParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public SiteParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
 		// Initialize sub-parser
@@ -137,7 +137,7 @@ class SiteParser extends AbstractParser {
 				break; // File name detected, break from directory parsing
 			}
 
-			WaebricToken element = tokens.next(); // Retrieve next path element
+			Token element = tokens.next(); // Retrieve next path element
 			if(isPathElement(element.getLexeme().toString())) {
 				directory.add(new PathElement(element.getLexeme().toString()));
 			} else {

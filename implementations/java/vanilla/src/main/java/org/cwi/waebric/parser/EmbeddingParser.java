@@ -15,8 +15,8 @@ import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -32,7 +32,7 @@ class EmbeddingParser extends AbstractParser {
 	private final MarkupParser markupParser;
 	private final ExpressionParser expressionParser;
 
-	public EmbeddingParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public EmbeddingParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 
 		// Initiate sub-parsers
@@ -46,7 +46,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Embedding parseEmbedding() throws SyntaxException {
-		WaebricToken peek = tokens.peek(1);
+		Token peek = tokens.peek(1);
 		if(peek.getSort() == WaebricTokenSort.QUOTE) {
 			// Decompose stream when first token is quote
 			tokenizeEmbedding();
@@ -220,18 +220,18 @@ class EmbeddingParser extends AbstractParser {
 		scanner.tokenizeStream();
 		
 		// Retrieve token stream
-		List<WaebricToken> elements = scanner.getTokens();
+		List<Token> elements = scanner.getTokens();
 		
 		// Attach " symbols to stream
-		elements.add(0, new WaebricToken(
+		elements.add(0, new Token(
 				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
 				tokens.current().getLine(), tokens.current().getCharacter()));
-		elements.add(new WaebricToken(
+		elements.add(new Token(
 				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
 				tokens.current().getLine(), tokens.current().getCharacter()));
 		
 		// Change token location to absolute instead of relative
-		for(WaebricToken token : elements) {
+		for(Token token : elements) {
 			token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
 			token.setLine(token.getLine() + tokens.current().getLine());
 		}
@@ -269,7 +269,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @param token Token
 	 * @return Embedding?
 	 */
-	public static boolean isEmbedding(WaebricToken token) {
+	public static boolean isEmbedding(Token token) {
 		return token.getSort() == WaebricTokenSort.QUOTE 
 			&& token.getLexeme().toString().matches("\\w*<\\w*>\\w*");
 	}

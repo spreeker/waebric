@@ -12,8 +12,8 @@ import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -29,7 +29,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public ExpressionParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public ExpressionParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 	}
 	
@@ -70,7 +70,7 @@ class ExpressionParser extends AbstractParser {
 				field.setExpression(expression);
 				next(WaebricSymbol.PERIOD, "Period separator", "Expression \".\" IdCon -> Expression");
 				next(WaebricTokenSort.IDCON, "Identifier", "Expression \".\" IdCon -> Expression");
-				field.setIdentifier(new IdCon(tokens.current().getLexeme().toString()));
+				field.setIdentifier(new IdCon(tokens.current()));
 				return field; // Return field
 			} else if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PLUS)) {
 				// Parse cat expression
@@ -94,7 +94,7 @@ class ExpressionParser extends AbstractParser {
 	 * @param token
 	 * @return
 	 */
-	public static boolean isExpression(WaebricToken token) {
+	public static boolean isExpression(Token token) {
 		if(token == null || token.getLexeme().equals("")) { return false; }
 		
 		if(token.getSort() == WaebricTokenSort.CHARACTER) {
@@ -116,7 +116,7 @@ class ExpressionParser extends AbstractParser {
 		
 		try {
 			next(WaebricTokenSort.IDCON, "Variable", "Var -> Expression");
-			expression.setVar(new IdCon(tokens.current().getLexeme().toString()));
+			expression.setVar(new IdCon(tokens.current()));
 		} catch(SyntaxException e) {
 			reportUnexpectedToken(tokens.current(), 
 					"Var expression", "Var -> Expression");
@@ -237,7 +237,7 @@ class ExpressionParser extends AbstractParser {
 		
 		// Parse identifier
 		next(WaebricTokenSort.IDCON, "Identifier", "IdCon \":\" Expression -> KeyValuePair");
-		IdCon identifier = new IdCon(tokens.current().getLexeme().toString());
+		IdCon identifier = new IdCon(tokens.current());
 		pair.setIdentifier(identifier);
 		
 		next(WaebricSymbol.COLON, "Colon separator", "IdCon \":\" Expression -> KeyValuePair");

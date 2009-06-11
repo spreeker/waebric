@@ -2,8 +2,8 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
-import org.cwi.waebric.scanner.token.WaebricToken;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 import org.cwi.waebric.parser.exception.MissingTokenException;
 import org.cwi.waebric.parser.exception.SyntaxException;
@@ -26,14 +26,14 @@ public abstract class AbstractParser {
 	/**
 	 * Token stream
 	 */
-	protected final WaebricTokenIterator tokens;
+	protected final TokenIterator tokens;
 	
 	/**
 	 * Construct abstract parser.
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public AbstractParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public AbstractParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		this.exceptions = exceptions;
 		this.tokens = tokens;
 	}
@@ -74,7 +74,7 @@ public abstract class AbstractParser {
 	 * @param syntax Syntax of expected token, used for error reporting
 	 * @throws UnexpectedTokenException Unexpected token is found
 	 */
-	protected void expect(WaebricToken token, Object lexeme, 
+	protected void expect(Token token, Object lexeme, 
 			String name, String syntax) throws UnexpectedTokenException {
 		if(! token.getLexeme().equals(lexeme)) {
 			reportUnexpectedToken(token, name, syntax);
@@ -89,7 +89,7 @@ public abstract class AbstractParser {
 	 * @param syntax Syntax of expected token, used for error reporting
 	 * @throws UnexpectedTokenException Unexpected token is found
 	 */
-	protected void expect(WaebricToken token, WaebricTokenSort sort, String name, String syntax) 
+	protected void expect(Token token, WaebricTokenSort sort, String name, String syntax) 
 			throws UnexpectedTokenException {
 		if(token.getSort() != sort) {
 			reportUnexpectedToken(token, name, syntax);
@@ -143,7 +143,7 @@ public abstract class AbstractParser {
 	 * @param syntax
 	 * @throws MissingTokenException
 	 */
-	protected void reportMissingToken(WaebricToken previous, String name, String syntax)
+	protected void reportMissingToken(Token previous, String name, String syntax)
 			throws MissingTokenException {
 		MissingTokenException e;
 		if(previous == null) {
@@ -163,7 +163,7 @@ public abstract class AbstractParser {
 	 * @param syntax
 	 * @throws UnexpectedTokenException
 	 */
-	protected void reportUnexpectedToken(WaebricToken token, String name, String syntax) 
+	protected void reportUnexpectedToken(Token token, String name, String syntax) 
 			throws UnexpectedTokenException {
 		UnexpectedTokenException e = new UnexpectedTokenException(token, name, syntax);
 		exceptions.add(e); // Store exception

@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.exception;
 
-import org.cwi.waebric.scanner.token.WaebricToken;
+import org.cwi.waebric.scanner.token.Token;
 
 /**
  * Unexpected token exceptions are thrown when a coming
@@ -16,7 +16,7 @@ public class UnexpectedTokenException extends SyntaxException {
 	 */
 	private static final long serialVersionUID = -3943077437342399851L;
 
-	public UnexpectedTokenException(WaebricToken actual, String expected, String syntax) {
+	public UnexpectedTokenException(Token actual, String expected, String syntax) {
 		super("Unexpected token found: " + actual.toString() + ". Was expecting a " + expected +
 				", follow the specified syntax (" + syntax + ")."); 
 	}

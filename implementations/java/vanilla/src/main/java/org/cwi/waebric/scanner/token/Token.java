@@ -1,5 +1,6 @@
 package org.cwi.waebric.scanner.token;
 
+
 /**
  * A token is a categorized block of text. This block of text, corresponding to the 
  * token is known as a lexeme.
@@ -9,7 +10,7 @@ package org.cwi.waebric.scanner.token;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class WaebricToken {
+public class Token {
 
 	private Object lexeme;
 	private WaebricTokenSort sort;
@@ -23,7 +24,7 @@ public class WaebricToken {
 	 * @param sort Token type
 	 * @param line Line number
 	 */
-	public WaebricToken(Object lexeme, WaebricTokenSort sort, int line, int character) {
+	public Token(Object lexeme, WaebricTokenSort sort, int line, int character) {
 		this.lexeme = lexeme;
 		this.sort = sort;
 		this.line = line;
@@ -80,8 +81,8 @@ public class WaebricToken {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof WaebricToken) {
-			WaebricToken token = (WaebricToken) obj;
+		if(obj instanceof Token) {
+			Token token = (Token) obj;
 			if(token.getSort() != this.sort) { return false; }
 			if(token.getLine() != this.line) { return false; }
 			if(token.getCharacter() != this.character) { return false; }

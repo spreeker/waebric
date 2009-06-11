@@ -9,7 +9,7 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
@@ -27,7 +27,7 @@ class PredicateParser extends AbstractParser {
 	 * @param tokens
 	 * @param exceptions
 	 */
-	public PredicateParser(WaebricTokenIterator tokens, List<SyntaxException> exceptions) {
+	public PredicateParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 
 		// Construct sub parser

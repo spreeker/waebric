@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.WaebricTokenIterator;
+import org.cwi.waebric.scanner.token.TokenIterator;
 
 /**
  * Parser attempts to reconstruct the derivation of a Waebric program,
@@ -37,7 +37,7 @@ public class WaebricParser extends AbstractParser {
 	 * Construct parser based on iterator.
 	 * @param iterator
 	 */
-	public WaebricParser(WaebricTokenIterator iterator) {
+	public WaebricParser(TokenIterator iterator) {
 		super(iterator, new ArrayList<SyntaxException>());
 	}
 	
