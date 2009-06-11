@@ -35,6 +35,12 @@ public interface INodeVisitor {
 	public void visit(Statement.Let statement, Object[] args);
 	public void visit(Statement.Yield statement, Object[] args);
 	
+	public void visit(Statement.RegularMarkupStatement statement, Object[] args);
+	public void visit(Statement.MarkupMarkup statement, Object[] args);
+	public void visit(Statement.MarkupExp statement, Object[] args);
+	public void visit(Statement.MarkupStat statement, Object[] args);
+	public void visit(Statement.MarkupEmbedding statement, Object[] args);
+	
 	public void visit(Assignment.FuncBind bind, Object[] args);
 	public void visit(Assignment.VarBind bind, Object[] args);
 	

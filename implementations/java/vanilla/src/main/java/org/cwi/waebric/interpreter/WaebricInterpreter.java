@@ -41,7 +41,7 @@ public class WaebricInterpreter {
 				try {
 					// Construct document
 					Document document = interpretModule(module, ast);
-					
+
 					File file = new File(getOutputPath(module.getIdentifier()));
 					file.createNewFile(); // Create file
 					OutputStream os = new FileOutputStream(file);

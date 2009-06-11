@@ -14,6 +14,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.RecordExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.SymbolExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
 import org.cwi.waebric.parser.ast.module.function.Formals;
@@ -22,10 +23,16 @@ import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
 import org.cwi.waebric.parser.ast.statement.Assignment.VarBind;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupMarkup;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
+import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Convert AST to JDOM format.
@@ -39,6 +46,12 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Document reference
 	 */
 	private final Document document;
+	
+	/**
+	 * XHTML name space
+	 */
+	private final Namespace XHTML = Namespace.
+		getNamespace("xhtml", "http://www.w3.org/1999/xhtml");
 	
 	/**
 	 * Construct JDOMVisitor based on document
@@ -142,6 +155,39 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void visit(RegularMarkupStatement statement, Object[] args) {
+		statement.getMarkup().accept(this, args);
+	}
+
+	@Override
+	public void visit(MarkupMarkup statement, Object[] args) {
+		for(Markup markup: statement.getMarkups()) {
+			markup.accept(this, args);
+		}
+	}
+
+	@Override
+	public void visit(MarkupExp statement, Object[] args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(MarkupStat statement, Object[] args) {
+		for(Markup markup: statement.getMarkups()) {
+			markup.accept(this, args);
+		}
+		
+		statement.getStatement().accept(this, args);
+	}
+
+	@Override
+	public void visit(MarkupEmbedding statement, Object[] args) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public void visit(FuncBind bind, Object[] args) {
@@ -164,7 +210,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	@Override
 	public void visit(Tag markup, Object[] args) {
-		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
+		Element tag = new Element(markup.getDesignator().getIdentifier().getName(), XHTML);
 		if(args[1] == null) {
 			document.setRootElement(tag);
 			args[1] = tag;
