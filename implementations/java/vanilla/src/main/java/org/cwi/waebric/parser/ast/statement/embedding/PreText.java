@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.statement.embedding;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -29,6 +30,11 @@ public class PreText extends AbstractSyntaxNode {
 			text,
 			new CharacterLiteral(WaebricSymbol.LESS_THAN)
 		};
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 	
 }

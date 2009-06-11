@@ -14,7 +14,6 @@ import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.jdom.Comment;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -33,14 +32,14 @@ public class WaebricInterpreter {
 	 * Interpret AST and generate HTML file.
 	 * @param tree
 	 */
-	public void interpretProgram(AbstractSyntaxTree tree) {
-		ModuleRegister.getInstance().loadDependancies(tree); // Retrieve all dependent modules
+	public void interpretProgram(AbstractSyntaxTree ast) {
+		ModuleRegister.getInstance().loadDependancies(ast); // Retrieve all dependent modules
 		
-		for(Module module: tree.getRoot()) {
+		for(Module module: ast.getRoot()) {
 			if(hasMain(module)) {
 				try {
 					// Construct document
-					Document document = interpretModule(module);
+					Document document = interpretModule(module, ast);
 					
 					File file = new File(getOutputPath(module.getIdentifier()));
 					file.createNewFile(); // Create file
@@ -50,22 +49,22 @@ public class WaebricInterpreter {
 					XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
 					out.output(document, os);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
 	}
 	
-	private Document interpretModule(Module module) {
+	private Document interpretModule(Module module, AbstractSyntaxTree ast) {
 		Document document = new Document();
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Comment comment = new Comment("Compiled on: " + format.format(new Date()));
 		document.addContent(comment);
-		
-		document.setRootElement(new Element("html"));
-		
+	
+		FunctionDef main = module.getFunctionDefinition("main");
+		main.accept(new JDOMVisitor(document), new Object[]{});
+
 		return document;
 	}
 	
@@ -75,13 +74,7 @@ public class WaebricInterpreter {
 	 * @return
 	 */
 	public static boolean hasMain(Module module) {
-		for(FunctionDef def: module.getFunctionDefinitions()) {
-			if(def.getIdentifier().getToken().getLexeme().equals("main")) {
-				return true;
-			}
-		}
-		
-		return false;
+		return module.getFunctionDefinition("main") != null;
 	}
 	
 	/**

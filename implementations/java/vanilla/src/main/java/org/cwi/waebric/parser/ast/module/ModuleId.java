@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -14,6 +15,11 @@ public class ModuleId extends AbstractSeparatedSyntaxNodeList<IdCon> {
 
 	public ModuleId() {
 		super(WaebricSymbol.PERIOD);
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 	
 }

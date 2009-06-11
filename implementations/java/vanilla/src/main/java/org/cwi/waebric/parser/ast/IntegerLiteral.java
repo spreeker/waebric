@@ -34,5 +34,10 @@ public class IntegerLiteral extends AbstractSyntaxNode {
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] { /* Leaf node */ };
 	}
+
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
+	}
 	
 }

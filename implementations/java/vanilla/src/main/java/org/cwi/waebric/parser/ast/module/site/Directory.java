@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 
 /**
@@ -16,6 +17,11 @@ public class Directory extends AbstractSeparatedSyntaxNodeList<PathElement> {
 	 */
 	public Directory() {
 		super(WaebricSymbol.SLASH);
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

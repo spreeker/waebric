@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.module.site;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
  * File path
@@ -46,6 +47,11 @@ public abstract class Path extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -56,6 +62,11 @@ public abstract class Path extends AbstractSyntaxNode {
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { fileName };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

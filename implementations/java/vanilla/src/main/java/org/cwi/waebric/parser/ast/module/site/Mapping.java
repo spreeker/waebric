@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.module.site;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
 /**
@@ -39,6 +40,11 @@ public class Mapping extends AbstractSyntaxNode {
 			new CharacterLiteral(WaebricSymbol.COLON), 
 			markup
 		};
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

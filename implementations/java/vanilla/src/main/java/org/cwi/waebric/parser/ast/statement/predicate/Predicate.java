@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.statement.predicate;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expression.Expression;
 
@@ -36,6 +37,11 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] { expression };
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -65,6 +71,11 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -89,6 +100,11 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] {
 				new CharacterLiteral('!'), predicate
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -126,6 +142,11 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -159,6 +180,11 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] {
 				left, new StringLiteral("||"), right
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
  * Directory -> DirName
@@ -32,6 +33,11 @@ public class DirName extends AbstractSyntaxNode {
 	@Override
 	public boolean equals(Object obj) {
 		return directory.equals(obj);
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

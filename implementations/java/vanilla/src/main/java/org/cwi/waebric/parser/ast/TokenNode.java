@@ -22,7 +22,12 @@ public class TokenNode extends AbstractSyntaxNode {
 	
 	@Override
 	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[]{};
+		return new AbstractSyntaxNode[] { };
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

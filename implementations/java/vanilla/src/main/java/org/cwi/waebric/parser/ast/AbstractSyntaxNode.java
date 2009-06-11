@@ -15,6 +15,13 @@ public abstract class AbstractSyntaxNode {
 	 */
 	public abstract AbstractSyntaxNode[] getChildren();
 	
+	/**
+	 * Allow visitor to execute actions on your node.
+	 * @param visitor
+	 * @param arg
+	 */
+	public abstract void accept(INodeVisitor visitor, Object[] args);
+	
 	@Override
 	public String toString() {
 		String name = this.getClass().getSimpleName() + "(";

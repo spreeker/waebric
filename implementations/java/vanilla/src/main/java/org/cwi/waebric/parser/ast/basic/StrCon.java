@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.basic;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -43,6 +44,11 @@ public class StrCon extends AbstractSyntaxNode {
 	@Override
 	public boolean equals(Object obj) {
 		return literal.equals(obj);
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

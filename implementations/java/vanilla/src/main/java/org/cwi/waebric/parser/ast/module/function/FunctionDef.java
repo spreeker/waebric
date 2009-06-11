@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.module.ModuleElement;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
@@ -15,7 +15,7 @@ import org.cwi.waebric.parser.ast.statement.Statement;
  * @author schagen
  *
  */
-public class FunctionDef extends ModuleElement {
+public class FunctionDef extends AbstractSyntaxNode {
 	
 	// Keyword literals
 	private static final String DEF_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.DEF);
@@ -61,6 +61,11 @@ public class FunctionDef extends ModuleElement {
 			statements,
 			new StringLiteral(END_LITERAL)
 		};
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

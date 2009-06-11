@@ -28,4 +28,9 @@ public class CharacterLiteral extends AbstractSyntaxNode {
 		return new AbstractSyntaxNode[] { /* Leaf node */ };
 	}
 	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
+	}
+	
 }

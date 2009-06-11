@@ -2,6 +2,7 @@ package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
@@ -62,6 +63,11 @@ public abstract class Attribute extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] { symbol, identifier };
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -93,6 +99,11 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { symbol, number };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -133,6 +144,11 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { symbol, number, secondSymbol, secondNumber };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

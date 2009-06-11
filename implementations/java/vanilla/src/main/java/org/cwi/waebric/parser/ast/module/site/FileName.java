@@ -2,6 +2,7 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 
 /**
@@ -37,6 +38,11 @@ public class FileName extends AbstractSyntaxNode {
 			new StringLiteral("" + WaebricSymbol.PERIOD),
 			ext
 		};
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

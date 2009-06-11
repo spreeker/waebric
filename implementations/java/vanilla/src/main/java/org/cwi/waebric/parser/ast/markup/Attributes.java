@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.markup;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
  * Collection of attributes
@@ -10,4 +11,9 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
  */
 public class Attributes extends AbstractSyntaxNodeList<Attribute> {
 
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
+	}
+	
 }

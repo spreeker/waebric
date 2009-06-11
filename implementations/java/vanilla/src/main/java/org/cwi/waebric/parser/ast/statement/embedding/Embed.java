@@ -2,6 +2,7 @@ package org.cwi.waebric.parser.ast.statement.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
@@ -50,6 +51,11 @@ public abstract class Embed extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] { markups, expression };
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -73,6 +79,11 @@ public abstract class Embed extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { markups, markup };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

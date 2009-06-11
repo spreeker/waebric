@@ -2,8 +2,8 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.module.ModuleElement;
 
 /**
  * "site" Mappings "end" -> Site
@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.module.ModuleElement;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Site extends ModuleElement {
+public class Site extends AbstractSyntaxNode {
 
 	private Mappings mappings;
 
@@ -29,6 +29,11 @@ public class Site extends ModuleElement {
 			mappings,
 			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.END))
 		};
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
@@ -72,6 +73,16 @@ public class Module extends AbstractSyntaxNode {
 		return defs.clone();
 	}
 	
+	public FunctionDef getFunctionDefinition(String designator) {
+		for(FunctionDef def: defs) {
+			if(def.getIdentifier().getToken().getLexeme().equals(designator)) {
+				return def;
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {
@@ -91,6 +102,11 @@ public class Module extends AbstractSyntaxNode {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

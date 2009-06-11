@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.statement.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
  * Text tail
@@ -27,6 +28,11 @@ public abstract class TextTail extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { post };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -66,6 +72,11 @@ public abstract class TextTail extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { mid, embed, tail };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

@@ -192,26 +192,9 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		return name + "]";
 	}
 	
-	/**
-	 * Construct a combined list of this and e.
-	 * @param element Element
-	 * @return Union
-	 */
-	public AbstractSyntaxNodeList<E> union(E element) {
-		AbstractSyntaxNodeList<E> clone = this.clone();
-		clone.add(element);
-		return clone;
-	}
-	
-	/**
-	 * Construct a combined list of this and c.
-	 * @param c Collection
-	 * @return Union
-	 */
-	public AbstractSyntaxNodeList<E> union(Collection<? extends E> c) {
-		AbstractSyntaxNodeList<E> clone = this.clone();
-		clone.addAll(c);
-		return clone;
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 	
 	/**
@@ -265,11 +248,8 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 			AbstractSyntaxNode[] children = new AbstractSyntaxNode[length];
 			
 			for(int i = 0; i < children.length; i++) {
-				if(i % 2 == 0) {
-					children[i] = elements[i/2]; // Even index are reserved to elements
-				} else {
-					children[i] = new CharacterLiteral(separator); // Uneven index are for separators
-				}
+				if(i % 2 == 0) { children[i] = elements[i/2]; }
+				else { children[i] = new CharacterLiteral(separator); }
 			}
 
 			return children;

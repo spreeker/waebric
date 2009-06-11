@@ -7,6 +7,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -54,6 +55,11 @@ public abstract class Formals extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS)
 			};
 		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
 
 	}
 	
@@ -71,6 +77,11 @@ public abstract class Formals extends AbstractSyntaxNode {
 		@Override
 		public List<IdCon> getIdentifiers() {
 			return new AbstractSyntaxNodeList<IdCon>();
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}

@@ -6,6 +6,7 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -23,6 +24,31 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
  */
 public abstract class Statement extends AbstractSyntaxNode {
 
+	/**
+	 * Markup statements are an abstraction for all statements
+	 * that start with Markup+
+	 * 
+	 * @author Jeroen van Schagen
+	 * @date 05-06-2009
+	 */
+	public abstract static class AbstractMarkupStatement extends Statement {
+		
+		protected AbstractSyntaxNodeList<Markup> markups;
+		
+		public AbstractMarkupStatement(AbstractSyntaxNodeList<Markup> markups) {
+			this.markups = markups;
+		}
+		
+		public Markup getMarkup(int index) {
+			return markups.get(index);
+		}
+		
+		public int getMarkupCount() {
+			return markups.size();
+		}
+		
+	}
+	
 	/**
 	 * "if" "(" Predicate ")" Statement NoElseMayFollow -> Statement
 	 */
@@ -57,6 +83,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -84,6 +115,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
 				elseStatement
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -133,6 +169,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -174,6 +215,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -207,6 +253,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -230,6 +281,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 				comment,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -257,6 +313,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -280,6 +341,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 				embedding,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -307,6 +373,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -319,6 +390,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.YIELD)),
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -345,29 +421,9 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
-	}
-	
-	/**
-	 * Markup statements are an abstraction for all statements
-	 * that start with Markup+
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 05-06-2009
-	 */
-	public abstract static class AbstractMarkupStatement extends Statement {
-		
-		protected AbstractSyntaxNodeList<Markup> markups;
-		
-		public AbstractMarkupStatement(AbstractSyntaxNodeList<Markup> markups) {
-			this.markups = markups;
-		}
-		
-		public Markup getMarkup(int index) {
-			return markups.get(index);
-		}
-		
-		public int getMarkupCount() {
-			return markups.size();
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -399,6 +455,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -426,6 +487,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 				statement,
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -457,6 +523,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -485,6 +556,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.SEMICOLON)
 			};
 		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 
 }

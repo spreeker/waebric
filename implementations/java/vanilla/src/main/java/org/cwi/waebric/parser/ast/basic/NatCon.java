@@ -1,6 +1,7 @@
 package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.IntegerLiteral;
 
 public class NatCon extends AbstractSyntaxNode {
@@ -26,6 +27,11 @@ public class NatCon extends AbstractSyntaxNode {
 	
 	public AbstractSyntaxNode[] getChildren() {
 		return new IntegerLiteral[] { literal };
+	}
+	
+	@Override
+	public void accept(INodeVisitor visitor, Object[] args) {
+		visitor.visit(this, args);
 	}
 
 }

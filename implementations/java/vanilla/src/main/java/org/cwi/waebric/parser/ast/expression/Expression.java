@@ -3,6 +3,7 @@ package org.cwi.waebric.parser.ast.expression;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
@@ -35,6 +36,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] { text };
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -54,6 +60,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { var };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -77,6 +88,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return new AbstractSyntaxNode[] { symbol };
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -96,6 +112,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { natural };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -127,6 +148,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -154,6 +180,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 				pairs,
 				new CharacterLiteral(WaebricSymbol.RCBRACKET)
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
@@ -190,6 +221,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 			};
 		}
 		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
+		}
+		
 	}
 	
 	/**
@@ -222,6 +258,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.PERIOD),
 				identifier
 			};
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor, Object[] args) {
+			visitor.visit(this, args);
 		}
 		
 	}
