@@ -46,7 +46,7 @@ class ModuleCheck implements IWaebricCheck {
 	public void checkModuleId(ModuleId identifier, List<SemanticException> exceptions) {
 		try {
 			// Attempt to process file
-			AbstractSyntaxTree tree = ModuleRegister.getInstance().cacheModule(identifier);
+			AbstractSyntaxTree tree = ModuleRegister.getInstance().loadModule(identifier);
 			checkAST(tree, exceptions); // Check dependent modules
 		} catch(FileNotFoundException e) {
 			exceptions.add(new NonExistingModuleException(identifier));

@@ -133,7 +133,7 @@ class FunctionCheck implements IWaebricCheck {
 		// Recursively retrieve function definitions of imported modules
 		for(Import imprt : module.getImports()) {
 			try {
-				AbstractSyntaxTree ast = ModuleRegister.getInstance().cacheModule(imprt.getIdentifier());
+				AbstractSyntaxTree ast = ModuleRegister.getInstance().loadModule(imprt.getIdentifier());
 				for(Module sub : ast.getRoot()) {
 					collected.add(sub.getIdentifier());
 					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));

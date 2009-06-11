@@ -10,6 +10,17 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
  */
 public class Modules extends AbstractSyntaxNodeList<Module> {
 
-	// No additional functionality needed
+	/**
+	 * Check if a module identifier is contained by modules.
+	 * @param identifier
+	 * @return
+	 */
+	public boolean contains(ModuleId identifier) {
+		for(Module module: this) {
+			if(module.getIdentifier().equals(identifier)) { return true; }
+		}
+		
+		return false;
+	}
 	
 }

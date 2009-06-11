@@ -13,7 +13,8 @@ import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.scanner.WaebricScanner;
 
 /**
- * Cache modules to enable optimize program processing.
+ * Module register allows users a clean interface to load the AST of modules based on
+ * their identifier. Additionally, loaded modules will be cached to improve performance.
  * @author Jeroen van Schagen
  * @date 10-06-2009
  */
@@ -37,11 +38,11 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Attempt to parse and cache a module based on its identifier.
+	 * Attempt to load a module from the file system based on an identifier.
 	 * @param identifier Module identifier, maps on relative file position.
 	 * @throws FileNotFoundException Invalid file
 	 */
-	public AbstractSyntaxTree cacheModule(ModuleId identifier) throws FileNotFoundException {
+	public AbstractSyntaxTree loadModule(ModuleId identifier) throws FileNotFoundException {
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
 		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 
@@ -59,7 +60,10 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Store a module and its abstract syntax tree in cache.
+	 * Store a module and its AST in cache. By caching parsed modules they only
+	 * have to be parsed once, which increases efficiency. It does however
+	 * require a bit more memory to store all loaded modules, when the memory
+	 * consumption gets too high use the clearCache function.
 	 * @param identifier Module identifier
 	 * @param ast Abstract syntax tree
 	 */
@@ -68,7 +72,7 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Check if cache already contains module with specified identifier.
+	 * Verify that a module is stored in the cache.
 	 * @param identifier Module identifier
 	 * @return
 	 */
@@ -77,7 +81,9 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Retrieve module from cache.
+	 * Retrieve module from cache, this function only works when the module
+	 * has been stored in cache. Non-cached modules should be retrieved using
+	 * the loadModule procedure, this will automatically cache the AST.
 	 * @param identifier
 	 * @return Module contents
 	 */
@@ -89,16 +95,22 @@ public class ModuleRegister {
 	 * Load all modules dependent to the contents of an abstract
 	 * syntax tree. Modules can be made dependent to each other
 	 * using of the import directive.
-	 * @param ast Abstract Syntax Tree
+	 * @param ast Abstract syntax tree for which dependencies need to be added
+	 * @return Abstract syntax tree containing all transitive dependent modules
 	 */
 	public void loadDependancies(AbstractSyntaxTree ast) {
-		for(Module module: ast.getRoot()) {
-			for(Import dependancy: module.getImports()) {
-				try {
-					AbstractSyntaxTree sub = ModuleRegister.getInstance().cacheModule(dependancy.getIdentifier());
-					ast.getRoot().addAll(sub.getRoot()); // Attach dependent AST to specified AST
-				} catch (FileNotFoundException e) {
-					// Skip invalid import directives
+		for(int i = 0; i < ast.getRoot().size(); i++) {
+			Module module = ast.getRoot().get(i);
+			for(Import imprt: module.getImports()) {
+				// Retrieve the AST of all dependent modules
+				if(! ast.getRoot().contains(imprt.getIdentifier())) {
+					try {
+						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); // Retrieve AST of import
+						loadDependancies(sub); // Recursively check for other dependencies
+						ast.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
+					} catch (FileNotFoundException e) {
+						// Skip invalid import directives
+					}
 				}
 			}
 		}
