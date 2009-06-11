@@ -146,10 +146,10 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		Block statement = parser.parseStatementCollection();
-		assertEquals(3, statement.getStatementCount());
-		assertEquals(Statement.Yield.class, statement.getStatement(0).getClass());
-		assertEquals(Statement.Comment.class, statement.getStatement(1).getClass());
-		assertEquals(Statement.MarkupExp.class, statement.getStatement(2).getClass());
+		assertEquals(3, statement.getStatements().size());
+		assertEquals(Statement.Yield.class, statement.getStatements().get(0).getClass());
+		assertEquals(Statement.Comment.class, statement.getStatements().get(1).getClass());
+		assertEquals(Statement.MarkupExp.class, statement.getStatements().get(2).getClass());
 	}
 	
 	@Test
@@ -212,7 +212,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp natstm = (MarkupExp) parser.parseMarkupStatements();
-		assertEquals(2, natstm.getMarkupCount());
+		assertEquals(2, natstm.getMarkups().size());
 		assertEquals(Expression.NatExpression.class, natstm.getExpression().getClass());
 		
 		// Var expression (resembles mark-up)
@@ -220,7 +220,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp varstm = (MarkupExp) parser.parseMarkupStatements();
-		assertEquals(2, varstm.getMarkupCount());
+		assertEquals(2, varstm.getMarkups().size());
 		assertEquals(Expression.VarExpression.class, varstm.getExpression().getClass());
 		
 		// Text expression
@@ -228,7 +228,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupExp estatement = (MarkupExp) parser.parseMarkupStatements();
-		assertEquals(2, estatement.getMarkupCount());
+		assertEquals(2, estatement.getMarkups().size());
 		assertEquals(Expression.TextExpression.class, estatement.getExpression().getClass());
 	}
 	
@@ -238,7 +238,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupEmbedding statement = (MarkupEmbedding) parser.parseMarkupStatements();
-		assertEquals(2, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkups().size());
 		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
 	}
 	
@@ -248,7 +248,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupStat statement = (MarkupStat) parser.parseMarkupStatements();
-		assertEquals(2, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkups().size());
 		assertEquals(Statement.Yield.class, statement.getStatement().getClass());
 		
 		// Markup statement collection
@@ -256,7 +256,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupStat cstatement = (MarkupStat) parser.parseMarkupStatements();
-		assertEquals(1, cstatement.getMarkupCount());
+		assertEquals(1, cstatement.getMarkups().size());
 		assertEquals(Statement.Block.class, cstatement.getStatement().getClass());
 	}
 	
@@ -266,7 +266,7 @@ public class TestStatementParser {
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupMarkup statement = (MarkupMarkup) parser.parseMarkupStatements();
-		assertEquals(2, statement.getMarkupCount());
+		assertEquals(2, statement.getMarkups().size());
 	}
 	
 	@Test

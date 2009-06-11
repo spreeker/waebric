@@ -6,6 +6,7 @@ import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
+import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 
 /**
  * Used visitor pattern to remove the need to cast everywhere during
@@ -25,7 +26,6 @@ public interface INodeVisitor {
 	// Statements
 	public void visit(Statement.If statement, Object[] args);
 	public void visit(Statement.IfElse statement, Object[] args);
-	public void visit(Statement.RegularMarkupStatement statement, Object[] args);
 	public void visit(Statement.Block statement, Object[] args);
 	public void visit(Statement.CData statement, Object[] args);
 	public void visit(Statement.Comment statement, Object[] args);
@@ -33,10 +33,6 @@ public interface INodeVisitor {
 	public void visit(Statement.Echo statement, Object[] args);
 	public void visit(Statement.EchoEmbedding statement, Object[] args);
 	public void visit(Statement.Let statement, Object[] args);
-	public void visit(Statement.MarkupEmbedding statement, Object[] args);
-	public void visit(Statement.MarkupExp statement, Object[] args);
-	public void visit(Statement.MarkupMarkup statement, Object[] args);
-	public void visit(Statement.MarkupStat statement, Object[] args);
 	public void visit(Statement.Yield statement, Object[] args);
 	
 	public void visit(Assignment.FuncBind bind, Object[] args);
@@ -55,5 +51,8 @@ public interface INodeVisitor {
 	public void visit(Expression.SymbolExpression expression, Object[] args);
 	public void visit(Expression.TextExpression expression, Object[] args);
 	public void visit(Expression.VarExpression expression, Object[] args);
+	
+	// Embedding
+	public void visit(Embedding embedding, Object[] args);
 	
 }

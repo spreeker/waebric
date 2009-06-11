@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -17,24 +18,12 @@ import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
 import org.cwi.waebric.parser.ast.statement.Assignment.VarBind;
-import org.cwi.waebric.parser.ast.statement.Statement.Block;
-import org.cwi.waebric.parser.ast.statement.Statement.CData;
-import org.cwi.waebric.parser.ast.statement.Statement.Comment;
-import org.cwi.waebric.parser.ast.statement.Statement.Each;
-import org.cwi.waebric.parser.ast.statement.Statement.Echo;
-import org.cwi.waebric.parser.ast.statement.Statement.EchoEmbedding;
-import org.cwi.waebric.parser.ast.statement.Statement.If;
-import org.cwi.waebric.parser.ast.statement.Statement.IfElse;
-import org.cwi.waebric.parser.ast.statement.Statement.Let;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupMarkup;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
-import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
-import org.cwi.waebric.parser.ast.statement.Statement.Yield;
+import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
+import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -43,33 +32,40 @@ import org.jdom.Element;
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
+@SuppressWarnings("unchecked")
 public class JDOMVisitor extends DefaultNodeVisitor {
 
-	private Document document;
+	/**
+	 * Document reference
+	 */
+	private final Document document;
 	
+	/**
+	 * Construct JDOMVisitor based on document
+	 * @param document XML Document
+	 */
 	public JDOMVisitor(Document document) {
 		this.document = document;
 	}
 	
 	@Override
 	public void visit(FunctionDef function, Object[] args) {
-		Map<IdCon, Object> variables = new HashMap<IdCon, Object>();
+		Map<IdCon, Expression> variables = new HashMap<IdCon, Expression>();
 		
 		if(args != null && args.length != 0) {
-			// Store variable values using names specified in formals
 			function.getFormals().accept(this, new Object[] { variables, args });
 		}
-		
+
 		for(Statement statement: function.getStatements()) {
-			statement.accept(this, new Object[] { variables });
+			statement.accept(this, new Object[] { variables, null });
 		}
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(Formals.RegularFormal formals, Object[] args) {
-		Map<IdCon, Object> variables = (Map<IdCon, Object>) args[0];
-		Object[] values = (Object[]) args[1];
+		// Store variable values using names specified in formals
+		Map<IdCon, Expression> variables = (Map<IdCon, Expression>) args[0];
+		Expression[] values = (Expression[]) args[1];
 		
 		int index = 0;
 		for(IdCon identifier: formals.getIdentifiers()) {
@@ -79,90 +75,70 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	@Override
-	public void visit(If statement, Object[] args) {
+	public void visit(Statement.If statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(IfElse statement, Object[] args) {
+	public void visit(Statement.IfElse statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(RegularMarkupStatement statement, Object[] args) {
-		statement.getMarkup().accept(this, args);
+	public void visit(Statement.Block statement, Object[] args) {
+		for(Statement sub: statement.getStatements()) {
+			sub.accept(this, args);
+		}
 	}
 
 	@Override
-	public void visit(Block statement, Object[] args) {
+	public void visit(Statement.CData statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(CData statement, Object[] args) {
+	public void visit(Statement.Comment statement, Object[] args) {
+		// Attach JDOM comment to document
+		Comment comment = new Comment(statement.getComment().toString());
+		document.addContent(comment);
+	}
+
+	@Override
+	public void visit(Statement.Each statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(Comment statement, Object[] args) {
+	public void visit(Statement.Echo statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(Each statement, Object[] args) {
+	public void visit(Statement.EchoEmbedding statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(Echo statement, Object[] args) {
-		// TODO Auto-generated method stub
+	public void visit(Statement.Let statement, Object[] args) {
+		// Process assignments to extend function and variable bindings
+		for(Assignment assignment: statement.getAssignments()) {
+			assignment.accept(this, args);
+		}
 		
+		// Delegate visit to sub-statements
+		for(Statement sub: statement.getStatements()) {
+			sub.accept(this, args);
+		}
 	}
 
 	@Override
-	public void visit(EchoEmbedding statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(Let statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(MarkupEmbedding statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(MarkupExp statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(MarkupMarkup statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(MarkupStat statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(Yield statement, Object[] args) {
+	public void visit(Statement.Yield statement, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -175,26 +151,33 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	@Override
 	public void visit(VarBind bind, Object[] args) {
-		// TODO Auto-generated method stub
-		
+		// Extend variable declarations with bind
+		Map<IdCon, Expression> variables = (Map<IdCon, Expression>) args[0];
+		variables.put(bind.getIdentifier(), bind.getExpression());
 	}
 
 	@Override
 	public void visit(Call markup, Object[] args) {
-		
+		// TODO Retrieve function definition
+		// TODO Visit function
 	}
 
 	@Override
 	public void visit(Tag markup, Object[] args) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
-		if(document.getContentSize() == 0) { document.setRootElement(tag); }
-		else { document.addContent(tag); };
+		if(args[1] == null) {
+			document.setRootElement(tag);
+			args[1] = tag;
+		} else {
+			Element parent = (Element) args[1];
+			parent.addContent(tag);
+			args[1] = tag;
+		}
 	}
 
 	@Override
 	public void visit(CatExpression expression, Object[] args) {
-		// TODO Retrieve function definition
-		// TODO Visit function
+		
 	}
 
 	@Override
@@ -229,12 +212,18 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	@Override
 	public void visit(TextExpression expression, Object[] args) {
+		Element element = (Element) args[1];
+		element.setText(expression.getText().getLiteral().toString());
+	}
+
+	@Override
+	public void visit(VarExpression expression, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void visit(VarExpression expression, Object[] args) {
+	public void visit(Embedding embedding, Object[] args) {
 		// TODO Auto-generated method stub
 		
 	}

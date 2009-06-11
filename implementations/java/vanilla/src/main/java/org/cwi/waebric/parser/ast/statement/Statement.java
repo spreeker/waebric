@@ -39,12 +39,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.markups = markups;
 		}
 		
-		public Markup getMarkup(int index) {
-			return markups.get(index);
-		}
-		
-		public int getMarkupCount() {
-			return markups.size();
+		public List<Markup> getMarkups() {
+			return markups;
 		}
 		
 	}
@@ -237,12 +233,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return statements.add(statement);
 		}
 		
-		public Statement getStatement(int index) {
-			return statements.get(index);
-		}
-		
-		public int getStatementCount() {
-			return statements.size();
+		public List<Statement> getStatements() {
+			return statements;
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
