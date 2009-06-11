@@ -13,28 +13,43 @@ namespace Parser.Ast.Site
     {
         #region Private Members
 
-        private MappingList Mappings;
+        private List<Mapping> MappingList;
 
         #endregion
 
         #region Public Methods
 
-        /// <summary>
-        /// Get mappings of site
-        /// </summary>
-        /// <returns>MappingList</returns>
-        public MappingList GetMappings()
+        public Site()
         {
-            return Mappings;
+            //Initalize containers
+            MappingList = new List<Mapping>();
         }
 
         /// <summary>
-        /// Set mappings of site
+        /// Get mappings of site
+        /// </summary>
+        /// <returns>List of mappings</returns>
+        public List<Mapping> GetMappings()
+        {
+            return MappingList;
+        }
+
+        /// <summary>
+        /// Add range of mappings
         /// </summary>
         /// <param name="mappings">MappingList</param>
-        public void SetMappings(MappingList mappings)
+        public void AddMappings(List<Mapping> mappings)
         {
-            this.Mappings = mappings;
+            MappingList.AddRange(mappings);
+        }
+
+        /// <summary>
+        /// Add mapping to site
+        /// </summary>
+        /// <param name="mapping">Mapping to add</param>
+        public void AddMapping(Mapping mapping)
+        {
+            MappingList.Add(mapping);
         }
 
         #endregion
