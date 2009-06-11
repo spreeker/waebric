@@ -8,14 +8,13 @@ package org.cwi.waebric;
  */
 public enum WaebricKeyword {
 	
-	// Statement
-	IF, ELSE, EACH, LET, IN, 
-	COMMENT, ECHO, CDATA, YIELD,
+	// Statement related keywords
+	IF, ELSE, EACH, LET, IN, COMMENT, ECHO, CDATA, YIELD,
 	
-	// Module
+	// Module related keywords
 	MODULE, IMPORT, DEF, END, SITE,
 	
-	// Type
+	// Type related keywords
 	LIST, RECORD, STRING;
 	
 	/**

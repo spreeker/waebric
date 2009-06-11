@@ -1,8 +1,7 @@
 package org.cwi.waebric;
 
 /**
- * Waebric symbol constants
- * 
+ * http://www.asciitable.com
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
+import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -76,13 +77,26 @@ class FunctionCheck implements IWaebricCheck {
 					exceptions.add(new ArityMismatchException(call));
 				}
 			} else {
-				exceptions.add(new UndefinedFunctionException(call));
+				// When called function is not defined and is not a XHTML tag, report undefined function
+				if(! isXHTMLTag(call.getDesignator().getIdentifier())) {
+					exceptions.add(new UndefinedFunctionException(call));
+				}
 			}
 		}
 		
 		// Recursively check node children
 		for(AbstractSyntaxNode child: node.getChildren()) {
 			checkCall(child, new ArrayList<FunctionDef>(definitions), exceptions);
+		}
+	}
+	
+	public boolean isXHTMLTag(IdCon identifier) {
+		if(identifier.getToken() == null || identifier.getToken().getLexeme() == null) { return false; }
+		String tag = identifier.getToken().getLexeme().toString();
+		try {
+			return XHTMLTag.valueOf(tag.toUpperCase()) != null;
+		} catch(IllegalArgumentException e) {
+			return false;
 		}
 	}
 	
