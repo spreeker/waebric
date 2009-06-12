@@ -1,5 +1,7 @@
-package org.cwi.waebric.parser.ast;
+package org.cwi.waebric.parser.ast.token;
 
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.scanner.token.Token;
 
 public class TokenNode extends AbstractSyntaxNode {

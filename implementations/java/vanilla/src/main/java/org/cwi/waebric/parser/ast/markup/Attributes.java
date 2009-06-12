@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
+import org.cwi.waebric.parser.ast.NodeList;
 
 /**
  * Collection of attributes

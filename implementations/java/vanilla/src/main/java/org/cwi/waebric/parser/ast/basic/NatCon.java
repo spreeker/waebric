@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.IntegerLiteral;
+import org.cwi.waebric.parser.ast.token.IntegerLiteral;
 
 public class NatCon extends AbstractSyntaxNode {
 

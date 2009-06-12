@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
-import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
+import org.cwi.waebric.parser.ast.NodeList;
 
 /**
  * Module* -> Modules

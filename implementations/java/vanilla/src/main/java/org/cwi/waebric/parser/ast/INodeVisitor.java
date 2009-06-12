@@ -7,6 +7,10 @@ import org.cwi.waebric.parser.ast.module.*;
 import org.cwi.waebric.parser.ast.statement.*;
 import org.cwi.waebric.parser.ast.statement.embedding.*;
 import org.cwi.waebric.parser.ast.statement.predicate.*;
+import org.cwi.waebric.parser.ast.token.CharacterLiteral;
+import org.cwi.waebric.parser.ast.token.IntegerLiteral;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
+import org.cwi.waebric.parser.ast.token.TokenNode;
 import org.cwi.waebric.parser.ast.module.site.*;
 import org.cwi.waebric.parser.ast.module.function.*;
 

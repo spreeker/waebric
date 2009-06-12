@@ -1,4 +1,7 @@
-package org.cwi.waebric.parser.ast;
+package org.cwi.waebric.parser.ast.token;
+
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.INodeVisitor;
 
 public class CharacterLiteral extends AbstractSyntaxNode {
 

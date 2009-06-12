@@ -3,9 +3,9 @@ package org.cwi.waebric.parser.ast.markup;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * Waebric provides shorthand notation for common XHTML attributes.<br><br>

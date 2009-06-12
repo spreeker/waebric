@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
@@ -21,6 +20,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed.ExpressionEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;

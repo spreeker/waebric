@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 public class FileExt extends AbstractSyntaxNode {
 

@@ -3,6 +3,8 @@ package org.cwi.waebric.parser.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.parser.ast.token.CharacterLiteral;
+
 /**
  * Generic syntax node list implementation for syntax that
  * represent a list structure, including a separator literal

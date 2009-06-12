@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestSyntaxNodeList {
+public class TestNodeList {
 
 	private NodeList<Mapping> mappings;
 	

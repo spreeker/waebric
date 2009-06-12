@@ -1,8 +1,8 @@
 package org.cwi.waebric.parser.ast.statement.embedding;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 

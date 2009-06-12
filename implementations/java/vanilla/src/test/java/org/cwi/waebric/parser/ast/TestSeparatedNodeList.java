@@ -4,13 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.cwi.waebric.parser.ast.SeparatedNodeList;
+import org.cwi.waebric.parser.ast.token.CharacterLiteral;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestSyntaxNodeListWithSeparator {
+public class TestSeparatedNodeList {
 
 	private SeparatedNodeList<StringLiteral> literals;
 	

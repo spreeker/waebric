@@ -20,6 +20,10 @@ import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.*;
+import org.cwi.waebric.parser.ast.token.CharacterLiteral;
+import org.cwi.waebric.parser.ast.token.IntegerLiteral;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
+import org.cwi.waebric.parser.ast.token.TokenNode;
 
 /**
  * Default implementation for node visiting, all visit functions contain

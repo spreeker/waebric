@@ -5,10 +5,10 @@ import java.util.List;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.statement.Statement;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "def" IdCon Formals? Statement* "end" -> FunctionDef

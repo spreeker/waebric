@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.NodeList;
-import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -13,6 +12,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.MidText;
 import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;

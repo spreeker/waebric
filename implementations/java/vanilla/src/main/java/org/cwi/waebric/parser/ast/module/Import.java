@@ -3,7 +3,7 @@ package org.cwi.waebric.parser.ast.module;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.StringLiteral;
+import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "import" ModuleId -> Import
