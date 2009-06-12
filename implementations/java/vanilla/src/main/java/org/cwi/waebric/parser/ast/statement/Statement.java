@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -33,9 +33,9 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public abstract static class AbstractMarkupStatement extends Statement {
 		
-		protected AbstractSyntaxNodeList<Markup> markups;
+		protected NodeList<Markup> markups;
 		
-		public AbstractMarkupStatement(AbstractSyntaxNodeList<Markup> markups) {
+		public AbstractMarkupStatement(NodeList<Markup> markups) {
 			this.markups = markups;
 		}
 		
@@ -177,12 +177,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class Let extends Statement {
 
-		private AbstractSyntaxNodeList<Assignment> assignments;
-		private AbstractSyntaxNodeList<Statement> statements;
+		private NodeList<Assignment> assignments;
+		private NodeList<Statement> statements;
 		
 		public Let() {
-			assignments = new AbstractSyntaxNodeList<Assignment>();
-			statements = new AbstractSyntaxNodeList<Statement>();
+			assignments = new NodeList<Assignment>();
+			statements = new NodeList<Statement>();
 		}
 		
 		public boolean addAssignment(Assignment assignment) {
@@ -223,10 +223,10 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class Block extends Statement {
 
-		private AbstractSyntaxNodeList<Statement> statements;
+		private NodeList<Statement> statements;
 		
 		public Block() {
-			statements = new AbstractSyntaxNodeList<Statement>();
+			statements = new NodeList<Statement>();
 		}
 		
 		public boolean addStatement(Statement statement) {
@@ -425,7 +425,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class MarkupMarkup extends AbstractMarkupStatement {
 
-		public MarkupMarkup(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupMarkup(NodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -461,7 +461,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Statement statement;
 		
-		public MarkupStat(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupStat(NodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -495,7 +495,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 
 		private Expression expression;
 		
-		public MarkupExp(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupExp(NodeList<Markup> markups) {
 			super(markups);
 		}
 
@@ -529,7 +529,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Embedding embedding;
 		
-		public MarkupEmbedding(AbstractSyntaxNodeList<Markup> markups) {
+		public MarkupEmbedding(NodeList<Markup> markups) {
 			super(markups);
 		}
 

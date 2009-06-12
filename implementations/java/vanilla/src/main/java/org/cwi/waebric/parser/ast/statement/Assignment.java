@@ -6,7 +6,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 
@@ -26,14 +26,14 @@ public abstract class Assignment extends AbstractSyntaxNode {
 	public static class FuncBind extends Assignment {
 	
 		private IdCon identifier;
-		private AbstractSeparatedSyntaxNodeList<IdCon> variables;
+		private SeparatedNodeList<IdCon> variables;
 		private Statement statement;
 		
 		/**
 		 * Construct default function binding.
 		 */
 		public FuncBind() {
-			variables = new AbstractSeparatedSyntaxNodeList<IdCon>(',');
+			variables = new SeparatedNodeList<IdCon>(',');
 		}
 		
 		public IdCon getIdentifier() {

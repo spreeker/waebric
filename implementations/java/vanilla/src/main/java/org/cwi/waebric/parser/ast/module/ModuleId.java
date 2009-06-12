@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.module;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class ModuleId extends AbstractSeparatedSyntaxNodeList<IdCon> {
+public class ModuleId extends SeparatedNodeList<IdCon> {
 
 	public ModuleId() {
 		super(WaebricSymbol.PERIOD);

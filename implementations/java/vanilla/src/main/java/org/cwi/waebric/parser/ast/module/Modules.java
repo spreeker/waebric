@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.module;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -9,7 +9,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Modules extends AbstractSyntaxNodeList<Module> {
+public class Modules extends NodeList<Module> {
 
 	/**
 	 * Check if a module identifier is contained by modules.

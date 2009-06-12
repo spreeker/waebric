@@ -15,7 +15,7 @@ import java.util.ListIterator;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements List<E> {
+public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements List<E> {
 
 	/**
 	 * Element collection
@@ -25,7 +25,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	/**
 	 * Construct syntax node list.
 	 */
-	public AbstractSyntaxNodeList() {
+	public NodeList() {
 		list =  new ArrayList<E>();
 	}
 
@@ -33,7 +33,7 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	 * Construct syntax node list.
 	 * @param list Collection of all elements
 	 */
-	public AbstractSyntaxNodeList(List<E> list) {
+	public NodeList(List<E> list) {
 		this.list = list;
 	}
 	
@@ -60,8 +60,8 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	}
 	
 	@Override
-	public AbstractSyntaxNodeList<E> clone() {
-		return new AbstractSyntaxNodeList<E>(new ArrayList<E>(list));
+	public NodeList<E> clone() {
+		return new NodeList<E>(new ArrayList<E>(list));
 	}
 	
 	public boolean contains(Object o) {
@@ -74,8 +74,8 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	
 	@Override
 	public boolean equals(Object arg) {
-		if(arg instanceof AbstractSyntaxNodeList) {
-			AbstractSyntaxNodeList<?> nodeList = (AbstractSyntaxNodeList<?>) arg;
+		if(arg instanceof NodeList) {
+			NodeList<?> nodeList = (NodeList<?>) arg;
 			if(nodeList.size() != this.size()) { return false; }
 			for(int i = 0; i < this.size(); i++) {
 				if(! this.get(i).equals(nodeList.get(i))) { return false; }
@@ -171,76 +171,6 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	@Override
 	public void accept(INodeVisitor visitor, Object[] args) {
 		visitor.visit(this, args);
-	}
-	
-	/**
-	 * Generic syntax node list implementation for syntax that
-	 * represent a list structure, including a separator literal
-	 * between each element.
-	 * 
-	 * @param <E>
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 20-05-2009
-	 */
-	public static class AbstractSeparatedSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNodeList<E> {
-		
-		/**
-		 * Separation character
-		 */
-		public final char separator;
-		
-		/**
-		 * Construct separated list.
-		 * @param separator Separation character
-		 */
-		public AbstractSeparatedSyntaxNodeList(char separator) {
-			this.separator = separator;
-		}
-		
-		/**
-		 * Construct separated list.
-		 * @param list List containing all elements.
-		 * @param separator Separation character
-		 */
-		public AbstractSeparatedSyntaxNodeList(List<E> list, char separator) {
-			super(list);
-			this.separator = separator;
-		}
-
-		@Override
-		public AbstractSeparatedSyntaxNodeList<E> clone() {
-			return new AbstractSeparatedSyntaxNodeList<E>(
-				new AbstractSyntaxNodeList<E>(new ArrayList<E>(list)), 
-				separator
-			);
-		}
-
-		@Override
-		public AbstractSyntaxNode[] getChildren() {
-			AbstractSyntaxNode[] elements = super.getChildren();
-			
-			int length = elements.length > 0 ? (elements.length * 2) - 1 : 0;
-			AbstractSyntaxNode[] children = new AbstractSyntaxNode[length];
-			
-			for(int i = 0; i < children.length; i++) {
-				if(i % 2 == 0) { children[i] = elements[i/2]; }
-				else { children[i] = new CharacterLiteral(separator); }
-			}
-
-			return children;
-		}
-		
-		@Override
-		public boolean equals(Object arg) {
-			if(arg instanceof AbstractSeparatedSyntaxNodeList) {
-				AbstractSeparatedSyntaxNodeList<?> list = (AbstractSeparatedSyntaxNodeList<?>) arg;
-				return list.separator == this.separator && super.equals(arg);
-			}
-			
-			return false;
-		}
-
 	}
 
 }

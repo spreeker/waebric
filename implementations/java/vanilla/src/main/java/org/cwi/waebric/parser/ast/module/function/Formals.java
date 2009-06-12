@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -29,14 +29,14 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 */
 	public static class RegularFormal extends Formals {
 		
-		private AbstractSeparatedSyntaxNodeList<IdCon> identifiers;
+		private SeparatedNodeList<IdCon> identifiers;
 		
 		public RegularFormal() {
-			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
+			this.identifiers = new SeparatedNodeList<IdCon>(WaebricSymbol.COMMA);
 		}
 		
 		public RegularFormal(Collection<IdCon> args) {
-			this.identifiers = new AbstractSeparatedSyntaxNodeList<IdCon>(WaebricSymbol.COMMA);
+			this.identifiers = new SeparatedNodeList<IdCon>(WaebricSymbol.COMMA);
 			this.identifiers.addAll(args);
 		}
 
@@ -76,7 +76,7 @@ public abstract class Formals extends AbstractSyntaxNode {
 
 		@Override
 		public List<IdCon> getIdentifiers() {
-			return new AbstractSyntaxNodeList<IdCon>();
+			return new NodeList<IdCon>();
 		}
 		
 		@Override

@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 
 /**
  * { Mapping ";" }* -> Mappings
@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntax
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Mappings extends AbstractSeparatedSyntaxNodeList<Mapping> {
+public class Mappings extends SeparatedNodeList<Mapping> {
 	
 	public Mappings() {
 		super(WaebricSymbol.SEMICOLON);

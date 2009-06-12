@@ -3,7 +3,7 @@ package org.cwi.waebric.parser.ast.module;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
@@ -18,17 +18,17 @@ import org.cwi.waebric.parser.ast.module.site.Site;
 public class Module extends AbstractSyntaxNode {
 
 	private ModuleId identifier;
-	private AbstractSyntaxNodeList<Import> imports;
-	private AbstractSyntaxNodeList<Site> sites;
-	private AbstractSyntaxNodeList<FunctionDef> defs;
+	private NodeList<Import> imports;
+	private NodeList<Site> sites;
+	private NodeList<FunctionDef> defs;
 	
 	/**
 	 * Construct module
 	 */
 	public Module() {
-		imports = new AbstractSyntaxNodeList<Import>();
-		sites = new AbstractSyntaxNodeList<Site>();
-		defs = new AbstractSyntaxNodeList<FunctionDef>();
+		imports = new NodeList<Import>();
+		sites = new NodeList<Site>();
+		defs = new NodeList<FunctionDef>();
 	}
 	
 	/**

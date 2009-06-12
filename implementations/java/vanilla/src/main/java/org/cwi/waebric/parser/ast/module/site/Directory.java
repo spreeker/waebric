@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 
 /**
  * { PathElement "/" }+ -> Directory
@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntax
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Directory extends AbstractSeparatedSyntaxNodeList<PathElement> {
+public class Directory extends SeparatedNodeList<PathElement> {
 	
 	/**
 	 * Separate path elements with a slash /

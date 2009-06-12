@@ -4,18 +4,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestSyntaxNodeListWithSeparator {
 
-	private AbstractSeparatedSyntaxNodeList<StringLiteral> literals;
+	private SeparatedNodeList<StringLiteral> literals;
 	
 	@Before
 	public void setUp() {
-		literals = new AbstractSeparatedSyntaxNodeList<StringLiteral>(';');
+		literals = new SeparatedNodeList<StringLiteral>(';');
 		literals.add(new StringLiteral("LOL"));
 		literals.add(new StringLiteral("LOL2"));
 	}

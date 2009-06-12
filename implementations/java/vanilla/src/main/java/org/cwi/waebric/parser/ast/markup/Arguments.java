@@ -4,7 +4,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.CharacterLiteral;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SeparatedNodeList;
 
 /**
  * "(" { Argument "," }* ")" -> Arguments
@@ -12,7 +12,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList.AbstractSeparatedSyntax
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Arguments extends AbstractSeparatedSyntaxNodeList<Argument> {
+public class Arguments extends SeparatedNodeList<Argument> {
 
 	public Arguments() {
 		super(WaebricSymbol.COMMA);

@@ -4,7 +4,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.StringLiteral;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
@@ -82,7 +82,7 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public Embed parseEmbed() throws SyntaxException {
 		// Parse mark-up tokens
-		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+		NodeList<Markup> markups = new NodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 			markups.add(markupParser.parseMarkup());
 		}
