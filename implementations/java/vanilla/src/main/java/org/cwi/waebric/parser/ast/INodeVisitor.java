@@ -2,8 +2,10 @@ package org.cwi.waebric.parser.ast;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -19,7 +21,9 @@ public interface INodeVisitor {
 	// Default reference
 	public void visit(AbstractSyntaxNode node, Object[] args);
 
-	// Functions
+	// High level elements
+	public void visit(Module module, Object[] args);
+	public void visit(Site site, Object[] args);
 	public void visit(FunctionDef function, Object[] args);
 	public void visit(Formals.RegularFormal function, Object[] args);
 	

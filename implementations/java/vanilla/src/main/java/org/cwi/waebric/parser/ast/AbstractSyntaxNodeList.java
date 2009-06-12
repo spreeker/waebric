@@ -37,29 +37,24 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		this.list = list;
 	}
 	
-	@Override
 	public boolean add(E element) {
 		if(element == null) { return false; }
 		if(this.contains(element)) { return false; }
 		return list.add(element);
 	}
 	
-	@Override
 	public void add(int index, E element) {
 		list.add(index, element);
 	}
 	
-	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		return list.addAll(c);
 	}
 	
-	@Override
 	public boolean addAll(int index, Collection<? extends E> c) {
 		return list.addAll(index, c);
 	}
 	
-	@Override
 	public void clear() {
 		list.clear();
 	}
@@ -69,12 +64,10 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		return new AbstractSyntaxNodeList<E>(new ArrayList<E>(list));
 	}
 	
-	@Override
 	public boolean contains(Object o) {
 		return list.contains(o);
 	}
 	
-	@Override
 	public boolean containsAll(Collection<?> c) {
 		return list.containsAll(c);
 	}
@@ -94,87 +87,70 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		return false;
 	}
 	
-	@Override
 	public E get(int index) {
 		return list.get(index);
 	}
 
-	@Override
 	public AbstractSyntaxNode[] getChildren() {
 		return list.toArray(new AbstractSyntaxNode[0]);
 	}
 
-	@Override
 	public int indexOf(Object o) {
 		return list.indexOf(o);
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return list.isEmpty();
 	}
 
-	@Override
 	public Iterator<E> iterator() {
 		return list.iterator();
 	}
 
-	@Override
 	public int lastIndexOf(Object o) {
 		return list.lastIndexOf(o);
 	}
 
-	@Override
 	public ListIterator<E> listIterator() {
 		return list.listIterator();
 	}
 
-	@Override
 	public ListIterator<E> listIterator(int index) {
 		return list.listIterator();
 	}
 
-	@Override
 	public E remove(int index) {
 		return list.remove(index);
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		return list.remove(o);
 	}
 
-	@Override
 	public boolean removeAll(Collection<?> c) {
 		return list.retainAll(c);
 	}
 
-	@Override
 	public boolean retainAll(Collection<?> c) {
 		return list.retainAll(c);
 	}
 
-	@Override
 	public E set(int index, E element) {
 		return list.set(index, element);
 	}
 
-	@Override
 	public int size() {
 		return list.size();
 	}
 
-	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
 		return list.subList(fromIndex, toIndex);
 	}
 
-	@Override
 	public Object[] toArray() {
 		return list.toArray();
 	}
 
-	@Override
 	public <T> T[] toArray(T[] a) {
 		return list.toArray(a);
 	}
