@@ -49,8 +49,8 @@ public class TestModuleRegister {
 	@Test
 	public void testLoadDependancies() {
 		assertEquals(1, ast.getRoot().size());
-		ModuleRegister.getInstance().loadDependancies(ast);
-		assertEquals(2, ast.getRoot().size()); // Sub module is imported
+		AbstractSyntaxTree dependencies = ModuleRegister.getInstance().loadDependancies(ast);
+		assertEquals(2, dependencies.getRoot().size()); // Sub module is imported
 	}
 	
 	@Test

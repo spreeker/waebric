@@ -1,7 +1,5 @@
 package org.cwi.waebric.interpreter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +17,6 @@ import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
-import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
@@ -60,25 +57,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public JDOMVisitor(Modules modules) {
 		this.modules = modules;
-	}
-	
-	/**
-	 * Construct document and call main function.
-	 * TODO: Call site mappings
-	 * Expected arguments: Document
-	 */
-	public void visit(Module module, Object[] args) {
-		Document document = (Document) args[0];
-
-		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Comment comment = new Comment("Compiled on: " + format.format(new Date()));
-		document.addContent(comment);
-	
-		FunctionDef main = module.getFunctionDefinition("main");
-		main.accept(this, new Object[] { 
-				document, // Document reference, used to create sub-elements
-				new Object[]{} // Main function takes no call arguments
-			});
 	}
 
 	public void visit(Site site, Object[] args) {

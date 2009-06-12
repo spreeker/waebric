@@ -98,22 +98,42 @@ public class ModuleRegister {
 	 * @param ast Abstract syntax tree for which dependencies need to be added
 	 * @return Abstract syntax tree containing all transitive dependent modules
 	 */
-	public void loadDependancies(AbstractSyntaxTree ast) {
-		for(int i = 0; i < ast.getRoot().size(); i++) {
-			Module module = ast.getRoot().get(i);
+	public AbstractSyntaxTree loadDependancies(AbstractSyntaxTree ast) {
+		AbstractSyntaxTree result = new AbstractSyntaxTree();
+		result.getRoot().addAll(ast.getRoot()); // Clone modules content
+		
+		for(Module module: ast.getRoot()) {
 			for(Import imprt: module.getImports()) {
-				// Retrieve the AST of all dependent modules
-				if(! ast.getRoot().contains(imprt.getIdentifier())) {
+				if(! result.getRoot().contains(imprt.getIdentifier())) {
 					try {
-						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); // Retrieve AST of import
+						// Retrieve the AST of all dependent modules
+						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); 
 						loadDependancies(sub); // Recursively check for other dependencies
-						ast.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
+						result.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
 					} catch (FileNotFoundException e) {
 						// Skip invalid import directives
 					}
 				}
 			}
 		}
+		
+//		for(int i = 0; i < ast.getRoot().size(); i++) {
+//			Module module = ast.getRoot().get(i);
+//			for(Import imprt: module.getImports()) {
+//				// Retrieve the AST of all dependent modules
+//				if(! ast.getRoot().contains(imprt.getIdentifier())) {
+//					try {
+//						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); // Retrieve AST of import
+//						loadDependancies(sub); // Recursively check for other dependencies
+//						ast.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
+//					} catch (FileNotFoundException e) {
+//						// Skip invalid import directives
+//					}
+//				}
+//			}
+//		}
+		
+		return result;
 	}
 	
 	/**
