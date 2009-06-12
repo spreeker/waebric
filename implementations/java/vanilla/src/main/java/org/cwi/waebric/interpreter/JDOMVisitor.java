@@ -37,6 +37,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Convert AST to JDOM format, allowing it to be parsed into an XHTML document.
@@ -87,33 +88,33 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	
 	/**
 	 * Store call values and delegate statements.
-	 * Expected arguments: Document, Object[] values
+	 * Expected arguments: Parent element, Object[] values
 	 */
 	public void visit(FunctionDef function, Object[] args) {
-		// Store call arguments in variable list
+		// Store the call values of each variable
 		Map<IdCon, Expression> variables = new HashMap<IdCon, Expression>();
-		if(args != null && args.length > 1) {
-			function.getFormals().accept(this, new Object[] {
-					variables, // Map for storing variables
-					args[1] // Call arguments, current value of formals
-				});
-		}
+		function.getFormals().accept(this, new Object[] {
+				variables, // Map for storing variables
+				args[1] // Call arguments, current value of formals
+			});
 
-		Document document = (Document) args[0];
-		if(function.getStatements().size() > 1) {
-			// Construct HTML root element, when multiple statements can be root
+		// Construct HTML root element when multiple statements can be root
+		if(args[0] instanceof Document && function.getStatements().size() > 1) {
+			Document document = (Document) args[0];
+
 			// <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-			Element html = new Element("html");
-			html.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-			html.setAttribute("xml:lang", "en");
+			Element html = new Element("html", Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
 			html.setAttribute("lang", "en");
 			document.setRootElement(html);
+			
 			args[0] = html; // Make HTML current element
 		}
 		
+		// Process statements
+		Object parent = args[0];
 		for(Statement statement: function.getStatements()) {
 			statement.accept(this, new Object[] { 
-					args[0], // Parent element (Document or HTML)
+					parent, // Parent element (Document or HTML)
 					variables // Map of variable names and expression values
 				});
 		}
@@ -148,8 +149,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Call all sub-statements which affecting current element.
 	 */
 	public void visit(Statement.Block statement, Object[] args) {
+		Element parent = (Element) args[0];
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this, args);
+			sub.accept(this, new Object[] { parent, args[1] });
 		}
 	}
 
@@ -213,15 +215,22 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(MarkupExp statement, Object[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void visit(MarkupStat statement, Object[] args) {
+		// Visit mark-up(s)
 		for(Markup markup: statement.getMarkups()) {
 			markup.accept(this, args);
 		}
 		
+		// Visit expression
+		statement.getExpression().accept(this, args);
+	}
+
+	public void visit(MarkupStat statement, Object[] args) {
+		// Visit mark-up(s)
+		for(Markup markup: statement.getMarkups()) {
+			markup.accept(this, args);
+		}
+		
+		// Visit statement
 		statement.getStatement().accept(this, args);
 	}
 
@@ -256,11 +265,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		if(args[0] instanceof Document) {
 			Document document = (Document) args[0];
 			document.setRootElement(tag);
-			args[1] = tag;
+			args[0] = tag;
 		} else if(args[0] instanceof Element) {
-			Element parent = (Element) args[1];
+			Element parent = (Element) args[0];
 			parent.addContent(tag);
-			args[1] = tag;
+			args[0] = tag;
 		}
 	}
 
@@ -294,7 +303,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(TextExpression expression, Object[] args) {
-		Element element = (Element) args[1];
+		Element element = (Element) args[0];
 		element.setText(expression.getText().getLiteral().toString());
 	}
 
