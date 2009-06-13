@@ -5,7 +5,37 @@ using System.Text;
 
 namespace Parser.Ast.Site
 {
-    public class DirName
+    /// <summary>
+    /// Node which contains DirName
+    /// </summary>
+    public class DirName : ISyntaxNode
     {
+        #region Private Members
+
+        private Directory DirectoryInstance;
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Set directory of DirName
+        /// </summary>
+        /// <param name="directory">Directory to set</param>
+        public void SetDirectory(Directory directory)
+        {
+            DirectoryInstance = directory;
+        }
+
+        /// <summary>
+        /// Get directory of DirName
+        /// </summary>
+        /// <returns>Directory</returns>
+        public Directory GetDirectory()
+        {
+            return DirectoryInstance;
+        }
+
+        #endregion
     }
 }

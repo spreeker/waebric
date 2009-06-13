@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Parser.Ast.Module;
 
 namespace Parser.Ast
 {
@@ -12,7 +13,7 @@ namespace Parser.Ast
     {
         #region Private Members
 
-        private ISyntaxNode root;
+        private ModuleList root;
 
         #endregion
 
@@ -30,7 +31,7 @@ namespace Parser.Ast
         /// Constructor which fills root with specified rootNode
         /// </summary>
         /// <param name="rootNode">Node to set as root</param>
-        public SyntaxTree(ISyntaxNode rootNode)
+        public SyntaxTree(ModuleList rootNode)
         {
             root = rootNode;
         }
@@ -39,7 +40,7 @@ namespace Parser.Ast
         /// Get root of tree
         /// </summary>
         /// <returns>Root of tree</returns>
-        public ISyntaxNode GetRoot()
+        public ModuleList GetRoot()
         {
             return root;
         }
@@ -48,7 +49,7 @@ namespace Parser.Ast
         /// Set root of tree
         /// </summary>
         /// <param name="rootNode">Node to set as root</param>
-        public void SetRoot(ISyntaxNode rootNode)
+        public void SetRoot(ModuleList rootNode)
         {
             this.root = rootNode;
         }

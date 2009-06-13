@@ -30,7 +30,7 @@ namespace Parser.Ast.Basic
         /// Get Identifier
         /// </summary>
         /// <returns>Identifier</returns>
-        public String GetIdCon()
+        public override String ToString()
         {
             return IdCon;
         }

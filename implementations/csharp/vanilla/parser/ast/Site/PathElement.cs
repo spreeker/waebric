@@ -31,7 +31,7 @@ namespace Parser.Ast.Site
         /// Get path element
         /// </summary>
         /// <returns>Path element</returns>
-        public String PathElement()
+        public String GetPathElement()
         {
             return Element;
         }
