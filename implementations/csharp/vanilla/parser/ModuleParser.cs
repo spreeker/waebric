@@ -67,26 +67,25 @@ namespace Parser
             Module module = new Module();
             //Parse first the identifier of the module and set it
             ModuleId moduleIdentifier = ParseModuleId();
-            module.SetIdentifier(moduleIdentifier);
+            module.SetModuleId(moduleIdentifier);
             
             //Look for elements like SITE, DEF, etc
             while (TokenStream.HasNext())
             {
-                //Breaking condition, if empty module found t
-
                 CurrentToken = TokenStream.NextToken();
+                //TODO: ADD breaking condition here (END of module found)
                 //Check for different elements which may appear in a module
                 if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.DEF.ToString()))
                 {   //Function definition found
-
+                    module.AddFunctionDefinition(null);
                 }
                 else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.SITE.ToString()))
                 {   //Site definition found, call siteparser
-                    module.SetElement(siteParser.ParseSite());
+                    module.AddSite(siteParser.ParseSite());
                 }
                 else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.IMPORT.ToString()))
                 {   //Imports found
-                    module.SetElement(ParseImport());
+                    module.AddImport(ParseImport());
                 }
                 else
                 {
@@ -106,9 +105,13 @@ namespace Parser
         {
             ModuleId moduleId = new ModuleId();
             //parse single identifier
-            if(NextToken("module identifier", "identifier", TokenType.IDENTIFIER))
+            if (NextToken("module identifier", "identifier", TokenType.IDENTIFIER))
             {
                 moduleId.SetIdentifier(new IdentifierCon(CurrentToken.GetValue().ToString()));
+            }
+            else
+            {
+                //Raise exception
             }
 
             return moduleId;
@@ -124,6 +127,10 @@ namespace Parser
             if (NextToken("import identifier", "identifier", TokenType.IDENTIFIER))
             {
                 import.SetIdentifier(new ModuleId(new IdentifierCon(CurrentToken.GetValue().ToString())));
+            }
+            else
+            {
+                //raise exception
             }
             return import;
         }

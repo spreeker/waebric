@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
     <Compile Include="Ast\Basic\IdentifierCon.cs" />
+    <Compile Include="Ast\Functions\FunctionDefinition.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
     <Compile Include="Ast\Module\Import.cs" />
     <Compile Include="Ast\Module\Module.cs" />
@@ -61,12 +62,15 @@
     <Compile Include="Ast\NodeList.cs" />
     <Compile Include="Ast\Site\Directory.cs" />
     <Compile Include="Ast\Site\DirName.cs" />
+    <Compile Include="Ast\Site\FileExt.cs" />
     <Compile Include="Ast\Site\FileName.cs" />
     <Compile Include="Ast\Site\Mapping.cs" />
     <Compile Include="Ast\Site\MappingList.cs" />
     <Compile Include="Ast\Site\Markup.cs" />
     <Compile Include="Ast\Site\Path.cs" />
+    <Compile Include="Ast\Site\PathElement.cs" />
     <Compile Include="Ast\Site\Site.cs" />
+    <Compile Include="Exceptions\UnexpectedToken.cs" />
     <Compile Include="MarkupParser.cs" />
     <Compile Include="SiteParser.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
@@ -78,11 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ast\Embedding\" />
-    <Folder Include="Ast\Functions\" />
     <Folder Include="Ast\Markup\" />
     <Folder Include="Ast\Predicates\" />
     <Folder Include="Ast\Statements\" />
-    <Folder Include="Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
