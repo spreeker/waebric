@@ -88,7 +88,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		// Start interpreting "main" function
-		FunctionDef main = module.getFunctionDefinition("main");
+		FunctionDef main = module.getFunction("main");
 		if(main != null) {
 			main.accept(this, new Object[] { 
 				document, // Document reference

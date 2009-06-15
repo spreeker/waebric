@@ -100,16 +100,9 @@ public class Module extends AbstractSyntaxNode {
 		return defs.clone();
 	}
 	
-	/**
-	 * 
-	 * @param designator
-	 * @return
-	 */
-	public FunctionDef getFunctionDefinition(String designator) {
-		for(FunctionDef def: defs) {
-			if(def.getIdentifier().getToken().getLexeme().equals(designator)) {
-				return def;
-			}
+	public FunctionDef getFunction(String name) {
+		for(FunctionDef function: this.getFunctionDefinitions()) {
+			if(function.getIdentifier().equals(name)) { return function; }
 		}
 		
 		return null;

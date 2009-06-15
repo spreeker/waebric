@@ -29,21 +29,19 @@ public class WaebricInterpreter {
 	 */
 	public void interpretProgram(AbstractSyntaxTree ast) {
 		for(Module module: ast.getRoot()) {
-			if(hasMain(module)) {
-				try {
-					// Interpret each module that contains a main function
-					Document document = interpretModule(module, ast.getRoot());
+			try {
+				// Interpret each module that contains a main function
+				Document document = interpretModule(module, ast.getRoot());
 
-					File file = new File(getOutputPath(module.getIdentifier()));
-					file.createNewFile(); // Create file, in case it doesn't exist yet
-					OutputStream os = new FileOutputStream(file);
-					
-					// Transform document in file
-					XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-					out.output(document, os);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				File file = new File(getOutputPath(module.getIdentifier()));
+				file.createNewFile(); // Create file, in case it doesn't exist yet
+				OutputStream os = new FileOutputStream(file);
+				
+				// Transform document in file
+				XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+				out.output(document, os);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -59,15 +57,6 @@ public class WaebricInterpreter {
 		Document document = new Document();
 		new JDOMVisitor().visit(module, new Object[] { document });
 		return document;
-	}
-	
-	/**
-	 * Check if module has a main function.
-	 * @param module
-	 * @return
-	 */
-	public static boolean hasMain(Module module) {
-		return module.getFunctionDefinition("main") != null;
 	}
 	
 	/**
