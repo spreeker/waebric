@@ -10,6 +10,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.scanner.WaebricScanner;
 
 /**
@@ -92,24 +93,22 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Load all modules dependent to the contents of an abstract
-	 * syntax tree. Modules can be made dependent to each other
-	 * using of the import directive.
-	 * @param ast Abstract syntax tree for which dependencies need to be added
-	 * @return Abstract syntax tree containing all transitive dependent modules
+	 * Retrieve all transitive dependent modules.
+	 * @param modules Modules from which dependent modules are retrieved.
+	 * @return 
 	 */
-	public AbstractSyntaxTree loadDependancies(AbstractSyntaxTree ast) {
+	public AbstractSyntaxTree loadDependancies(Modules modules) {
 		AbstractSyntaxTree result = new AbstractSyntaxTree();
-		result.getRoot().addAll(ast.getRoot()); // Clone modules content
+		result.getRoot().addAll(modules); // Clone modules content
 		
-		for(Module module: ast.getRoot()) {
+		for(Module module: modules) {
 			for(Import imprt: module.getImports()) {
 				if(! result.getRoot().contains(imprt.getIdentifier())) {
 					try {
-						// Retrieve the AST of all dependent modules
+						// Retrieve and store AST of imported modules
 						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); 
-						loadDependancies(sub); // Recursively check for other dependencies
-						result.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
+						loadDependancies(sub.getRoot());
+						result.getRoot().addAll(sub.getRoot());
 					} catch (FileNotFoundException e) {
 						// Skip invalid import directives
 					}
@@ -117,23 +116,27 @@ public class ModuleRegister {
 			}
 		}
 		
-//		for(int i = 0; i < ast.getRoot().size(); i++) {
-//			Module module = ast.getRoot().get(i);
-//			for(Import imprt: module.getImports()) {
-//				// Retrieve the AST of all dependent modules
-//				if(! ast.getRoot().contains(imprt.getIdentifier())) {
-//					try {
-//						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); // Retrieve AST of import
-//						loadDependancies(sub); // Recursively check for other dependencies
-//						ast.getRoot().addAll(sub.getRoot()); // Store AST of dependent module
-//					} catch (FileNotFoundException e) {
-//						// Skip invalid import directives
-//					}
-//				}
-//			}
-//		}
-		
 		return result;
+	}
+	
+	/**
+	 * Retrieve all transitive dependent modules.
+	 * @param module Module from which dependent modules are retrieved.
+	 * @return
+	 */
+	public AbstractSyntaxTree loadDependancies(Module module) {
+		Modules modules = new Modules();
+		modules.add(module);
+		return loadDependancies(modules);
+	}
+	
+	/**
+	 * Retrieve all transitive dependent modules.
+	 * @param ast Abstract syntax tree from which dependent modules are retrieved.
+	 * @return
+	 */
+	public AbstractSyntaxTree loadDependancies(AbstractSyntaxTree ast) {
+		return loadDependancies(ast.getRoot());
 	}
 	
 	/**

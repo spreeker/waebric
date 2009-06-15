@@ -1,8 +1,11 @@
 package org.cwi.waebric.interpreter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -17,6 +20,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
@@ -42,13 +46,12 @@ import org.jdom.Namespace;
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
-@SuppressWarnings("unchecked")
 public class JDOMVisitor extends DefaultNodeVisitor {
 	
 	/**
-	 * Modules instance, used to collect function definitions by name
+	 * Active function definitions
 	 */
-	public final Modules modules;
+	private Map<IdCon, FunctionDef> functions;
 	
 	/**
 	 * Active variables
@@ -59,9 +62,41 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Construct JDOM visitor based on modules instance.
 	 * @param modules
 	 */
-	public JDOMVisitor(Modules modules) {
-		this.modules = modules;
+	public JDOMVisitor() {
+		this.functions = new HashMap<IdCon, FunctionDef>();
 		this.variables = new HashMap<IdCon, Expression>();
+	}
+
+	/**
+	 * Store function definitions and interpret "main".
+	 * @param args[0] Document as JDOM root element.
+	 */
+	public void visit(Module module, Object[] args) {
+		Document document = (Document) args[0];
+		
+		// Brand-mark document
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Comment comment = new Comment("Compiled on: " + format.format(new Date()));
+		document.addContent(comment);
+		
+		// Store function definitions
+		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
+		for(Module dependancy: dependancies) {
+			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
+				functions.put(function.getIdentifier(), function);
+			}
+		}
+		
+		// Start interpreting "main" function
+		FunctionDef main = module.getFunctionDefinition("main");
+		if(main != null) {
+			main.accept(this, new Object[] { 
+				document, // Document reference
+				new Expression[]{} // Main function takes no call values
+			});
+		}
+		
+		functions.clear(); // Terminate all function definitions
 	}
 
 	public void visit(Site site, Object[] args) {
@@ -71,7 +106,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	
 	/**
 	 * Store call values and delegate statements.
-	 * Expected arguments: Parent element, Expression[] call values
+	 * @param args[0] Document or Element as parent node
+	 * @param args[1] Expression[] as function variable values
 	 */
 	public void visit(FunctionDef function, Object[] args) {	
 		// Store function variables with their called expressions
@@ -218,7 +254,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	public void visit(VarBind bind, Object[] args) {
 		// Extend variable declarations with bind
-		Map<IdCon, Expression> variables = (Map<IdCon, Expression>) args[0];
 		variables.put(bind.getIdentifier(), bind.getExpression());
 	}
 

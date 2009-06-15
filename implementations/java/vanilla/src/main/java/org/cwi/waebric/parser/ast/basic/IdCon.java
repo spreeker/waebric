@@ -4,6 +4,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.token.TokenNode;
 import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}
@@ -13,16 +14,42 @@ import org.cwi.waebric.scanner.token.Token;
  */
 public class IdCon extends AbstractSyntaxNode {
 
-	private TokenNode node;
+	/**
+	 * Reference to lexical token.
+	 */
+	private final TokenNode node;
 	
+	/**
+	 * Construct identifier purely based on string name,
+	 * use this constructor when the token is unknown.
+	 * @param name
+	 */
+	public IdCon(String name) {
+		this(new Token(name, WaebricTokenSort.IDCON, -1, -1));
+	}
+	
+	/**
+	 * Construct identifier using the token object, by
+	 * providing a token reference detailed error messages
+	 * can be generated.
+	 * @param token
+	 */
 	public IdCon(Token token) {
 		this.node = new TokenNode(token);
 	}
 	
+	/**
+	 * Retrieve token
+	 * @return
+	 */
 	public Token getToken() {
 		return node.getToken();
 	}
 	
+	/**
+	 * Retrieve name
+	 * @return
+	 */
 	public String getName() {
 		return node.getToken().getLexeme().toString();
 	}
@@ -37,6 +64,7 @@ public class IdCon extends AbstractSyntaxNode {
 		return false;
 	}
 
+	@Override
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] { node };
 	}

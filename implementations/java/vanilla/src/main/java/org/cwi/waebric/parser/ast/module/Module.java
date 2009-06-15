@@ -49,30 +49,62 @@ public class Module extends AbstractSyntaxNode {
 		this.identifier = identifier;
 	}
 	
+	/**
+	 * 
+	 * @param imprt
+	 * @return
+	 */
 	public boolean addImport(Import imprt) {
 		return imports.add(imprt);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Import> getImports() {
 		return imports.clone();
 	}
 	
+	/**
+	 * 
+	 * @param site
+	 * @return
+	 */
 	public boolean addSite(Site site) {
 		return sites.add(site);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Site> getSites() {
 		return sites.clone();
 	}
 	
+	/**
+	 * 
+	 * @param def
+	 * @return
+	 */
 	public boolean addFunctionDef(FunctionDef def) {
 		return defs.add(def);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<FunctionDef> getFunctionDefinitions() {
 		return defs.clone();
 	}
 	
+	/**
+	 * 
+	 * @param designator
+	 * @return
+	 */
 	public FunctionDef getFunctionDefinition(String designator) {
 		for(FunctionDef def: defs) {
 			if(def.getIdentifier().getToken().getLexeme().equals(designator)) {

@@ -60,11 +60,9 @@ class MarkupParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Designator parseDesignator() throws SyntaxException {
-		Designator designator = new Designator();
-		
 		// Parse identifier
 		next(WaebricTokenSort.IDCON, "designator identifier", "identifier");
-		designator.setIdentifier(new IdCon(tokens.current()));
+		Designator designator = new Designator(new IdCon(tokens.current()));
 		
 		// Parse attributes
 		designator.setAttributes(parseAttributes());
