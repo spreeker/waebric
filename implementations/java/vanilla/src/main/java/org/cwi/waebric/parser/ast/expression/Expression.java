@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.expression;
 
+import java.util.List;
+
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
@@ -50,12 +52,12 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		private IdCon var;
 		
+		public VarExpression(IdCon var) {
+			this.var = var;
+		}
+		
 		public IdCon getVar() {
 			return var;
-		}
-
-		public void setVar(IdCon var) {
-			this.var = var;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
@@ -136,8 +138,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return expressions.add(expression);
 		}
 		
-		public AbstractSyntaxNode[] getElements() {
-			return expressions.toArray(new AbstractSyntaxNode[0]);
+		public List<Expression> getExpressions() {
+			return expressions;
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
@@ -170,8 +172,8 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return pairs.add(pair);
 		}
 		
-		public AbstractSyntaxNode[] getElements() {
-			return pairs.toArray(new AbstractSyntaxNode[0]);
+		public List<KeyValuePair> getPairs() {
+			return pairs;
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {

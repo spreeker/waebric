@@ -108,9 +108,9 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.ListExpression expression = parser.parseListExpression();
-		assertTrue(expression.getElements().length == 2);
-		assertTrue(expression.getElements()[0] instanceof Expression.VarExpression);
-		assertTrue(expression.getElements()[1] instanceof Expression.VarExpression);
+		assertTrue(expression.getExpressions().size() == 2);
+		assertTrue(expression.getExpressions().get(0) instanceof Expression.VarExpression);
+		assertTrue(expression.getExpressions().get(1) instanceof Expression.VarExpression);
 	}
 	
 	@Test
@@ -119,9 +119,9 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.RecordExpression expression = parser.parseRecordExpression();
-		assertTrue(expression.getElements().length == 2);
-		assertTrue(expression.getElements()[0] instanceof KeyValuePair);
-		assertTrue(expression.getElements()[1] instanceof KeyValuePair);
+		assertTrue(expression.getPairs().size() == 2);
+		assertTrue(expression.getPairs().get(0) instanceof KeyValuePair);
+		assertTrue(expression.getPairs().get(1) instanceof KeyValuePair);
 	}
 	
 }

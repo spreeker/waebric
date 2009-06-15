@@ -1,6 +1,7 @@
 package org.cwi.waebric.interpreter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -170,6 +172,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 			
 			return false;
+		} else if(predicate instanceof Predicate.RegularPredicate) {
+			Predicate.RegularPredicate reg = (Predicate.RegularPredicate) predicate;
+			if(reg.getExpression() instanceof Expression.Field) {
+				// TODO Figure out how field expressions work
+			} else if(reg.getExpression() instanceof Expression.VarExpression) {
+				String name = ((Expression.VarExpression) reg.getExpression()).getVar().getName();
+				return variables.containsKey(name);
+			} else { return true; }
 		} else if(predicate instanceof Predicate.And) {
 			Predicate.And and = (Predicate.And) predicate;
 			return evaluatePredicate(and.getLeft()) && evaluatePredicate(and.getRight());
@@ -206,12 +216,32 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(Statement.Each statement) {
-		// TODO Auto-generated method stub
+		// Retrieve elements of expression
+		ArrayList<Expression> expressions = new ArrayList<Expression>();
+		if(statement.getExpression() instanceof Expression.ListExpression) {
+			// Store elements of list
+			Expression.ListExpression list = (Expression.ListExpression) statement.getExpression();
+			expressions.addAll(list.getExpressions());
+		} else if(statement.getExpression() instanceof Expression.RecordExpression) {
+			// Store values of record
+			Expression.RecordExpression record = (Expression.RecordExpression) statement.getExpression();
+			for(KeyValuePair value: record.getPairs()) { expressions.add(value.getExpression()); }
+		} else {
+			// Non-collection based expression, store single expression
+			expressions.add(statement.getExpression());
+		}
 		
+		// Execute statement for each element
+		for(Expression expression: expressions) {
+			variables.put(statement.getVar().getName(), expression);
+			statement.getStatement().accept(this);
+			variables.remove(statement.getVar().getName());
+		}
 	}
 
 	public void visit(Statement.Echo statement) {
 		statement.getExpression().accept(this);
+		current.setText(current.getText() + text);
 	}
 
 	public void visit(Statement.EchoEmbedding statement) {
@@ -358,7 +388,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(VarExpression expression) {
-		variables.get(expression.getVar()).accept(this);
+		variables.get(expression.getVar().getName()).accept(this);
 	}
 
 	public void visit(Embedding embedding) {

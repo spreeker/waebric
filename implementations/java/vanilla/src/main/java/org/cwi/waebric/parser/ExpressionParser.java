@@ -112,17 +112,14 @@ class ExpressionParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Expression.VarExpression parseVarExpression() throws SyntaxException {
-		Expression.VarExpression expression = new Expression.VarExpression();
-		
 		try {
 			next(WaebricTokenSort.IDCON, "Variable", "Var -> Expression");
-			expression.setVar(new IdCon(tokens.current()));
+			return new Expression.VarExpression(new IdCon(tokens.current()));
 		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), 
-					"Var expression", "Var -> Expression");
+			reportUnexpectedToken(tokens.current(), "Var expression", "Var -> Expression");
 		}
 		
-		return expression;
+		return null;
 	}
 	
 	/**

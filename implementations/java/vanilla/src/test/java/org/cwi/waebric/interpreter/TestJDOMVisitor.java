@@ -12,6 +12,7 @@ import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.parser.ast.statement.Statement;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Before;
@@ -26,6 +27,31 @@ public class TestJDOMVisitor {
 	public void setUp() {
 		this.document = new Document();
 		this.visitor = new JDOMVisitor(document);
+	}
+	
+	@Test
+	public void testEach() {
+		Expression.ListExpression list = new Expression.ListExpression();
+		list.addExpression(new Expression.TextExpression(new Text("test ")));
+		list.addExpression(new Expression.TextExpression(new Text("has ")));
+		list.addExpression(new Expression.TextExpression(new Text("succeeded")));
+		
+		IdCon var = new IdCon("myvar");
+		
+		Statement.Echo echo = new Statement.Echo();
+		echo.setExpression(new Expression.VarExpression(var));
+		
+		Statement.Each each = new Statement.Each();
+		each.setExpression(list);
+		each.setVar(var);
+		each.setStatement(echo);
+		
+		Element current = new Element("test");
+		
+		visitor.setCurrent(current);
+		visitor.visit(each);
+		
+		assertEquals("test has succeeded", current.getText());
 	}
 	
 	@Test
