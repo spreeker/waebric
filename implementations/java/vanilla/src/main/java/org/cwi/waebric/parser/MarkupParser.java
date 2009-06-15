@@ -106,7 +106,7 @@ class MarkupParser extends AbstractParser {
 		char symbol = tokens.current().getLexeme().toString().charAt(0);
 		
 		if(symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':') { // Identifier attribute
-			next(WaebricTokenSort.IDCON, "Identifier attribute", "{ # , $ : } Identifier");
+			next(WaebricTokenSort.IDCON, "Identifier attribute", "{ # . $ : } Identifier");
 			Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(symbol);
 			attribute.setIdentifier(new IdCon(tokens.current()));
 			return attribute;

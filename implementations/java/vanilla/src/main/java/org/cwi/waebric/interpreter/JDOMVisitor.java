@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import org.cwi.waebric.ModuleRegister;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -78,6 +80,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Current text
 	 */
 	private String text = "";
+	
+	/**
+	 * Store call statement for yield
+	 */
+	private Stack<Statement> yield = new Stack<Statement>();
 	
 	/**
 	 * Construct JDOM visitor
@@ -273,6 +280,29 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Statement.Yield statement) {
 		// TODO Auto-generated method stub
 		
+		
+		/**
+		 * WATCHOUT:
+		 * module test
+			
+			def main 
+			  layout("Hello") echo "Hello2";
+			  main2 echo "Hello3";
+			end
+			
+			def main2
+			  layout("Hello") yield;
+			end
+			
+			def layout(msg)
+			  html { 
+			   head title msg;
+			    body yield;
+			    p yield;
+			  }
+			end
+			
+		 */
 	}
 
 	public void visit(RegularMarkupStatement statement) {
@@ -346,6 +376,26 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			index++;
 		}
 	}
+	
+	/**
+	 * Check if function definition contains a yield statement, either
+	 * contained directly in the statement collection or indirectly 
+	 * by calling a statement with yield.
+	 * @param function
+	 * @return
+	 */
+	public boolean hasYield(FunctionDef function) {
+		for(AbstractSyntaxNode node: function.getChildren()) {
+			if(node instanceof Statement.Yield) {
+				return true; 
+			} else if(node instanceof Markup.Call) {
+				Markup.Call call = (Markup.Call) node;
+				return hasYield(functions.get(call.getDesignator().getIdentifier().getName()));
+			}
+		}
+		
+		return false;
+	}
 
 	public void visit(Tag markup) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
@@ -359,6 +409,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					tag.setAttribute("id", id.getIdentifier().getName());
 				} else if(id.getSymbol().toCharacter() == '$') {
 					tag.setAttribute("name", id.getIdentifier().getName());
+				} else if(id.getSymbol().toCharacter() == ':') {
+					tag.setAttribute("type", id.getIdentifier().getName());
 				}
 			} else if(attribute instanceof Attribute.AttributeNatCon) {
 				Attribute.AttributeNatCon nat = (Attribute.AttributeNatCon) attribute;
