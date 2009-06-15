@@ -31,25 +31,29 @@ public class TestJDOMVisitor {
 	
 	@Test
 	public void testEach() {
+		Statement.Each each = new Statement.Each();
+		
+		// List expression on which will be iterated
 		Expression.ListExpression list = new Expression.ListExpression();
 		list.addExpression(new Expression.TextExpression(new Text("test ")));
 		list.addExpression(new Expression.TextExpression(new Text("has ")));
 		list.addExpression(new Expression.TextExpression(new Text("succeeded")));
+		each.setExpression(list);
 		
+		// Variable which is constructed per element
 		IdCon var = new IdCon("myvar");
+		each.setVar(var);
 		
+		// Statement which is executed for each element
 		Statement.Echo echo = new Statement.Echo();
 		echo.setExpression(new Expression.VarExpression(var));
-		
-		Statement.Each each = new Statement.Each();
-		each.setExpression(list);
-		each.setVar(var);
 		each.setStatement(echo);
 		
+		// Set root element
 		Element current = new Element("test");
-		
 		visitor.setCurrent(current);
-		visitor.visit(each);
+		
+		visitor.visit(each); // Execute visit
 		
 		assertEquals("test has succeeded", current.getText());
 	}

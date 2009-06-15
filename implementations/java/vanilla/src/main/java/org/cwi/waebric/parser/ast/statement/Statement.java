@@ -46,7 +46,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "if" "(" Predicate ")" Statement NoElseMayFollow -> Statement
+	 * If-else statements allow their users to control their statement
+	 * flow with the use of predicates. In case a predicate is met the
+	 * first statement is executed, otherwise nothing is executed.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"if" "(" Predicate ")" Statement NoElseMayFollow -> Statement
+	 * <code>
 	 */
 	public static class If extends Statement {
 		
@@ -87,7 +94,15 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "if" "(" Predicate ")" Statement "else" Statement -> Statement
+	 * If-else statements allow their users to control their statement
+	 * flow with the use of predicates. In case a predicate is met the
+	 * first statement is executed, otherwise the second statement is
+	 * executed.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"if" "(" Predicate ")" Statement "else" Statement -> Statement
+	 * </code>
 	 */
 	public static class IfElse extends If {
 		
@@ -121,7 +136,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 
 	/**
-	 * "each" "(" IdCon ":" Expression ")" Statement -> Statement
+	 * Each statement allows users to iterate over a collection of
+	 * expressions, such as a list or a record. For each element
+	 * a local variable will be initiated and a statement executed.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"each" "(" IdCon ":" Expression ")" Statement -> Statement
+	 * </code>
 	 */
 	public static class Each extends Statement {
 
@@ -173,7 +195,13 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "let" Assignment+ "in" Statement* "end" -> Statement
+	 * Let statements allow users to make additional variable and function
+	 * bindings, which stay alive until the let statement is ended. <br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"let" Assignment+ "in" Statement* "end" -> Statement
+	 * </code>
 	 */
 	public static class Let extends Statement {
 
@@ -219,7 +247,13 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "{" Statement* "}"
+	 * Block statements allow the user to define additional statements within
+	 * the statement itself.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"{" Statement* "}"
+	 * </code>
 	 */
 	public static class Block extends Statement {
 
@@ -253,7 +287,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "comment" StrCon ";" -> Statement
+	 * Comment statements will be interpreted as HTML comment tags.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"comment" StrCon ";" -> Statement
+	 * </code>
 	 */
 	public static class Comment extends Statement {
 
@@ -283,7 +322,13 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "echo" Expression ";" -> Statement
+	 * Echo statements allow the user to attach text to the current
+	 * XML element.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"echo" Expression ";" -> Statement
+	 * </code>
 	 */
 	public static class Echo extends Statement {
 		
@@ -343,7 +388,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * "cdata" Expression ";" -> Statement
+	 * CData statements translate directly in regular CDATA tags.<br><br>
+	 * 
+	 * Grammar:<br>
+	 * <code>
+	 * 	"cdata" Expression ";" -> Statement
+	 * </code>
 	 */
 	public static class CData extends Statement {
 
