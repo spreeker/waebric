@@ -19,6 +19,22 @@ namespace Parser.Ast.Site
         #region Public Methods
 
         /// <summary>
+        /// Empty constructor
+        /// </summary>
+        public PathElement()
+        {
+        }
+
+        /// <summary>
+        /// Constructor with pathelement
+        /// </summary>
+        /// <param name="pathElement">Pathelement</param>
+        public PathElement(String pathElement)
+        {
+            Element = pathElement;
+        }
+
+        /// <summary>
         /// Set path element
         /// </summary>
         /// <param name="pathElement">Path element to set</param>

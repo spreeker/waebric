@@ -19,6 +19,22 @@ namespace Parser.Ast.Site
         #region Public Methods
 
         /// <summary>
+        /// Empty constructor
+        /// </summary>
+        public FileExt()
+        {
+        }
+
+        /// <summary>
+        /// Constructor with creation of fileExtension
+        /// </summary>
+        /// <param name="fileExtension">Extension</param>
+        public FileExt(String fileExtension)
+        {
+            FileExtension = fileExtension;
+        }
+
+        /// <summary>
         /// Set file extension
         /// </summary>
         /// <param name="fileExtension">File extension</param>

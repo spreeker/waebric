@@ -90,13 +90,18 @@ namespace Parser
         public Path ParsePath()
         {
             Path path = new Path();
-            while (TokenStream.HasNext()) 
-            {   // Get all path elements
+           
+            //Determine if we have directories in path or just a filename
+            if (TokenStream.Peek(2).GetValue().ToString() == ".")
+            {   //Just a single filename to parse
+                path.SetFilename(ParseFileName());
+            }
+            else
+            {   //Directory and filename
                 path.SetDirectoryName(ParseDirectoryName());
                 path.SetFilename(ParseFileName());
-
-                //TODO: ADD BREAKING CONDITION HERE!!!!
             }
+
             return path;
         }
 
@@ -107,9 +112,10 @@ namespace Parser
         public DirName ParseDirectoryName()
         {
             DirName directoryName = new DirName();
+            
             directoryName.SetDirectory(ParseDirectory());
+            
             return directoryName;
-
         }
 
         /// <summary>
@@ -118,7 +124,20 @@ namespace Parser
         /// <returns>Parsed FileName</returns>
         public FileName ParseFileName()
         {
-            return null;
+            FileName filename = new FileName();
+
+            //Filename
+            NextToken("filename", "filename.ext");
+            filename.SetName(new PathElement(CurrentToken.GetValue().ToString()));
+            
+            //Period (between filename and extension)
+            NextToken(".", "filename.ext", '.');
+            
+            //Extension
+            NextToken("extension", "filename.ext");
+            filename.SetFileExtension(new FileExt(CurrentToken.GetValue().ToString()));
+
+            return filename;
         }
 
         /// <summary>
@@ -128,13 +147,23 @@ namespace Parser
         public Directory ParseDirectory()
         {
             Directory directory = new Directory();
-            //Parse all path elements here!!!
+            
+            //Parse path elements
+            while (TokenStream.HasNext())
+            {
+                if(TokenStream.Peek(2).GetValue().ToString() == ".")
+                { //End of directory, filename starts here
+                    break;
+                }
+                PathElement element = new PathElement();
+                NextToken("directory", "directory/filename.ext");
+                element.SetPathElement(CurrentToken.GetValue().ToString());
+                directory.AddDirectoryElement(element);
 
-
+                //Skip / or \
+                NextToken("/ or \\", "directory/FileName.ext");
+            }
             return directory;
         }
-        
-        
-
     }
 }
