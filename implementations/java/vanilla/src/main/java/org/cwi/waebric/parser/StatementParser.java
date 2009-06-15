@@ -241,6 +241,8 @@ class StatementParser extends AbstractParser {
 		} else {
 			reportUnexpectedToken(tokens.current(), "comments text", "\"comments\" \" Text \"");
 		}
+		
+		next(WaebricSymbol.SEMICOLON, "Comment closure \";\"", "\"comment\" StrCon \";\"");
 		return statement;
 	}
 	

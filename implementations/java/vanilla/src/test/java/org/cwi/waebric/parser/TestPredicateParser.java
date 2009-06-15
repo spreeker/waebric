@@ -100,7 +100,7 @@ public class TestPredicateParser {
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Type type = parser.parseType();
-		assertEquals("string", type.getType().toString()); // Correct literal stored
+		assertEquals("string", type.getName().toString()); // Correct literal stored
 	}
 	
 	@Test

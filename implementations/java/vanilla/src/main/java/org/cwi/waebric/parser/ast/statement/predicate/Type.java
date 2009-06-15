@@ -21,7 +21,7 @@ public class Type extends AbstractSyntaxNode {
 	
 	private StringLiteral type;
 
-	public StringLiteral getType() {
+	public StringLiteral getName() {
 		return type;
 	}
 

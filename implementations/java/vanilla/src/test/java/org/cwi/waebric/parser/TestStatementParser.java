@@ -92,7 +92,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testIfStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("if(123) comment \"succes\"");
+		iterator = TestUtilities.quickScan("if(123) comment \"succes\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		If statement = parser.parseIfStatement();
@@ -102,7 +102,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testIfElseStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("if(123) comment \"succes\" else yield;");
+		iterator = TestUtilities.quickScan("if(123) comment \"succes\"; else yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		IfElse statement = (IfElse) parser.parseIfStatement();
@@ -131,7 +131,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEachStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("each(var1:10) comment \"test\"");
+		iterator = TestUtilities.quickScan("each(var1:10) comment \"test\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Each statement = parser.parseEachStatement();
@@ -142,7 +142,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testStatementCollection() throws SyntaxException {
-		iterator = TestUtilities.quickScan("{ yield; comment \"text\" markup1 markup2 var; }");
+		iterator = TestUtilities.quickScan("{ yield; comment \"text\"; markup1 markup2 var; }");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Block statement = parser.parseStatementCollection();
@@ -154,7 +154,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testLetStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("let var=100 in comment \"test\" end");
+		iterator = TestUtilities.quickScan("let var=100 in comment \"test\"; end");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Let statement = parser.parseLetStatement();

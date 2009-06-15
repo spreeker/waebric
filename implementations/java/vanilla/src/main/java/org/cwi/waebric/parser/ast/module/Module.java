@@ -100,14 +100,6 @@ public class Module extends AbstractSyntaxNode {
 		return defs.clone();
 	}
 	
-	public FunctionDef getFunction(String name) {
-		for(FunctionDef function: this.getFunctionDefinitions()) {
-			if(function.getIdentifier().equals(name)) { return function; }
-		}
-		
-		return null;
-	}
-	
 	@Override
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {

@@ -64,8 +64,6 @@ public class IdCon extends AbstractSyntaxNode {
 		if(obj instanceof IdCon) {
 			IdCon id = (IdCon) obj;
 			return id.getToken().getLexeme().equals(this.getToken().getLexeme());
-		} else if(obj instanceof String) {
-			return this.toString().equals(obj.toString());
 		}
 		
 		return false;
