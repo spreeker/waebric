@@ -122,8 +122,8 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor, Object[] args) {
-		visitor.visit(this, args);
+	public void accept(INodeVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

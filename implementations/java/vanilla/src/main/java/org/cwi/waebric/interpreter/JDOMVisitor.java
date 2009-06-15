@@ -95,21 +95,19 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param functions Declared functions
 	 * @param variables Defined variables
 	 */
-	public JDOMVisitor(Document document, Map<String, FunctionDef> functions, 
-			Map<String, Expression> variables) {
+	public JDOMVisitor(Document document, Map<String, FunctionDef> functions, Map<String, Expression> variables) {
 		this.document = document;
 		this.functions = functions;
 		this.variables = variables;
 	}
 
-	public void visit(Module module, Object[] args) {
+	public void visit(Module module) {
 		// Brand-mark document
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Comment comment = new Comment("Compiled on: " + format.format(new Date()));
 		document.addContent(comment);
 		
 		// Store function definitions
-		Map<String, FunctionDef> functions = new HashMap<String, FunctionDef>();
 		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
 		for(Module dependancy: dependancies) {
 			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
@@ -118,20 +116,18 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		// Start interpreting "main" function
-		FunctionDef main = functions.get("main");
-		if(main != null) {
-			main.accept(this, args);
-		}
+		visit(functions.get("main"));
 		
-		functions.clear(); // Terminate all function definitions
+		// Terminate all function definitions
+		functions.clear();
 	}
 
-	public void visit(Site site, Object[] args) {
+	public void visit(Site site) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(FunctionDef function, Object[] args) {	
+	public void visit(FunctionDef function) {	
 		// Construct HTML root element when multiple statements can be root
 		if(function.getStatements().size() > 1) {
 			Element html = new Element("html", Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
@@ -145,7 +141,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// Process statement(s)
 		Element root = current;
 		for(Statement statement: function.getStatements()) {
-			statement.accept(this, args);
+			statement.accept(this);
 			current = root; // Reset current to root
 		}
 		
@@ -155,17 +151,17 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
-	public void visit(Statement.If statement, Object[] args) {
+	public void visit(Statement.If statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
-			statement.getStatement().accept(this, args);
+			statement.getStatement().accept(this);
 		}
 	}
 
-	public void visit(Statement.IfElse statement, Object[] args) {
+	public void visit(Statement.IfElse statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
-			statement.getStatement().accept(this, args);
+			statement.getStatement().accept(this);
 		} else {
-			statement.getElseStatement().accept(this, args);
+			statement.getElseStatement().accept(this);
 		}
 	}
 	
@@ -202,50 +198,50 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		return false;
 	}
 
-	public void visit(Statement.Block statement, Object[] args) {
+	public void visit(Statement.Block statement) {
 		Element root = current;
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this, args);
+			sub.accept(this);
 			current = root; // Reset current to root
 		}
 	}
 
-	public void visit(Statement.CData statement, Object[] args) {
+	public void visit(Statement.CData statement) {
 		// Process expression to fill data field
-		statement.getExpression().accept(this, args);
+		statement.getExpression().accept(this);
 		
 		CDATA cdata = new CDATA(text);
 		current.addContent(cdata);
 	}
 
-	public void visit(Statement.Comment statement, Object[] args) {
+	public void visit(Statement.Comment statement) {
 		Comment comment = new Comment(statement.getComment().getLiteral().toString());
 		current.addContent(comment);
 	}
 
-	public void visit(Statement.Each statement, Object[] args) {
+	public void visit(Statement.Each statement) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(Statement.Echo statement, Object[] args) {
-		statement.getExpression().accept(this, args);
+	public void visit(Statement.Echo statement) {
+		statement.getExpression().accept(this);
 	}
 
-	public void visit(Statement.EchoEmbedding statement, Object[] args) {
+	public void visit(Statement.EchoEmbedding statement) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(Statement.Let statement, Object[] args) {
+	public void visit(Statement.Let statement) {
 		// Extend function and variable definitions with assignments
 		for(Assignment assignment: statement.getAssignments()) {
-			assignment.accept(this, args);
+			assignment.accept(this);
 		}
 		
 		// Visit sub-statements
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this, args);
+			sub.accept(this);
 		}
 		
 		// Destroy let assignments
@@ -258,48 +254,48 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
-	public void visit(Statement.Yield statement, Object[] args) {
+	public void visit(Statement.Yield statement) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(RegularMarkupStatement statement, Object[] args) {
-		statement.getMarkup().accept(this, args);
+	public void visit(RegularMarkupStatement statement) {
+		statement.getMarkup().accept(this);
 	}
 
-	public void visit(MarkupMarkup statement, Object[] args) {
+	public void visit(MarkupMarkup statement) {
 		for(Markup markup: statement.getMarkups()) {
-			markup.accept(this, args);
+			markup.accept(this);
 		}
 	}
 
-	public void visit(MarkupExp statement, Object[] args) {
+	public void visit(MarkupExp statement) {
 		// Visit mark-up(s)
 		for(Markup markup: statement.getMarkups()) {
-			markup.accept(this, args);
+			markup.accept(this);
 		}
 		
 		// Visit expression
-		statement.getExpression().accept(this, args);
+		statement.getExpression().accept(this);
 		current.setText(text);
 	}
 
-	public void visit(MarkupStat statement, Object[] args) {
+	public void visit(MarkupStat statement) {
 		// Visit mark-up(s)
 		for(Markup markup: statement.getMarkups()) {
-			markup.accept(this, args);
+			markup.accept(this);
 		}
 		
 		// Visit statement
-		statement.getStatement().accept(this, args);
+		statement.getStatement().accept(this);
 	}
 
-	public void visit(MarkupEmbedding statement, Object[] args) {
+	public void visit(MarkupEmbedding statement) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(FuncBind bind, Object[] args) {
+	public void visit(FuncBind bind) {
 		// Construct new function definition based on bind data
 		FunctionDef definition = new FunctionDef();
 		
@@ -318,11 +314,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		functions.put(bind.getIdentifier().getName(), definition);
 	}
 
-	public void visit(VarBind bind, Object[] args) {
+	public void visit(VarBind bind) {
 		variables.put(bind.getIdentifier().getName(), bind.getExpression());
 	}
 
-	public void visit(Call markup, Object[] args) {
+	public void visit(Call markup) {
 		// Retrieve function definition
 		FunctionDef function = functions.get(markup.getDesignator().getIdentifier().getName());
 		
@@ -335,51 +331,51 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
-	public void visit(Tag markup, Object[] args) {
+	public void visit(Tag markup) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
 		current.addContent(tag);
 		current = tag; // Current element is tag
 	}
 
-	public void visit(CatExpression expression, Object[] args) {
+	public void visit(CatExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(Field expression, Object[] args) {
+	public void visit(Field expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(ListExpression expression, Object[] args) {
+	public void visit(ListExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(NatExpression expression, Object[] args) {
+	public void visit(NatExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(RecordExpression expression, Object[] args) {
+	public void visit(RecordExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(SymbolExpression expression, Object[] args) {
+	public void visit(SymbolExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void visit(TextExpression expression, Object[] args) {
+	public void visit(TextExpression expression) {
 		text = expression.getText().getLiteral().toString();
 	}
 
-	public void visit(VarExpression expression, Object[] args) {
-		variables.get(expression.getVar()).accept(this, args);
+	public void visit(VarExpression expression) {
+		variables.get(expression.getVar()).accept(this);
 	}
 
-	public void visit(Embedding embedding, Object[] args) {
+	public void visit(Embedding embedding) {
 		// TODO Auto-generated method stub
 		
 	}

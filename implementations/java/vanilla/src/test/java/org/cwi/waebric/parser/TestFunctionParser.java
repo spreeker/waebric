@@ -36,7 +36,7 @@ public class TestFunctionParser {
 	
 	@Test
 	public void testFunctionDef() throws SyntaxException {
-		iterator = TestUtilities.quickScan("home(var1,var2) comment \"lol\" end");
+		iterator = TestUtilities.quickScan("home(var1,var2) comment \"lol\"; end");
 		parser = new FunctionParser(iterator, exceptions);
 		
 		FunctionDef def = parser.parseFunctionDef();

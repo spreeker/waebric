@@ -34,78 +34,78 @@ import org.cwi.waebric.parser.ast.token.TokenNode;
  */
 public class DefaultNodeVisitor implements INodeVisitor {
 
-	public void visit(Modules modules, Object[] args) { }
-	public void visit(Module module, Object[] args) { }
-	public void visit(ModuleId id, Object[] args) { }
-	public void visit(Import imprt, Object[] args) { }
-	public void visit(Site site, Object[] args) { }
-	public void visit(Mappings mappings, Object[] args) { }
-	public void visit(Mapping mapping, Object[] args) { }
-	public void visit(Path path, Object[] args) { }
-	public void visit(PathElement element, Object[] args) { }
-	public void visit(Directory directory, Object[] args) { }
-	public void visit(DirName name, Object[] args) { }
-	public void visit(FileName name, Object[] args) { }
-	public void visit(FileExt ext, Object[] args) { }
-	public void visit(FunctionDef function, Object[] args) { }
-	public void visit(RegularFormal formals, Object[] args) { }
-	public void visit(EmptyFormal formals, Object[] args) { }
-	public void visit(If statement, Object[] args) { }
-	public void visit(IfElse statement, Object[] args) { }
-	public void visit(Block statement, Object[] args) { }
-	public void visit(CData statement, Object[] args) { }
-	public void visit(Comment statement, Object[] args) { }
-	public void visit(Each statement, Object[] args) { }
-	public void visit(Echo statement, Object[] args) { }
-	public void visit(EchoEmbedding statement, Object[] args) { }
-	public void visit(Let statement, Object[] args) { }
-	public void visit(Yield statement, Object[] args) { }
-	public void visit(RegularMarkupStatement statement, Object[] args) { }
-	public void visit(MarkupMarkup statement, Object[] args) { }
-	public void visit(MarkupExp statement, Object[] args) { }
-	public void visit(MarkupStat statement, Object[] args) { }
-	public void visit(MarkupEmbedding statement, Object[] args) { }
-	public void visit(FuncBind bind, Object[] args) { }
-	public void visit(VarBind bind, Object[] args) { }
-	public void visit(RegularPredicate predicate, Object[] args) { }
-	public void visit(And predicate, Object[] args) { }
-	public void visit(Is predicate, Object[] args) { }
-	public void visit(Not predicate, Object[] args) { }
-	public void visit(Or predicate, Object[] args) { }
-	public void visit(Type type, Object[] args) { }
-	public void visit(Embedding embedding, Object[] args) { }
-	public void visit(Embed embed, Object[] args) { }
-	public void visit(PreText text, Object[] args) { }
-	public void visit(MidText text, Object[] args) { }
-	public void visit(PostText text, Object[] args) { }
-	public void visit(MidTail tail, Object[] args) { }
-	public void visit(PostTail tail, Object[] args) { }
-	public void visit(Call markup, Object[] args) { }
-	public void visit(Tag markup, Object[] args) { }
-	public void visit(Designator designator, Object[] args) { }
-	public void visit(Attributes attributes, Object[] args) { }
-	public void visit(Attribute attribute, Object[] args) { }
-	public void visit(Arguments arguments, Object[] args) { }
-	public void visit(Argument argument, Object[] args) { }
-	public void visit(CatExpression expression, Object[] args) { }
-	public void visit(Field expression, Object[] args) { }
-	public void visit(ListExpression expression, Object[] args) { }
-	public void visit(NatExpression expression, Object[] args) { }
-	public void visit(RecordExpression expression, Object[] args) { }
-	public void visit(SymbolExpression expression, Object[] args) { }
-	public void visit(TextExpression expression, Object[] args) { }
-	public void visit(VarExpression expression, Object[] args) { }
-	public void visit(KeyValuePair pair, Object[] args) { }
-	public void visit(Text text, Object[] args) { }
-	public void visit(IdCon id, Object[] args) { }
-	public void visit(NatCon nat, Object[] args) { }
-	public void visit(StrCon str, Object[] args) { }
-	public void visit(SymbolCon symbol, Object[] args) { }
-	public void visit(NodeList<?> list, Object[] args) { }
-	public void visit(SeparatedNodeList<?> list, Object[] args) { }
-	public void visit(CharacterLiteral literal, Object[] args) { }
-	public void visit(IntegerLiteral literal, Object[] args) { }
-	public void visit(StringLiteral literal, Object[] args) { }
-	public void visit(TokenNode node, Object[] args) { }
+	public void visit(Modules modules) { }
+	public void visit(Module module) { }
+	public void visit(ModuleId id) { }
+	public void visit(Import imprt) { }
+	public void visit(Site site) { }
+	public void visit(Mappings mappings) { }
+	public void visit(Mapping mapping) { }
+	public void visit(Path path) { }
+	public void visit(PathElement element) { }
+	public void visit(Directory directory) { }
+	public void visit(DirName name) { }
+	public void visit(FileName name) { }
+	public void visit(FileExt ext) { }
+	public void visit(FunctionDef function) { }
+	public void visit(RegularFormal formals) { }
+	public void visit(EmptyFormal formals) { }
+	public void visit(If statement) { }
+	public void visit(IfElse statement) { }
+	public void visit(Block statement) { }
+	public void visit(CData statement) { }
+	public void visit(Comment statement) { }
+	public void visit(Each statement) { }
+	public void visit(Echo statement) { }
+	public void visit(EchoEmbedding statement) { }
+	public void visit(Let statement) { }
+	public void visit(Yield statement) { }
+	public void visit(RegularMarkupStatement statement) { }
+	public void visit(MarkupMarkup statement) { }
+	public void visit(MarkupExp statement) { }
+	public void visit(MarkupStat statement) { }
+	public void visit(MarkupEmbedding statement) { }
+	public void visit(FuncBind bind) { }
+	public void visit(VarBind bind) { }
+	public void visit(RegularPredicate predicate) { }
+	public void visit(And predicate) { }
+	public void visit(Is predicate) { }
+	public void visit(Not predicate) { }
+	public void visit(Or predicate) { }
+	public void visit(Type type) { }
+	public void visit(Embedding embedding) { }
+	public void visit(Embed embed) { }
+	public void visit(PreText text) { }
+	public void visit(MidText text) { }
+	public void visit(PostText text) { }
+	public void visit(MidTail tail) { }
+	public void visit(PostTail tail) { }
+	public void visit(Call markup) { }
+	public void visit(Tag markup) { }
+	public void visit(Designator designator) { }
+	public void visit(Attributes attributes) { }
+	public void visit(Attribute attribute) { }
+	public void visit(Arguments arguments) { }
+	public void visit(Argument argument) { }
+	public void visit(CatExpression expression) { }
+	public void visit(Field expression) { }
+	public void visit(ListExpression expression) { }
+	public void visit(NatExpression expression) { }
+	public void visit(RecordExpression expression) { }
+	public void visit(SymbolExpression expression) { }
+	public void visit(TextExpression expression) { }
+	public void visit(VarExpression expression) { }
+	public void visit(KeyValuePair pair) { }
+	public void visit(Text text) { }
+	public void visit(IdCon id) { }
+	public void visit(NatCon nat) { }
+	public void visit(StrCon str) { }
+	public void visit(SymbolCon symbol) { }
+	public void visit(NodeList<?> list) { }
+	public void visit(SeparatedNodeList<?> list) { }
+	public void visit(CharacterLiteral literal) { }
+	public void visit(IntegerLiteral literal) { }
+	public void visit(StringLiteral literal) { }
+	public void visit(TokenNode node) { }
 
 }

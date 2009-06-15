@@ -1,5 +1,6 @@
 package org.cwi.waebric.interpreter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -29,7 +30,8 @@ public class TestJDOMVisitor {
 		Markup.Tag markup = new Markup.Tag();
 		markup.setDesignator(new Designator(new IdCon("head")));
 		visitor.setCurrent(parent);
-		visitor.visit(markup, new Object[]{});
+		visitor.visit(markup);
+		assertEquals("head", visitor.getCurrent().getName());
 		assertTrue(parent.getContent().contains(visitor.getCurrent()));
 	}
 

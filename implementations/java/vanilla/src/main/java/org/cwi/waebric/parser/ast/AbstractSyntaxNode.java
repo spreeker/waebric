@@ -20,7 +20,7 @@ public abstract class AbstractSyntaxNode {
 	 * @param visitor
 	 * @param arg
 	 */
-	public abstract void accept(INodeVisitor visitor, Object[] args);
+	public abstract void accept(INodeVisitor visitor);
 	
 	@Override
 	public String toString() {

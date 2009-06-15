@@ -55,7 +55,7 @@ public class WaebricInterpreter {
 	 */
 	public Document interpretModule(Module module, Modules modules) {
 		Document document = new Document();
-		new JDOMVisitor(document).visit(module, new Object[]{});
+		new JDOMVisitor(document).visit(module);
 		return document;
 	}
 	
