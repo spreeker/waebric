@@ -5,7 +5,7 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
+import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * Waebric provides shorthand notation for common XHTML attributes.<br><br>
@@ -23,27 +23,22 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  * @date 25-05-2009
  */
 public abstract class Attribute extends AbstractSyntaxNode {
-	
-	protected StringLiteral symbol;
-	
-	public StringLiteral getSymbol() {
-		return symbol;
-	}
 
 	/**
 	 * Grammar:<br>
 	 * <code>
-	 * 	"#" IdCon -> Attribute
-	 *  "." IdCon -> Attribute
+	 * 	"#" IdCon -> Attribute<br>
+	 *  "." IdCon -> Attribute<br>
 	 *  "$" IdCOn -> Attribute
 	 * </code>
 	 */
 	public static class AttributeIdCon extends Attribute {
 
+		private final CharacterLiteral symbol;
 		private IdCon identifier;
 		
 		public AttributeIdCon(char symbol) {
-			this.symbol = new StringLiteral("" + symbol);
+			this.symbol = new CharacterLiteral(symbol);
 		}
 		
 		public IdCon getIdentifier() {
@@ -52,6 +47,10 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		public void setIdentifier(IdCon identifier) {
 			this.identifier = identifier;
+		}
+
+		public CharacterLiteral getSymbol() {
+			return symbol;
 		}
 		
 		@Override
@@ -80,10 +79,6 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		protected NatCon number;
 		
-		public AttributeNatCon() {
-			symbol = new StringLiteral("" + WaebricSymbol.AT_SIGN);
-		}
-		
 		public NatCon getNumber() {
 			return number;
 		}
@@ -94,11 +89,14 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		@Override
 		public String toString() {
-			return "" + symbol + number;
+			return "@" + number;
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { symbol, number };
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.AT_SIGN), 
+					number
+				};
 		}
 		
 		@Override
@@ -116,17 +114,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	 */
 	public static class AttributeDoubleNatCon extends AttributeNatCon {
 
-		private final StringLiteral secondSymbol;
 		private NatCon secondNumber;
-		
-		public AttributeDoubleNatCon() {
-			super();
-			secondSymbol = new StringLiteral("" + WaebricSymbol.AT_SIGN);
-		}
-		
-		public StringLiteral getSecondSymbol() {
-			return secondSymbol;
-		}
 		
 		public NatCon getSecondNumber() {
 			return secondNumber;
@@ -138,12 +126,15 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		@Override
 		public String toString() {
-			return "" + symbol + number + secondSymbol + secondNumber;
+			return "@" + number + '%' + secondNumber;
 		}
 		
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { symbol, number, secondSymbol, secondNumber };
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.AT_SIGN), number, 
+					new CharacterLiteral(WaebricSymbol.PERCENT_SIGN), secondNumber 
+				};
 		}
 		
 		@Override

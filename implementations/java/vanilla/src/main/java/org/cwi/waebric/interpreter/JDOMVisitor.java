@@ -19,6 +19,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.RecordExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.SymbolExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
+import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
@@ -47,8 +48,7 @@ import org.jdom.Namespace;
 
 /**
  * Convert AST to JDOM format, allowing it to be parsed into an XHTML document.
- * The conversion is done using the visitor pattern to quit the endless casts
- * on statements and expressions.
+ * Visitor pattern is applied to eliminate the endless casts on AST nodes.
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
@@ -117,7 +117,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	public void visit(FunctionDef function) {	
 		// Construct HTML root element when multiple statements can be root
-		if(function.getStatements().size() > 1) {
+		if(function.getStatements().size() > 1 && ! document.hasRootElement()) {
 			Element html = new Element("html", Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
 			html.setAttribute("lang", "en");
 			
@@ -158,7 +158,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param predicate
 	 * @return Boolean
 	 */
-	private boolean evaluatePredicate(Predicate predicate) {
+	public boolean evaluatePredicate(Predicate predicate) {
 		if(predicate instanceof Predicate.Is) {
 			Predicate.Is is = (Predicate.Is) predicate;
 			
@@ -203,7 +203,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(Statement.CData statement) {
-		// Process expression to fill data field
+		// Process expression to fill text field
 		statement.getExpression().accept(this);
 		
 		CDATA cdata = new CDATA(text);
@@ -349,6 +349,27 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	public void visit(Tag markup) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
+		
+		for(Attribute attribute: markup.getDesignator().getAttributes()) {
+			if(attribute instanceof Attribute.AttributeIdCon) {
+				Attribute.AttributeIdCon id = (Attribute.AttributeIdCon) attribute;
+				if(id.getSymbol().toCharacter() == '.') {
+					tag.setAttribute("class", id.getIdentifier().getName());
+				} else if(id.getSymbol().toCharacter() == '#') {
+					tag.setAttribute("id", id.getIdentifier().getName());
+				} else if(id.getSymbol().toCharacter() == '$') {
+					tag.setAttribute("name", id.getIdentifier().getName());
+				}
+			} else if(attribute instanceof Attribute.AttributeNatCon) {
+				Attribute.AttributeNatCon nat = (Attribute.AttributeNatCon) attribute;
+				tag.setAttribute("width", nat.getNumber().getLiteral().toString());
+			} else if(attribute instanceof Attribute.AttributeDoubleNatCon) {
+				Attribute.AttributeDoubleNatCon dnat = (Attribute.AttributeDoubleNatCon) attribute;
+				tag.setAttribute("width", dnat.getNumber().getLiteral().toString());
+				tag.setAttribute("height", dnat.getSecondNumber().getLiteral().toString());
+			}
+		}
+		
 		current.addContent(tag);
 		current = tag; // Current element is tag
 	}
