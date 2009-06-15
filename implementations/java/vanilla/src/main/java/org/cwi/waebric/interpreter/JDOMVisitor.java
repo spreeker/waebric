@@ -18,7 +18,6 @@ import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.ast.statement.Assignment;
@@ -52,11 +51,17 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public final Modules modules;
 	
 	/**
+	 * Active variables
+	 */
+	private Map<IdCon, Expression> variables;
+	
+	/**
 	 * Construct JDOM visitor based on modules instance.
 	 * @param modules
 	 */
 	public JDOMVisitor(Modules modules) {
 		this.modules = modules;
+		this.variables = new HashMap<IdCon, Expression>();
 	}
 
 	public void visit(Site site, Object[] args) {
@@ -66,15 +71,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	
 	/**
 	 * Store call values and delegate statements.
-	 * Expected arguments: Parent element, Object[] values
+	 * Expected arguments: Parent element, Expression[] call values
 	 */
-	public void visit(FunctionDef function, Object[] args) {
-		// Store the call values of each variable
-		Map<IdCon, Expression> variables = new HashMap<IdCon, Expression>();
-		function.getFormals().accept(this, new Object[] {
-				variables, // Map for storing variables
-				args[1] // Call arguments, current value of formals
-			});
+	public void visit(FunctionDef function, Object[] args) {	
+		// Store function variables with their called expressions
+		Expression[] values = (Expression[]) args[1]; int index = 0; 
+		for(IdCon identifier: function.getFormals().getIdentifiers()) {
+			variables.put(identifier, values[index]);
+			index++;
+		}
 
 		// Construct HTML root element when multiple statements can be root
 		if(args[0] instanceof Document && function.getStatements().size() > 1) {
@@ -88,28 +93,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			args[0] = html; // Make HTML current element
 		}
 		
-		// Process statements
-		Object parent = args[0];
+		// Process statement(s)
 		for(Statement statement: function.getStatements()) {
 			statement.accept(this, new Object[] { 
-					parent, // Parent element (Document or HTML)
-					variables // Map of variable names and expression values
+					args[0] // Parent node, document or element instance
 				});
 		}
-	}
-	
-	/**
-	 * Map variables on their called expression value.
-	 * Expected arguments: Map<IdCon, Expression> storage, Expression[] values
-	 */
-	public void visit(Formals.RegularFormal formals, Object[] args) {
-		Map<IdCon, Expression> variables = (Map<IdCon, Expression>) args[0];
-		Expression[] values = (Expression[]) args[1];
 		
-		int index = 0;
-		for(IdCon identifier: formals.getIdentifiers()) {
-			variables.put(identifier, values[index]);
-			index++;
+		// Terminate function variables
+		for(IdCon identifier: function.getFormals().getIdentifiers()) {
+			variables.remove(identifier);
 		}
 	}
 	
@@ -129,7 +122,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Statement.Block statement, Object[] args) {
 		Element parent = (Element) args[0];
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this, new Object[] { parent, args[1] });
+			sub.accept(this, new Object[] { parent });
 		}
 	}
 
@@ -172,8 +165,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		// Delegate visit to sub-statements
+		Object parent = args[0];
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this, args);
+			sub.accept(this, new Object[] { parent });
 		}
 	}
 
@@ -286,8 +280,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(VarExpression expression, Object[] args) {
-		// TODO Auto-generated method stub
-		
+		// Delegate visit to expression value of variable
+		variables.get(expression.getVar()).accept(this, args);
 	}
 
 	public void visit(Embedding embedding, Object[] args) {

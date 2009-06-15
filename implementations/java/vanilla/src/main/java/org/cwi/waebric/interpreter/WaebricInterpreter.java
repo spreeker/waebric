@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
+import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
@@ -75,8 +76,8 @@ public class WaebricInterpreter {
 		
 		// Fill document using the JDOM visitor
 		visitor.visit(main, new Object[] { 
-				document, // Document reference, used to create sub-elements
-				new Object[]{} // Main function takes no call arguments
+				document, // Document reference, used to create XML elements
+				new Expression[]{} // Main function takes no call values
 			});
 		
 		return document;
