@@ -83,22 +83,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public JDOMVisitor(Document document) {
 		this.document = document;
-		
-		// Initiate mappings
-		variables = new HashMap<String, Expression>();
 		functions = new HashMap<String, FunctionDef>();
-	}
-	
-	/**
-	 * Construct JDOM visitor
-	 * @param document Document
-	 * @param functions Declared functions
-	 * @param variables Defined variables
-	 */
-	public JDOMVisitor(Document document, Map<String, FunctionDef> functions, Map<String, Expression> variables) {
-		this.document = document;
-		this.functions = functions;
-		this.variables = variables;
+		variables = new HashMap<String, Expression>();
 	}
 
 	public void visit(Module module) {
@@ -428,6 +414,24 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public Expression getVariable(String name) {
 		return variables.get(name);
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param function
+	 */
+	public void addFunctionDef(String name, FunctionDef function) {
+		functions.put(name, function);
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	public void addVariable(String name, Expression value) {
+		variables.put(name, value);
 	}
 	
 }

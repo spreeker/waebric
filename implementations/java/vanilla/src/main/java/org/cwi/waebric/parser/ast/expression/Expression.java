@@ -23,13 +23,13 @@ public abstract class Expression extends AbstractSyntaxNode {
 	public static class TextExpression extends Expression {
 
 		private Text text;
+		
+		public TextExpression(Text text) {
+			this.text = text;
+		}
 
 		public Text getText() {
 			return text;
-		}
-
-		public void setText(Text text) {
-			this.text = text;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
