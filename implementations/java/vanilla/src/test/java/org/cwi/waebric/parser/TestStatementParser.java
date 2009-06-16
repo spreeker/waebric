@@ -29,7 +29,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;

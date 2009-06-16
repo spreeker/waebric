@@ -5,9 +5,6 @@ import java.util.List;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
-import org.cwi.waebric.parser.exception.MissingTokenException;
-import org.cwi.waebric.parser.exception.SyntaxException;
-import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 
 /**
  * Abstract parser stores token stream and exceptions. Based on these fields

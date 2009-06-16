@@ -10,7 +10,6 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;

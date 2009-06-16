@@ -8,7 +8,6 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 

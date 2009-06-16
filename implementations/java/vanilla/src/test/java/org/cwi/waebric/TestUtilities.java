@@ -8,9 +8,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
+import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.TokenIterator;
 

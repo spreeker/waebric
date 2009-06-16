@@ -15,7 +15,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;

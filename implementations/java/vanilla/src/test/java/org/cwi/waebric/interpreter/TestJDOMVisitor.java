@@ -52,7 +52,6 @@ public class TestJDOMVisitor {
 		// Set root element
 		Element current = new Element("test");
 		visitor.setCurrent(current);
-		
 		visitor.visit(each); // Execute visit
 		
 		assertEquals("test has succeeded", current.getText());
