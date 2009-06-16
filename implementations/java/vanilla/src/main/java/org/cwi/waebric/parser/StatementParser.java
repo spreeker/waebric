@@ -74,7 +74,7 @@ class StatementParser extends AbstractParser {
 				// Comment statements start with a comments keyword
 				return parseCommentStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-				if(tokens.peek(2).getSort().equals(WaebricTokenSort.QUOTE)) {
+				if(EmbeddingParser.isEmbedding(tokens.peek(2))) {
 					// Embedding echo production is followed by a text
 					return parseEchoEmbeddingStatement();
 				} else {
@@ -421,7 +421,8 @@ class StatementParser extends AbstractParser {
 				|| token.getLexeme().equals(WaebricKeyword.COMMENT)
 				|| token.getLexeme().equals(WaebricKeyword.EACH)
 				|| token.getLexeme().equals(WaebricKeyword.LET)
-				|| token.getLexeme().equals(WaebricKeyword.YIELD);
+				|| token.getLexeme().equals(WaebricKeyword.YIELD)
+				|| token.getLexeme().equals(WaebricKeyword.ECHO);
 		}
 		
 		return token.getLexeme().equals(WaebricSymbol.LCBRACKET);

@@ -1,7 +1,6 @@
 package org.cwi.waebric.interpreter;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +11,6 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -49,42 +47,43 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 
 /**
- * Convert AST to JDOM format, allowing it to be parsed into an XHTML document.
- * Visitor pattern is applied to eliminate the endless casts on AST nodes.
+ * Convert AST in JDOM format, the eventual XHTML document is generated using
+ * the JDOM libraries. During conversion the visitor pattern is applied to
+ * minimize the need for node casts and result in more readable code.
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
 public class JDOMVisitor extends DefaultNodeVisitor {
 
 	/**
-	 * Current defined functions
+	 * Active function definitions
 	 */
 	private final Map<String, FunctionDef> functions;
 	
 	/**
-	 * Current defined variables
+	 * Active variables
 	 */
 	private final Map<String, Expression> variables;
 	
 	/**
-	 * JDOM document
+	 * JDOM root element
 	 */
 	private final Document document;
 	
 	/**
-	 * Current element
+	 * JDOM current element
 	 */
 	private Element current;
 	
 	/**
-	 * Current text
+	 * Current text value
 	 */
 	private String text = "";
 	
 	/**
-	 * Store call statement for yield
+	 * Current yield stack (statement, expression or embedding)
 	 */
-	private Stack<Statement> yield = new Stack<Statement>();
+	private Stack<AbstractSyntaxNode> yield;
 	
 	/**
 	 * Construct JDOM visitor
@@ -92,8 +91,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public JDOMVisitor(Document document) {
 		this.document = document;
+		
 		functions = new HashMap<String, FunctionDef>();
 		variables = new HashMap<String, Expression>();
+
+		yield = new Stack<AbstractSyntaxNode>();
 	}
 
 	public void visit(Module module) {
@@ -110,11 +112,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 		}
 		
-		// Start interpreting "main" function
-		visit(functions.get("main"));
-		
-		// Terminate all function definitions
-		functions.clear();
+		visit(functions.get("main")); // Start interpreting "main" function
+		functions.clear(); // Terminate all function definitions
 	}
 
 	public void visit(Site site) {
@@ -223,27 +222,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(Statement.Each statement) {
-		// Retrieve elements of expression
-		ArrayList<Expression> expressions = new ArrayList<Expression>();
 		if(statement.getExpression() instanceof Expression.ListExpression) {
-			// Store elements of list
 			Expression.ListExpression list = (Expression.ListExpression) statement.getExpression();
-			expressions.addAll(list.getExpressions());
-		} else if(statement.getExpression() instanceof Expression.RecordExpression) {
-			// Store values of record
-			Expression.RecordExpression record = (Expression.RecordExpression) statement.getExpression();
-			for(KeyValuePair value: record.getPairs()) { expressions.add(value.getExpression()); }
-		} else {
-			// Non-collection based expression, store single expression
-			expressions.add(statement.getExpression());
-		}
-		
-		// Execute statement for each element
-		for(Expression expression: expressions) {
-			variables.put(statement.getVar().getName(), expression);
-			statement.getStatement().accept(this);
-			variables.remove(statement.getVar().getName());
-		}
+			
+			// Execute statement for each element
+			for(Expression expression: list.getExpressions()) {
+				variables.put(statement.getVar().getName(), expression);
+				statement.getStatement().accept(this);
+				variables.remove(statement.getVar().getName());
+			}
+		}	
 	}
 
 	public void visit(Statement.Echo statement) {
@@ -277,32 +265,12 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
+	/**
+	 * Retrieve first element from yield stack and visit it.
+	 */
 	public void visit(Statement.Yield statement) {
-		// TODO Auto-generated method stub
-		
-		
-		/**
-		 * WATCHOUT:
-		 * module test
-			
-			def main 
-			  layout("Hello") echo "Hello2";
-			  main2 echo "Hello3";
-			end
-			
-			def main2
-			  layout("Hello") yield;
-			end
-			
-			def layout(msg)
-			  html { 
-			   head title msg;
-			    body yield;
-			    p yield;
-			  }
-			end
-			
-		 */
+		AbstractSyntaxNode replacement = yield.peek();
+		if(replacement != null) { replacement.accept(this); }
 	}
 
 	public void visit(RegularMarkupStatement statement) {
@@ -316,29 +284,62 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(MarkupExp statement) {
-		// Visit mark-up(s)
+		int index = 0;
 		for(Markup markup: statement.getMarkups()) {
-			markup.accept(this);
+			// Store the element behind each mark-up call as replacement for yield statements
+			if(markup instanceof Call) {
+				if(index == statement.getMarkups().size()-1) {
+					yield.add(statement.getExpression());
+				} else { yield.add(null); }
+			}
+
+			markup.accept(this); // Visit mark-up
+			index++;
+			
+			// Pop yield element from stack
+			if(markup instanceof Call) { yield.pop(); }
 		}
 		
-		// Visit expression
 		statement.getExpression().accept(this);
 		current.setText(text);
 	}
 
 	public void visit(MarkupStat statement) {
 		// Visit mark-up(s)
+		int index = 0;
 		for(Markup markup: statement.getMarkups()) {
+			// Store expression as replacement for yield statement
+			if(index == statement.getMarkups().size()-1) { 
+				if(markup instanceof Call) { yield.add(statement.getStatement()); }
+			}
+			
 			markup.accept(this);
+			index++;
+			
+			// Pop yield element from stack
+			if(markup instanceof Call) { yield.pop(); }
 		}
 		
-		// Visit statement
 		statement.getStatement().accept(this);
 	}
 
 	public void visit(MarkupEmbedding statement) {
-		// TODO Auto-generated method stub
+		// Visit mark-up(s)
+		int index = 0;
+		for(Markup markup: statement.getMarkups()) {
+			// Store expression as replacement for yield statement
+			if(index == statement.getMarkups().size()-1) { 
+				if(markup instanceof Call) { yield.add(statement.getEmbedding()); }
+			}
+			
+			markup.accept(this);
+			index++;
+			
+			// Pop yield element from stack
+			if(markup instanceof Call) { yield.pop(); }
+		}
 		
+		statement.getEmbedding().accept(this);
 	}
 
 	public void visit(FuncBind bind) {
@@ -375,6 +376,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			variables.put(identifier.toString(), expression);
 			index++;
 		}
+		
+		function.accept(this); // Visit function
 	}
 	
 	/**
@@ -384,13 +387,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param function
 	 * @return
 	 */
-	public boolean hasYield(FunctionDef function) {
+	public boolean containsYield(FunctionDef function) {
 		for(AbstractSyntaxNode node: function.getChildren()) {
 			if(node instanceof Statement.Yield) {
 				return true; 
 			} else if(node instanceof Markup.Call) {
 				Markup.Call call = (Markup.Call) node;
-				return hasYield(functions.get(call.getDesignator().getIdentifier().getName()));
+				return containsYield(functions.get(call.getDesignator().getIdentifier().getName()));
 			}
 		}
 		
@@ -422,7 +425,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 		}
 		
-		current.addContent(tag);
+		if(current != null) { current.addContent(tag); }
+		else { document.addContent(tag); }
+		
 		current = tag; // Current element is tag
 	}
 
@@ -431,9 +436,26 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		
 	}
 
-	public void visit(Field expression) {
-		// TODO Auto-generated method stub
+	/**
+	 * Retrieve expression element from record expression, when
+	 * undefined or other expression type return "undef".
+	 */
+	public void visit(Field field) {
+		Expression expression = field.getExpression();
+		while(expression instanceof Expression.VarExpression) {
+			// Browse over variable expressions until a raw type is detected
+			Expression.VarExpression var = (Expression.VarExpression) expression;
+			expression = variables.get(var.getVar().getName());
+		}
 		
+		if(expression instanceof Expression.RecordExpression) {
+			Expression.RecordExpression record = (Expression.RecordExpression) expression;
+			
+			// Retrieve referenced element from record and visit it
+			Expression reference = record.getExpression(field.getIdentifier());
+			if(reference == null) { text = "undef"; } // Unknown record element
+			reference.accept(this);
+		} else { text = "undef"; } // Invalid expression type
 	}
 
 	public void visit(ListExpression expression) {

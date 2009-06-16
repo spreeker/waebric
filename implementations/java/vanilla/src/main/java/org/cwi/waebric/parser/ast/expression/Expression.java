@@ -176,6 +176,16 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return pairs;
 		}
 		
+		public Expression getExpression(IdCon identifier) {
+			for(KeyValuePair pair: pairs) {
+				if(identifier.equals(pair.getIdentifier())) {
+					return pair.getExpression();
+				}
+			}
+			
+			return null;
+		}
+		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { 
 				new CharacterLiteral(WaebricSymbol.LCBRACKET),
