@@ -13,6 +13,7 @@ import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -44,6 +45,7 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 
 import org.jdom.CDATA;
 import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -75,11 +77,40 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public JDOMVisitor(Document document) {
 		this.document = document;
-		
 		functions = new HashMap<String, FunctionDef>();
 		variables = new HashMap<String, Expression>();
-
 		yield = new Stack<AbstractSyntaxNode>();
+	}
+	
+	/**
+	 * Attach content to current element, in-case element
+	 * does not exist create root element.
+	 * @param content
+	 */
+	private void addContent(Content content) {
+		// Construct root element
+		if(! document.hasRootElement()) {
+			if(content instanceof Element) {
+				Element rootElement = (Element) content;
+				document.setRootElement(rootElement);
+				current = rootElement;
+				return; // Content added, quit function
+			} else {
+				Element XHTML = createXHTMLTag();
+				document.setRootElement(XHTML);
+				current = XHTML;
+			}
+		}
+		
+		current.addContent(content); // Attach content
+		if(content instanceof Element) { current = (Element) content; } // Update current
+	}
+	
+	private Element createXHTMLTag() {
+		Namespace XHTML = Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml");
+		Element tag = new Element("html", XHTML);
+		tag.setAttribute("lang", "en");
+		return tag;
 	}
 
 	public void visit(Module module) {
@@ -106,14 +137,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(FunctionDef function) {	
-		// Construct HTML root element when multiple statements can be root
+		// Construct XHTML tag when multiple statements can be root
 		if(function.getStatements().size() > 1 && ! document.hasRootElement()) {
-			Element html = new Element("html", Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
-			html.setAttribute("lang", "en");
-			
-			// Store HTML tag as root element
-			document.setRootElement(html);
-			current = html;
+			addContent(createXHTMLTag());
 		}
 
 		// Process statement(s)
@@ -122,7 +148,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			current = root; // Reset current to root
 			statement.accept(this);
 		}
-		
 	}
 
 	/**
@@ -143,18 +168,22 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			// Delegate check to children
 			for(AbstractSyntaxNode child: node.getChildren()) {
 				if(containsYield(child)) { return true; }
-			}
-			
-			return false; // Nothing found
+			} return false; // Nothing found
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void visit(Statement.If statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
 			statement.getStatement().accept(this);
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void visit(Statement.IfElse statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
 			statement.getStatement().accept(this);
@@ -170,8 +199,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public boolean evaluatePredicate(Predicate predicate) {
 		if(predicate instanceof Predicate.Is) {
+			// Is predicates checks if an expression has the correct type
 			Predicate.Is is = (Predicate.Is) predicate;
-			
 			String type = is.getType().getName().toString();
 			if(type.equals("string")) {
 				return is.getExpression().getClass() == Expression.TextExpression.class;
@@ -179,50 +208,44 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				return is.getExpression().getClass() == Expression.ListExpression.class;
 			} else if(type.equals("record")) {
 				return is.getExpression().getClass() == Expression.RecordExpression.class;
-			}
-			
-			return false;
+			} else { return false; } // Invalid type, should not be parsed in the first place
 		} else if(predicate instanceof Predicate.RegularPredicate) {
 			Predicate.RegularPredicate reg = (Predicate.RegularPredicate) predicate;
 			if(reg.getExpression() instanceof Expression.Field) {
-				// TODO Figure out how field expressions work
+				// Field predicates check if the referenced field exists in record expression
+				Expression value = getFieldExpression((Expression.Field) reg.getExpression());
+				return value != null;
 			} else if(reg.getExpression() instanceof Expression.VarExpression) {
+				// Variable predicates check if the referenced variable is defined
 				String name = ((Expression.VarExpression) reg.getExpression()).getVar().getName();
 				return variables.containsKey(name);
 			} else { return true; }
 		} else if(predicate instanceof Predicate.And) {
+			// And predicate return Left && Right
 			Predicate.And and = (Predicate.And) predicate;
 			return evaluatePredicate(and.getLeft()) && evaluatePredicate(and.getRight());
 		} else if(predicate instanceof Predicate.Or) {
+			// Or predicates return Left || Right
 			Predicate.Or or = (Predicate.Or) predicate;
 			return evaluatePredicate(or.getLeft()) || evaluatePredicate(or.getRight());			
 		} else if(predicate instanceof Predicate.Not) {
+			// Not predicates return ! Predicate
 			Predicate.Not and = (Predicate.Not) predicate;
 			return ! evaluatePredicate(and.getPredicate());			
 		}
 		
-		return false;
+		return false; // Unknown predicate type
 	}
 
+	/**
+	 * 
+	 */
 	public void visit(Statement.Block statement) {
 		Element root = current;
 		for(Statement sub: statement.getStatements()) {
 			current = root; // Reset current to root
 			sub.accept(this);
 		}
-	}
-
-	public void visit(Statement.CData statement) {
-		// Process expression to fill text field
-		statement.getExpression().accept(this);
-		
-		CDATA cdata = new CDATA(text);
-		current.addContent(cdata);
-	}
-
-	public void visit(Statement.Comment statement) {
-		Comment comment = new Comment(statement.getComment().getLiteral().toString());
-		current.addContent(comment);
 	}
 
 	public void visit(Statement.Each statement) {
@@ -237,12 +260,36 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 		}	
 	}
-
-	public void visit(Statement.Echo statement) {
+	
+	/**
+	 * Attach <!-- COMMENT --> to current element.
+	 */
+	public void visit(Statement.Comment statement) {
+		Comment comment = new Comment(statement.getComment().getLiteral().toString());
+		addContent(comment);
+	}
+	
+	/**
+	 * Attach CDATA to current element.
+	 */
+	public void visit(Statement.CData statement) {
 		statement.getExpression().accept(this);
-		current.setText(current.getText() + text);
+		CDATA cdata = new CDATA(text);
+		addContent(cdata);
 	}
 
+	/**
+	 * Attach text to current element.
+	 */
+	public void visit(Statement.Echo statement) {
+		statement.getExpression().accept(this);
+		org.jdom.Text echo = new org.jdom.Text(text);
+		addContent(echo);
+	}
+
+	/**
+	 * Attach text to current element.
+	 */
 	public void visit(Statement.EchoEmbedding statement) {
 		// TODO Auto-generated method stub
 		
@@ -460,10 +507,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 		}
 		
-		if(current != null) { current.addContent(tag); }
-		else { document.addContent(tag); }
-		
-		current = tag; // Current element is tag
+		addContent(tag);
 	}
 
 	public void visit(CatExpression expression) {
@@ -476,6 +520,17 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * undefined or other expression type return "undef".
 	 */
 	public void visit(Field field) {
+		Expression expr = getFieldExpression(field);
+		if(expr == null) { new Expression.TextExpression(new Text("undef")); }
+		expr.accept(this); // Visit expression
+	}
+	
+	/**
+	 * Retrieve defined value from record expression.
+	 * @param field
+	 * @return
+	 */
+	public Expression getFieldExpression(Field field) {
 		Expression expression = field.getExpression();
 		while(expression instanceof Expression.VarExpression) {
 			// Browse over variable expressions until a raw type is detected
@@ -487,18 +542,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.RecordExpression record = (Expression.RecordExpression) expression;
 			
 			// Retrieve referenced element from record and visit it
-			Expression reference = record.getExpression(field.getIdentifier());
-			if(reference == null) { text = "undef"; } // Unknown record element
-			reference.accept(this);
-		} else { text = "undef"; } // Invalid expression type
+			Expression result = record.getExpression(field.getIdentifier());
+			if(result != null) { return result; }
+		}
+
+		return null; // Undefined value
 	}
 
 	public void visit(ListExpression expression) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void visit(NatExpression expression) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -507,16 +558,31 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// TODO Auto-generated method stub
 		
 	}
-
-	public void visit(SymbolExpression expression) {
-		// TODO Auto-generated method stub
-		
+	
+	/**
+	 * Store number in text field.
+	 */
+	public void visit(NatExpression expression) {
+		text = expression.getNatural().getLiteral().toString();
 	}
 
+	/**
+	 * Store symbol name in text field.
+	 */
+	public void visit(SymbolExpression expression) {
+		text = expression.getSymbol().getLiteral().toString();
+	}
+
+	/**
+	 * Store text expression literal in text field.
+	 */
 	public void visit(TextExpression expression) {
 		text = expression.getText().getLiteral().toString();
 	}
 
+	/**
+	 * Delegate visit to variable value.
+	 */
 	public void visit(VarExpression expression) {
 		variables.get(expression.getVar().getName()).accept(this);
 	}
