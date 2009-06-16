@@ -271,7 +271,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Retrieve first element from yield stack and visit it.
 	 */
 	public void visit(Statement.Yield statement) {
-		AbstractSyntaxNode replacement = yield.peek();
+		AbstractSyntaxNode replacement = yield.pop();
 		if(replacement != null) {
 			replacement.accept(this);
 	
@@ -318,7 +318,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			markup.accept(this); // Visit mark-up
 
 			if(markup instanceof Markup.Call) {
-				if(containsYield) { yield.pop(); } // Remove yield value from stack
 				return; // Quit parsing mark-up expression after first call
 			}
 		}
@@ -353,7 +352,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			markup.accept(this); // Visit mark-up
 
 			if(markup instanceof Markup.Call) {
-				if(containsYield) { yield.pop(); } // Remove yield value from stack
 				return; // Quit parsing mark-up statement after first call
 			}
 		}
@@ -387,7 +385,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			markup.accept(this); // Visit mark-up
 
 			if(markup instanceof Markup.Call) {
-				if(containsYield) { yield.pop(); } // Remove yield value from stack
 				return; // Quit parsing mark-up embedding after first call
 			}
 		}
