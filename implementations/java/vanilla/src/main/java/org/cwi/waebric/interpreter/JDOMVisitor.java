@@ -57,34 +57,16 @@ import org.jdom.Namespace;
  */
 public class JDOMVisitor extends DefaultNodeVisitor {
 
-	/**
-	 * Active function definitions
-	 */
+	// Currently defined variables and functions
 	private final Map<String, FunctionDef> functions;
-	
-	/**
-	 * Active variables
-	 */
 	private final Map<String, Expression> variables;
 	
-	/**
-	 * JDOM root element
-	 */
+	// JDOM instances
 	private final Document document;
-	
-	/**
-	 * JDOM current element
-	 */
 	private Element current;
-	
-	/**
-	 * Current text value
-	 */
 	private String text = "";
 	
-	/**
-	 * Current yield stack (statement, expression or embedding)
-	 */
+	// Yield related
 	private Stack<AbstractSyntaxNode> yield;
 
 	/**
@@ -140,10 +122,30 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			current = root; // Reset current to root
 			statement.accept(this);
 		}
+		
+	}
 
-		// Terminate all function variables
-		for(IdCon identifier: function.getFormals().getIdentifiers()) {
-			variables.remove(identifier.toString());
+	/**
+	 * Check if node contains a yield statement, either contained directly in 
+	 * the statement collection or indirectly by calling a statement with yield.
+	 * @param node
+	 * @return
+	 */
+	private boolean containsYield(AbstractSyntaxNode node) {
+		if(node instanceof Statement.Yield) { 
+			return true; // Yield found!
+		} else if(node instanceof Markup.Call) {
+			// Retrieve called function and check if that contains a yield statement
+			Markup.Call call = (Markup.Call) node;
+			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
+			return containsYield(function);
+		} else {
+			// Delegate check to children
+			for(AbstractSyntaxNode child: node.getChildren()) {
+				if(containsYield(child)) { return true; }
+			}
+			
+			return false; // Nothing found
 		}
 	}
 
@@ -273,6 +275,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Statement.Yield statement) {
 		if(yield.isEmpty()) { return; }
 		
+		// Clone yield stack
+		Stack<AbstractSyntaxNode> clone = new Stack<AbstractSyntaxNode>();
+		clone.addAll(yield);
+		
 		AbstractSyntaxNode replacement = yield.pop();
 		if(replacement != null) {
 			replacement.accept(this); // Visit replacement
@@ -282,6 +288,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				current.setText(text);
 			}
 		}
+		
+		yield = clone; // Restore yield stack
 	}
 
 	public void visit(RegularMarkupStatement statement) {
@@ -300,9 +308,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next();
-			boolean containsYield = containsYield(markup);
-			
-			if(containsYield) {
+
+			if(containsYield(markup)) {
 				// Determine and store yield value
 				if(markups.hasNext()) {
 					// Remainder of mark-up chain
@@ -331,9 +338,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next();
-			boolean containsYield = containsYield(markup);
-			
-			if(containsYield) {
+
+			if(containsYield(markup)) {
 				// Determine and store yield value
 				if(markups.hasNext()) {
 					// Remainder of mark-up chain
@@ -361,9 +367,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next();
-			boolean containsYield = containsYield(markup);
-			
-			if(containsYield) {
+
+			if(containsYield(markup)) {
 				// Determine and store yield value
 				if(markups.hasNext()) {
 					// Remainder of mark-up chain
@@ -385,30 +390,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// Interpret embedding when mark-up chain is call free
 		statement.getEmbedding().accept(this);
 		current.setText(text);
-	}
-
-	/**
-	 * Check if node contains a yield statement, either contained directly in 
-	 * the statement collection or indirectly by calling a statement with yield.
-	 * @param node
-	 * @return
-	 */
-	private boolean containsYield(AbstractSyntaxNode node) {
-		if(node instanceof Statement.Yield) { 
-			return true; // Yield found!
-		} else if(node instanceof Markup.Call) {
-			// Retrieve called function and check if that contains a yield statement
-			Markup.Call call = (Markup.Call) node;
-			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
-			return containsYield(function);
-		} else {
-			// Delegate check to children
-			for(AbstractSyntaxNode child: node.getChildren()) {
-				if(containsYield(child)) { return true; }
-			}
-			
-			return false; // Nothing found
-		}
 	}
 
 	public void visit(FuncBind bind) {
@@ -438,7 +419,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// Retrieve function definition
 		FunctionDef function = functions.get(markup.getDesignator().getIdentifier().getName());
 		
-		// Store function variables and their called values
+		// Initiate function variables
 		int index = 0; 
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
 			Expression expression = markup.getArguments().get(index).getExpression();
@@ -447,6 +428,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		function.accept(this); // Visit function
+		
+		// Terminate function variables
+		for(IdCon identifier: function.getFormals().getIdentifiers()) {
+			variables.remove(identifier.toString());
+		}
 	}
 
 	public void visit(Tag markup) {
