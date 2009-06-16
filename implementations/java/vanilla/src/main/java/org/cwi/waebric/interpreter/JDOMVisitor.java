@@ -135,8 +135,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// Process statement(s)
 		Element root = current;
 		for(Statement statement: function.getStatements()) {
-			statement.accept(this);
 			current = root; // Reset current to root
+			statement.accept(this);
 		}
 		
 		// Terminate all function variables
@@ -203,8 +203,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Statement.Block statement) {
 		Element root = current;
 		for(Statement sub: statement.getStatements()) {
-			sub.accept(this);
 			current = root; // Reset current to root
+			sub.accept(this);
 		}
 	}
 
@@ -282,64 +282,104 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			markup.accept(this);
 		}
 	}
+	
+	/**
+	 * Check if function definition contains a yield statement, either
+	 * contained directly in the statement collection or indirectly 
+	 * by calling a statement with yield.
+	 * @param function
+	 * @return
+	 */
+	public boolean containsYield(Markup call) {
+		if(call instanceof Markup.Call) {
+			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
+			for(AbstractSyntaxNode node: function.getStatements()) {
+				if(node instanceof Statement.Yield) {
+					return true; 
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	public void visit(MarkupExp statement) {
+		// Visit mark-up(s)
 		int index = 0;
 		for(Markup markup: statement.getMarkups()) {
-			// Store the element behind each mark-up call as replacement for yield statements
-			if(markup instanceof Call) {
-				if(index == statement.getMarkups().size()-1) {
-					yield.add(statement.getExpression());
-				} else { yield.add(null); }
+			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+			
+			if(yielded) { 
+				// Store expression as replacement for yield statement
+				if(index == statement.getMarkups().size()-1) { 
+					yield.add(statement.getExpression()); // Last mark-up takes expression
+				} else { yield.add(null); } // Other mark-ups receive no replacement
 			}
-
+			
 			markup.accept(this); // Visit mark-up
 			index++;
 			
-			// Pop yield element from stack
-			if(markup instanceof Call) { yield.pop(); }
+			// Pop yield replacement
+			if(yielded) { yield.pop(); }
 		}
 		
-		statement.getExpression().accept(this);
-		current.setText(text);
+		// Interpret expression when last mark-up is yield-free
+		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
+			statement.getExpression().accept(this);
+			current.setText(text);
+		}
 	}
 
 	public void visit(MarkupStat statement) {
 		// Visit mark-up(s)
 		int index = 0;
 		for(Markup markup: statement.getMarkups()) {
-			// Store expression as replacement for yield statement
-			if(index == statement.getMarkups().size()-1) { 
-				if(markup instanceof Call) { yield.add(statement.getStatement()); }
+			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+			
+			if(yielded) { 
+				// Store expression as replacement for yield statement
+				if(index == statement.getMarkups().size()-1) { 
+					yield.add(statement.getStatement()); // Last mark-up takes expression
+				} else { yield.add(null); } // Other mark-ups receive no replacement
 			}
 			
-			markup.accept(this);
+			markup.accept(this); // Visit mark-up
 			index++;
 			
-			// Pop yield element from stack
-			if(markup instanceof Call) { yield.pop(); }
+			// Pop yield replacement
+			if(yielded) { yield.pop(); }
 		}
 		
-		statement.getStatement().accept(this);
+		// Interpret statement when last mark-up is yield-free
+		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
+			statement.getStatement().accept(this);
+		}
 	}
 
 	public void visit(MarkupEmbedding statement) {
 		// Visit mark-up(s)
 		int index = 0;
 		for(Markup markup: statement.getMarkups()) {
-			// Store expression as replacement for yield statement
-			if(index == statement.getMarkups().size()-1) { 
-				if(markup instanceof Call) { yield.add(statement.getEmbedding()); }
+			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+			
+			if(yielded) { 
+				// Store embedding as replacement for yield statement
+				if(index == statement.getMarkups().size()-1) { 
+					yield.add(statement.getEmbedding()); // Last mark-up takes embedding
+				} else { yield.add(null); } // Other mark-ups receive no replacement
 			}
 			
-			markup.accept(this);
+			markup.accept(this); // Visit mark-up
 			index++;
 			
-			// Pop yield element from stack
-			if(markup instanceof Call) { yield.pop(); }
+			// Pop yield replacement
+			if(yielded) { yield.pop(); }
 		}
 		
-		statement.getEmbedding().accept(this);
+		// Interpret embedding when last mark-up is yield-free
+		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
+			statement.getEmbedding().accept(this);
+		}
 	}
 
 	public void visit(FuncBind bind) {
@@ -378,26 +418,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		function.accept(this); // Visit function
-	}
-	
-	/**
-	 * Check if function definition contains a yield statement, either
-	 * contained directly in the statement collection or indirectly 
-	 * by calling a statement with yield.
-	 * @param function
-	 * @return
-	 */
-	public boolean containsYield(FunctionDef function) {
-		for(AbstractSyntaxNode node: function.getChildren()) {
-			if(node instanceof Statement.Yield) {
-				return true; 
-			} else if(node instanceof Markup.Call) {
-				Markup.Call call = (Markup.Call) node;
-				return containsYield(functions.get(call.getDesignator().getIdentifier().getName()));
-			}
-		}
-		
-		return false;
 	}
 
 	public void visit(Tag markup) {
