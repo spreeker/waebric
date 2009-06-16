@@ -89,7 +89,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	private void addContent(Content content) {
 		// Construct root element
-		if(! document.hasRootElement()) {
+		if(current == null) {
 			if(content instanceof Element) {
 				Element rootElement = (Element) content;
 				document.setRootElement(rootElement);
