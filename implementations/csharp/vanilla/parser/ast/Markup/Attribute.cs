@@ -6,10 +6,9 @@ using System.Text;
 namespace Parser.Ast.Markup
 {
     /// <summary>
-    /// Node containing an argument
+    /// Node which contains attribute
     /// </summary>
-    public class Argument : ISyntaxNode
+    public class Attribute : ISyntaxNode
     {
-
     }
 }

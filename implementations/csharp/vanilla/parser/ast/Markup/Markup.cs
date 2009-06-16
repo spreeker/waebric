@@ -12,7 +12,7 @@ namespace Parser.Ast.Markup
     {
         #region Private Members
 
-        private List<Argument> ArgumentList;
+        private Arguments Args;
         private Designator Tag;
 
         #endregion
@@ -21,7 +21,8 @@ namespace Parser.Ast.Markup
 
         public Markup()
         {
-            ArgumentList = new List<Argument>();
+            //Intialize arguments (TO REMOVE)
+            Args = new Arguments();
         }
 
         /// <summary>
@@ -43,21 +44,21 @@ namespace Parser.Ast.Markup
         }
 
         /// <summary>
-        /// Add argument to markup
+        /// Add arguments to markup
         /// </summary>
-        /// <param name="argument">Argument to add</param>
-        public void AddArgument(Argument argument)
+        /// <param name="argument">Arguments to add</param>
+        public void AddArguments(Arguments arguments)
         {
-            ArgumentList.Add(argument);
+            Args = arguments;
         }
 
         /// <summary>
-        /// Get list of arguments
+        /// Get arguments
         /// </summary>
-        /// <returns>ArgumentList</returns>
-        public List<Argument> GetArguments()
+        /// <returns>Arguments</returns>
+        public Arguments GetArguments()
         {
-            return ArgumentList;
+            return Args;
         }
 
         #endregion
