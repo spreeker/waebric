@@ -86,7 +86,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Current yield stack (statement, expression or embedding)
 	 */
 	private Stack<AbstractSyntaxNode> yield;
-	
+
 	/**
 	 * Construct JDOM visitor
 	 * @param document Document
@@ -140,7 +140,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			current = root; // Reset current to root
 			statement.accept(this);
 		}
-		
+
 		// Terminate all function variables
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
 			variables.remove(identifier.toString());
@@ -271,9 +271,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Retrieve first element from yield stack and visit it.
 	 */
 	public void visit(Statement.Yield statement) {
+		if(yield.isEmpty()) { return; }
+		
 		AbstractSyntaxNode replacement = yield.pop();
 		if(replacement != null) {
-			replacement.accept(this);
+			replacement.accept(this); // Visit replacement
 	
 			// Place text value in current element
 			if(replacement instanceof Expression || replacement instanceof Embedding) {
@@ -316,10 +318,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-
-			if(markup instanceof Markup.Call) {
-				return; // Quit parsing mark-up expression after first call
-			}
+			if(markup instanceof Markup.Call) {	return; } // Quit interpreting after call
 		}
 		
 		// Interpret expression when mark-up chain is call free
@@ -350,10 +349,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-
-			if(markup instanceof Markup.Call) {
-				return; // Quit parsing mark-up statement after first call
-			}
+			if(markup instanceof Markup.Call) {	return; } // Quit interpreting after call
 		}
 		
 		// Interpret statement when mark-up chain is call free
@@ -383,10 +379,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-
-			if(markup instanceof Markup.Call) {
-				return; // Quit parsing mark-up embedding after first call
-			}
+			if(markup instanceof Markup.Call) {	return; }
 		}
 		
 		// Interpret embedding when mark-up chain is call free
