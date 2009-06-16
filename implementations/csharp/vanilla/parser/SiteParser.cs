@@ -21,7 +21,7 @@ namespace Parser
         public SiteParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
         {
             //Create parsers
-            MarkupParser markupParser = new MarkupParser(tokenStream, exceptionList);
+            markupParser = new MarkupParser(tokenStream, exceptionList);
         }
 
         /// <summary>
@@ -77,6 +77,10 @@ namespace Parser
             
             // Parse Path
             mapping.SetPath(ParsePath());
+            
+            // Skip : symbol
+            NextToken(":", "path : mapping", ':');
+
             // Parse Markup
             mapping.SetMarkup(markupParser.ParseMarkup());
             
