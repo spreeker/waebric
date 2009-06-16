@@ -3,12 +3,14 @@ package org.cwi.waebric.interpreter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
 import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
+import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
@@ -270,7 +272,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.Yield statement) {
 		AbstractSyntaxNode replacement = yield.peek();
-		if(replacement != null) { replacement.accept(this); }
+		if(replacement != null) {
+			replacement.accept(this);
+	
+			// Place text value in current element
+			if(replacement instanceof Expression || replacement instanceof Embedding) {
+				current.setText(text);
+			}
+		}
 	}
 
 	public void visit(RegularMarkupStatement statement) {
@@ -284,102 +293,137 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * Check if function definition contains a yield statement, either
-	 * contained directly in the statement collection or indirectly 
-	 * by calling a statement with yield.
-	 * @param function
+	 * Check if node contains a yield statement, either contained directly in 
+	 * the statement collection or indirectly by calling a statement with yield.
+	 * @param node
 	 * @return
 	 */
-	public boolean containsYield(Markup call) {
-		if(call instanceof Markup.Call) {
+	private boolean containsYield(AbstractSyntaxNode node) {
+		if(node instanceof Statement.Yield) { 
+			return true; // Yield found!
+		} else if(node instanceof Markup.Call) {
+			// Retrieve called function and check if that contains a yield statement
+			Markup.Call call = (Markup.Call) node;
 			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
-			for(AbstractSyntaxNode node: function.getStatements()) {
-				if(node instanceof Statement.Yield) {
-					return true; 
-				}
+			return containsYield(function);
+		} else {
+			// Delegate check to children
+			for(AbstractSyntaxNode child: node.getChildren()) {
+				if(containsYield(child)) { return true; }
 			}
+			
+			return false; // Nothing found
 		}
-		
-		return false;
 	}
 
 	public void visit(MarkupExp statement) {
-		// Visit mark-up(s)
-		int index = 0;
-		for(Markup markup: statement.getMarkups()) {
-			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+		// Visit mark-ups
+		Iterator<Markup> markups = statement.getMarkups().iterator();
+		while(markups.hasNext()) {
+			Markup markup = markups.next();
 			
-			if(yielded) { 
-				// Store expression as replacement for yield statement
-				if(index == statement.getMarkups().size()-1) { 
-					yield.add(statement.getExpression()); // Last mark-up takes expression
-				} else { yield.add(null); } // Other mark-ups receive no replacement
+			// Determine yield value
+			boolean hasYield = containsYield(markup);
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { 
+					if(markups.hasNext()) {
+						// Attach remainder of mark-up chain as yield value
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						Statement.MarkupExp expr = new Statement.MarkupExp(remainder);
+						expr.setExpression(statement.getExpression());
+						yield.add(expr);
+					} else {
+						// Attach expression as yield value
+						yield.add(statement.getExpression());
+					}
+				}
 			}
-			
+
 			markup.accept(this); // Visit mark-up
-			index++;
-			
-			// Pop yield replacement
-			if(yielded) { yield.pop(); }
+
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { yield.pop(); } // Remove yield value from stack
+				return; // Quit parsing mark-up expression after first call
+			}
 		}
 		
-		// Interpret expression when last mark-up is yield-free
-		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
-			statement.getExpression().accept(this);
-			current.setText(text);
-		}
+		// Interpret expression when mark-up chain is call free
+		statement.getExpression().accept(this);
+		current.setText(text);
 	}
 
 	public void visit(MarkupStat statement) {
-		// Visit mark-up(s)
-		int index = 0;
-		for(Markup markup: statement.getMarkups()) {
-			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+		// Visit mark-ups
+		Iterator<Markup> markups = statement.getMarkups().iterator();
+		while(markups.hasNext()) {
+			Markup markup = markups.next();
 			
-			if(yielded) { 
-				// Store expression as replacement for yield statement
-				if(index == statement.getMarkups().size()-1) { 
-					yield.add(statement.getStatement()); // Last mark-up takes expression
-				} else { yield.add(null); } // Other mark-ups receive no replacement
+			// Determine yield value
+			boolean hasYield = containsYield(markup);
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { 
+					if(markups.hasNext()) {
+						// Attach remainder of mark-up chain as yield value
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						Statement.MarkupStat stm = new Statement.MarkupStat(remainder);
+						stm.setStatement(statement.getStatement());
+						yield.add(stm);
+					} else {
+						// Attach statement as yield value
+						yield.add(statement.getStatement());
+					}
+				}
 			}
-			
+
 			markup.accept(this); // Visit mark-up
-			index++;
-			
-			// Pop yield replacement
-			if(yielded) { yield.pop(); }
+
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { yield.pop(); } // Remove yield value from stack
+				return; // Quit parsing mark-up statement after first call
+			}
 		}
 		
-		// Interpret statement when last mark-up is yield-free
-		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
-			statement.getStatement().accept(this);
-		}
+		// Interpret statement when mark-up chain is call free
+		statement.getStatement().accept(this);
 	}
 
 	public void visit(MarkupEmbedding statement) {
-		// Visit mark-up(s)
-		int index = 0;
-		for(Markup markup: statement.getMarkups()) {
-			boolean yielded = containsYield(markup); // Check if called function contains yield statements
+		// Visit mark-ups
+		Iterator<Markup> markups = statement.getMarkups().iterator();
+		while(markups.hasNext()) {
+			Markup markup = markups.next();
 			
-			if(yielded) { 
-				// Store embedding as replacement for yield statement
-				if(index == statement.getMarkups().size()-1) { 
-					yield.add(statement.getEmbedding()); // Last mark-up takes embedding
-				} else { yield.add(null); } // Other mark-ups receive no replacement
+			// Determine yield value
+			boolean hasYield = containsYield(markup);
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { 
+					if(markups.hasNext()) {
+						// Attach remainder of mark-up chain as yield value
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						Statement.MarkupEmbedding embedding = new Statement.MarkupEmbedding(remainder);
+						embedding.setEmbedding(statement.getEmbedding());
+						yield.add(embedding);
+					} else {
+						// Attach embedding as yield value
+						yield.add(statement.getEmbedding());
+					}
+				}
 			}
-			
+
 			markup.accept(this); // Visit mark-up
-			index++;
-			
-			// Pop yield replacement
-			if(yielded) { yield.pop(); }
+
+			if(markup instanceof Markup.Call) {
+				if(hasYield) { yield.pop(); } // Remove yield value from stack
+				return; // Quit parsing mark-up embedding after first call
+			}
 		}
 		
-		// Interpret embedding when last mark-up is yield-free
-		if(! containsYield(statement.getMarkups().get(statement.getMarkups().size()-1))) {
-			statement.getEmbedding().accept(this);
-		}
+		// Interpret embedding when mark-up chain is call free
+		statement.getEmbedding().accept(this);
+		current.setText(text);
 	}
 
 	public void visit(FuncBind bind) {
