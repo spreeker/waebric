@@ -50,6 +50,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionParserTest.cs" />
+    <Compile Include="MarkupParserTest.cs" />
     <Compile Include="ModuleParserTest.cs" />
     <Compile Include="Ast\NodeListTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -7,6 +7,7 @@ using System.IO;
 using Lexer;
 using Parser.Ast;
 using Parser.Ast.Module;
+using Parser.Ast.Site;
 
 namespace TestParser
 {
@@ -99,7 +100,7 @@ namespace TestParser
             Assert.IsTrue(modules.GetSize() == 1); //Contains only 1 module
 
             Module module = (Module) modules.Get(0);
-            Assert.IsTrue(module.GetIdentifier().GetIdentifier().GetIdCon().ToString() == "test");
+            Assert.IsTrue(module.GetModuleId().GetIdentifier().ToString() == "test");
         }
 
         /// <summary>
@@ -133,13 +134,13 @@ namespace TestParser
             Assert.IsTrue(modules.GetElements().Length == 1); //One element
             Module module = (Module) modules.Get(0);
 
-            ISyntaxNode[] moduleElements = module.GetElements();
+            //ISyntaxNode[] moduleElements = module.GetElements();
 
-            Assert.IsTrue(moduleElements[0].GetType() == typeof(Import));
+  //          Assert.IsTrue(moduleElements[0].GetType() == typeof(Import));
 
-            Import import = (Import) moduleElements[0];
+    //        Import import = (Import) moduleElements[0];
             //TODO: As shown here it takes to much methods to get real identifier
-            Assert.IsTrue(import.GetIdentifier().GetIdentifier().GetIdCon().ToString() == "importtest");
+      //      Assert.IsTrue(import.GetIdentifier().GetIdentifier().ToString().ToString() == "importtest");
         }
 
         /// <summary>
@@ -148,20 +149,31 @@ namespace TestParser
         [TestMethod]
         public void ModuleParserSiteTest()
         {
-            List<Exception> exceptions;
-            SyntaxTree tree;
+            List<Exception> exceptions = new List<Exception>();
+            SyntaxTree tree = new SyntaxTree();
 
             //Create lexer to tokenize stream
-            WaebricLexer lexer = new WaebricLexer(new StringReader("module test\n\nsite\n  site/index.html : home()\nend"));
+            WaebricLexer lexer = new WaebricLexer(new StringReader("module test\n\nsite\n  site/index.html : home() ; site/index2.html : home()\nend"));
             lexer.LexicalizeStream();
 
-            //Test if stream is lexicalized into 4 tokens
-            //Assert.IsTrue(lexer.GetTokenIterator().GetSize() == 4);
+            //Parse tokenized stream
+            ModuleParser parser = new ModuleParser(lexer.GetTokenIterator(), exceptions);
+            tree.SetRoot(parser.ParseModules());
+            
+            //Check output of parser
+            ModuleList modules = tree.GetRoot();
+            Assert.IsTrue(modules.GetSize() == 1);
 
-            //Retrieve tokenIterator from lexer and lets parse it
-            //WaebricParser parser = new WaebricParser(lexer.GetTokenIterator());
-            //exceptions = parser.Parse();
+            //Check module
+            Module firstModule = (Module) modules.Get(0);
+            Assert.IsTrue(firstModule.GetModuleId().GetIdentifier().ToString() == "test");
+            Assert.AreEqual(0, firstModule.GetImports().Count); //No imports
+            Assert.AreEqual(0, firstModule.GetFunctionDefinitions().Count); //No function definitions
+            Assert.AreEqual(1, firstModule.GetSites().Count); //One site
 
+            //Check site
+            Site[] sites = firstModule.GetSites().ToArray();
+            Assert.AreEqual(2, sites[0].GetMappings().Count);
         }
     }
 }

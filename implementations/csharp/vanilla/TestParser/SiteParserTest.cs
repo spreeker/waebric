@@ -8,6 +8,7 @@ using Dir = Parser.Ast.Site.Directory;
 using Pth = Parser.Ast.Site.Path;
 using Lexer;
 using System.IO;
+using Parser.Ast.Markup;
 
 namespace TestParser
 {
@@ -23,6 +24,7 @@ namespace TestParser
 
 
         private TestContext testContextInstance;
+        private WaebricLexer lexer;
 
         /// <summary>
         ///Gets or sets the test context which provides
@@ -41,33 +43,27 @@ namespace TestParser
         }
 
         #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
+        
+        /// <summary>
+        /// Initialize test
+        /// </summary>
+        /// <param name="stream">Stream to lexicalize</param>
+        /// <returns>TokenIterator</returns>
+        private TokenIterator Init(String stream)
+        {
+            lexer = new WaebricLexer(new StringReader(stream));
+            lexer.LexicalizeStream();
+
+            return lexer.GetTokenIterator();
+        }
+
+        [TestCleanup]
+        public void CleanUp()
+        {
+            lexer = null;
+        }
+        
+
         #endregion
 
 
@@ -86,12 +82,8 @@ namespace TestParser
         [TestMethod()]
         public void ParsePathTest()
         {
-            //Create lexer and lexicalizeStream
-            WaebricLexer lexer = new WaebricLexer(new StringReader("site/home.html"));
-            lexer.LexicalizeStream();
-
             //Get tokens and parse it
-            TokenIterator tokens = lexer.GetTokenIterator();
+            TokenIterator tokens = Init("site/home.html");
             List<Exception> exceptions = new List<Exception>();
             SiteParser siteParser = new SiteParser(tokens, exceptions);
             Pth path = siteParser.ParsePath();
@@ -120,30 +112,51 @@ namespace TestParser
         [TestMethod()]
         public void ParseMappingsTest()
         {
+            //Set up parser
+            TokenIterator tokens = Init("site/home.html : home(); site2/home.html : home2()");
+            List<Exception> exceptions = new List<Exception>();
+            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            Mapping[] parsedMappings = siteParser.ParseMappings().ToArray();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test mappings
+            Assert.AreEqual(2, parsedMappings.Length);
         }
 
         /// <summary>
         ///A test for ParseMapping
         ///</summary>
         [TestMethod()]
-        public void ParseMappingTest()
+        public void ParseSingleMappingTest()
         {
+            //Set up parser
+            TokenIterator tokens = Init("site/home.html : home()");
+            List<Exception> exceptions = new List<Exception>();
+            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            Mapping mapping = siteParser.ParseMapping();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test path of site
+            Assert.AreEqual("site/home.html", mapping.GetPath().ToString());
+            
+            //Test markup of site
+            Markup parsedMarkup = mapping.GetMarkup();
+            Assert.AreEqual("home", parsedMarkup.GetDesignator().GetIdentifier());
+            Assert.AreEqual(0, parsedMarkup.GetArguments().GetArguments().Count);
         }
 
         /// <summary>
         ///A test for ParseFileName
         ///</summary>
-        [TestMethod()]
+        [TestMethod]
         public void ParseFileNameTest()
         {
-            //Create lexer and lexicalizeStream
-            WaebricLexer lexer = new WaebricLexer(new StringReader("filename.ext"));   
-            lexer.LexicalizeStream();
-            
             //Get tokens and parse it
-            TokenIterator tokens = lexer.GetTokenIterator();
+            TokenIterator tokens = Init("filename.ext");
             List<Exception> exceptions = new List<Exception>();
             SiteParser siteParser = new SiteParser(tokens, exceptions);
             FileName output = siteParser.ParseFileName();
@@ -162,12 +175,8 @@ namespace TestParser
         [TestMethod()]
         public void ParseDirectoryNameTest()
         {
-            //Create lexer and lexicalizeStream
-            WaebricLexer lexer = new WaebricLexer(new StringReader("home\\site\\test.wae"));
-            lexer.LexicalizeStream();
-
             //Get tokens and parse it
-            TokenIterator tokens = lexer.GetTokenIterator();
+            TokenIterator tokens = Init("home\\site\\test.wae");
             List<Exception> exceptions = new List<Exception>();
             SiteParser siteParser = new SiteParser(tokens, exceptions);
             DirName output = siteParser.ParseDirectoryName();
@@ -191,12 +200,8 @@ namespace TestParser
         [TestMethod()]
         public void ParseDirectoryTest()
         {
-            //Create lexer and lexicalizeStream
-            WaebricLexer lexer = new WaebricLexer(new StringReader("directory1\\directory2\\filename.ext"));
-            lexer.LexicalizeStream();
-
             //Get tokens and parse it
-            TokenIterator tokens = lexer.GetTokenIterator();
+            TokenIterator tokens = Init("directory1\\directory2\\filename.ext");
             List<Exception> exceptions = new List<Exception>();
             SiteParser siteParser = new SiteParser(tokens, exceptions);
             Dir output = siteParser.ParseDirectory();
@@ -221,5 +226,7 @@ namespace TestParser
         {
 
         }
+
+     
     }
 }
