@@ -29,7 +29,11 @@ public abstract class Expression extends AbstractSyntaxNode {
 		public TextExpression(Text text) {
 			this.text = text;
 		}
-
+		
+		public TextExpression(String text) {
+			this.text = new Text(text);
+		}
+		
 		public Text getText() {
 			return text;
 		}

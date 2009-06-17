@@ -48,15 +48,18 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testEmbedding() throws SyntaxException {
-		iterator = TestUtilities.quickScan("\"<123>\"");
+		iterator = TestUtilities.quickScan("\"<markup1 \"name\">\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding simple = parser.parseEmbedding();
 		assertEquals("", simple.getPre().getText().toString());
-		assertEquals(0, simple.getEmbed().getMarkupCount());
+		assertEquals(1, simple.getEmbed().getMarkupCount());
+		assertEquals(Embed.ExpressionEmbed.class, simple.getEmbed().getClass());
+		assertEquals(Expression.TextExpression.class, ((Embed.ExpressionEmbed) simple.getEmbed()).getExpression().getClass());
+		assertEquals("name", ((Expression.TextExpression) ((Embed.ExpressionEmbed) simple.getEmbed()).getExpression()).getText().getLiteral().toString());
 		assertEquals(TextTail.PostTail.class, simple.getTail().getClass());
 		
-		iterator = TestUtilities.quickScan("\"left<func1() 123>right\"");
+		iterator = TestUtilities.quickScan("\"left<func1() \"text\">right\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding extended = parser.parseEmbedding();

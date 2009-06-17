@@ -209,34 +209,69 @@ class EmbeddingParser extends AbstractParser {
 	/**
 	 * Convert next token to sub-tokens. For example:<br>
 	 * "<123>" is converted to [ ", <, 123, >, " ]
+	 * @throws UnexpectedTokenException 
 	 */
-	private void tokenizeEmbedding() {
-		tokens.next(); // Jump to next element
-		
+	private void tokenizeEmbedding() throws UnexpectedTokenException {
+		Token start = tokens.next(); // Retrieve quote token
+
 		// Convert text to new token stream
-		StringReader reader = new StringReader(tokens.current().getLexeme().toString());
+		StringReader reader = new StringReader(start.getLexeme().toString());
 		WaebricScanner scanner = new WaebricScanner(reader);
 		scanner.tokenizeStream();
 		
-		// Retrieve token stream
-		List<Token> elements = scanner.getTokens();
-		
-		// Attach " symbols to stream
-		elements.add(0, new Token(
-				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-				tokens.current().getLine(), tokens.current().getCharacter()));
-		elements.add(new Token(
-				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-				tokens.current().getLine(), tokens.current().getCharacter()));
-		
-		// Change token location to absolute instead of relative
+		List<Token> elements = scanner.getTokens(); // Retrieve tokens embedded in quote
 		for(Token token : elements) {
+			// Change token location to absolute instead of relative
 			token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
 			token.setLine(token.getLine() + tokens.current().getLine());
 		}
 		
+		// Attach left "
+		elements.add(0, new Token(
+				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+				tokens.current().getLine(), tokens.current().getCharacter()));
+
+		/**
+		 * When an embedding is not followed by an IDCON instead of the expected semicolon,
+		 * the embed most likely contains a TextExpression, which messed up the quotes. In
+		 * this case restore the text expression as quote and return the back to normal.
+		 * 
+		 * "Text* < Mark-up* "Expression"> Text*" -> QUOTE IDCON QOTE
+		 */
+		boolean textExpression = false;
+		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
+			textExpression = true;
+			
+			// Convert identifier to quote
+			Token text = tokens.next();
+			elements.add(new Token(
+					text.getLexeme(), WaebricTokenSort.QUOTE,
+					tokens.current().getLine(), tokens.current().getCharacter()));
+			
+			// Convert back, back to sub-tokens
+			Token back = tokens.next();
+			if(back.getLexeme().toString().startsWith(">")) {
+				// Embed closure symbol
+				elements.add(new Token(
+						WaebricSymbol.GREATER_THAN, WaebricTokenSort.QUOTE,
+						tokens.current().getLine(), tokens.current().getCharacter()));
+				
+				// Test characters
+				elements.add(new Token(
+						back.getLexeme().toString().substring(1), WaebricTokenSort.IDCON,
+						tokens.current().getLine(), tokens.current().getCharacter()));
+			} else {
+				reportUnexpectedToken(back, "Embedding back", "> Text* \"");
+			}
+		}
+		
+		// Attach right "
+		elements.add(new Token(
+				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
+				tokens.current().getLine(), tokens.current().getCharacter()));
+		
 		// Swap quote token with extended token collection
-		tokens.remove();
+		tokens.remove(); if(textExpression) { tokens.remove(); tokens.remove(); }
 		tokens.addAll(elements);
 	}
 	
