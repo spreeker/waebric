@@ -189,7 +189,6 @@ namespace Lexer
                 CurrentToken = tokenizer.NextToken();
             }
 
-            //Add quoted text to tokenStream (TODO: FIX TYPES)
             TokenStream.Add(new Token(stringBuilder.ToString(),TokenType.TEXT, tempLine));
         }
 
@@ -208,8 +207,7 @@ namespace Lexer
                 CurrentToken = tokenizer.NextToken();
             }
 
-            //TODO Redefine TokenType and move namespace. Also add newer specific waebric types
-            TokenStream.Add(new Token(tokenizer.ToString(), TokenType.SYMBOL, tokenizer.GetScannedLines()));
+            TokenStream.Add(new Token(tokenizer.ToString(), TokenType.WAEBRICSYMBOL, tokenizer.GetScannedLines()));
         }
 
         /// <summary>

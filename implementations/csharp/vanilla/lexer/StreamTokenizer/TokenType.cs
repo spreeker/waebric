@@ -33,6 +33,12 @@
         /// SYMBOL:
         /// Characters like @#$%^, etc
         /// </summary>
-        SYMBOL        
+        SYMBOL,
+        
+        /// <summary>
+        /// WAEBRICSYMBOL:
+        /// 'symbol
+        /// </summary>
+        WAEBRICSYMBOL
     };
 }
