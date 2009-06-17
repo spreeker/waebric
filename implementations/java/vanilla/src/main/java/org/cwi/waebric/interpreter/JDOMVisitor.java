@@ -22,6 +22,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.RecordExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.SymbolExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
+import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
@@ -270,7 +271,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * Attach CDATA to current element.
+	 * Attach <-CDATA TEXT -> to current element.
 	 */
 	public void visit(Statement.CData statement) {
 		statement.getExpression().accept(this);
@@ -462,26 +463,48 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		variables.put(bind.getIdentifier().getName(), bind.getExpression());
 	}
 
+	/**
+	 * 
+	 */
 	public void visit(Call markup) {
 		// Retrieve function definition
 		FunctionDef function = functions.get(markup.getDesignator().getIdentifier().getName());
 		
-		// Initiate function variables
-		int index = 0; 
-		for(IdCon identifier: function.getFormals().getIdentifiers()) {
-			Expression expression = markup.getArguments().get(index).getExpression();
-			variables.put(identifier.toString(), expression);
-			index++;
-		}
-		
-		function.accept(this); // Visit function
-		
-		// Terminate function variables
-		for(IdCon identifier: function.getFormals().getIdentifiers()) {
-			variables.remove(identifier.toString());
+		if(function != null) {
+			// Initiate function variables
+			int index = 0; 
+			for(IdCon identifier: function.getFormals().getIdentifiers()) {
+				Expression expression = markup.getArguments().get(index).getExpression();
+				variables.put(identifier.toString(), expression);
+				index++;
+			}
+			
+			function.accept(this); // Visit function
+			
+			// Terminate function variables
+			for(IdCon identifier: function.getFormals().getIdentifiers()) {
+				variables.remove(identifier.toString());
+			}
+		} else {
+			// Undefined function, execute call as tag
+			Tag tag = new Tag();
+			tag.setDesignator(markup.getDesignator());
+			tag.accept(this);
+			
+			// Store call arguments as value attribute
+			String value = "";
+			for(Argument argument: markup.getArguments()) {
+				argument.getExpression().accept(this); // Store expression value in text field
+				value += text; // Store text field value in value before it is overwritten
+			}
+			current.setAttribute("value", value);
 		}
 	}
 
+	/**
+	 * Create next element in JDOM tree structure for tag. Attach additional attributes
+	 * when these are specified in the tag mark-up.
+	 */
 	public void visit(Tag markup) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
 		
@@ -510,9 +533,12 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		addContent(tag);
 	}
 
+	/**
+	 * Execute left and right expression after each other.
+	 */
 	public void visit(CatExpression expression) {
-		// TODO Auto-generated method stub
-		
+		expression.getLeft().accept(this);
+		expression.getRight().accept(this);
 	}
 
 	/**
@@ -549,14 +575,35 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		return null; // Undefined value
 	}
 
+	/**
+	 * Convert list in [element1,element2,...] text value
+	 */
 	public void visit(ListExpression expression) {
-		// TODO Auto-generated method stub
+		String result = "[";
+		for(Expression sub: expression.getExpressions()) {
+			// Attach a comma separator in front of each element, except first in list
+			if(expression.getExpressions().indexOf(sub) != 0) { result += ","; }
+			
+			// Surround symbol and text expressions between double quotes
+			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { 
+				result += "\"";
+			}
+			
+			sub.accept(this); // Fill text field with expression value
+			result += text; // Store value in result string, before it is overwritten by next element
+			
+			// Surround symbol and text expressions between double quotes
+			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { result += "\""; }
+		}
+		result += "]";
 		
+		this.text = result;
 	}
 
 	public void visit(RecordExpression expression) {
 		// TODO Auto-generated method stub
-		
+		// Evaluator returns: markup-to-xhtml(html () { p () { join("[",strcon-to-text("<key,\"value?\">]")) } })
+		// This is not XHTML, so I don't think its correct.
 	}
 	
 	/**
@@ -647,8 +694,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param name
 	 * @param function
 	 */
-	public void addFunctionDef(String name, FunctionDef function) {
-		functions.put(name, function);
+	public void addFunctionDef(FunctionDef function) {
+		functions.put(function.getIdentifier().getName(), function);
 	}
 	
 	/**
