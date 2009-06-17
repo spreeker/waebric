@@ -182,17 +182,19 @@ public class WaebricScanner implements Iterable<Token> {
 			if(current < 0) {
 				// End of file found before closing ", store as separate tokens
 				WaebricScanner scanner = new WaebricScanner(new StringReader(data));
-				scanner.tokenizeStream();
+				exceptions.addAll(scanner.tokenizeStream());
+				
+				// Attach opening double quote as character
 				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
 				
-				// Attach quote start position to sub-token
+				// Attach sub-tokens with absolute positions
 				for(Token token: scanner.getTokens()) {
 					token.setLine(lineno + token.getLine() - 1);
 					token.setCharacter(charno + token.getCharacter());
 					tokens.add(token);
 				}
 				
-				return;
+				return; // Quit scanning quote, as it is not a quote
 			}
 			
 			data += tokenizer.toString(); // Build quote data
