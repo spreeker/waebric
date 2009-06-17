@@ -39,6 +39,21 @@ namespace TestLexer
         #endregion
 
         /// <summary>
+        /// Test NumericToken method
+        /// </summary>
+        [TestMethod]
+        public void NumericTokenTest()
+        {
+            //Set up tokenizer
+            Tokenizer = new StreamTokenizer(new StringReader("100"));
+
+            Tokenizer.NextToken();
+            
+            //Test token
+            Assert.AreEqual(100, Tokenizer.GetNumericValue());
+        }
+
+        /// <summary>
         /// This test tests an specific part of waebric
         /// with all types of tokens
         /// </summary>

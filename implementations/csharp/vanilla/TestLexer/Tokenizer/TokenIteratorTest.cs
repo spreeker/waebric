@@ -1,6 +1,7 @@
 ﻿using Lexer.Tokenizer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using Lexer;
 
 namespace TestLexer
 {
@@ -70,33 +71,23 @@ namespace TestLexer
         [TestMethod()]
         public void PeekTest()
         {
-            List<Token> tokenStream = null; // TODO: Initialize to an appropriate value
-            TokenIterator target = new TokenIterator(tokenStream); // TODO: Initialize to an appropriate value
-            int offset = 0; // TODO: Initialize to an appropriate value
-            Token expected = null; // TODO: Initialize to an appropriate value
-            Token actual;
-            actual = target.Peek(offset);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create list and add dummy tokens to it
+            List<Token> tokenStream = new List<Token>();
+            Token token1 = new Token();
+            Token token2 = new Token();
+            tokenStream.Add(token1);
+            tokenStream.Add(token2);
+
+            //Create iterator with tokenstream and then test some things out
+            TokenIterator iterator = new TokenIterator(tokenStream);
+
+            //Test Peek method
+            Assert.AreEqual(token1, iterator.Peek(1));
+            Assert.AreEqual(token2, iterator.Peek(2));
         }
 
         /// <summary>
-        ///A test for NextToken
-        ///</summary>
-        [TestMethod()]
-        public void NextTokenTest()
-        {
-            List<Token> tokenStream = null; // TODO: Initialize to an appropriate value
-            TokenIterator target = new TokenIterator(tokenStream); // TODO: Initialize to an appropriate value
-            Token expected = null; // TODO: Initialize to an appropriate value
-            Token actual;
-            actual = target.NextToken();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
-
-        /// <summary>
-        ///A test for HasNext
+        ///A test for HasNext/NextToken
         ///</summary>
         [TestMethod()]
         public void HasNextTest()
@@ -132,17 +123,6 @@ namespace TestLexer
 
             //No items in list left
             Assert.IsFalse(iterator.HasNext());
-        }
-
-        /// <summary>
-        ///A test for TokenIterator Constructor
-        ///</summary>
-        [TestMethod()]
-        public void TokenIteratorConstructorTest()
-        {
-            List<Token> tokenStream = null; // TODO: Initialize to an appropriate value
-            TokenIterator target = new TokenIterator(tokenStream);
-            Assert.Inconclusive("TODO: Implement code to verify target");
         }
     }
 }
