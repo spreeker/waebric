@@ -303,9 +303,19 @@ class EmbeddingParser extends AbstractParser {
 	 * @param token Token
 	 * @return Embedding?
 	 */
-	public static boolean isEmbedding(Token token) {
-		return token.getSort() == WaebricTokenSort.QUOTE 
-			&& token.getLexeme().toString().matches("\\w*<\\w*>\\w*");
+	public boolean isEmbedding(int k) {
+		if(tokens.hasNext(k) && tokens.peek(k).getSort() == WaebricTokenSort.QUOTE
+				&& tokens.peek(k).getLexeme().toString().matches("\\w*<\\w*>\\w*")) {
+			return true; // Regular embedding
+		} else if(tokens.hasNext(3) 
+				&& tokens.peek(k).getSort() == WaebricTokenSort.QUOTE 
+				&& tokens.peek(k+1).getSort() == WaebricTokenSort.IDCON
+				&& tokens.peek(k+2).getSort() == WaebricTokenSort.QUOTE
+				&& tokens.peek(k+2).getLexeme().toString().startsWith(">")) {
+			return true; // Embedding with text expression
+		}
+		
+		return false;
 	}
 	
 }

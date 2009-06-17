@@ -2,7 +2,6 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -112,11 +111,11 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEchoEmbeddingStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("echo \"<123>\";");
+		iterator = TestUtilities.quickScan("echo \"<\"text\">\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		EchoEmbedding statement = parser.parseEchoEmbeddingStatement();
-		assertNotNull(statement.getEmbedding());
+		EchoEmbedding statement = (EchoEmbedding) parser.parseStatement();
+		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
 	}
 	
 	@Test
@@ -124,7 +123,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		Echo statement = parser.parseEchoExpressionStatement();
+		Echo statement = (Echo) parser.parseStatement();
 		assertEquals(Expression.NatExpression.class, statement.getExpression().getClass());
 	}
 	
