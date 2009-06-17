@@ -40,6 +40,23 @@ namespace Parser.Ast.Site
         {
             return DirectoryList;
         }
+        
+        /// <summary>
+        /// Converts directory's to String
+        /// </summary>
+        /// <returns>String</returns>
+        public override String ToString()
+        {
+            PathElement[] elements = DirectoryList.ToArray();
+            StringBuilder directoryString = new StringBuilder();
+            foreach (PathElement current in elements)
+            { //rebuild directorypath
+                directoryString.Append(current.ToString());
+                directoryString.Append("/");
+            }
+            
+            return directoryString.ToString();
+        }
 
         #endregion
     }

@@ -52,6 +52,15 @@ namespace Parser.Ast.Site
             return FileExtension;
         }
 
+        /// <summary>
+        /// Get fileextension as string
+        /// </summary>
+        /// <returns>String</returns>
+        public String ToString()
+        {
+            return FileExtension;
+        }
+
         #endregion
     }
 }

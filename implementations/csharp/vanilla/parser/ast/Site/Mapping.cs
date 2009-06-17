@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Parser.Ast.Markup;
 
 namespace Parser.Ast.Site
 {
@@ -13,7 +14,7 @@ namespace Parser.Ast.Site
         #region Private Members
 
         private Path Path; //Path of mapping
-        private Markup Markup; //Markup of mapping
+        private Markup.Markup Markup; //Markup of mapping
 
         #endregion
 
@@ -23,7 +24,7 @@ namespace Parser.Ast.Site
         {
             //Create containers
             Path = new Path();
-            Markup = new Markup();
+            Markup = new Markup.Markup();
         }
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Parser.Ast.Site
         /// Set markup of mapping
         /// </summary>
         /// <param name="markup">Markup of mapping</param>
-        public void SetMarkup(Markup markup)
+        public void SetMarkup(Markup.Markup markup)
         {
             Markup = markup;
         }
@@ -57,7 +58,7 @@ namespace Parser.Ast.Site
         /// Get markup of mapping
         /// </summary>
         /// <returns>Markup</returns>
-        public Markup GetMarkup()
+        public Markup.Markup GetMarkup()
         {
             return Markup;
         }

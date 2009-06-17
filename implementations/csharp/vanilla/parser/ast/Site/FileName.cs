@@ -55,6 +55,15 @@ namespace Parser.Ast.Site
             return Name;
         }
 
+        /// <summary>
+        /// Get filename.extension as string
+        /// </summary>
+        /// <returns>String</returns>
+        public override String ToString()
+        {
+            return Name.ToString() + "." + FileExtension.ToString();
+        }
+
         #endregion
     }
 }

@@ -52,6 +52,15 @@ namespace Parser.Ast.Site
             return Element;
         }
 
+        /// <summary>
+        /// Get path element as string
+        /// </summary>
+        /// <returns>String</returns>
+        public String ToString()
+        {
+            return Element;
+        }
+
         #endregion
     }
 }

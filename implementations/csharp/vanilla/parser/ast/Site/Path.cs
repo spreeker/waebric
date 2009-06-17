@@ -56,6 +56,15 @@ namespace Parser.Ast.Site
             return DirectoryName;
         }
 
+        /// <summary>
+        /// Gives complete path back as string
+        /// </summary>
+        /// <returns>String</returns>
+        public String ToString()
+        {
+            return DirectoryName.ToString() + Filename.ToString();
+        }
+
         #endregion
     }
 }

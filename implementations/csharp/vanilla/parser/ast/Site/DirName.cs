@@ -36,6 +36,15 @@ namespace Parser.Ast.Site
             return DirectoryInstance;
         }
 
+        /// <summary>
+        /// Returns directory as string
+        /// </summary>
+        /// <returns>Directory</returns>
+        public String ToString()
+        {
+            return DirectoryInstance.ToString();
+        }
+
         #endregion
     }
 }
