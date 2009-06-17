@@ -286,11 +286,6 @@ namespace Parser
             return c == ":" || c == "#" || c == "$" || c == "." || c == ":" || c == "@";
         }
 
-        private int ObjectToInt(Object o)
-        {
-            return Convert.ToInt32(o);
-        }
-
         #endregion
     }
 }

@@ -120,6 +120,16 @@ namespace Parser
             return expected.ToUpper().Equals(retrieved.ToUpper());
         }
 
+
+        /// <summary>
+        /// Conversion function to convert object to integer
+        /// </summary>
+        /// <param name="o">Object</param>
+        /// <returns>Integer</returns>
+        protected int ObjectToInt(Object o)
+        {
+            return Convert.ToInt32(o);
+        }
         #endregion
     }
 }
