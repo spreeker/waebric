@@ -1,6 +1,5 @@
 package org.cwi.waebric.checker;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -20,13 +19,6 @@ class ModuleCheck implements IWaebricCheck {
 	
 	public void checkAST(AbstractSyntaxTree tree, List<SemanticException> exceptions) {
 		for(Module module: tree.getRoot()) {
-			// Check and cache module definition
-			String path = ModuleRegister.getPath(module.getIdentifier());
-			File file = new File(path);
-			if(! file.isFile()) { // Check of expected file exists
-				exceptions.add(new NonExistingModuleException(module.getIdentifier()));
-			}
-			
 			ModuleRegister.getInstance().cacheModule(module.getIdentifier(), tree);
 			
 			// Apply recursion on all, not cached, transitive imported modules

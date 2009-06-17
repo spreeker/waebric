@@ -46,14 +46,6 @@ public class TestModuleCheck {
 	}
 	
 	@Test
-	public void testInvalidModuleDec() throws FileNotFoundException {
-		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/invalidmodule.wae");
-		check.checkAST(ast, exceptions);
-		assertEquals(1, exceptions.size());
-		assertEquals(ModuleCheck.NonExistingModuleException.class, exceptions.get(0).getClass());
-	}
-	
-	@Test
 	public void testInvalidImport() throws FileNotFoundException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/invalidimport.wae");
 		check.checkAST(ast, exceptions);
