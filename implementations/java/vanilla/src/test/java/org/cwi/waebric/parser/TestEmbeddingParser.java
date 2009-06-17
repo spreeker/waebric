@@ -48,7 +48,7 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testEmbedding() throws SyntaxException {
-		iterator = TestUtilities.quickScan("\"<markup1 \"name\">\"");
+		iterator = TestUtilities.quickScan("\"<markup1(\"txtarg\") \"name\">\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		Embedding simple = parser.parseEmbedding();

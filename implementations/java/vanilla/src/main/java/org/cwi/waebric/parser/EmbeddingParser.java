@@ -207,71 +207,47 @@ class EmbeddingParser extends AbstractParser {
 	}
 	
 	/**
-	 * Convert next token to sub-tokens. For example:<br>
+	 * Convert next token(s) to sub-tokens. For example:<br>
 	 * "<123>" is converted to [ ", <, 123, >, " ]
-	 * @throws UnexpectedTokenException 
+	 * @throws SyntaxException 
 	 */
-	private void tokenizeEmbedding() throws UnexpectedTokenException {
+	public void tokenizeEmbedding() throws SyntaxException {
 		Token start = tokens.next(); // Retrieve quote token
-
-		// Convert text to new token stream
-		StringReader reader = new StringReader(start.getLexeme().toString());
+		String data = start.getLexeme().toString(); // Embedded token stream
+		int length = 1; // Number of tokens processed, required for replacing current stream
+		
+		// When an embedding quote does not follow the specified regular expression, it likely 
+		// contains content with double quotes. Further decompose token stream to retrieve all
+		// embedding related data.
+		if(tokens.hasNext() && ! start.getLexeme().toString().matches("\\w*<\\w*>\\w*")) {
+			do {
+				data += "\"";
+				data += tokens.next().getLexeme().toString();
+				length++;
+			} while(tokens.hasNext() && ! tokens.current().getLexeme().toString().startsWith(">"));
+			current(WaebricTokenSort.QUOTE, "Embedding back", "> Text \"");
+		}
+		
+		// Convert data to new token stream
+		StringReader reader = new StringReader(data);
 		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream();
+		scanner.tokenizeStream(); 
 		
-		List<Token> elements = scanner.getTokens(); // Retrieve tokens embedded in quote
+		// Retrieve tokens embedded in quote
+		List<Token> elements = scanner.getTokens(); 
+		
+		// Convert token location from relative to absolute
 		for(Token token : elements) {
-			// Change token location to absolute instead of relative
-			token.setCharacter(token.getCharacter() + tokens.current().getCharacter());
-			token.setLine(token.getLine() + tokens.current().getLine());
+			token.setCharacter(token.getCharacter() + start.getCharacter());
+			token.setLine(token.getLine() + start.getLine());
 		}
 		
-		// Attach left "
-		elements.add(0, new Token(
-				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-				tokens.current().getLine(), tokens.current().getCharacter()));
-
-		/**
-		 * When an embedding is not followed by an IDCON instead of the expected semicolon,
-		 * the embed most likely contains a TextExpression, which messed up the quotes. In
-		 * this case restore the text expression as quote and return the back to normal.
-		 * 
-		 * "Text* < Mark-up* "Expression"> Text*" -> QUOTE IDCON QOTE
-		 */
-		boolean textExpression = false;
-		if(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
-			textExpression = true;
-			
-			// Convert identifier to quote
-			Token text = tokens.next();
-			elements.add(new Token(
-					text.getLexeme(), WaebricTokenSort.QUOTE,
-					tokens.current().getLine(), tokens.current().getCharacter()));
-			
-			// Convert back, back to sub-tokens
-			Token back = tokens.next();
-			if(back.getLexeme().toString().startsWith(">")) {
-				// Embed closure symbol
-				elements.add(new Token(
-						WaebricSymbol.GREATER_THAN, WaebricTokenSort.QUOTE,
-						tokens.current().getLine(), tokens.current().getCharacter()));
-				
-				// Test characters
-				elements.add(new Token(
-						back.getLexeme().toString().substring(1), WaebricTokenSort.IDCON,
-						tokens.current().getLine(), tokens.current().getCharacter()));
-			} else {
-				reportUnexpectedToken(back, "Embedding back", "> Text* \"");
-			}
-		}
-		
-		// Attach right "
-		elements.add(new Token(
-				WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, 
-				tokens.current().getLine(), tokens.current().getCharacter()));
+		// Attach double quote symbol tokens at begin and end of stream
+		elements.add(0, new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, start.getLine(), start.getCharacter()));
+		elements.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, tokens.current().getLine(), tokens.current().getCharacter()));
 		
 		// Swap quote token with extended token collection
-		tokens.remove(); if(textExpression) { tokens.remove(); tokens.remove(); }
+		for(int i = 0; i < length; i++) { tokens.remove(); } 
 		tokens.addAll(elements);
 	}
 	
@@ -303,19 +279,9 @@ class EmbeddingParser extends AbstractParser {
 	 * @param token Token
 	 * @return Embedding?
 	 */
-	public boolean isEmbedding(int k) {
-		if(tokens.hasNext(k) && tokens.peek(k).getSort() == WaebricTokenSort.QUOTE
-				&& tokens.peek(k).getLexeme().toString().matches("\\w*<\\w*>\\w*")) {
-			return true; // Regular embedding
-		} else if(tokens.hasNext(3) 
-				&& tokens.peek(k).getSort() == WaebricTokenSort.QUOTE 
-				&& tokens.peek(k+1).getSort() == WaebricTokenSort.IDCON
-				&& tokens.peek(k+2).getSort() == WaebricTokenSort.QUOTE
-				&& tokens.peek(k+2).getLexeme().toString().startsWith(">")) {
-			return true; // Embedding with text expression
-		}
-		
-		return false;
+	public static boolean isEmbedding(Token token) {
+		return token.getSort() == WaebricTokenSort.QUOTE 
+			&& token.getLexeme().toString().indexOf('<') != -1;
 	}
 	
 }

@@ -73,7 +73,7 @@ class StatementParser extends AbstractParser {
 				// Comment statements start with a comments keyword
 				return parseCommentStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-				if(embeddingParser.isEmbedding(2)) {
+				if(EmbeddingParser.isEmbedding(tokens.peek(2))) {
 					// Embedding echo production is followed by a text
 					return parseEchoEmbeddingStatement();
 				} else {
@@ -345,7 +345,7 @@ class StatementParser extends AbstractParser {
 					Statement.MarkupMarkup statement = new Statement.MarkupMarkup(markups);
 					statement.setMarkup(end);
 					return statement;
-				} else if(embeddingParser.isEmbedding(1)) {
+				} else if(EmbeddingParser.isEmbedding(peek)) {
 					MarkupEmbedding statement = new MarkupEmbedding(markups);
 					try {
 						statement.setEmbedding(embeddingParser.parseEmbedding());
