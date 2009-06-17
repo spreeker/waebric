@@ -204,16 +204,30 @@ namespace Lexer.Tokenizer
         private int NumericToken()
         {
             //Calculate integer value of token
-            int value = System.Convert.ToInt32(CurrentCharacter.ToString(), 10);
-            do {
+            
+            int value = Int32.Parse(ConvertIntCharToString(CurrentCharacter));
+            Read();
+            while(IsNumeric(CurrentCharacter))
+            {
                 value*= 10;
-                value+= System.Convert.ToInt32(CurrentCharacter.ToString(), 10);
+                value += Int32.Parse(ConvertIntCharToString(CurrentCharacter));
                 Read();
-            } while(IsNumeric(CurrentCharacter));
+            }
             
             NumValue = value;
             
             return NUMBER;
+        }
+
+        /// <summary>
+        /// Converts an integer indirectly to an string
+        /// String value contains real character representation
+        /// </summary>
+        /// <param name="character">Character as integer</param>
+        /// <returns>String</returns>
+        private String ConvertIntCharToString(int character)
+        {
+            return ((char)character).ToString();
         }
 
         /// <summary>
