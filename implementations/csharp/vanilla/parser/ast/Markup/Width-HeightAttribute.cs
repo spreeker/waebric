@@ -8,7 +8,7 @@ namespace Parser.Ast.Markup
     /// <summary>
     /// Node which contains Width_HeightAttribute
     /// </summary>
-    public class Width_HeightAttribute
+    public class Width_HeightAttribute : Attribute
     {
         #region Private Members
 

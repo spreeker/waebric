@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Parser.Ast.Expressions;
 
 namespace Parser.Ast.Markup
 {
@@ -10,6 +11,15 @@ namespace Parser.Ast.Markup
     /// </summary>
     public class Argument : ISyntaxNode
     {
+        #region Private Members
 
+        private Expression ArgumentExpression;
+        private String Identifier;
+
+        #endregion
+
+        #region Public Methods
+
+        #endregion
     }
 }
