@@ -1,19 +1,16 @@
 package org.cwi.waebric.interpreter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -27,11 +24,8 @@ import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
-import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
-import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
@@ -43,13 +37,13 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-
 import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.Text;
 
 /**
  * Convert AST in JDOM format, the eventual XHTML document is generated using
@@ -84,6 +78,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
+	 * Construct JDOM visitor based on function definitions.
+	 * @param document
+	 * @param functions
+	 */
+	public JDOMVisitor(Document document, Collection<FunctionDef> functions) {
+		this(document);
+		addFunctionDefs(functions);
+	}
+	
+	/**
 	 * Attach content to current element, in-case element
 	 * does not exist create root element.
 	 * @param content
@@ -107,6 +111,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		if(content instanceof Element) { current = (Element) content; } // Update current
 	}
 	
+	/**
+	 * Create default XHTML root tag
+	 * @return
+	 */
 	private Element createXHTMLTag() {
 		Namespace XHTML = Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml");
 		Element tag = new Element("html", XHTML);
@@ -114,29 +122,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		return tag;
 	}
 
-	public void visit(Module module) {
-		// Brand-mark document
-		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Comment comment = new Comment("Compiled on: " + format.format(new Date()));
-		document.addContent(comment);
-		
-		// Store function definitions
-		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
-		for(Module dependancy: dependancies) {
-			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
-				functions.put(function.getIdentifier().toString(), function);
-			}
-		}
-		
-		visit(functions.get("main")); // Start interpreting "main" function
-		functions.clear(); // Terminate all function definitions
-	}
-
-	public void visit(Site site) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	/**
+	 * Determine root element and visit each statement.
+	 */
 	public void visit(FunctionDef function) {	
 		// Construct XHTML tag when multiple statements can be root
 		if(function.getStatements().size() > 1 && ! document.hasRootElement()) {
@@ -284,7 +272,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.Echo statement) {
 		statement.getExpression().accept(this);
-		org.jdom.Text echo = new org.jdom.Text(text);
+		Text echo = new Text(text);
 		addContent(echo);
 	}
 
@@ -547,7 +535,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Field field) {
 		Expression expr = getFieldExpression(field);
-		if(expr == null) { new Expression.TextExpression(new Text("undef")); }
+		if(expr == null) { new Expression.TextExpression("undef"); }
 		expr.accept(this); // Visit expression
 	}
 	
@@ -631,12 +619,21 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		variables.get(expression.getVar().getName()).accept(this);
+		Expression variable = variables.get(expression.getVar().getName());
+		if(variable != null) { variable.accept(this); }
+		else { this.text = "undef"; }
 	}
 
 	public void visit(Embedding embedding) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/**
+	 * 
+	 */
+	public Document getDocument() {
+		return document;
 	}
 
 	/**
@@ -695,7 +692,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param function
 	 */
 	public void addFunctionDef(FunctionDef function) {
-		functions.put(function.getIdentifier().getName(), function);
+		String identifier = function.getIdentifier().getName();
+		if(! functions.containsKey(identifier)) { functions.put(identifier, function); }
+	}
+	
+	/**
+	 * All collection of functions
+	 * @param functions
+	 */
+	public void addFunctionDefs(Collection<FunctionDef> functions) {
+		for(FunctionDef function: functions) { addFunctionDef(function); }
 	}
 	
 	/**
