@@ -11,5 +11,57 @@ namespace Parser.Ast.Expressions
     /// </summary>
     public class RecordExpression : Expression
     {
+        #region Private Members
+
+        private List<KeyValuePair> RecordList;
+
+        #endregion
+
+        #region Public Methods
+
+        public RecordExpression()
+        {
+            RecordList = new List<KeyValuePair>();
+        }
+
+        /// <summary>
+        /// Add KeyValuePair to RecordExpression
+        /// </summary>
+        /// <param name="pair">KeyValuePair to add</param>
+        public void AddKeyValuePair(KeyValuePair pair)
+        {
+            RecordList.Add(pair);
+        }
+
+        /// <summary>
+        /// Get list of records
+        /// </summary>
+        /// <returns>RecordList</returns>
+        public List<KeyValuePair> GetRecords()
+        {
+            return RecordList;
+        }
+
+        /// <summary>
+        /// Get string representation of RecordExpression
+        /// </summary>
+        /// <returns>String</returns>
+        public override String ToString()
+        {
+            //Build string with all items separated by comma
+            StringBuilder records = new StringBuilder();
+            KeyValuePair[] recordArray = RecordList.ToArray();
+            for (int i = 0; i <= (recordArray.Length - 1); i++)
+            {
+                records.Append(recordArray[i].ToString());
+                if (i != (recordArray.Length - 1))
+                {
+                    records.Append(",");
+                }
+            }
+            return "{" + records.ToString() + "}";
+        }
+
+        #endregion
     }
 }
