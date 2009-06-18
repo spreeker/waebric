@@ -53,6 +53,15 @@ namespace Parser.Ast.Expressions
             VariableIdentifier = variableIdentifier;
         }
 
+        /// <summary>
+        /// Get string representation of VarExpression
+        /// </summary>
+        /// <returns>String</returns>
+        public override String ToString()
+        {
+            return VariableIdentifier;
+        }
+
         #endregion
     }
 }
