@@ -56,10 +56,60 @@ namespace Parser
             {   //Record expression
                 expression = ParseRecordExpression();
             }
-
-            //TODO: ADD HERE CASES WHERE AN FIELD OR CAT EXPRESSION IS THE CASE
+            //Check if it is maybe an catenation or field
+            if(TokenStream.HasNext(2) && TokenStream.Peek(1).GetValue().ToString() == "." && TokenStream.Peek(2).GetType()== TokenType.IDENTIFIER)
+            { //Field
+                return ParseFieldExpression(expression);
+            }
+            else if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == "+")
+            { //Catenation
+                return ParseCatExpression(expression);
+            }
 
             return expression;
+        }
+
+        /// <summary>
+        /// Parse an FieldExpression
+        /// </summary>
+        /// <param name="expression">Expression which is already parsed</param>
+        /// <returns></returns>
+        public Expression ParseFieldExpression(Expression expression)
+        {
+            FieldExpression fieldExpression = new FieldExpression();
+
+            //Add already parsed expression to field
+            fieldExpression.SetExpression(expression);
+
+            //Skip . token
+            NextToken(".", "expression.identifier", '.');
+
+            //Parse identifier
+            CurrentToken = TokenStream.NextToken();
+            fieldExpression.SetIdentifier(CurrentToken.GetValue().ToString());
+
+            return fieldExpression;
+        }
+
+        /// <summary>
+        /// Parse an CatExpression
+        /// </summary>
+        /// <param name="expression">Expression which is already parsed</param>
+        /// <returns></returns>
+        public Expression ParseCatExpression(Expression expression)
+        {
+            CatExpression catExpression = new CatExpression();
+
+            //Left part of catenation expression
+            catExpression.SetLeftExpression(expression);
+
+            //Skip + token
+            NextToken("+", "expression + expression", '+');
+
+            //Parse right part of token
+            catExpression.SetRightExpression(ParseExpression());
+
+            return catExpression;
         }
 
         /// <summary>
