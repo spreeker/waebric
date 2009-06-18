@@ -105,30 +105,35 @@ namespace Parser
         }
 
         /// <summary>
-        /// Parse an FieldExpression
-        /// </summary>
-        /// <returns>Parsed Fiel Expression</returns>
-        public FieldExpression ParseFieldExpression()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Parse an CatenationExpression
-        /// </summary>
-        /// <returns>Parsed Catenation Expression</returns>
-        public CatExpression ParseCatExpression()
-        {
-            return null;
-        }
-
-        /// <summary>
         /// Parse an ListExpression
         /// </summary>
         /// <returns>Parsed List Expression</returns>
         public ListExpression ParseListExpression()
         {
-            return null;
+            ListExpression listExpression = new ListExpression();
+
+            //Skip [ token
+            NextToken("[", "[ expression, expression ]", '[');
+
+            while (TokenStream.HasNext())
+            {   //Scan for expressions
+                if (TokenStream.Peek(1).GetValue().ToString() == "]")
+                {
+                    break; //empty list found
+                }
+
+                listExpression.AddExpression(ParseExpression());
+
+                if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ",")
+                {   //separator
+                    NextToken(",", "[ expression, expression ]", ',');
+                }
+            }
+
+            //Skip ] token
+            NextToken("]", "[ expression, expression ]", ']');
+
+            return listExpression;
         }
 
         /// <summary>
@@ -137,7 +142,31 @@ namespace Parser
         /// <returns>Parsed Record Expression</returns>
         public RecordExpression ParseRecordExpression()
         {
-            return null;
+            RecordExpression recordExpression = new RecordExpression();
+
+            //Skip { token
+            NextToken("{", "{key:value, key:value}", '{');
+
+            while (TokenStream.HasNext())
+            {   //Scan for key value pairs
+                if(TokenStream.Peek(1).GetValue().ToString() == "}")
+                {
+                    break; //} marks end of stream
+                }
+
+                recordExpression.AddKeyValuePair(ParseKeyValuePair());
+
+                if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ",")
+                {
+                    //Skip , token
+                    NextToken(",", "{key:value, key:value}", ',');
+                }
+            }
+
+            //Skip } token
+            NextToken("}", "{key:value, key:value}", '}');
+
+            return recordExpression;
         }
 
         /// <summary>
@@ -146,7 +175,19 @@ namespace Parser
         /// <returns>Parsed KeyValuePair</returns>
         public KeyValuePair ParseKeyValuePair()
         {
-            return null;
+            KeyValuePair keyValuePair = new KeyValuePair();
+
+            //Get key
+            CurrentToken = TokenStream.NextToken();
+            keyValuePair.SetKey(CurrentToken.GetValue().ToString());
+
+            //Skip :
+            NextToken(":", "key : value", ':');
+
+            //Get value
+            keyValuePair.SetValue(ParseExpression());
+
+            return keyValuePair;
         }
 
         /// <summary>
