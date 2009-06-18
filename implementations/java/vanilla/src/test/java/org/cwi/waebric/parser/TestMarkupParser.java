@@ -14,9 +14,6 @@ import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Argument.Attr;
 import org.cwi.waebric.parser.ast.markup.Argument.RegularArgument;
-import org.cwi.waebric.parser.ast.markup.Attribute.AttributeDoubleNatCon;
-import org.cwi.waebric.parser.ast.markup.Attribute.AttributeIdCon;
-import org.cwi.waebric.parser.ast.markup.Attribute.AttributeNatCon;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -87,9 +84,9 @@ public class TestMarkupParser {
 		
 		Attributes attributes = parser.parseAttributes();
 		assertEquals(3, attributes.size());
-		assertEquals(Attribute.AttributeNatCon.class, attributes.get(0).getClass());
-		assertEquals(Attribute.AttributeIdCon.class, attributes.get(1).getClass());
-		assertEquals(Attribute.AttributeDoubleNatCon.class, attributes.get(2).getClass());
+		assertEquals(Attribute.WidthAttribute.class, attributes.get(0).getClass());
+		assertEquals(Attribute.IdAttribute.class, attributes.get(1).getClass());
+		assertEquals(Attribute.WidthHeightAttribute.class, attributes.get(2).getClass());
 	}
 	
 	@Test
@@ -98,23 +95,23 @@ public class TestMarkupParser {
 		iterator = TestUtilities.quickScan("#myattribute");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Attribute.AttributeIdCon attributei = (AttributeIdCon) parser.parseAttribute();
+		Attribute.IdAttribute attributei = (Attribute.IdAttribute) parser.parseAttribute();
 		assertEquals("myattribute", attributei.getIdentifier().getToken().getLexeme().toString());
 		
 		// Regular natural attribute
 		iterator = TestUtilities.quickScan("@99");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Attribute.AttributeNatCon attributen = (AttributeNatCon) parser.parseAttribute();
-		assertEquals(99, attributen.getNumber().getLiteral().toInteger());
+		Attribute.WidthAttribute attributen = (Attribute.WidthAttribute) parser.parseAttribute();
+		assertEquals(99, attributen.getWidth().getLiteral().toInteger());
 		
 		// Double natural attribute
 		iterator = TestUtilities.quickScan("@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
-		Attribute.AttributeDoubleNatCon attributedn = (AttributeDoubleNatCon) parser.parseAttribute();
-		assertEquals(99, attributedn.getNumber().getLiteral().toInteger());
-		assertEquals(12, attributedn.getSecondNumber().getLiteral().toInteger());
+		Attribute.WidthHeightAttribute attributedn = (Attribute.WidthHeightAttribute) parser.parseAttribute();
+		assertEquals(99, attributedn.getWidth().getLiteral().toInteger());
+		assertEquals(12, attributedn.getHeight().getLiteral().toInteger());
 	}
 	
 	@Test

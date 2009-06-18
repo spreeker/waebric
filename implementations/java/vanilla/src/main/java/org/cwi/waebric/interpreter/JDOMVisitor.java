@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
@@ -42,6 +41,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
+
 import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.Content;
@@ -126,7 +126,120 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		tag.setAttribute("lang", "en");
 		return tag;
 	}
+	
+	/**
+	 * Delegate interpretation to called function, in case the called function does 
+	 * not exists the call is interpreted as a mark-up tag and its arguments as attributes.
+	 */
+	public void visit(Call markup) {
+		String name = markup.getDesignator().getIdentifier().getName();
 
+		if(functions.containsKey(name)) { // Call to defined function
+			FunctionDef function = functions.get(name); // Retrieve function definition
+			
+			// Store function variables
+			int index = 0; 
+			for(Argument argument: markup.getArguments()) {
+				if(argument instanceof Argument.RegularArgument) {
+					IdCon variable = function.getFormals().getIdentifiers().get(index);
+					variables.put(variable.getName(), argument.getExpression());
+					index++;
+				}
+			}
+
+			function.accept(this); // Visit function
+			
+			// Terminate function variables
+			for(IdCon identifier: function.getFormals().getIdentifiers()) {
+				variables.remove(identifier.toString());
+			}
+		} else { // Call to undefined function
+			// Interpret designator similar to tag
+			Tag tag = new Tag();
+			tag.setDesignator(markup.getDesignator());
+			visit(tag);
+			
+			// Interpret arguments as attributes
+			String value = "";
+			for(Argument argument: markup.getArguments()) {
+				if(argument instanceof Argument.RegularArgument) {
+					// The combined value of regular arguments are stored as value attribute
+					argument.getExpression().accept(this);
+					value += text;
+				} else if(argument instanceof Argument.Attr) {
+					// Attribute arguments are stored as separate attribute
+					argument.getExpression().accept(this);
+					current.setAttribute(((Argument.Attr) argument).getIdentifier().getName(), text);
+				}
+			}
+			
+			current.setAttribute("value", value); // Store value attribute
+		}
+	}
+
+	/**
+	 * Create next element in JDOM tree structure for tag. Attach additional attributes
+	 * when these are specified in the tag mark-up.
+	 */
+	public void visit(Tag markup) {
+		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
+		addContent(tag); // Store tag as element in JDOM structure
+
+		visit(markup.getDesignator().getAttributes()); // Process attributes
+	}
+	
+	/**
+	 * Attach attributes to current JDOM element.
+	 */
+	public void visit(Attributes attributes) {
+		for(Attribute attribute: attributes) {
+			attribute.accept(this);
+		}
+	}
+	
+	/**
+	 * Store class attribute.
+	 */
+	public void visit(Attribute.ClassAttribute attribute) {
+		current.setAttribute("class", attribute.getIdentifier().getName());
+	}
+	
+	/**
+	 * Store id attribute.
+	 */
+	public void visit(Attribute.IdAttribute attribute) {
+		current.setAttribute("id", attribute.getIdentifier().getName());
+	}
+	
+	/**
+	 * Store name attribute.
+	 */
+	public void visit(Attribute.NameAttribute attribute) {
+		current.setAttribute("name", attribute.getIdentifier().getName());
+	}
+	
+	/**
+	 * Store type attribute.
+	 */
+	public void visit(Attribute.TypeAttribute attribute) {
+		current.setAttribute("type", attribute.getIdentifier().getName());
+	}
+	
+	/**
+	 * Store width attribute.
+	 */
+	public void visit(Attribute.WidthAttribute attribute) {
+		current.setAttribute("width", attribute.getWidth().getLiteral().toString());
+	}
+	
+	/**
+	 * Store width and height attribute.
+	 */
+	public void visit(Attribute.WidthHeightAttribute attribute) {
+		current.setAttribute("width", attribute.getWidth().getLiteral().toString());
+		current.setAttribute("height", attribute.getHeight().getLiteral().toString());
+	}
+	
 	/**
 	 * Determine root element and visit each statement.
 	 */
@@ -145,29 +258,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	/**
-	 * Check if node contains a yield statement, either contained directly in 
-	 * the statement collection or indirectly by calling a statement with yield.
-	 * @param node
-	 * @return
-	 */
-	private boolean containsYield(AbstractSyntaxNode node) {
-		if(node instanceof Statement.Yield) { 
-			return true; // Yield found!
-		} else if(node instanceof Markup.Call) {
-			// Retrieve called function and check if that contains a yield statement
-			Markup.Call call = (Markup.Call) node;
-			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
-			return containsYield(function);
-		} else {
-			// Delegate check to children
-			for(AbstractSyntaxNode child: node.getChildren()) {
-				if(containsYield(child)) { return true; }
-			} return false; // Nothing found
-		}
-	}
-
-	/**
-	 * 
+	 * Evaluate predicate and potentially execute statement based on outcome.
 	 */
 	public void visit(Statement.If statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
@@ -176,7 +267,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	/**
-	 * 
+	 * Evaluate predicate and execute either of the statements based on outcome.
 	 */
 	public void visit(Statement.IfElse statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
@@ -232,7 +323,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	/**
-	 * 
+	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
 		Element root = current;
@@ -242,6 +333,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
+	/**
+	 * Execute statement for each element in list expression, also
+	 * create a local element variable during each loop.
+	 */
 	public void visit(Statement.Each statement) {
 		if(statement.getExpression() instanceof Expression.ListExpression) {
 			Expression.ListExpression list = (Expression.ListExpression) statement.getExpression();
@@ -286,6 +381,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		statement.getEmbedding().accept(this);
 	}
 
+	/**
+	 * Extend definition with assignments and execute statements, remove
+	 * definitions after completion of the let statement.
+	 */
 	public void visit(Statement.Let statement) {
 		// Extend function and variable definitions with assignments
 		for(Assignment assignment: statement.getAssignments()) {
@@ -330,10 +429,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		yield = clone; // Restore yield stack
 	}
 
+	/**
+	 * Interpret mark-up embedded in statement.
+	 */
 	public void visit(RegularMarkupStatement statement) {
 		statement.getMarkup().accept(this);
 	}
 
+	/**
+	 * Interpret mark-ups embedded in statement.
+	 */
 	public void visit(MarkupMarkup statement) {
 		for(Markup markup: statement.getMarkups()) {
 			markup.accept(this);
@@ -341,6 +446,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 	}
 
+	/**
+	 * Interpret mark-ups and expression embedded in statement.
+	 */
 	public void visit(MarkupExp statement) {
 		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
@@ -370,7 +478,32 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		statement.getExpression().accept(this);
 		current.setText(text);
 	}
+	
+	/**
+	 * Check if node contains a yield statement, either contained directly in 
+	 * the statement collection or indirectly by calling a statement with yield.
+	 * @param node
+	 * @return
+	 */
+	private boolean containsYield(AbstractSyntaxNode node) {
+		if(node instanceof Statement.Yield) { 
+			return true; // Yield found!
+		} else if(node instanceof Markup.Call) {
+			// Retrieve called function and check if that contains a yield statement
+			Markup.Call call = (Markup.Call) node;
+			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
+			return containsYield(function);
+		} else {
+			// Delegate check to children
+			for(AbstractSyntaxNode child: node.getChildren()) {
+				if(containsYield(child)) { return true; }
+			} return false; // Nothing found
+		}
+	}
 
+	/**
+	 * Interpret mark-ups and sub-statement embedded in statement.
+	 */
 	public void visit(MarkupStat statement) {
 		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
@@ -400,6 +533,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		statement.getStatement().accept(this);
 	}
 
+	/**
+	 * Interpret mark-ups and embedding embedded in statement.
+	 */
 	public void visit(MarkupEmbedding statement) {
 		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
@@ -430,6 +566,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		current.setText(text);
 	}
 
+	/**
+	 * Extend function definitions with binding.
+	 */
 	public void visit(FuncBind bind) {
 		// Construct new function definition based on bind data
 		FunctionDef definition = new FunctionDef();
@@ -449,94 +588,12 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		functions.put(bind.getIdentifier().getName(), definition);
 	}
 
+	/**
+	 * Extend current variable definition with binding, in case variable
+	 * already exists its value will be overwritten.
+	 */
 	public void visit(VarBind bind) {
 		variables.put(bind.getIdentifier().getName(), bind.getExpression());
-	}
-
-	/**
-	 * 
-	 */
-	public void visit(Call markup) {
-		// Retrieve function definition
-		String name = markup.getDesignator().getIdentifier().getName();
-		FunctionDef function = functions.get(name);
-		
-		if(function != null) {
-			// Initiate function variables
-			int index = 0; 
-			for(Argument argument: markup.getArguments()) {
-				if(argument instanceof Argument.RegularArgument) {
-					IdCon variable = function.getFormals().getIdentifiers().get(index);
-					variables.put(variable.getName(), argument.getExpression());
-					index++;
-				}
-			}
-
-			function.accept(this); // Visit function
-			
-			// Terminate function variables
-			for(IdCon identifier: function.getFormals().getIdentifiers()) {
-				variables.remove(identifier.toString());
-			}
-		} else if(XHTMLTag.isXHTMLTag(name)) {
-			/**
-			 * else {
-					argument.getExpression().accept(this);
-					String value = this.text;
-					if(current == null) { addContent(this.createXHTMLTag()); }
-					current.setAttribute(((Argument.Attr) argument).getIdentifier().getName(), value);
-				}
-			 */
-		} else {
-			// Undefined function, execute call as tag
-			Tag tag = new Tag();
-			tag.setDesignator(markup.getDesignator());
-			tag.accept(this);
-			
-			// Store call arguments as value attribute
-			String value = "";
-			for(Argument argument: markup.getArguments()) {
-				argument.getExpression().accept(this); // Store expression value in text field
-				value += text; // Store text field value in value before it is overwritten
-			}
-			current.setAttribute("value", value);
-		}
-	}
-
-	/**
-	 * Create next element in JDOM tree structure for tag. Attach additional attributes
-	 * when these are specified in the tag mark-up.
-	 */
-	public void visit(Tag markup) {
-		// Convert tag to element
-		addContent(new Element(markup.getDesignator().getIdentifier().getName()));
-		
-		// Process attributes
-		markup.getDesignator().getAttributes().accept(this);
-	}
-	
-	public void visit(Attributes attributes) {
-		for(Attribute attribute: attributes) {
-			if(attribute instanceof Attribute.AttributeIdCon) {
-				Attribute.AttributeIdCon id = (Attribute.AttributeIdCon) attribute;
-				if(id.getSymbol().toCharacter() == '.') {
-					current.setAttribute("class", id.getIdentifier().getName());
-				} else if(id.getSymbol().toCharacter() == '#') {
-					current.setAttribute("id", id.getIdentifier().getName());
-				} else if(id.getSymbol().toCharacter() == '$') {
-					current.setAttribute("name", id.getIdentifier().getName());
-				} else if(id.getSymbol().toCharacter() == ':') {
-					current.setAttribute("type", id.getIdentifier().getName());
-				}
-			} else if(attribute instanceof Attribute.AttributeNatCon) {
-				Attribute.AttributeNatCon nat = (Attribute.AttributeNatCon) attribute;
-				current.setAttribute("width", nat.getNumber().getLiteral().toString());
-			} else if(attribute instanceof Attribute.AttributeDoubleNatCon) {
-				Attribute.AttributeDoubleNatCon dnat = (Attribute.AttributeDoubleNatCon) attribute;
-				current.setAttribute("width", dnat.getNumber().getLiteral().toString());
-				current.setAttribute("height", dnat.getSecondNumber().getLiteral().toString());
-			}
-		}
 	}
 
 	/**
@@ -665,6 +722,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		else { this.text = "undef"; }
 	}
 
+	/**
+	 * Attach pretext to current element and delegate interpret to embed and tail.
+	 */
 	public void visit(Embedding embedding) {
 		// Attach pretext to current element
 		Text pre = new Text(embedding.getPre().getText().toString());
@@ -674,6 +734,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		embedding.getTail().accept(this); // Delegate tail
 	}
 	
+	/**
+	 * Interpret mark-ups and expression.
+	 * @param embed
+	 */
 	public void visit(Embed.ExpressionEmbed embed) {
 		// Interpret similar to mark-up expression
 		Statement.MarkupExp stm = new Statement.MarkupExp(embed.getMarkups());
@@ -681,6 +745,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		stm.accept(this);
 	}
 	
+	/**
+	 * Interpret mark-ups embedded in embed.
+	 * @param embed
+	 */
 	public void visit(Embed.MarkupEmbed embed) {
 		// Interpret similar to mark-up mark-up
 		Statement.MarkupMarkup stm = new Statement.MarkupMarkup(embed.getMarkups());
@@ -688,6 +756,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		stm.accept(this);
 	}
 	
+	/**
+	 * Interpret mid text while visiting embed and tail.
+	 */
 	public void visit(TextTail.MidTail tail) {
 		// Attach mid text to current element
 		Text mid = new Text(tail.getMid().getText().toString());
@@ -697,6 +768,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		tail.getTail().accept(this);
 	}
 	
+	/**
+	 * Store post text.
+	 */
 	public void visit(TextTail.PostTail tail) {
 		// Attach post text to current element
 		Text post = new Text(tail.getPost().getText().toString());
@@ -704,14 +778,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Retrieve JDOM document.
 	 */
 	public Document getDocument() {
 		return document;
 	}
 
 	/**
-	 * 
+	 * Retrieve current JDOM element.
 	 * @return
 	 */
 	public Element getCurrent() {
@@ -719,7 +793,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Modify current JDOM element.
 	 * @param current
 	 */
 	public void setCurrent(Element current) {
@@ -727,7 +801,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Retrieve current text value.
 	 * @return
 	 */
 	public String getText() {
@@ -735,7 +809,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Modify current text value.
 	 * @param data
 	 */
 	public void setText(String text) {
@@ -743,7 +817,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Retrieve function definition.
 	 * @param name
 	 * @return
 	 */
@@ -752,7 +826,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Retrieve variable expression.
 	 * @param name
 	 * @return
 	 */
@@ -761,7 +835,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Extend current function definitions with a function.
 	 * @param name
 	 * @param function
 	 */
@@ -771,7 +845,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * All collection of functions
+	 * Extend current function definitions with a collection of functions.
 	 * @param functions
 	 */
 	public void addFunctionDefs(Collection<FunctionDef> functions) {
@@ -779,7 +853,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * 
+	 * Extend current variable definitions with a variable.
 	 * @param name
 	 * @param value
 	 */

@@ -27,19 +27,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	/**
 	 * Grammar:<br>
 	 * <code>
-	 * 	"#" IdCon -> Attribute<br>
 	 *  "." IdCon -> Attribute<br>
-	 *  "$" IdCOn -> Attribute
 	 * </code>
 	 */
-	public static class AttributeIdCon extends Attribute {
-
-		private final CharacterLiteral symbol;
-		private IdCon identifier;
+	public static class ClassAttribute extends Attribute {
 		
-		public AttributeIdCon(char symbol) {
-			this.symbol = new CharacterLiteral(symbol);
-		}
+		private IdCon identifier;
 		
 		public IdCon getIdentifier() {
 			return identifier;
@@ -49,22 +42,50 @@ public abstract class Attribute extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 
-		public CharacterLiteral getSymbol() {
-			return symbol;
-		}
-		
-		@Override
-		public String toString() {
-			return "" + symbol + identifier;
-		}
-		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { symbol, identifier };
-		}
-		
 		@Override
 		public void accept(INodeVisitor visitor) {
 			visitor.visit(this);
+		}
+
+		@Override
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.PERIOD), 
+					identifier
+				};
+		}
+
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 *  "#" IdCon -> Attribute<br>
+	 * </code>
+	 */
+	public static class IdAttribute extends Attribute {
+		
+		private IdCon identifier;
+		
+		public IdCon getIdentifier() {
+			return identifier;
+		}
+		
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
+		}
+
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+
+		@Override
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.NUMBER_SIGN), 
+					identifier
+				};
 		}
 		
 	}
@@ -72,36 +93,98 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	/**
 	 * Grammar:<br>
 	 * <code>
-	 * 	"@" w:NatCon -> Attribute
+	 *  "$" IdCon -> Attribute<br>
 	 * </code>
 	 */
-	public static class AttributeNatCon extends Attribute {
+	public static class NameAttribute extends Attribute {
+		
+		private IdCon identifier;
+		
+		public IdCon getIdentifier() {
+			return identifier;
+		}
+		
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
+		}
 
-		protected NatCon number;
-		
-		public NatCon getNumber() {
-			return number;
-		}
-		
-		public void setNumber(NatCon number) {
-			this.number = number;
-		}
-		
 		@Override
-		public String toString() {
-			return "@" + number;
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+
+		@Override
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.DOLLAR_SIGN), 
+					identifier
+				};
 		}
 		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 *  ":" IdCon -> Attribute<br>
+	 * </code>
+	 */
+	public static class TypeAttribute extends Attribute {
+		
+		private IdCon identifier;
+		
+		public IdCon getIdentifier() {
+			return identifier;
+		}
+		
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
+		}
+
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+
+		@Override
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.COLON), 
+					identifier
+				};
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 *  "@" NatCon -> Attribute<br>
+	 * </code>
+	 */
+	public static class WidthAttribute extends Attribute {
+		
+		private NatCon width;
+		
+		public NatCon getWidth() {
+			return width;
+		}
+		
+		public void setWidth(NatCon width) {
+			this.width = width;
+		}
+
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+
+		@Override
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { 
 					new CharacterLiteral(WaebricSymbol.AT_SIGN), 
-					number
+					width
 				};
-		}
-		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
 		}
 		
 	}
@@ -109,37 +192,43 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	/**
 	 * Grammar:<br>
 	 * <code>
-	 * 	"@" w:NatCon "%" h:NatCon -> Attribute
+	 *  "@" NatCon "%" NatCon -> Attribute<br>
 	 * </code>
 	 */
-	public static class AttributeDoubleNatCon extends AttributeNatCon {
+	public static class WidthHeightAttribute extends Attribute {
+		
+		private NatCon width;
+		private NatCon height;
+		
+		public NatCon getWidth() {
+			return width;
+		}
+		
+		public void setWidth(NatCon width) {
+			this.width = width;
+		}
+		
+		public NatCon getHeight() {
+			return height;
+		}
+		
+		public void setHeight(NatCon height) {
+			this.height = height;
+		}
 
-		private NatCon secondNumber;
-		
-		public NatCon getSecondNumber() {
-			return secondNumber;
-		}
-		
-		public void setSecondNumber(NatCon secondNumber) {
-			this.secondNumber = secondNumber;
-		}
-		
-		@Override
-		public String toString() {
-			return "@" + number + '%' + secondNumber;
-		}
-		
-		@Override
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.AT_SIGN), number, 
-					new CharacterLiteral(WaebricSymbol.PERCENT_SIGN), secondNumber 
-				};
-		}
-		
 		@Override
 		public void accept(INodeVisitor visitor) {
 			visitor.visit(this);
+		}
+
+		@Override
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { 
+					new CharacterLiteral(WaebricSymbol.AT_SIGN), 
+					width,
+					new CharacterLiteral(WaebricSymbol.PERCENT_SIGN),
+					height
+				};
 		}
 		
 	}

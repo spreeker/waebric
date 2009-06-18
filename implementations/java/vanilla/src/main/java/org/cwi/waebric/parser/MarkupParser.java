@@ -104,9 +104,24 @@ class MarkupParser extends AbstractParser {
 		next(WaebricTokenSort.CHARACTER, "Attribute", "{ # . $ : @ } Identifier");
 		char symbol = tokens.current().getLexeme().toString().charAt(0);
 		
-		if(symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':') { // Identifier attribute
-			next(WaebricTokenSort.IDCON, "Identifier attribute", "{ # . $ : } Identifier");
-			Attribute.AttributeIdCon attribute = new Attribute.AttributeIdCon(symbol);
+		if(symbol == '.') {
+			next(WaebricTokenSort.IDCON, "Class name", "\".\" Identifier");
+			Attribute.ClassAttribute attribute = new Attribute.ClassAttribute();
+			attribute.setIdentifier(new IdCon(tokens.current()));
+			return attribute;
+		} else if(symbol == '#') {
+			next(WaebricTokenSort.IDCON, "Id name", "\"#\" Identifier");
+			Attribute.IdAttribute attribute = new Attribute.IdAttribute();
+			attribute.setIdentifier(new IdCon(tokens.current()));
+			return attribute;
+		} else if(symbol == '$') {
+			next(WaebricTokenSort.IDCON, "Name", "\"$\" Identifier");
+			Attribute.NameAttribute attribute = new Attribute.NameAttribute();
+			attribute.setIdentifier(new IdCon(tokens.current()));
+			return attribute;
+		} else if(symbol == ':') {
+			next(WaebricTokenSort.IDCON, "Type name", "\":\" Identifier");
+			Attribute.TypeAttribute attribute = new Attribute.TypeAttribute();
 			attribute.setIdentifier(new IdCon(tokens.current()));
 			return attribute;
 		} else if(symbol == '@') { // Natural attribute
@@ -119,13 +134,13 @@ class MarkupParser extends AbstractParser {
 				next(WaebricTokenSort.NATCON, "Natural attribute", "@ Number % Number");
 				NatCon second = new NatCon(tokens.current().getLexeme().toString());
 
-				Attribute.AttributeDoubleNatCon attribute = new Attribute.AttributeDoubleNatCon();
-				attribute.setNumber(number);
-				attribute.setSecondNumber(second);
+				Attribute.WidthHeightAttribute attribute = new Attribute.WidthHeightAttribute();
+				attribute.setWidth(number);
+				attribute.setHeight(second);
 				return attribute;
 			} else { // Regular natural attribute
-				Attribute.AttributeNatCon attribute = new Attribute.AttributeNatCon();
-				attribute.setNumber(number);
+				Attribute.WidthAttribute attribute = new Attribute.WidthAttribute();
+				attribute.setWidth(number);
 				return attribute;
 			}
 		} else {

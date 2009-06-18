@@ -84,7 +84,12 @@ public class DefaultNodeVisitor implements INodeVisitor {
 	public void visit(Tag markup) { }
 	public void visit(Designator designator) { }
 	public void visit(Attributes attributes) { }
-	public void visit(Attribute attribute) { }
+	public void visit(Attribute.IdAttribute attribute) { }
+	public void visit(Attribute.NameAttribute attribute) { }
+	public void visit(Attribute.TypeAttribute attribute) { }
+	public void visit(Attribute.WidthAttribute attribute) { }
+	public void visit(Attribute.WidthHeightAttribute attribute) { }
+	public void visit(Attribute.ClassAttribute attribute) { }
 	public void visit(Arguments arguments) { }
 	public void visit(Argument argument) { }
 	public void visit(CatExpression expression) { }
