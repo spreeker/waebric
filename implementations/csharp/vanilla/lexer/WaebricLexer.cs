@@ -269,7 +269,7 @@ namespace Lexer
             
             //Check out all characters
             char[] possibleSymbolCharacters = possibleSymbol.ToCharArray();
-            for(int i = 0; i < (possibleSymbol.Length - 1); i++)
+            for(int i = 0; i <= (possibleSymbol.Length - 1); i++)
             {
                 if (!IsWaebricSymbol(possibleSymbol[i]))
                 {
@@ -283,7 +283,7 @@ namespace Lexer
         private bool IsWaebricSymbol(int c)
         {
             //~[0-31] \t\n\r;> [127-255]
-            return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>';
+            return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}';
         }
 
         /// <summary>
