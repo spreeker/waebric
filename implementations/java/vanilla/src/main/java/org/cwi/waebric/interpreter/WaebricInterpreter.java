@@ -32,7 +32,14 @@ import org.jdom.output.XMLOutputter;
  */
 public class WaebricInterpreter {
 
+	/**
+	 * Output directory
+	 */
 	public static final String OUTPUT_DIR = "output/";
+	
+	/**
+	 * Output stream being written to
+	 */
 	public final OutputStream os;
 	
 	/**
@@ -143,6 +150,10 @@ public class WaebricInterpreter {
 	 * Convert requested output file path into output stream. In case
 	 * the interpreted was construct with an output stream, this stream
 	 * will be returned instead.
+	 * 
+	 * When a directory or file in the specified path does not exist
+	 * they will be created, this might result in an IOException.
+	 * 
 	 * @param module
 	 * @return
 	 * @throws IOException
@@ -173,9 +184,9 @@ public class WaebricInterpreter {
 	 */
 	private void outputDocument(Document document, String path) {
 		try {
-			// Brand-mark document with some awesome comment
+			// Brand-mark document
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Comment comment = new Comment("Compiled by JWHIZZLE on: " + format.format(new Date()));
+			Comment comment = new Comment("Generated on " + format.format(new Date()));
 			document.addContent(0, comment);
 			
 			// Output document

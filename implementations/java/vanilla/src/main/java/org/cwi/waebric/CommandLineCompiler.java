@@ -93,8 +93,13 @@ public class CommandLineCompiler {
 				return; // Quit application
 			}
 			
-			WaebricInterpreter interpreter = new WaebricInterpreter();
+			WaebricInterpreter interpreter = new WaebricInterpreter(System.out);
+
+			System.out.println("\nInterpreting program and writing to output stream:\n");
+			curr = System.currentTimeMillis();
 			interpreter.interpretProgram(parser.getAbstractSyntaxTree());
+			long interpret_time = System.currentTimeMillis() - curr;
+			System.out.println("Interpreted in " + interpret_time + "ms.");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
