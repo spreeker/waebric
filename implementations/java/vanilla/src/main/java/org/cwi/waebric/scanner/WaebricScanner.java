@@ -288,7 +288,7 @@ public class WaebricScanner implements Iterable<Token> {
 	 * @return 
 	 */
 	private static boolean isSymbolChar(int c) {
-		return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>';
+		return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}' && c != ']';
 	}
 
 	/**
