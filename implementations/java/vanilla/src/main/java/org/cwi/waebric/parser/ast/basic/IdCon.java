@@ -56,7 +56,7 @@ public class IdCon extends AbstractSyntaxNode {
 	
 	@Override
 	public String toString() {
-		return node.toString();
+		return this.getName();
 	}
 	
 	@Override

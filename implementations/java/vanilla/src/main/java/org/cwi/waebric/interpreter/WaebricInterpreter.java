@@ -101,13 +101,18 @@ public class WaebricInterpreter {
 		}
 	}
 	
+	/**
+	 * Convert path in relative file path.
+	 * @param path Path
+	 * @return Relative file path
+	 */
 	public static String getPath(Path path) {
 		String result = "";
 		
 		if(path instanceof Path.PathWithDir) {
 			Directory dir = ((Path.PathWithDir) path).getDirName().getDirectory();
-			for(AbstractSyntaxNode node: dir.getChildren()) {
-				result += node.toString();
+			for(AbstractSyntaxNode element: dir.getChildren()) {
+				result += element.toString();
 			}
 		}
 		
@@ -119,9 +124,19 @@ public class WaebricInterpreter {
 		return OUTPUT_DIR + result;
 	}
 	
+	/**
+	 * Convert module identifier in relative file path.
+	 * @param identifier Identifier
+	 * @return Relative file path
+	 */
 	public static String getPath(ModuleId identifier) {
-		String name = identifier.get(identifier.size()-1).getToken().getLexeme().toString();
-		return OUTPUT_DIR + name + ".html";
+		String result = "";
+		
+		for(AbstractSyntaxNode element: identifier.getChildren()) {
+			result += element.toString();
+		}
+		
+		return OUTPUT_DIR + result.replace('.', '/') + ".html";
 	}
 	
 	/**
