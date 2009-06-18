@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
@@ -22,6 +23,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Attribute;
+import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
@@ -456,23 +458,35 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Call markup) {
 		// Retrieve function definition
-		FunctionDef function = functions.get(markup.getDesignator().getIdentifier().getName());
+		String name = markup.getDesignator().getIdentifier().getName();
+		FunctionDef function = functions.get(name);
 		
 		if(function != null) {
 			// Initiate function variables
 			int index = 0; 
-			for(IdCon identifier: function.getFormals().getIdentifiers()) {
-				Expression expression = markup.getArguments().get(index).getExpression();
-				variables.put(identifier.toString(), expression);
-				index++;
+			for(Argument argument: markup.getArguments()) {
+				if(argument instanceof Argument.RegularArgument) {
+					IdCon variable = function.getFormals().getIdentifiers().get(index);
+					variables.put(variable.getName(), argument.getExpression());
+					index++;
+				}
 			}
-			
+
 			function.accept(this); // Visit function
 			
 			// Terminate function variables
 			for(IdCon identifier: function.getFormals().getIdentifiers()) {
 				variables.remove(identifier.toString());
 			}
+		} else if(XHTMLTag.isXHTMLTag(name)) {
+			/**
+			 * else {
+					argument.getExpression().accept(this);
+					String value = this.text;
+					if(current == null) { addContent(this.createXHTMLTag()); }
+					current.setAttribute(((Argument.Attr) argument).getIdentifier().getName(), value);
+				}
+			 */
 		} else {
 			// Undefined function, execute call as tag
 			Tag tag = new Tag();
@@ -494,31 +508,35 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * when these are specified in the tag mark-up.
 	 */
 	public void visit(Tag markup) {
-		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
+		// Convert tag to element
+		addContent(new Element(markup.getDesignator().getIdentifier().getName()));
 		
-		for(Attribute attribute: markup.getDesignator().getAttributes()) {
+		// Process attributes
+		markup.getDesignator().getAttributes().accept(this);
+	}
+	
+	public void visit(Attributes attributes) {
+		for(Attribute attribute: attributes) {
 			if(attribute instanceof Attribute.AttributeIdCon) {
 				Attribute.AttributeIdCon id = (Attribute.AttributeIdCon) attribute;
 				if(id.getSymbol().toCharacter() == '.') {
-					tag.setAttribute("class", id.getIdentifier().getName());
+					current.setAttribute("class", id.getIdentifier().getName());
 				} else if(id.getSymbol().toCharacter() == '#') {
-					tag.setAttribute("id", id.getIdentifier().getName());
+					current.setAttribute("id", id.getIdentifier().getName());
 				} else if(id.getSymbol().toCharacter() == '$') {
-					tag.setAttribute("name", id.getIdentifier().getName());
+					current.setAttribute("name", id.getIdentifier().getName());
 				} else if(id.getSymbol().toCharacter() == ':') {
-					tag.setAttribute("type", id.getIdentifier().getName());
+					current.setAttribute("type", id.getIdentifier().getName());
 				}
 			} else if(attribute instanceof Attribute.AttributeNatCon) {
 				Attribute.AttributeNatCon nat = (Attribute.AttributeNatCon) attribute;
-				tag.setAttribute("width", nat.getNumber().getLiteral().toString());
+				current.setAttribute("width", nat.getNumber().getLiteral().toString());
 			} else if(attribute instanceof Attribute.AttributeDoubleNatCon) {
 				Attribute.AttributeDoubleNatCon dnat = (Attribute.AttributeDoubleNatCon) attribute;
-				tag.setAttribute("width", dnat.getNumber().getLiteral().toString());
-				tag.setAttribute("height", dnat.getSecondNumber().getLiteral().toString());
+				current.setAttribute("width", dnat.getNumber().getLiteral().toString());
+				current.setAttribute("height", dnat.getSecondNumber().getLiteral().toString());
 			}
 		}
-		
-		addContent(tag);
 	}
 
 	/**

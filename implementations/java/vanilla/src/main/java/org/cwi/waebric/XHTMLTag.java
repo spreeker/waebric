@@ -132,4 +132,15 @@ public enum XHTMLTag {
 	@Deprecated
 	XMP;
 	
+	public static boolean isXHTMLTag(String data) {
+		try {
+			// Literal should be in enumeration
+			XHTMLTag tag = XHTMLTag.valueOf(data.toUpperCase());
+			return tag != null;
+		} catch(IllegalArgumentException e) {
+			// Enumeration does not exists
+			return false;
+		}
+	}
+	
 }
