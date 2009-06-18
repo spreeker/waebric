@@ -56,11 +56,11 @@ namespace Lexer
                         LexicalizeNumber();
                         break;
                     case StreamTokenizer.CHARACTER: // Character
-                        if (CurrentToken == '"') // Possible a quote
+                        if (tokenizer.GetCharacterValue() == '"') // Possible a quote
                         {
                             LexicalizeQuote();
                         }
-                        else if (CurrentToken == '\'') //Waebric Symbol ('symbol ) 
+                        else if (tokenizer.GetCharacterValue() == '\'') //Waebric Symbol ('symbol ) 
                         {
                             LexicalizeSymbol();
                         }
@@ -167,7 +167,7 @@ namespace Lexer
             StringBuilder stringBuilder = new StringBuilder();
             while (tokenizer.GetCharacterValue() != '\"') //Scan until " found
             {
-                if(CurrentToken != StreamTokenizer.EOF)
+                if(CurrentToken == StreamTokenizer.EOF)
                 {   // End of file, so it wasn't a quoted part but just a single "
                     
                     //First add a single quote as token
@@ -190,6 +190,9 @@ namespace Lexer
             }
 
             TokenStream.Add(new Token(stringBuilder.ToString(),TokenType.TEXT, tempLine));
+            
+            //Skip " token, only text is interesting
+            CurrentToken = tokenizer.NextToken();
         }
 
         /// <summary>
@@ -199,15 +202,15 @@ namespace Lexer
         {
             //Create a string with symbol
             StringBuilder stringBuilder = new StringBuilder();
-            CurrentToken = tokenizer.NextToken(); //Get next part of symbol after '
-
-            while(IsWaebricSymbol(tokenizer.ToString())) 
+            CurrentToken = tokenizer.NextToken(); //Skip ' token
+ 
+            while(IsWaebricSymbol(tokenizer.ToString()) && CurrentToken != StreamTokenizer.EOF) 
             {
                 stringBuilder.Append(tokenizer.ToString());
                 CurrentToken = tokenizer.NextToken();
             }
 
-            TokenStream.Add(new Token(tokenizer.ToString(), TokenType.WAEBRICSYMBOL, tokenizer.GetScannedLines()));
+            TokenStream.Add(new Token(stringBuilder.ToString(), TokenType.WAEBRICSYMBOL, tokenizer.GetScannedLines()));
         }
 
         /// <summary>
@@ -268,13 +271,19 @@ namespace Lexer
             char[] possibleSymbolCharacters = possibleSymbol.ToCharArray();
             for(int i = 0; i < (possibleSymbol.Length - 1); i++)
             {
-                if (!IsSymbol(possibleSymbol[i]))
+                if (!IsWaebricSymbol(possibleSymbol[i]))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        private bool IsWaebricSymbol(int c)
+        {
+            //~[0-31] \t\n\r;> [127-255]
+            return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>';
         }
 
         /// <summary>

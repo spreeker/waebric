@@ -1,6 +1,7 @@
 ﻿using Lexer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using Lexer.Tokenizer;
 
 namespace TestLexer
 {
@@ -63,7 +64,46 @@ namespace TestLexer
         //
         #endregion
 
+        /// <summary>
+        /// Test for WaebricSymbol
+        /// </summary>
+        [TestMethod]
+        public void WaebricSymbolTokenTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("'test"));
+            lexer.LexicalizeStream();
 
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            //Test token
+            Assert.AreEqual(1, tokens.GetSize());
+            Token token = tokens.NextToken();
+            Assert.AreEqual(TokenType.WAEBRICSYMBOL, token.GetType());
+            Assert.AreEqual("test", token.GetValue().ToString());
+        }
+
+        /// <summary>
+        /// Test for Quotes
+        /// </summary>
+        [TestMethod]
+        public void QuoteTokenTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("\"test\""));
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            //Test token
+            Assert.AreEqual(1, tokens.GetSize());
+            Assert.AreEqual(TokenType.TEXT, tokens.Peek(1).GetType());
+            Assert.AreEqual("test", tokens.Peek(1).GetValue().ToString());
+        }
+
+        /// <summary>
+        /// Test an more complex form of stream
+        /// </summary>
         [TestMethod]
         public void TestComplexStream()
         {
