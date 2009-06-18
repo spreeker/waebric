@@ -106,7 +106,7 @@ namespace TestParser
         {
             //Create parser and parse tokens
             List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("{token1:\"token1\", token2:10, token3:symbol}"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("{token1:\"token1\", token2:10, token3:'symbol}"), exceptions);
             RecordExpression expression = expressionParser.ParseRecordExpression();
 
             //Test output
@@ -125,10 +125,8 @@ namespace TestParser
             Assert.AreEqual(10, ((NumExpression)recordList[1].GetValue()).GetNum());
 
             Assert.AreEqual("token3", recordList[2].GetKey());
-            Assert.AreEqual(typeof(VarExpression), recordList[2].GetValue().GetType());
+            Assert.AreEqual(typeof(SymExpression), recordList[2].GetValue().GetType());
             Assert.AreEqual("symbol", recordList[2].GetValue().ToString());
-
-            //TODO: fix symbol in record
         }
 
         /// <summary>
