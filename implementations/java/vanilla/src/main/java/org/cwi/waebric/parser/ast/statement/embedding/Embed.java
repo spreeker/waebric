@@ -1,5 +1,8 @@
 package org.cwi.waebric.parser.ast.statement.embedding;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
@@ -14,18 +17,10 @@ import org.cwi.waebric.parser.ast.markup.Markup;
  */
 public abstract class Embed extends AbstractSyntaxNode {
 
-	protected NodeList<Markup> markups;
-	
-	public Embed(NodeList<Markup> markups) {
-		this.markups = markups;
-	}
-	
-	public Markup getMarkup(int index) {
-		return markups.get(index);
-	}
-	
-	public int getMarkupCount() {
-		return markups.size();
+	protected NodeList<Markup> markups = new NodeList<Markup>();
+
+	public List<Markup> getMarkups() {
+		return markups.clone();
 	}
 	
 	/**
@@ -33,11 +28,11 @@ public abstract class Embed extends AbstractSyntaxNode {
 	 */
 	public static class ExpressionEmbed extends Embed {
 		
-		public ExpressionEmbed(NodeList<Markup> markups) {
-			super(markups);
-		}
-
 		private Expression expression;
+
+		public ExpressionEmbed(Collection<Markup> args) {
+			markups.addAll(args);
+		}
 
 		public Expression getExpression() {
 			return expression;
@@ -63,11 +58,11 @@ public abstract class Embed extends AbstractSyntaxNode {
 	 */
 	public static class MarkupEmbed extends Embed {
 		
-		public MarkupEmbed(NodeList<Markup> markups) {
-			super(markups);
-		}
-
 		private Markup markup;
+		
+		public MarkupEmbed(Collection<Markup> args) {
+			markups.addAll(args);
+		}
 
 		public Markup getMarkup() {
 			return markup;

@@ -11,6 +11,7 @@ import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
+import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
 import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
@@ -35,7 +36,9 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupMarkup;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
+import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
+import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.jdom.CDATA;
 import org.jdom.Comment;
@@ -263,8 +266,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.CData statement) {
 		statement.getExpression().accept(this);
-		CDATA cdata = new CDATA(text);
-		addContent(cdata);
+		addContent(new CDATA(text));
 	}
 
 	/**
@@ -272,16 +274,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.Echo statement) {
 		statement.getExpression().accept(this);
-		Text echo = new Text(text);
-		addContent(echo);
+		addContent(new Text(text));
 	}
 
 	/**
 	 * Attach text to current element.
 	 */
 	public void visit(Statement.EchoEmbedding statement) {
-		// TODO Auto-generated method stub
-		
+		statement.getEmbedding().accept(this);
 	}
 
 	public void visit(Statement.Let statement) {
@@ -584,14 +584,37 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { result += "\""; }
 		}
 		result += "]";
-		
+
 		this.text = result;
 	}
 
+	/**
+	 * Convert record in [id1:expr1,id2:expr2,...] text value
+	 */
 	public void visit(RecordExpression expression) {
-		// TODO Auto-generated method stub
-		// Evaluator returns: markup-to-xhtml(html () { p () { join("[",strcon-to-text("<key,\"value?\">]")) } })
-		// This is not XHTML, so I don't think its correct.
+		String result = "{";
+		for(KeyValuePair pair: expression.getPairs()) {
+			// Attach a comma separator in front of each element, except first in list
+			if(expression.getPairs().indexOf(pair) != 0) { result += ","; }
+			
+			result += pair.getIdentifier().getName() + ":";
+			
+			// Surround symbol and text expressions between double quotes
+			if(pair.getExpression() instanceof SymbolExpression || pair.getExpression() instanceof TextExpression) { 
+				result += "\"";
+			}
+			
+			pair.getExpression().accept(this); // Fill text field with expression value
+			result += text; // Store value in result string, before it is overwritten by next element
+			
+			// Surround symbol and text expressions between double quotes
+			if(pair.getExpression() instanceof SymbolExpression || pair.getExpression() instanceof TextExpression) { 
+				result += "\"";
+			}
+		}
+		result += "}";
+
+		this.text = result;
 	}
 	
 	/**
@@ -625,8 +648,41 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	public void visit(Embedding embedding) {
-		// TODO Auto-generated method stub
+		// Attach pretext to current element
+		Text pre = new Text(embedding.getPre().getText().toString());
+		addContent(pre);
 		
+		embedding.getEmbed().accept(this); // Delegate embed
+		embedding.getTail().accept(this); // Delegate tail
+	}
+	
+	public void visit(Embed.ExpressionEmbed embed) {
+		// Interpret similar to mark-up expression
+		Statement.MarkupExp stm = new Statement.MarkupExp(embed.getMarkups());
+		stm.setExpression(embed.getExpression());
+		stm.accept(this);
+	}
+	
+	public void visit(Embed.MarkupEmbed embed) {
+		// Interpret similar to mark-up mark-up
+		Statement.MarkupMarkup stm = new Statement.MarkupMarkup(embed.getMarkups());
+		stm.setMarkup(embed.getMarkup());
+		stm.accept(this);
+	}
+	
+	public void visit(TextTail.MidTail tail) {
+		// Attach mid text to current element
+		Text mid = new Text(tail.getMid().getText().toString());
+		addContent(mid);
+		
+		tail.getEmbed().accept(this);
+		tail.getTail().accept(this);
+	}
+	
+	public void visit(TextTail.PostTail tail) {
+		// Attach post text to current element
+		Text post = new Text(tail.getPost().getText().toString());
+		addContent(post);
 	}
 	
 	/**

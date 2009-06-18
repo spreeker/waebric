@@ -53,7 +53,7 @@ public class TestEmbeddingParser {
 		
 		Embedding simple = parser.parseEmbedding();
 		assertEquals("", simple.getPre().getText().toString());
-		assertEquals(1, simple.getEmbed().getMarkupCount());
+		assertEquals(1, simple.getEmbed().getMarkups().size());
 		assertEquals(Embed.ExpressionEmbed.class, simple.getEmbed().getClass());
 		assertEquals(Expression.TextExpression.class, ((Embed.ExpressionEmbed) simple.getEmbed()).getExpression().getClass());
 		assertEquals("name", ((Expression.TextExpression) ((Embed.ExpressionEmbed) simple.getEmbed()).getExpression()).getText().getLiteral().toString());
@@ -64,8 +64,8 @@ public class TestEmbeddingParser {
 		
 		Embedding extended = parser.parseEmbedding();
 		assertEquals("left", extended.getPre().getText().toString());
-		assertEquals(1, extended.getEmbed().getMarkupCount());
-		assertEquals(Markup.Call.class, extended.getEmbed().getMarkup(0).getClass());
+		assertEquals(1, extended.getEmbed().getMarkups().size());
+		assertEquals(Markup.Call.class, extended.getEmbed().getMarkups().get(0).getClass());
 		assertEquals(TextTail.PostTail.class, extended.getTail().getClass());
 	}
 	
@@ -77,7 +77,7 @@ public class TestEmbeddingParser {
 		
 		Embed.ExpressionEmbed simple = (ExpressionEmbed) parser.parseEmbed();
 		assertEquals(Expression.NatExpression.class, simple.getExpression().getClass());
-		assertEquals(0, simple.getMarkupCount());
+		assertEquals(0, simple.getMarkups().size());
 		
 		// Embed with single mark-up
 		iterator = TestUtilities.quickScan("func1 123>");
@@ -85,7 +85,7 @@ public class TestEmbeddingParser {
 		
 		Embed.ExpressionEmbed diff = (ExpressionEmbed) parser.parseEmbed();
 		assertEquals(Expression.NatExpression.class, diff.getExpression().getClass());
-		assertEquals(1, diff.getMarkupCount());
+		assertEquals(1, diff.getMarkups().size());
 		
 		// Embed with multiple mark-up
 		iterator = TestUtilities.quickScan("func1(arg1) func2 123>");
@@ -93,15 +93,15 @@ public class TestEmbeddingParser {
 		
 		Embed.ExpressionEmbed diff2 = (ExpressionEmbed) parser.parseEmbed();
 		assertEquals(Expression.NatExpression.class, diff2.getExpression().getClass());
-		assertEquals(2, diff2.getMarkupCount());
-		assertEquals(Markup.Call.class, diff2.getMarkup(0).getClass());
+		assertEquals(2, diff2.getMarkups().size());
+		assertEquals(Markup.Call.class, diff2.getMarkups().get(0).getClass());
 		
 		// Embed Markup* Markup
 		iterator = TestUtilities.quickScan("func1(arg1) func2 func3>");
 		parser = new EmbeddingParser(iterator, exceptions);
 		Embed.MarkupEmbed markupemb = (MarkupEmbed) parser.parseEmbed();
-		assertEquals(2, markupemb.getMarkupCount());
-		assertEquals(Markup.Call.class, markupemb.getMarkup(0).getClass());
+		assertEquals(2, markupemb.getMarkups().size());
+		assertEquals(Markup.Call.class, markupemb.getMarkups().get(0).getClass());
 	}
 	
 	@Test

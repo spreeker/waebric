@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser.ast.statement;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
@@ -33,11 +34,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public abstract static class AbstractMarkupStatement extends Statement {
 		
-		protected NodeList<Markup> markups;
-		
-		public AbstractMarkupStatement(NodeList<Markup> markups) {
-			this.markups = markups;
-		}
+		protected NodeList<Markup> markups = new NodeList<Markup>();
 		
 		public List<Markup> getMarkups() {
 			return markups;
@@ -475,8 +472,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class MarkupMarkup extends AbstractMarkupStatement {
 
-		public MarkupMarkup(NodeList<Markup> markups) {
-			super(markups);
+		public MarkupMarkup(Collection<Markup> args) {
+			markups.addAll(args);
 		}
 
 		private Markup markup;
@@ -511,8 +508,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Statement statement;
 		
-		public MarkupStat(NodeList<Markup> markups) {
-			super(markups);
+		public MarkupStat(Collection<Markup> args) {
+			markups.addAll(args);
 		}
 
 		public Statement getStatement() {
@@ -545,8 +542,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 
 		private Expression expression;
 		
-		public MarkupExp(NodeList<Markup> markups) {
-			super(markups);
+		public MarkupExp(Collection<Markup> args) {
+			markups.addAll(args);
 		}
 
 		public Expression getExpression() {
@@ -579,8 +576,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Embedding embedding;
 		
-		public MarkupEmbedding(NodeList<Markup> markups) {
-			super(markups);
+		public MarkupEmbedding(Collection<Markup> args) {
+			markups.addAll(args);
 		}
 
 		public Embedding getEmbedding() {

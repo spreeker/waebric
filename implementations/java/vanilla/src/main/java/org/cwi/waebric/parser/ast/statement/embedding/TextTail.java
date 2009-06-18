@@ -12,6 +12,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
 public abstract class TextTail extends AbstractSyntaxNode {
 
 	/**
+	 * > TextChar* " -> PostText<br>
 	 * PostText -> TextTail
 	 */
 	public static class PostTail extends TextTail {
@@ -38,6 +39,7 @@ public abstract class TextTail extends AbstractSyntaxNode {
 	}
 	
 	/**
+	 * > TextChar* < -> MidText <br>
 	 * MidText Embed TextTail -> TextTail
 	 */
 	public static class MidTail extends TextTail {

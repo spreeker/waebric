@@ -7,7 +7,7 @@ import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
- * "\"" TextChar* "<"
+ * "\"" TextChar* "<" -> PreText
  * 
  * @author Jeroen van Schagen
  * @date 02-06-2009
