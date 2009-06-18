@@ -490,9 +490,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			return true; // Yield found!
 		} else if(node instanceof Markup.Call) {
 			// Retrieve called function and check if that contains a yield statement
-			Markup.Call call = (Markup.Call) node;
-			FunctionDef function = functions.get(call.getDesignator().getIdentifier().getName());
-			return containsYield(function);
+			String call = ((Markup.Call) node).getDesignator().getIdentifier().getName();
+			if(functions.containsKey(call)) { 
+				return containsYield(functions.get(call));
+			} return false; // Invalid call, stop checking
 		} else {
 			// Delegate check to children
 			for(AbstractSyntaxNode child: node.getChildren()) {
