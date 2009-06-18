@@ -60,8 +60,7 @@ namespace TestParser
             lexer = null;
         }
         #endregion
-
-
+        
         /// <summary>
         ///A test for ParseVarExpression
         ///</summary>
@@ -89,7 +88,7 @@ namespace TestParser
         {
             //Create parser and parse tokens
             List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("symbol"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("'symbol"), exceptions);
             SymExpression expression = expressionParser.ParseSymExpression();
 
             //Test output
@@ -105,7 +104,31 @@ namespace TestParser
         [TestMethod()]
         public void ParseRecordExpressionTest()
         {
-   
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("{token1:\"token1\", token2:10, token3:symbol}"), exceptions);
+            RecordExpression expression = expressionParser.ParseRecordExpression();
+
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+            
+            //Test Record contents
+            Assert.AreEqual(3, expression.GetRecords().Count);
+            KeyValuePair[] recordList = expression.GetRecords().ToArray();
+            
+            Assert.AreEqual("token1", recordList[0].GetKey());
+            Assert.AreEqual(typeof(TextExpression), recordList[0].GetValue().GetType());
+            Assert.AreEqual("token1", recordList[0].GetValue().ToString());
+
+            Assert.AreEqual("token2", recordList[1].GetKey());
+            Assert.AreEqual(typeof(NumExpression), recordList[1].GetValue().GetType());
+            Assert.AreEqual(10, ((NumExpression)recordList[1].GetValue()).GetNum());
+
+            Assert.AreEqual("token3", recordList[2].GetKey());
+            Assert.AreEqual(typeof(VarExpression), recordList[2].GetValue().GetType());
+            Assert.AreEqual("symbol", recordList[2].GetValue().ToString());
+
+            //TODO: fix symbol in record
         }
 
         /// <summary>
