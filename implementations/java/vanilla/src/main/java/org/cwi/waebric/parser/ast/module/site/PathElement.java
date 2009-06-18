@@ -11,6 +11,10 @@ public class PathElement extends AbstractSyntaxNode {
 	public PathElement(String literal) {
 		this.literal = new StringLiteral(literal);
 	}
+	
+	public StringLiteral getLiteral() {
+		return literal;
+	}
 
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] { literal };

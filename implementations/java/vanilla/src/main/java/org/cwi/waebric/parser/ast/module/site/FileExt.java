@@ -11,6 +11,10 @@ public class FileExt extends AbstractSyntaxNode {
 	public FileExt(String literal) {
 		this.literal = new StringLiteral(literal);
 	}
+	
+	public StringLiteral getLiteral() {
+		return literal;
+	}
 
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] { literal };
