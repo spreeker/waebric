@@ -132,7 +132,21 @@ namespace TestParser
         [TestMethod()]
         public void ParseListExpressionTest()
         {
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("[var1, var2, var3, var4]"), exceptions);
+            ListExpression listExpression = expressionParser.ParseListExpression();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+            
+            //Test items of list
+            Assert.AreEqual(4, listExpression.GetExpressions().Count);
+            Expression[] expressions = listExpression.GetExpressions().ToArray();
+            Assert.AreEqual("var1", expressions[0].ToString());
+            Assert.AreEqual("var2", expressions[1].ToString());
+            Assert.AreEqual("var3", expressions[2].ToString());
+            Assert.AreEqual("var4", expressions[3].ToString());
         }
 
         /// <summary>
@@ -141,7 +155,21 @@ namespace TestParser
         [TestMethod()]
         public void ParseKeyValuePairTest()
         {
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("token1:\"value1\""), exceptions);
+            KeyValuePair keyValuePair = expressionParser.ParseKeyValuePair();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Check key
+            Assert.AreEqual("token1", keyValuePair.GetKey());
+
+            //Check value
+            Assert.AreEqual(typeof(TextExpression), keyValuePair.GetValue().GetType());
+            TextExpression textExpression = (TextExpression) keyValuePair.GetValue();
+            Assert.AreEqual("value1", textExpression.GetText());
         }
 
         /// <summary>
@@ -150,7 +178,22 @@ namespace TestParser
         [TestMethod()]
         public void ParseFieldExpressionTest()
         {
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"), exceptions);
+            Expression expression = expressionParser.ParseExpression();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test type of expression
+            Assert.AreEqual(typeof(FieldExpression), expression.GetType());
+            FieldExpression parsedFieldExpression = (FieldExpression)expression;
+            
+            //Test field members
+            Assert.AreEqual("expressie", parsedFieldExpression.GetExpression().ToString());
+            Assert.AreEqual(typeof(VarExpression), parsedFieldExpression.GetExpression().GetType());
+            Assert.AreEqual("identifier", parsedFieldExpression.GetIdentifier());
         }
 
         /// <summary>
@@ -168,7 +211,26 @@ namespace TestParser
         [TestMethod()]
         public void ParseCatExpressionTest()
         {
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("expression+'symbol"), exceptions);
+            Expression expression = expressionParser.ParseExpression();
 
+            //Check output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Check type of expression
+            Assert.AreEqual(typeof(CatExpression), expression.GetType());
+            CatExpression parsedCatExpression = (CatExpression)expression;
+
+            //Check expressions in catexpression
+            Assert.AreEqual(typeof(VarExpression), parsedCatExpression.GetLeftExpression().GetType());
+            Assert.AreEqual(typeof(SymExpression), parsedCatExpression.GetRightExpression().GetType());
+
+            VarExpression left = (VarExpression) parsedCatExpression.GetLeftExpression();
+            SymExpression right = (SymExpression)parsedCatExpression.GetRightExpression();
+            Assert.AreEqual("expression", left.GetVariableIdentifier());
+            Assert.AreEqual("symbol", right.GetSym());
         }
 
 
@@ -185,15 +247,6 @@ namespace TestParser
 
             //Test variable identifier
             Assert.AreEqual("text", expression.GetText());
-        }
-
-        /// <summary>
-        ///A test for ExpressionParser Constructor
-        ///</summary>
-        [TestMethod()]
-        public void ExpressionParserConstructorTest()
-        {
-
         }
     }
 }
