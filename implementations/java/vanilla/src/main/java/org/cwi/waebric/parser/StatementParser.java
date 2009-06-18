@@ -395,10 +395,12 @@ class StatementParser extends AbstractParser {
 					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
 					&& tokens.peek(k+2).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
 				return true;
+			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				return false; // Only field expressions are followed by a .
 			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				// Final identifier of string is variable by default, unless it is a single identifier
-				return ! tokens.hasNext(k-1)
-					|| tokens.peek(k-1).getSort() != WaebricTokenSort.IDCON;
+				// Check if mark-up is first in chain
+				boolean first = ! tokens.hasNext(k-1) || tokens.peek(k-1).getSort() != WaebricTokenSort.IDCON; 
+				return first; // Semicolon marks the end of a mark-up chain, the last identifier is a variable by default unless it is alone
 			} else {
 				// All identifiers not at tail are seen as mark-up
 				return true;

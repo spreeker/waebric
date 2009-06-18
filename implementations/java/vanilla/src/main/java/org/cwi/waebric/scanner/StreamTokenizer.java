@@ -204,7 +204,7 @@ public class StreamTokenizer {
 		do {
 			sval += (char) current;
 			read(); // Read next character
-		} while(isLetter(current) || isNumeral(current));
+		} while(isLetter(current) || isNumeral(current) || current == '-');
 		
 		return WORD;
 	}

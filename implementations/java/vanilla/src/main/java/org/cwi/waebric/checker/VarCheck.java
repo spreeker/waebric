@@ -53,12 +53,14 @@ class VarCheck implements IWaebricCheck {
 		} else if(node instanceof Statement.Let) {
 			Statement.Let stm = (Statement.Let) node;
 			for(Assignment assignment: stm.getAssignments()) {
+				// Attach variables bound in let assignments
 				if(assignment instanceof Assignment.VarBind) {
-					// Attach variables bound in let assignments
-					Assignment.VarBind bind = (Assignment.VarBind) assignment;
-					vars.add(bind.getIdentifier());
+					vars.add(((Assignment.VarBind) assignment).getIdentifier());
 				}
 			}
+		} else if(node instanceof Statement.Each) {
+			// Attach variable bound in each statement
+			vars.add(((Statement.Each) node).getVar());
 		}
 		
 		// Recursively check children of node

@@ -1,13 +1,10 @@
 package org.cwi.waebric.interpreter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Text;
-import org.cwi.waebric.parser.ast.markup.Designator;
-import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 import org.jdom.Document;
@@ -52,18 +49,6 @@ public class TestJDOMVisitor {
 		visitor.visit(each); // Execute visit
 		
 		assertEquals("test has succeeded", current.getText());
-	}
-	
-	@Test
-	public void testTag() {
-		Element parent = new Element("html");
-		Markup.Tag markup = new Markup.Tag();
-		markup.setDesignator(new Designator(new IdCon("head")));
-		visitor.setCurrent(parent);
-		visitor.visit(markup);
-		
-		assertEquals("head", visitor.getCurrent().getName());
-		assertTrue(parent.getContent().contains(visitor.getCurrent()));
 	}
 
 }

@@ -17,6 +17,7 @@ import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
 /**
@@ -80,6 +81,30 @@ class FunctionCheck implements IWaebricCheck {
 				// When called function is not defined and is not a XHTML tag, report undefined function
 				if(! isXHTMLTag(call.getDesignator().getIdentifier())) {
 					exceptions.add(new UndefinedFunctionException(call));
+				}
+			}
+		} else if(node instanceof Statement.Let) {
+			Statement.Let stm = (Statement.Let) node;
+			for(Assignment assignment: stm.getAssignments()) {
+				// Attach functions bound in let assignments
+				if(assignment instanceof Assignment.FuncBind) {
+					Assignment.FuncBind bind = (Assignment.FuncBind) assignment;
+					
+					// Construct new function definition based on bind data
+					FunctionDef definition = new FunctionDef();
+					definition.setIdentifier(bind.getIdentifier());
+					definition.addStatement(bind.getStatement());
+					if(bind.getVariables().size() == 0) {
+						definition.setFormals(new Formals.EmptyFormal());
+					} else {
+						Formals.RegularFormal formals = new Formals.RegularFormal();
+						for(IdCon variable : bind.getVariables()) {
+							formals.addIdentifier(variable);
+						}
+					}
+
+					// Attach definition to collection
+					definitions.add(definition);
 				}
 			}
 		}
