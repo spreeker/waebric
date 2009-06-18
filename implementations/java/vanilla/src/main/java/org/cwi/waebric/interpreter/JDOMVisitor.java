@@ -173,7 +173,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				}
 			}
 			
-			current.setAttribute("value", value); // Store value attribute
+			// Store value attribute
+			if(! value.equals("")) { current.setAttribute("value", value); }
 		}
 	}
 
@@ -338,16 +339,37 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * create a local element variable during each loop.
 	 */
 	public void visit(Statement.Each statement) {
-		if(statement.getExpression() instanceof Expression.ListExpression) {
-			Expression.ListExpression list = (Expression.ListExpression) statement.getExpression();
+		Expression expression = statement.getExpression();
+		if(expression instanceof Expression.ListExpression) {
+			Expression.ListExpression list = (Expression.ListExpression) expression;
 			
 			// Execute statement for each element
-			for(Expression expression: list.getExpressions()) {
-				variables.put(statement.getVar().getName(), expression);
+			for(Expression e: list.getExpressions()) {
+				variables.put(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				variables.remove(statement.getVar().getName());
 			}
-		}	
+		} else if(expression instanceof Expression.VarExpression) {
+			// Retrieve actual expression from variable cache
+			expression = variables.get(((Expression.VarExpression) expression).getVar().getName());
+			
+			// Execute function again
+			Statement.Each each = new Statement.Each();
+			each.setVar(statement.getVar());
+			each.setStatement(statement.getStatement());
+			each.setExpression(expression);
+			visit(each);
+		} else if(expression instanceof Expression.Field) {
+			// Retrieve actual expression from field
+			expression = getFieldExpression((Expression.Field) expression);
+			
+			// Execute function again
+			Statement.Each each = new Statement.Each();
+			each.setVar(statement.getVar());
+			each.setStatement(statement.getStatement());
+			each.setExpression(expression);
+			visit(each);
+		}
 	}
 	
 	/**
