@@ -344,7 +344,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.ListExpression list = (Expression.ListExpression) expression;
 			
 			// Execute statement for each element
+			Element root = current;
 			for(Expression e: list.getExpressions()) {
+				current = root;
 				variables.put(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				variables.remove(statement.getVar().getName());
