@@ -156,8 +156,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 		} else { // Call to undefined function
 			// Interpret designator similar to tag
-			Tag tag = new Tag();
-			tag.setDesignator(markup.getDesignator());
+			Tag tag = new Tag(markup.getDesignator());
 			visit(tag);
 			
 			// Interpret arguments as attributes
@@ -466,8 +465,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(MarkupMarkup statement) {
 		for(Markup markup: statement.getMarkups()) {
 			markup.accept(this);
-			if(markup instanceof Markup.Call) { return; } // Quit interpreting after call
+			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
+		
+		statement.getMarkup().accept(this);
 	}
 
 	/**
@@ -897,6 +898,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void addVariable(String name, Expression value) {
 		variables.put(name, value);
+	}
+	
+	/**
+	 * Push node in yield stack.
+	 * @param node
+	 */
+	public void addYield(AbstractSyntaxNode node) {
+		yield.push(node);
 	}
 	
 }

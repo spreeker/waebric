@@ -36,6 +36,10 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		protected NodeList<Markup> markups = new NodeList<Markup>();
 		
+		public void addMarkup(Markup markup) {
+			markups.add(markup);
+		}
+		
 		public List<Markup> getMarkups() {
 			return markups;
 		}
@@ -489,11 +493,17 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class MarkupMarkup extends AbstractMarkupStatement {
 
+		private Markup markup;
+
+		public MarkupMarkup() { }
+
+		public MarkupMarkup(Markup markup) {
+			markups.add(markup);
+		}
+		
 		public MarkupMarkup(Collection<Markup> args) {
 			markups.addAll(args);
 		}
-
-		private Markup markup;
 		
 		public Markup getMarkup() {
 			return markup;
@@ -524,6 +534,10 @@ public abstract class Statement extends AbstractSyntaxNode {
 	public static class MarkupStat extends AbstractMarkupStatement {
 		
 		private Statement statement;
+		
+		public MarkupStat(Markup markup) {
+			markups.add(markup);
+		}
 		
 		public MarkupStat(Collection<Markup> args) {
 			markups.addAll(args);

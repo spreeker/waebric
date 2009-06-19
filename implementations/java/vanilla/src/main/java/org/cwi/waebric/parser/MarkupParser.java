@@ -40,18 +40,13 @@ class MarkupParser extends AbstractParser {
 		// Parse designator
 		Designator designator = parseDesignator();
 		
-		// Determine mark-up type
-		Markup markup = null;
+		// Determine type based on look-ahead
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			Arguments arguments = parseArguments();
-			markup = new Markup.Call(arguments);
+			Arguments arguments = parseArguments(); // Retrieve arguments
+			return new Markup.Call(designator, arguments);
 		} else {
-			markup = new Markup.Tag();
+			return new Markup.Tag(designator);
 		}
-
-		// Store designator
-		markup.setDesignator(designator);
-		return markup;
 	}
 	
 	/**

@@ -2,12 +2,15 @@ package org.cwi.waebric.interpreter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
+import org.cwi.waebric.parser.ast.markup.Designator;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -241,6 +244,81 @@ public class TestStatements {
 		visitor.visit(each); // Execute visit
 		
 		assertEquals("testhassucceeded", placeholder.getText());
+	}
+	
+	/**
+	 * Create a yield stack and check if the correct statement is executed.<br><br>
+	 * 
+	 * Simulated program:<br>
+	 * <code>
+	 * 	def main() call1() echo "success"; end
+	 * 	def call1() call2() yield; end
+	 * 	def call2() yield; end
+	 * </code>
+	 */
+	@Test
+	public void testYield() {
+		Statement yield = new Statement.Yield();
+		
+		visitor.addYield(new Statement.Echo(new Expression.TextExpression("success")));
+		visitor.addYield(new Statement.Yield());
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		yield.accept(visitor); // Execute visit
+		
+		assertEquals("success", placeholder.getText());
+	}
+	
+	/**
+	 * Execute mark-up statement, which consists of a single tag called "test". 
+	 * Verify that the root element contains a child element with the name test
+	 * after interpretation.
+	 */
+	@Test
+	public void testRegularMarkupStatement() {
+		Statement.RegularMarkupStatement stm = new Statement.RegularMarkupStatement();
+		stm.setMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor); // Execute visit
+		
+		assertNotNull(placeholder.getChild("test"));
+	}
+	
+	/**
+	 * Execute mark-ups statement consisting of two tags "test1" and "test2".
+	 * After interpretation verify that the structure is stored as: <tag1><tag2 /></tag1>
+	 */
+	@Test
+	public void testMarkupMarkup() {
+		Statement.MarkupMarkup stm = new Statement.MarkupMarkup();
+		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test1"))));
+		stm.setMarkup(new Markup.Tag(new Designator(new IdCon("test2"))));
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor); // Execute visit
+		
+		Element test1 = placeholder.getChild("test1");
+		assertNotNull(test1);
+		assertNotNull(test1.getChild("test2")); 
+	}
+	
+	@Test
+	public void testMarkupExpression() {
+		
+	}
+	
+	@Test
+	public void testMarkupEmbedding() {
+		
+	}
+	
+	@Test
+	public void testMarkupStatement() {
+		
 	}
 	
 	/**

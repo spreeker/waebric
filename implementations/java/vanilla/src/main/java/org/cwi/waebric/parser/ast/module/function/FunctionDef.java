@@ -21,12 +21,20 @@ public class FunctionDef extends AbstractSyntaxNode {
 	private static final String DEF_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.DEF);
 	private static final String END_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.END);
 	
+	private NodeList<Statement> statements = new NodeList<Statement>();
+	
 	private IdCon identifier;
 	private Formals formals;
-	private NodeList<Statement> statements;
 
-	public FunctionDef() {
-		statements = new NodeList<Statement>();
+	public FunctionDef() { }
+	
+	public FunctionDef(IdCon identifier) {
+		this(identifier, new Formals.EmptyFormal());
+	}
+	
+	public FunctionDef(IdCon identifier, Formals formals) {
+		this.identifier = identifier;
+		this.formals = formals;
 	}
 	
 	public IdCon getIdentifier() {
