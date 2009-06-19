@@ -175,36 +175,58 @@ public class WaebricScanner implements Iterable<Token> {
 	private void tokenizeQuote() {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
-		
+
 		if(tokenizer.getStringValue().equals("" + WaebricSymbol.DQUOTE)) {
 			// Token is not a quote but a single " character
 			Token quote = new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno);
 			tokens.add(quote);
 		} else if(tokenizer.getStringValue().endsWith("" + WaebricSymbol.DQUOTE)) {
-			// Remove opening and closure " characters
-			String value = tokenizer.getStringValue().substring(1, tokenizer.getStringValue().length()-1);
-					
-			// Construct token
-			Token quote = new Token(value, WaebricTokenSort.QUOTE, lineno, charno);
-			tokens.add(quote); // Attach quote to collection
-		} else {
-			// Quote is not closed with a ", thus it should be further decomposed
-			String value = tokenizer.getStringValue().substring(1);
-			WaebricScanner scanner = new WaebricScanner(new StringReader(value));
-			exceptions.addAll(scanner.tokenizeStream());
+			String value = tokenizer.getStringValue(); // Retrieve data without double quotes
+			value = value.substring(1, tokenizer.getStringValue().length()-1);
 			
+			if(value.indexOf('<') == -1) {
+				// Construct regular quote token, when no embedding found '<'
+				Token quote = new Token(value, WaebricTokenSort.QUOTE, lineno, charno);
+				tokens.add(quote); // Attach quote to collection
+			} else {
+				// Attach opening double quote as character
+				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
+				
+				 // Embedding found, decompose string in sub-tokens
+				tokenizeString(value, lineno, charno);
+				
+				// Attach closing double quote as character
+				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
+			}
+		} else {
 			// Attach opening double quote as character
 			tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
 			
-			// Attach sub-tokens with absolute positions
-			for(Token token: scanner.getTokens()) {
-				token.setLine(lineno + token.getLine() - 1);
-				token.setCharacter(charno + token.getCharacter());
-				tokens.add(token);
-			}
+			// Decompose string in sub-tokens
+			String value = tokenizer.getStringValue().substring(1);
+			tokenizeString(value, lineno, charno);
 		}
 		
 		next(); // Retrieve next token
+	}
+	
+	/**
+	 * Create new scanner instance and retrieve tokens, store these tokens 
+	 * in current token collection and  
+	 * @param reader Reader
+	 * @param lineno Start line number
+	 * @param charno Start character number
+	 */
+	private void tokenizeString(String data, int lineno, int charno) {
+		WaebricScanner scanner = new WaebricScanner(new StringReader(data));
+		exceptions.addAll(scanner.tokenizeStream());
+
+		// Attach sub-tokens with absolute positions
+		for(Token token: scanner.getTokens()) {
+			token.setLine(lineno + token.getLine() - 1);
+			token.setCharacter(charno + token.getCharacter());
+			tokens.add(token);
+		}
 	}
 	
 	/**

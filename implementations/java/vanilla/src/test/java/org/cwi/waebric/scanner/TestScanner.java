@@ -91,6 +91,13 @@ public class TestScanner {
 	}
 	
 	@Test
+	public void testScanEmbedding() {
+		iterator = TestUtilities.quickScan("\"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org/\") \"Free CSS Templates\">\"");
+		assertEquals('"', iterator.next().getLexeme());
+		assertEquals('&', iterator.next().getLexeme());
+	}
+	
+	@Test
 	public void testScanSymbol() {
 		iterator = TestUtilities.quickScan("'abc '123 '@@@ 'abc123@@@");
 		assertEquals("abc", iterator.next().getLexeme());
