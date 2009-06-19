@@ -14,7 +14,7 @@ namespace Parser
     {
         #region Private Members
 
-        MarkupParser markupParser;
+        private MarkupParser markupParser;
 
         #endregion
 
@@ -35,6 +35,9 @@ namespace Parser
             
             //Parse one or more mappings
             site.AddMappings(ParseMappings());
+
+            //Skip END tag
+            NextToken("end", "site end", "end");
 
             return site;
         }
