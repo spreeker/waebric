@@ -27,8 +27,13 @@ public class TestStatements {
 		this.visitor = new JDOMVisitor(document);
 	}
 	
+	/**
+	 * Initiate an if-statement with a true predicate. While interpreting the statement
+	 * check if the sub statement (echo "success";) is executed, by comparing the current
+	 * text to "success".
+	 */
 	@Test
-	public void testIf() { // Program: if(var) echo var;
+	public void testIf() {
 		Expression text = new Expression.TextExpression("success");
 		
 		// Create a true predicate
@@ -41,17 +46,27 @@ public class TestStatements {
 		successEcho.setExpression(text);
 		
 		// Create if statement
-		Statement.If ifStm = new Statement.If();
-		ifStm.setPredicate(truePredicate);
-		ifStm.setTrueStatement(successEcho);
+		Statement.If ifStatement = new Statement.If();
+		ifStatement.setPredicate(truePredicate);
+		ifStatement.setTrueStatement(successEcho);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
-		ifStm.accept(visitor);
+		ifStatement.accept(visitor);
 		
 		assertEquals("success", placeholder.getText());
 	}
 	
+	/**
+	 * Create two if-else statements, one with a true predicate and one with a
+	 * false predicate. While interpreting the statement with a true predicate,
+	 * the sub-statement (echo "success";) will be executed, while a false 
+	 * predicate will trigger (echo "fail;")<br><br>
+	 * 
+	 * Consecutively execute the statements with a true and false predicate,
+	 * then compare the current text to "successfail" to verify they statements
+	 * maintained the correct flow.
+	 */
 	@Test
 	public void testIfElse() {
 		// Create a true and false predicate
@@ -64,7 +79,7 @@ public class TestStatements {
 		Statement.Echo successEcho = new Statement.Echo(new Expression.TextExpression("success"));
 		Statement.Echo failEcho = new Statement.Echo(new Expression.TextExpression("fail"));
 		
-		// Create true and false if-else statement
+		// Create instance of if-else statement with different flows
 		Statement.IfElse ifFlow = new Statement.IfElse(truePredicate, successEcho, failEcho);
 		Statement.IfElse elseFlow = new Statement.IfElse(falsePredicate, successEcho, failEcho);
 		
@@ -74,6 +89,25 @@ public class TestStatements {
 		elseFlow.accept(visitor);
 		
 		assertEquals("successfail", placeholder.getText());
+	}
+	
+	/**
+	 * Construct a blow statement, with three sub-statements (echo "one"; echo "two";
+	 * echo "three";). While interpreting the block, each sub-statement should be visited, 
+	 * this can be asserted by comparing the current text to "onetwothree".
+	 */
+	@Test
+	public void testBlock() {
+		Statement.Block block = new Statement.Block();
+		block.addStatement(new Statement.Echo(new Expression.TextExpression("one")));
+		block.addStatement(new Statement.Echo(new Expression.TextExpression("two")));
+		block.addStatement(new Statement.Echo(new Expression.TextExpression("three")));
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		block.accept(visitor);
+		
+		assertEquals("onetwothree", placeholder.getText());
 	}
 	
 	@Test
@@ -96,12 +130,11 @@ public class TestStatements {
 		echo.setExpression(new Expression.VarExpression(var));
 		each.setStatement(echo);
 		
-		// Set root element
-		Element current = new Element("home");
-		visitor.setCurrent(current);
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
 		visitor.visit(each); // Execute visit
 		
-		assertEquals("test has succeeded", current.getText());
+		assertEquals("test has succeeded", placeholder.getText());
 	}
 	
 	@Test
