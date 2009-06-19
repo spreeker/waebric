@@ -50,13 +50,41 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
-    <Compile Include="Ast\Basic\IdentifierCon.cs" />
+    <Compile Include="Ast\Basic\IdCon.cs" />
+    <Compile Include="Ast\Basic\NatCon.cs" />
+    <Compile Include="Ast\Basic\SymbolCon.cs" />
+    <Compile Include="Ast\Expressions\CatExpression.cs" />
+    <Compile Include="Ast\Expressions\Expression.cs" />
+    <Compile Include="Ast\Expressions\FieldExpression.cs" />
+    <Compile Include="Ast\Expressions\KeyValuePair.cs" />
+    <Compile Include="Ast\Expressions\ListExpression.cs" />
+    <Compile Include="Ast\Expressions\NumExpression.cs" />
+    <Compile Include="Ast\Expressions\RecordExpression.cs" />
+    <Compile Include="Ast\Expressions\SymExpression.cs" />
+    <Compile Include="Ast\Expressions\TextExpression.cs" />
+    <Compile Include="Ast\Expressions\VarExpression.cs" />
+    <Compile Include="Ast\Functions\EmptyFormal.cs" />
+    <Compile Include="Ast\Functions\Formal.cs" />
+    <Compile Include="Ast\Functions\Formals.cs" />
     <Compile Include="Ast\Functions\FunctionDefinition.cs" />
+    <Compile Include="Ast\Functions\IdentifierFormal.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\Markup\Argument.cs" />
+    <Compile Include="Ast\Markup\Arguments.cs" />
+    <Compile Include="Ast\Markup\AttrArgument.cs" />
+    <Compile Include="Ast\Markup\Attribute.cs" />
+    <Compile Include="Ast\Markup\ClassAttribute.cs" />
+    <Compile Include="Ast\Markup\Designator.cs" />
+    <Compile Include="Ast\Markup\ExpressionArgument.cs" />
+    <Compile Include="Ast\Markup\HeightAttribute.cs" />
+    <Compile Include="Ast\Markup\IdAttribute.cs" />
+    <Compile Include="Ast\Markup\Markup.cs" />
+    <Compile Include="Ast\Markup\NameAttribute.cs" />
+    <Compile Include="Ast\Markup\TypeAttribute.cs" />
+    <Compile Include="Ast\Markup\Width-HeightAttribute.cs" />
     <Compile Include="Ast\Module\Import.cs" />
     <Compile Include="Ast\Module\Module.cs" />
     <Compile Include="Ast\Module\ModuleElement.cs" />
-    <Compile Include="Ast\Module\ModuleElementList.cs" />
     <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
@@ -65,26 +93,27 @@
     <Compile Include="Ast\Site\FileExt.cs" />
     <Compile Include="Ast\Site\FileName.cs" />
     <Compile Include="Ast\Site\Mapping.cs" />
-    <Compile Include="Ast\Site\MappingList.cs" />
-    <Compile Include="Ast\Site\Markup.cs" />
     <Compile Include="Ast\Site\Path.cs" />
     <Compile Include="Ast\Site\PathElement.cs" />
     <Compile Include="Ast\Site\Site.cs" />
+    <Compile Include="Ast\Statements\Statement.cs" />
+    <Compile Include="Ast\Statements\Statements.cs" />
     <Compile Include="Exceptions\UnexpectedToken.cs" />
+    <Compile Include="ExpressionParser.cs" />
     <Compile Include="MarkupParser.cs" />
+    <Compile Include="PredicateParser.cs" />
     <Compile Include="SiteParser.cs" />
     <Compile Include="Ast\SyntaxTree.cs" />
     <Compile Include="FunctionParser.cs" />
     <Compile Include="ModuleParser.cs" />
+    <Compile Include="StatementParser.cs" />
     <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ast\Embedding\" />
-    <Folder Include="Ast\Markup\" />
     <Folder Include="Ast\Predicates\" />
-    <Folder Include="Ast\Statements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
