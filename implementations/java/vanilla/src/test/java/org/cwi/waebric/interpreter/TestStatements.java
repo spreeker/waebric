@@ -111,13 +111,39 @@ public class TestStatements {
 	}
 	
 	@Test
+	public void testComment() {
+		
+	}
+	
+	@Test
+	public void testCData() {
+		
+	}
+	
+	@Test
+	public void testEchoExpression() {
+		
+	}
+	
+	@Test
+	public void testEchoEmbedding() {
+		
+	}
+	
+	/**
+	 * Create an each statement, which will iterate over the list ["test","has","succeeded"].
+	 * For each element the statement (echo e) will be executed, in which the variable e
+	 * represents an element in the list. The interpretation will be verified by comparing
+	 * the current text to "testhassucceeded".
+	 */
+	@Test
 	public void testEach() {
 		Statement.Each each = new Statement.Each();
 		
 		// List expression on which will be iterated
 		Expression.ListExpression list = new Expression.ListExpression();
-		list.addExpression(new Expression.TextExpression(new Text("test ")));
-		list.addExpression(new Expression.TextExpression(new Text("has ")));
+		list.addExpression(new Expression.TextExpression(new Text("test")));
+		list.addExpression(new Expression.TextExpression(new Text("has")));
 		list.addExpression(new Expression.TextExpression(new Text("succeeded")));
 		each.setExpression(list);
 		
@@ -134,9 +160,12 @@ public class TestStatements {
 		visitor.setCurrent(placeholder);
 		visitor.visit(each); // Execute visit
 		
-		assertEquals("test has succeeded", placeholder.getText());
+		assertEquals("testhassucceeded", placeholder.getText());
 	}
 	
+	/**
+	 * Verify that all predicates evaluate in the correct boolean value.
+	 */
 	@Test
 	public void testEvaluatePredicate() {
 		// Is-string predicate
