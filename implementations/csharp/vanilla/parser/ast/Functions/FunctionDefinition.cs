@@ -14,8 +14,8 @@ namespace Parser.Ast.Functions
         #region Private Members
 
         private String Identifier;
-        private List<Formal> FormalList;
-        private List<Statement> StatementList;
+        private Formals Frmls;
+        private Statements.Statement Stmts;
 
         #endregion
 
@@ -40,39 +40,39 @@ namespace Parser.Ast.Functions
         }
 
         /// <summary>
-        /// Add formal to FunctionDefinition
+        /// Set formals of FunctionDefinition
         /// </summary>
-        /// <param name="formal">Formal to add</param>
-        public void AddFormal(Formal formal)
+        /// <param name="formal">Formals to set</param>
+        public void SetFormals(Formals formals)
         {
-            FormalList.Add(formal);
+            Frmls = formals;
         }
 
         /// <summary>
         /// Get formals of FunctionDefinition
         /// </summary>
-        /// <returns>FormalList</returns>
-        public List<Formal> GetFormals()
+        /// <returns>Formals</returns>
+        public Formals GetFormals()
         {
-            return FormalList;
+            return Frmls;
         }
 
         /// <summary>
-        /// Add statement to FunctionDefinition
+        /// Set statements of FunctionDefinition
         /// </summary>
-        /// <param name="statement">Statement to add</param>
-        public void AddStatement(Statement statement)
+        /// <param name="statement">Statements to set</param>
+        public void SetStatements(Statements.Statement statements)
         {
-            StatementList.Add(statement);
+            Stmts = statements;
         }
 
         /// <summary>
         /// Get statements of FunctionDefinition
         /// </summary>
-        /// <returns>StatementList</returns>
-        public List<Statement> GetStatements()
+        /// <returns>Statements</returns>
+        public Statements.Statement GetStatements()
         {
-            return StatementList;
+            return Stmts;
         }
 
         /// <summary>
