@@ -223,7 +223,16 @@ namespace TestParser
         [TestMethod()]
         public void ParseExpressionTest()
         {
+            //Create parser and parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"), exceptions);
+            Expression expression = expressionParser.ParseExpression();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test type of expression
+            Assert.AreEqual(typeof(FieldExpression), expression.GetType());
         }
 
         /// <summary>

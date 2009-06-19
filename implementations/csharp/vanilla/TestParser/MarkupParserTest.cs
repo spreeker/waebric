@@ -7,6 +7,7 @@ using Parser.Ast.Markup;
 using Attribute = Parser.Ast.Markup.Attribute;
 using System.IO;
 using Lexer;
+using Parser.Ast.Expressions;
 
 namespace TestParser
 {
@@ -19,7 +20,6 @@ namespace TestParser
     [TestClass()]
     public class MarkupParserTest
     {
-
 
         private TestContext testContextInstance;
         private WaebricLexer lexer;
@@ -267,25 +267,60 @@ namespace TestParser
             Assert.AreEqual(0, exceptions.Count);
 
             //Test arguments
-            Assert.AreEqual(2, args.GetArguments().Count);
+            Assert.AreEqual(0, args.GetArguments().Count);
         }
 
         /// <summary>
-        ///A test for ParseArgument
+        ///A test for ParseExpressionArgument
         ///</summary>
         [TestMethod()]
-        public void ParseArgumentTest()
+        public void ParseExpressionArgumentTest()
         {
+            //Parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            MarkupParser markupParser = new MarkupParser(Init("([1234,2345,3556,646])"), exceptions);
+            Arguments args = markupParser.ParseArguments();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test argument
+            Assert.AreEqual(1, args.GetArguments().Count);
+            Argument[] arguments = args.GetArguments().ToArray();
+            Assert.AreEqual(typeof(ExpressionArgument), arguments[0].GetType());
+
+            //Test expression argument
+            ExpressionArgument exprArgument = (ExpressionArgument)arguments[0];
+            Assert.AreEqual(typeof(ListExpression), exprArgument.GetExpression().GetType());
+
+            //Test list expression
+            ListExpression listExpression = (ListExpression) exprArgument.GetExpression();
+            Assert.AreEqual(4, listExpression.GetExpressions().Count);
         }
 
         /// <summary>
-        ///A test for MarkupParser Constructor
-        ///</summary>
-        [TestMethod()]
-        public void MarkupParserConstructorTest()
+        /// Test for ParseAttrArgument
+        /// </summary>
+        [TestMethod]
+        public void ParseAttrArgumentTest()
         {
+            //Parse tokens
+            List<Exception> exceptions = new List<Exception>();
+            MarkupParser markupParser = new MarkupParser(Init("(i = 1)"), exceptions);
+            Arguments args = markupParser.ParseArguments();
 
+            //Test output
+            Assert.AreEqual(0, exceptions.Count);
+
+            //Test arguments
+            Assert.AreEqual(1, args.GetArguments().Count);
+            Argument[] arguments = args.GetArguments().ToArray();
+            Assert.AreEqual(typeof(AttrArgument), arguments[0].GetType());
+            
+            //Test specific argument
+            AttrArgument attrArgument = (AttrArgument)arguments[0];
+            Assert.AreEqual("i", attrArgument.GetIdentifier());
+            Assert.AreEqual(typeof(NumExpression), attrArgument.GetExpression().GetType());
         }
     }
 }

@@ -254,21 +254,53 @@ namespace Parser
         /// <returns>Parsed Argument</returns>
         public Argument ParseArgument()
         {
-            Argument argument = new Argument();
-
+            Argument argument = null;
             //Determine type of argument
             if (TokenStream.Peek(2).GetValue().ToString() == "=")
             {   //IdCon = Expression
-
+                argument = ParseAttrArgument();
             }
             else
             {   //Expression
-               
-                    
-                   //= expressionParser.ParseExpression();
+                argument = ParseExpressionArgument();
             }
 
-            return new Argument();
+            return argument;
+        }
+
+        /// <summary>
+        /// Parser for ExpressionArgument
+        /// </summary>
+        /// <returns>ExpressionArgument</returns>
+        public Argument ParseExpressionArgument()
+        {
+            ExpressionArgument argument = new ExpressionArgument();
+
+            //Parse expression
+            argument.SetExpression(expressionParser.ParseExpression());
+
+            return argument;
+        }
+
+        /// <summary>
+        /// Parser for AttrArgument
+        /// </summary>
+        /// <returns>Parsed AttrArgument</returns>
+        public AttrArgument ParseAttrArgument()
+        {
+            AttrArgument argument = new AttrArgument();
+
+            //Parse identifier
+            CurrentToken = TokenStream.NextToken();
+            argument.SetIdentifier(CurrentToken.GetValue().ToString());
+
+            //Skip = token
+            NextToken("=", "identifier = expression", '=');
+
+            //Parse expression
+            argument.SetExpression(expressionParser.ParseExpression());
+
+            return argument;
         }
 
         #endregion
