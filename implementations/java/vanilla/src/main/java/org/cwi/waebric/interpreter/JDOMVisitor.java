@@ -602,7 +602,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		
 		// Interpret embedding when mark-up chain is call free
 		statement.getEmbedding().accept(this);
-		addContent(new Text(text));
 	}
 
 	/**

@@ -535,6 +535,8 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Statement statement;
 		
+		public MarkupStat() { }
+
 		public MarkupStat(Markup markup) {
 			markups.add(markup);
 		}
@@ -542,7 +544,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 		public MarkupStat(Collection<Markup> args) {
 			markups.addAll(args);
 		}
-
+		
 		public Statement getStatement() {
 			return statement;
 		}
@@ -572,6 +574,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	public static class MarkupExp extends AbstractMarkupStatement {
 
 		private Expression expression;
+		
+		public MarkupExp() { }
+
+		public MarkupExp(Markup markup) {
+			markups.add(markup);
+		}
 		
 		public MarkupExp(Collection<Markup> args) {
 			markups.addAll(args);
@@ -606,6 +614,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	public static class MarkupEmbedding extends AbstractMarkupStatement {
 		
 		private Embedding embedding;
+		
+		public MarkupEmbedding() { }
+
+		public MarkupEmbedding(Markup markup) {
+			markups.add(markup);
+		}
 		
 		public MarkupEmbedding(Collection<Markup> args) {
 			markups.addAll(args);

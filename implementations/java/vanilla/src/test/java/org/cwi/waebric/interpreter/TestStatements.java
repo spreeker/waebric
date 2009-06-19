@@ -289,7 +289,8 @@ public class TestStatements {
 	
 	/**
 	 * Execute mark-ups statement consisting of two tags "test1" and "test2".
-	 * After interpretation verify that the structure is stored as: <tag1><tag2 /></tag1>
+	 * After interpretation verify that the structure is stored as: 
+	 * <code>< test1 >< test2 / >< /test1 ></code>
 	 */
 	@Test
 	public void testMarkupMarkup() {
@@ -306,19 +307,68 @@ public class TestStatements {
 		assertNotNull(test1.getChild("test2")); 
 	}
 	
+	/**
+	 * Execute mark-expr statement consisting of tag "test" and expression "success".
+	 * After interpretation verify that the structure is stored as: 
+	 * <code>< test > success < /test ></code>
+	 */
 	@Test
 	public void testMarkupExpression() {
+		Statement.MarkupExp stm = new Statement.MarkupExp();
+		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
+		stm.setExpression(new Expression.TextExpression("success"));
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor); // Execute visit
+		
+		Element test = placeholder.getChild("test");
+		assertNotNull(test);
+		assertEquals("success", test.getText());
 	}
 	
+	/**
+	 * Execute mark-embedding statement consisting of tag "test" and embedding 
+	 * "left<"success">right". After interpretation verify that the structure:
+	 * <code>< test > leftsuccessright < /test ></code>
+	 */
 	@Test
 	public void testMarkupEmbedding() {
+		Statement.MarkupEmbedding stm = new Statement.MarkupEmbedding();
+		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
+		Embedding embedding = new Embedding();
+		embedding.setPre(new PreText("left"));
+		embedding.setEmbed(new Embed.ExpressionEmbed(new Expression.TextExpression("success")));
+		embedding.setTail(new TextTail.PostTail(new PostText("right")));
+		stm.setEmbedding(embedding);
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor); // Execute visit
+		
+		Element test = placeholder.getChild("test");
+		assertNotNull(test);
+		assertEquals("leftsuccessright", test.getText());
 	}
 	
+	/**
+	 * Execute mark-embedding statement consisting of tag "test" and statement 
+	 * (echo "success";). After interpretation verify that the structure:
+	 * <code>< test > success < /test ></code>
+	 */
 	@Test
 	public void testMarkupStatement() {
+		Statement.MarkupStat stm = new Statement.MarkupStat();
+		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
+		stm.setStatement(new Statement.Echo(new Expression.TextExpression("success")));
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor); // Execute visit
+		
+		Element test = placeholder.getChild("test");
+		assertNotNull(test);
+		assertEquals("success", test.getText());
 	}
 	
 	/**
