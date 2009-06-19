@@ -14,8 +14,8 @@ public class Token {
 
 	private Object lexeme;
 	private WaebricTokenSort sort;
-	private int line;
-	private int character;
+	private int lineno;
+	private int charno;
 	
 	/**
 	 * Initialize token
@@ -24,11 +24,22 @@ public class Token {
 	 * @param sort Token type
 	 * @param line Line number
 	 */
-	public Token(Object lexeme, WaebricTokenSort sort, int line, int character) {
+	public Token(Object lexeme, WaebricTokenSort sort, int lineno, int charno) {
 		this.lexeme = lexeme;
 		this.sort = sort;
-		this.line = line;
-		this.character = character;
+		this.lineno = lineno;
+		this.charno = charno;
+	}		
+	
+	/**
+	 * Initialize token
+	 * 
+	 * @param lexeme Block of text
+	 * @param sort Token type
+	 * @param line Line number
+	 */
+	public Token(Object lexeme, WaebricTokenSort sort, Position position) {
+		this(lexeme, sort, position.lineno, position.charno);
 	}
 
 	/**
@@ -52,7 +63,15 @@ public class Token {
 	 * @return
 	 */
 	public int getLine() {
-		return line;
+		return lineno;
+	}
+	
+	/**
+	 * Modify line number
+	 * @param lineno
+	 */
+	public void setLine(int lineno) {
+		this.lineno = lineno;
 	}
 	
 	/**
@@ -60,33 +79,25 @@ public class Token {
 	 * @return
 	 */
 	public int getCharacter() {
-		return character;
+		return charno;
 	}
 	
 	/**
-	 * Modify line number
-	 * @param line
+	 * Modify character number
+	 * @param charno
 	 */
-	public void setLine(int line) {
-		this.line = line;
-	}
-
-	/**
-	 * Modify chararacter number
-	 * @param character
-	 */
-	public void setCharacter(int character) {
-		this.character = character;
+	public void setCharacter(int charno) {
+		this.charno = charno;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Token) {
 			Token token = (Token) obj;
-			if(token.getSort() != this.sort) { return false; }
-			if(token.getLine() != this.line) { return false; }
-			if(token.getCharacter() != this.character) { return false; }
-			return token.getLexeme().equals(this.lexeme);
+			if(token.getSort() != this.getSort()) { return false; }
+			if(token.getLine() != this.getLine()) { return false; }
+			if(token.getCharacter() != this.getCharacter()) { return false; }
+			return token.getLexeme().equals(this.getLexeme());
 		}
 		
 		return false;
@@ -95,7 +106,7 @@ public class Token {
 	@Override
 	public String toString() {
 		return "\"" + lexeme.toString() + "\" " + sort.name() + 
-		" (line: " + line + ", character: " + character + ")";
+		" (line: " + getLine() + ", character: " + getCharacter() + ")";
 	}
 
 }

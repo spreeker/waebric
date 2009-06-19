@@ -1,7 +1,7 @@
 package org.cwi.waebric;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +12,7 @@ import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.scanner.WaebricScanner;
+import org.cwi.waebric.scanner.token.TokenIterator;
 
 /**
  * Module register allows users a clean interface to load the AST of modules based on
@@ -41,17 +42,17 @@ public class ModuleRegister {
 	/**
 	 * Attempt to load a module from the file system based on an identifier.
 	 * @param identifier Module identifier, maps on relative file position.
-	 * @throws FileNotFoundException Invalid file
+	 * @throws IOException 
 	 */
-	public AbstractSyntaxTree loadModule(ModuleId identifier) throws FileNotFoundException {
+	public AbstractSyntaxTree loadModule(ModuleId identifier) throws IOException {
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
 		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 
 		// Attempt to process file
 		FileReader reader = new FileReader(getPath(identifier));
 		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream(); // Scan module
-		WaebricParser parser = new WaebricParser(scanner);
+		TokenIterator iterator = scanner.tokenizeStream(); // Scan module
+		WaebricParser parser = new WaebricParser(iterator);
 		parser.parseTokens(); // Parse module
 		
 		// Retrieve modules
@@ -96,6 +97,7 @@ public class ModuleRegister {
 	 * Retrieve all transitive dependent modules.
 	 * @param modules Modules from which dependent modules are retrieved.
 	 * @return 
+	 * @throws  
 	 */
 	public AbstractSyntaxTree loadDependancies(Modules modules) {
 		AbstractSyntaxTree result = new AbstractSyntaxTree();
@@ -109,7 +111,7 @@ public class ModuleRegister {
 						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); 
 						loadDependancies(sub.getRoot());
 						result.getRoot().addAll(sub.getRoot());
-					} catch (FileNotFoundException e) {
+					} catch (IOException e) {
 						// Skip invalid import directives
 					}
 				}

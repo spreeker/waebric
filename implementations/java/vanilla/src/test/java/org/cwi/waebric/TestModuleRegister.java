@@ -4,13 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 
-import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,16 +18,9 @@ public class TestModuleRegister {
 	private AbstractSyntaxTree ast;
 	
 	@Before
-	public void setUp() throws FileNotFoundException {
-		FileReader reader = new FileReader("src/test/waebric/helloworld.wae");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream();
-		WaebricParser parser = new WaebricParser(scanner);
-		parser.parseTokens();
-		
-		ast = parser.getAbstractSyntaxTree();
+	public void setUp() throws IOException {
+		ast = TestUtilities.quickParse("src/test/waebric/helloworld.wae");
 		identifier = ast.getRoot().get(0).getIdentifier();
-		
 		ModuleRegister.getInstance().cacheModule(identifier, ast);
 	}
 	

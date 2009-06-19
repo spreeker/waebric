@@ -1,6 +1,6 @@
 package org.cwi.waebric.checker;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,7 +163,7 @@ class FunctionCheck implements IWaebricCheck {
 					collected.add(sub.getIdentifier());
 					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
 				}
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				// Invalid file name, these are checked by module check
 			}
 		}

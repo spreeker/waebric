@@ -11,8 +11,8 @@ import org.cwi.waebric.checker.WaebricChecker;
 import org.cwi.waebric.interpreter.WaebricInterpreter;
 import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
-import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
+import org.cwi.waebric.scanner.token.TokenIterator;
 
 public class CommandLineCompiler {
 	
@@ -45,21 +45,12 @@ public class CommandLineCompiler {
 			WaebricScanner scanner = new WaebricScanner(reader);
 			
 			long curr = System.currentTimeMillis();
-			List<LexicalException> le = scanner.tokenizeStream();
+			TokenIterator iterator = scanner.tokenizeStream();
 			long scan_time = System.currentTimeMillis() - curr;
-			System.out.println("\nScanned in " + scan_time + "ms, with " + le.size() + " lexical exceptions.");
+			System.out.println("\nScanned in " + scan_time + "ms, with " + scanner.getTokens().size() + " tokens.");
+			System.out.println(scanner.getTokens().toString());
 			
-			if(le.size() == 0) {
-				System.out.println(scanner.getTokens().toString());
-			} else {
-				for(LexicalException exception : le) {
-					exception.printStackTrace();
-				}
-				
-				return; // Quit application
-			}
-			
-			WaebricParser parser = new WaebricParser(scanner.iterator());
+			WaebricParser parser = new WaebricParser(iterator);
 			
 			curr = System.currentTimeMillis();
 			List<SyntaxException> se = parser.parseTokens();

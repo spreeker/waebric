@@ -73,7 +73,7 @@ class StatementParser extends AbstractParser {
 				// Comment statements start with a comments keyword
 				return parseCommentStatement();
 			} else if(peek.getLexeme().equals(WaebricKeyword.ECHO)) {
-				if(EmbeddingParser.isEmbedding(tokens.peek(2))) {
+				if(tokens.hasNext(2) && tokens.peek(2).getSort() == WaebricTokenSort.EMBEDDING) {
 					// Embedding echo production is followed by a text
 					return parseEchoEmbeddingStatement();
 				} else {
@@ -231,7 +231,7 @@ class StatementParser extends AbstractParser {
 		next(WaebricKeyword.COMMENT, "Comment keyword", "\"comment\"");
 		
 		Statement.Comment statement = new Statement.Comment();
-		next(WaebricTokenSort.QUOTE, "Comments text", "\"comments\" Text");
+		next(WaebricTokenSort.TEXT, "Comments text", "\"comments\" Text");
 		if(WaebricScanner.isStringChars(tokens.current().getLexeme().toString())) {
 			StrCon comment = new StrCon(tokens.current().getLexeme().toString());
 			statement.setComment(comment);
@@ -343,7 +343,7 @@ class StatementParser extends AbstractParser {
 					Statement.MarkupMarkup statement = new Statement.MarkupMarkup(markups);
 					statement.setMarkup(end);
 					return statement;
-				} else if(EmbeddingParser.isEmbedding(peek)) {
+				} else if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
 					MarkupEmbedding statement = new MarkupEmbedding(markups);
 					try {
 						statement.setEmbedding(embeddingParser.parseEmbedding());

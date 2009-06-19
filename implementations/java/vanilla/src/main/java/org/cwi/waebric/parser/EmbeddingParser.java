@@ -1,5 +1,6 @@
 package org.cwi.waebric.parser;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -31,6 +32,11 @@ class EmbeddingParser extends AbstractParser {
 	private final MarkupParser markupParser;
 	private final ExpressionParser expressionParser;
 
+	/**
+	 * Construct embedding parser.
+	 * @param tokens
+	 * @param exceptions
+	 */
 	public EmbeddingParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 
@@ -46,8 +52,8 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public Embedding parseEmbedding() throws SyntaxException {
 		Token peek = tokens.peek(1);
-		if(peek.getSort() == WaebricTokenSort.QUOTE) {
-			// Decompose stream when first token is quote
+		if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
+			// Decompose stream when first token is embedding
 			tokenizeEmbedding();
 		}
 		
@@ -88,23 +94,19 @@ class EmbeddingParser extends AbstractParser {
 		// Determine type based on look-ahead information
 		if(isMarkup(1)) { // Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
-			
 			try {
 				embed.setMarkup(markupParser.parseMarkup());
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "Markup embedding", "Markup+ Markup");
 			}
-			
 			return embed;
 		} else { // Markup* Expression -> Markup
 			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
-			
 			try {
 				embed.setExpression(expressionParser.parseExpression());
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "Expression embedding", "Markup+ Expression");
 			}
-			
 			return embed;
 		}
 	}
@@ -198,43 +200,28 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public void tokenizeEmbedding() throws SyntaxException {
-		Token start = tokens.next(); // Retrieve quote token
-		String data = start.getLexeme().toString(); // Embedded token stream
-		int length = 1; // Number of tokens processed, required for replacing current stream
+		Token embedding = tokens.next(); // Retrieve embedding token
+		String data = embedding.getLexeme().toString(); // Embedded token stream
 		
-		// When an embedding quote does not follow the specified regular expression, it likely 
-		// contains content with double quotes. Further decompose token stream to retrieve all
-		// embedding related data.
-		if(tokens.hasNext() && ! start.getLexeme().toString().matches("\\w*<\\w*>\\w*")) {
-			do {
-				data += "\"";
-				data += tokens.next().getLexeme().toString();
-				length++;
-			} while(tokens.hasNext() && ! tokens.current().getLexeme().toString().startsWith(">"));
-			current(WaebricTokenSort.QUOTE, "Embedding back", "> Text \"");
+		try {
+			// Decompose embedding data in sub-tokens
+			StringReader reader = new StringReader(data);
+			WaebricScanner scanner = new WaebricScanner(reader);
+			scanner.tokenizeStream();
+			
+			// Make position of all tokens relative
+			for(Token token: scanner.getTokens()) {
+				token.setLine(embedding.getLine() + token.getLine());
+				token.setCharacter(embedding.getCharacter() + token.getCharacter());
+			}
+			
+			tokens.add(new Token('"', WaebricTokenSort.CHARACTER, embedding.getLine(), embedding.getCharacter()));
+			tokens.addAll(scanner.getTokens());
+			tokens.add(new Token('"', WaebricTokenSort.CHARACTER, embedding.getLine(), embedding.getCharacter()));
+			tokens.remove(); // Remove embedding token
+		} catch(IOException e) {
+			throw new InternalError();
 		}
-		
-		// Convert data to new token stream
-		StringReader reader = new StringReader(data);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		scanner.tokenizeStream(); 
-		
-		// Retrieve tokens embedded in quote
-		List<Token> elements = scanner.getTokens(); 
-		
-		// Convert token location from relative to absolute
-		for(Token token : elements) {
-			token.setCharacter(token.getCharacter() + start.getCharacter());
-			token.setLine(token.getLine() + start.getLine());
-		}
-		
-		// Attach double quote symbol tokens at begin and end of stream
-		elements.add(0, new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, start.getLine(), start.getCharacter()));
-		elements.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, tokens.current().getLine(), tokens.current().getCharacter()));
-		
-		// Swap quote token with extended token collection
-		for(int i = 0; i < length; i++) { tokens.remove(); } 
-		tokens.addAll(elements);
 	}
 	
 	/**
@@ -258,16 +245,6 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Determine if specified token is embedding
-	 * @param token Token
-	 * @return Embedding?
-	 */
-	public static boolean isEmbedding(Token token) {
-		return token.getSort() == WaebricTokenSort.QUOTE 
-			&& token.getLexeme().toString().indexOf('<') != -1;
 	}
 	
 }

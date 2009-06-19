@@ -23,7 +23,7 @@ public class TestTokenIterator {
 		tokens.add(new Token(123, WaebricTokenSort.NATCON, 1, 2)); // Number
 		tokens.add(new Token("identifier1", WaebricTokenSort.IDCON, 3, 4)); // Identifier
 		tokens.add(new Token(WaebricKeyword.DEF, WaebricTokenSort.KEYWORD, 5, 6)); // Keyword
-		tokens.add(new Token("text", WaebricTokenSort.QUOTE, 7, 8)); // Quote
+		tokens.add(new Token("text", WaebricTokenSort.TEXT, 7, 8)); // Quote
 		tokens.add(new Token('@', WaebricTokenSort.CHARACTER, 9, 10)); // Character
 		tokens.add(new Token("symbol1", WaebricTokenSort.SYMBOLCON, 11, 12)); // Symbol
 		iterator = new TokenIterator(tokens);
@@ -72,14 +72,14 @@ public class TestTokenIterator {
 	
 	@Test
 	public void testAdd() {
-		Token newbie = new Token("test", WaebricTokenSort.QUOTE, 1, 2);
+		Token newbie = new Token("test", WaebricTokenSort.TEXT, 1, 2);
 		iterator.add(newbie);
 		assertEquals(newbie, iterator.next());
 	}
 	
 	@Test
 	public void testAddAll() {
-		Token newbie = new Token("test", WaebricTokenSort.QUOTE, 1, 2);
+		Token newbie = new Token("test", WaebricTokenSort.TEXT, 1, 2);
 		ArrayList<Token> list = new ArrayList<Token>();
 		list.add(newbie);
 		iterator.addAll(list);

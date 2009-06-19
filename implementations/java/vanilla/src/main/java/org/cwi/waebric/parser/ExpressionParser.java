@@ -47,7 +47,7 @@ class ExpressionParser extends AbstractParser {
 			} else if(tokens.peek(1).getSort() == WaebricTokenSort.NATCON) {
 				// Natural expressions consist of a natural
 				expression =  parseNatExpression();
-			} else if(tokens.peek(1).getSort() == WaebricTokenSort.QUOTE) {
+			} else if(tokens.peek(1).getSort() == WaebricTokenSort.TEXT) {
 				// Textual expressions consist of a text
 				expression =  parseTextExpression();
 			} else if(tokens.peek(1).getSort() == WaebricTokenSort.IDCON) {
@@ -136,7 +136,7 @@ class ExpressionParser extends AbstractParser {
 	 * @see Expression.TextExpression
 	 */
 	public Expression.TextExpression parseTextExpression() throws SyntaxException {
-		next(WaebricTokenSort.QUOTE, "Textual expression","Text -> Expression");
+		next(WaebricTokenSort.TEXT, "Textual expression","Text -> Expression");
 		if(WaebricScanner.isTextChars(tokens.current().getLexeme().toString())) {
 			Text text = new Text(new StringLiteral(tokens.current().getLexeme().toString()));
 			Expression.TextExpression expression = new Expression.TextExpression(text);

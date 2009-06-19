@@ -102,7 +102,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Store additional token behind current token.
-	 * 
 	 * @param token Token
 	 */
 	public void add(Token token) {
@@ -111,7 +110,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Store collection of tokens behind current token.
-	 * 
 	 * @param tokens Collection of tokens
 	 */
 	public void addAll(List<? extends Token> tokens) {

@@ -7,328 +7,340 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.scanner.token.Position;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
-/**
- * The lexical analyzer, also known as a scanner, reads an input character stream
- * from which it generates a stream of tokens. During this "tokenization" process
- * layout and comments characters are removed to simplify and optimize parsing.
- * 
- * @author Jeroen van Schagen
- * @date 18-05-2009
- */
-public class WaebricScanner implements Iterable<Token> {
+public class WaebricScanner {
+	
+	/**
+	 * Character value to indicate EOF
+	 */
+	public static final int EOF = -1;
+	
+	/**
+	 * Default tab character length
+	 */
+	public static final int TAB_LENGTH = 5;
+	
+	/**
+	 * Current character
+	 */
+	private int curr;
+	
+	/**
+	 * Value buffer
+	 */
+	private String buffer;
+	
+	/**
+	 * Current character position
+	 */
+	private Position cpos;
+	
+	/**
+	 * Current token position
+	 */
+	private Position tpos;
+	
+	/**
+	 * Collection of tokens
+	 */
+	private final List<Token> tokens;
 
-	private final StreamTokenizer tokenizer;
-	
 	/**
-	 * Currently processed tokens
+	 * Input stream
 	 */
-	private List<Token> tokens;
+	private final Reader reader;
 	
 	/**
-	 * Currently occurred exceptions, stored instead of thrown to detect multiple 
-	 * exceptions at once.
-	 */
-	private List<LexicalException> exceptions;
-	
-	/**
-	 * Current character being processed
-	 */
-	private int current;
-	
-	/**
-	 * Construct scanner
+	 * Construct tokenizer based on reader, in case an invalid reader is given,
+	 * a null pointer exception will be thrown.
+	 * 
+	 * @see Reader
 	 * 
 	 * @param reader Input character stream
+	 * @param exceptions Collection of scan exceptions
+	 * @throws IOException Thrown by Reader
 	 */
-	public WaebricScanner(Reader reader) {
-		try {
-			tokenizer = new StreamTokenizer(reader); 
-		} catch(IOException e) {
-			throw new InternalError(); // Should never occur
+	public WaebricScanner(Reader reader) throws IOException {
+		if(reader == null) {
+			throw new NullPointerException();
 		}
 		
-		tokens = new ArrayList<Token>();
-		exceptions = new ArrayList<LexicalException>();
-	}
-
-	/**
-	 * Convert character stream in token stream
-	 * 
-	 * @return List of scanner exceptions
-	 * @throws IOException Fired by next token procedure in stream tokenizer.
-	 * @see java.io.StreamTokenizer
-	 */
-	public List<LexicalException> tokenizeStream() {
-		tokens.clear(); exceptions.clear(); // Reset
+		// Initiate position structures
+		cpos = new Position();
+		tpos = new Position();
 		
-		// Scan and store tokens
-		next();
-		while(current != StreamTokenizer.END_OF_FILE) {
-			switch(current) {
-				case StreamTokenizer.WORD:
-					tokenizeWord();
-					break;
-				case StreamTokenizer.NUMBER:
-					tokenizeNumber();
-					break;
-				case StreamTokenizer.CHARACTER:
-					if(tokenizer.getCharacterValue() == '\'') {
-						tokenizeSymbol();
-					} else {
-						tokenizeCharacter();
-					} break;
-				case StreamTokenizer.QUOTE:
-					tokenizeQuote();
-					break;
-				case StreamTokenizer.LAYOUT: 
-					next();
-					break; // Layout tokens will not be parsed
-				case StreamTokenizer.COMMENT: 
-					next();
-					break; // Comment tokens will not be parsed
-			}
-		}
-
-		return exceptions;
+		this.tokens = new ArrayList<Token>(); // Initiate collection
+		this.reader = reader; // Store reader reference
+		
+		read(); // Buffer first character
 	}
 	
 	/**
-	 * Retrieve next character and log any exceptions that occur.
-	 * @return
-	 */
-	private boolean next() {
-		try {
-			current = tokenizer.nextToken();
-			return true;
-		} catch (IOException e) {
-			exceptions.add(new LexicalException(e));
-			return false;
-		}
-	}
-
-	/**
-	 * 
-	 * @param exceptions
+	 * Read next character from stream and increment character count.
+	 * @return character
 	 * @throws IOException
 	 */
-	private void tokenizeWord() {
-		int lineno = tokenizer.getTokenLineNumber();
-		int charno = tokenizer.getTokenCharacterNumber();
+	private void read() throws IOException {
+		curr = reader.read();
 		
-		String word = "";
-		while(current == StreamTokenizer.WORD || current == StreamTokenizer.NUMBER) {
-			word += tokenizer.getStringValue();
-			next();
+		// Maintain actual line and character numbers
+		if(curr == '\n') { cpos.charno = 0; cpos.lineno++; } // New line
+		else if(curr == '\t') { cpos.charno += TAB_LENGTH; } // Tab
+		else if(curr >= 0) { cpos.charno++; } // Not end of file
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws IOException 
+	 */
+	public TokenIterator tokenizeStream() throws IOException {
+		if(tokens.size() > 0) { return new TokenIterator(tokens); }
+		
+		while(curr != EOF) {
+			buffer = ""; // Clean buffer
+			
+			// Store actual token position
+			tpos.lineno = cpos.lineno;
+			tpos.charno = cpos.charno;
+			
+			// Process token, based on first character
+			if(isLayout(curr)) { processLayout(); }
+			else if(curr == '/') { processComment(); }
+			else if(curr == '"') { tokenizeText(); }
+			else if(curr == '\'') { tokenizeSymbol(); }
+			else if(isLetter(curr)) { tokenizeWord(); }
+			else if(isNumeral(curr)) { tokenizeNumber(); }
+			else { tokenizeCharacter(); }
 		}
 		
-		if(isKeyword(word)) {
-			WaebricKeyword type = WaebricKeyword.valueOf(word.toUpperCase());
-			Token keyword = new Token(type, WaebricTokenSort.KEYWORD, lineno, charno);
+		return new TokenIterator(tokens);
+	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	private void processLayout() throws IOException {
+		read(); // Skip layout characters
+	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	private void processComment() throws IOException {
+		read(); // Retrieve next symbol
+		
+		if(curr == '*') { // Multiple-line comment /* */
+			read(); // Retrieve first comment character
+			
+			char previous; // Store previous
+			do {
+				previous = (char) curr;
+				read(); // Retrieve next comment character
+			} while(! (previous == '*' && curr == '/') && curr != EOF);
+			
+			read(); // Retrieve next character
+		} else if(curr == '/') { // Single-line comment //
+			read(); // Retrieve first comment character
+			
+			do {
+				read(); // Retrieve next comment character
+			} while(curr != '\n'  && curr != EOF);
+		
+			read(); // Retrieve next character
+		} else { // Symbol character /
+			Token slash = new Token('/', WaebricTokenSort.CHARACTER, tpos);
+			tokens.add(slash);
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	private void tokenizeWord() throws IOException {
+		do {
+			buffer += (char) curr;
+			read(); // Read next character
+		} while(isLetter(curr) || isNumeral(curr) || curr == '-');
+		
+		// Determine token sort
+		if(isKeyword(buffer)) {
+			// Retrieve keyword element from enumeration
+			WaebricKeyword element = WaebricKeyword.valueOf(buffer.toUpperCase());
+			
+			// Store keyword
+			Token keyword = new Token(element, WaebricTokenSort.KEYWORD, tpos);
 			tokens.add(keyword);
 		} else {
-			Token identifier = new Token(word, WaebricTokenSort.IDCON, lineno, charno);
+			// Store word
+			Token identifier = new Token(buffer, WaebricTokenSort.IDCON, tpos);
 			tokens.add(identifier);
 		}
 	}
 	
 	/**
 	 * 
-	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeNumber() {
-		Token number = new Token(
-				tokenizer.getIntegerValue(), WaebricTokenSort.NATCON, 
-				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
-			); // Construct number token
+	private void tokenizeNumber() throws IOException {
+		int number = 0; // Integer buffer
 		
-		tokens.add(number);
-		next();
+		while(isNumeral(curr)) {
+			number *= 10; // Create space for next character
+			number += curr - 48; // '0' equals decimal 48
+			read(); // Read next number
+		}
+		
+		// Store natural
+		Token natural = new Token(number, WaebricTokenSort.NATCON, tpos);
+		tokens.add(natural);
 	}
 	
 	/**
 	 * 
-	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeCharacter() {
-		Token character = new Token(
-				tokenizer.getCharacterValue(), WaebricTokenSort.CHARACTER, 
-				tokenizer.getTokenLineNumber(), tokenizer.getTokenCharacterNumber()
-			); // Construct token
-		
+	private void tokenizeCharacter() throws IOException {
+		// Store character
+		Token character = new Token((char) curr, WaebricTokenSort.CHARACTER, tpos);
 		tokens.add(character);
-		next();
+		
+		read(); // Retrieve next character
 	}
 	
 	/**
-	 * " * "
 	 * 
-	 * @param exceptions
 	 * @throws IOException
 	 */
-	private void tokenizeQuote() {
-		int lineno = tokenizer.getTokenLineNumber();
-		int charno = tokenizer.getTokenCharacterNumber();
-
-		if(tokenizer.getStringValue().equals("" + WaebricSymbol.DQUOTE)) {
-			// Token is not a quote but a single " character
-			Token quote = new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno);
-			tokens.add(quote);
-		} else if(tokenizer.getStringValue().endsWith("" + WaebricSymbol.DQUOTE)) {
-			String value = tokenizer.getStringValue(); // Retrieve data without double quotes
-			value = value.substring(1, tokenizer.getStringValue().length()-1);
-			
-			if(value.indexOf('<') == -1) {
-				// Construct regular quote token, when no embedding found '<'
-				Token quote = new Token(value, WaebricTokenSort.QUOTE, lineno, charno);
-				tokens.add(quote); // Attach quote to collection
-			} else {
-				// Attach opening double quote as character
-				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
-				
-				 // Embedding found, decompose string in sub-tokens
-				tokenizeString(value, lineno, charno);
-				
-				// Attach closing double quote as character
-				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
-			}
-		} else {
-			// Attach opening double quote as character
-			tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
-			
-			// Decompose string in sub-tokens
-			String value = tokenizer.getStringValue().substring(1);
-			tokenizeString(value, lineno, charno);
+	private void tokenizeSymbol() throws IOException {
+		read(); // Retrieve first symbol character
+		
+		while(isSymbolChar(curr)) {
+			buffer += (char) curr;
+			read(); // Retrieve next symbol character
 		}
 		
-		next(); // Retrieve next token
-	}
-	
-	/**
-	 * Create new scanner instance and retrieve tokens, store these tokens 
-	 * in current token collection and  
-	 * @param reader Reader
-	 * @param lineno Start line number
-	 * @param charno Start character number
-	 */
-	private void tokenizeString(String data, int lineno, int charno) {
-		WaebricScanner scanner = new WaebricScanner(new StringReader(data));
-		exceptions.addAll(scanner.tokenizeStream());
-
-		// Attach sub-tokens with absolute positions
-		for(Token token: scanner.getTokens()) {
-			token.setLine(lineno + token.getLine() - 1);
-			token.setCharacter(charno + token.getCharacter());
-			tokens.add(token);
-		}
-	}
-	
-	/**
-	 * ' SymbolChar*
-	 * 
-	 * @param exceptions
-	 * @throws IOException
-	 */
-	private void tokenizeSymbol() {
-		int lineno = tokenizer.getTokenLineNumber();
-		int charno = tokenizer.getTokenCharacterNumber();
-		
-		next(); // Skip ' opening character
-		
-		String data = "";
-		while(isSymbolChars(tokenizer.toString())) {
-			data += tokenizer.toString();
-			next(); // Retrieve next char
-		}
-		
-		Token symbol = new Token(data, WaebricTokenSort.SYMBOLCON, lineno, charno);
+		// Store symbol
+		Token symbol = new Token(buffer, WaebricTokenSort.SYMBOLCON, tpos);
 		tokens.add(symbol);
 	}
-
-	/**
-	 * Retrieve token
-	 * 
-	 * @param index Token index in structured text
-	 * @return token
-	 */
-	public Token getToken(int index) {
-		return tokens.get(index);
-	}
-	
-	/**
-	 * Retrieve amount of tokens
-	 * 
-	 * @return size
-	 */
-	public int getSize() {
-		return tokens.size();
-	}
-	
-	/**
-	 * Retrieve token list
-	 * 
-	 * @return
-	 */
-	public List<Token> getTokens() {
-		return tokens;
-	}
-	
-	/**
-	 * Retrieve token iterator
-	 * 
-	 * @return iterator
-	 */
-	public TokenIterator iterator() {
-		return new TokenIterator(tokens);
-	}
 	
 	/**
 	 * 
-	 * @param lexeme
-	 * @return
+	 * @throws IOException
 	 */
-	public static boolean isSymbolChars(String lexeme) {
-		if(lexeme == null) { return false; }
-		char chars[] = lexeme.toCharArray();
-
-		for(char c: chars) {
-			if(! isSymbolChar(c)) { return false; }
-		}
+	private void tokenizeText() throws IOException {
+		read(); // Retrieve first character
 		
-		return true;
+		do {
+			if(curr == EOF) {
+				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
+				tokens.add(quote); // Store " as character token
+				tpos.charno++; // Increment character position for "
+				flushBuffer(); // End-of-file without text closure symbol ("), store re-scan tokens
+				return;
+			} else if(curr == '<') {
+				// Embedding character recognized
+				tokenizeEmbedding(); return;
+			} else {
+				// Acceptable character, store in buffer and continue
+				buffer += (char) curr;
+				read();
+			}
+		} while(curr != '"');
+		
+		// Store text as token
+		Token text = new Token(buffer, WaebricTokenSort.TEXT, tpos);
+		tokens.add(text);
+		
+		read(); // Skip closure " symbol
 	}
 	
 	/**
-	 * Check if character is a symbol.
 	 * 
+	 * @throws IOException
+	 */
+	private void tokenizeEmbedding() throws IOException {
+		boolean quoted = false; // Character in quote? " char "
+		boolean embeded = false; // Character in embed? < char >
+		
+		do {
+			if(curr == EOF) {
+				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
+				tokens.add(quote); // Store " as character token
+				tpos.charno++; // Increment character position for "
+				flushBuffer(); // End-of-file without embedding closure symbol ("), store re-scan tokens
+				return;
+			}
+			
+			buffer += (char) curr;
+			
+			if(curr == '"') { quoted = ! quoted; }
+			if(curr == '<' && ! quoted) { embeded = true; }
+			if(curr == '>' && ! quoted) { embeded = false; }
+			
+			read(); // Retrieve next character
+		} while(curr != '"' || embeded);
+		
+		// Store embedding as token
+		Token embedding = new Token(buffer, WaebricTokenSort.EMBEDDING, tpos);
+		tokens.add(embedding);
+		
+		read(); // Skip closure " symbol
+	}
+
+	/**
+	 * Convert buffer data in character input stream, which is then converted by a new 
+	 * scanner instance into tokens.
+	 * @param tokens
+	 * @throws IOException 
+	 */
+	private void flushBuffer() throws IOException {
+		if(buffer == null || buffer.equals("")) { return; } // Buffer contains no contents, quit
+		StringReader reader = new StringReader(buffer);
+		WaebricScanner instance = new WaebricScanner(reader);
+		instance.tokenizeStream();
+		tokens.addAll(instance.getTokens());
+		buffer = ""; // Clean buffer
+	}
+	
+	/**
+	 * @param c
+	 * @return
+	 */
+	public static boolean isLetter(int c) {
+		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+	}
+	
+	/**
+	 * @param c
+	 * @return
+	 */
+	public static boolean isNumeral(int c) {
+		return c >= '0' && c <= '9';
+	}
+	
+	/**
+	 * @param c
+	 * @return
+	 */
+	public static boolean isLayout(int c) {
+		return c == ' ' || c == '\t' || c =='\n' || c == '\r';
+	}
+	
+	/**
 	 * @param c
 	 * @return 
 	 */
 	private static boolean isSymbolChar(int c) {
 		return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}' && c != ']';
-	}
-
-	/**
-	 * Check if lexeme is a keyword.
-	 * 
-	 * @param lexeme Token value
-	 * @return 
-	 */
-	public boolean isKeyword(String lexeme) {
-		try {
-			// Literal should be in enumeration
-			WaebricKeyword literal = WaebricKeyword.valueOf(lexeme.toUpperCase());
-			return literal != null;
-		} catch(IllegalArgumentException e) {
-			// Enumeration does not exists
-			return false;
-		}
 	}
 	
 	/**
@@ -341,23 +353,16 @@ public class WaebricScanner implements Iterable<Token> {
 		char chars[] = lexeme.toCharArray();
 		
 		for(int i = 0; i < chars.length; i++) {
-			char c = chars[i]; // Retrieve current character
-			if(! isTextChar(c)) {
-				// Allow "\\&" "\\""
-				if(c == '&' || c == '"') {
+			char c = chars[i];
+			if(! isTextChar(c)) { 
+				if(c == '&' || c == '"') { // Allow "\\&" "\\""
 					if(i > 0) {
 						char previous = chars[i-1];
 						if(previous == '\\') {
 							i++; // Skip checking & or ' and accept
-						} else {
-							return false; // Incorrect occurrence of & or " character
-						}
-					} else {
-						return false; // Incorrect occurrence of & or " character
-					}
-				} else {
-					return false; // Incorrect character
-				}
+						} else { return false; }
+					} else { return false; }
+				} else { return false; }
 			}
 		}
 		
@@ -370,12 +375,10 @@ public class WaebricScanner implements Iterable<Token> {
 	 * @return
 	 */
 	public static boolean isTextChar(char c) {
-		return c > 31 && c < 128 && c != '<' && c != '&' && c != '"' 
-			|| c == '\n' || c == '\t' || c == '\r';
+		return c > 31 && c < 128 && c != '<' && c != '&' && c != '"' || c == '\n' || c == '\t' || c == '\r';
 	}
 	
 	/**
-	 * 
 	 * @param lexeme
 	 * @return
 	 */
@@ -386,21 +389,14 @@ public class WaebricScanner implements Iterable<Token> {
 		for(int i = 0; i < chars.length; i++) {
 			char c = chars[i]; // Retrieve current character
 			if(! isStringChar(c)) {
-				// Allow "\\n" "\\t" "\\\"" "\\\\"
-				if(c == '\\') {
+				if(c == '\\') { // Allow "\\n" "\\t" "\\\"" "\\\\"
 					if(i+1 < chars.length) {
 						char peek = chars[i+1];
 						if(peek == 'n' || peek == 't' || peek == '"' || peek == '\\') {
 							i++; // Check checking \\ and accept
-						} else {
-							return false; // Invalid occurrence of '\\'
-						}
-					} else {
-						return false; // Invalid occurrence of '\\'
-					}
-				} else {
-					return false; // Invalid string symbol found
-				}
+						} else { return false; }
+					} else { return false; }
+				} else { return false; }
 			}
 		}
 		
@@ -408,12 +404,34 @@ public class WaebricScanner implements Iterable<Token> {
 	}
 	
 	/**
-	 * 
 	 * @param c
 	 * @return
 	 */
 	public static boolean isStringChar(char c) {
 		return c > 31 && c != '\n' && c != '\t' && c != '"' && c != '\\';
 	}
-
+	
+	/**
+	 * @param lexeme
+	 * @return
+	 */
+	public static boolean isKeyword(String data) {
+		try {
+			// Literal should be in enumeration
+			WaebricKeyword literal = WaebricKeyword.valueOf(data.toUpperCase());
+			return literal != null;
+		} catch(IllegalArgumentException e) {
+			// Enumeration does not exists
+			return false;
+		}
+	}
+	
+	/**
+	 * Retrieve tokens
+	 * @return
+	 */
+	public List<Token> getTokens() {
+		return tokens;
+	}
+	
 }

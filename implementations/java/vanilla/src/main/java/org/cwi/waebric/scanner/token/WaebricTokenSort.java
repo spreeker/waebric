@@ -9,7 +9,7 @@ package org.cwi.waebric.scanner.token;
 public enum WaebricTokenSort {
 	
 	/**
-	 * Identifier tokens are non-keyword words in a structured text.
+	 * Identifier tokens are non-keyword words in a structured text.<br><br>
 	 * 
 	 * For example, in the below text:<br>
 	 * 	<code>module helloworld</code><br>
@@ -24,26 +24,38 @@ public enum WaebricTokenSort {
 	NATCON, 
 	
 	/**
-	 * SymbolCons are a collection of 0..* characters started with a single quote.
+	 * Symbol tokens contain of a single quote followed by characters.<br><br>
+	 * 
+	 * For example, in the below text:<br>
+	 * 	<code>'@bc</code><br>
+	 * @bc is the symbol
 	 */
 	SYMBOLCON,
 	
 	/**
-	 * Quote token contains characters between two double quotes. Both the Text
-	 * and StrCon type in Waebric are forms of quotes.
+	 * Text token contains characters between two double quotes.<br><br>
 	 * 
 	 * For example:<br>
-	 * "This is a quote"
+	 * 	<code>"This is a text"</code>
 	 */
-	QUOTE,
+	TEXT,
 	
 	/**
-	 * Symbol char tokens are all regular ASCII symbols between the decimal range of 32..126
+	 * Embedding tokens are an extension to text tokens, which include mark-up and
+	 * sometimes an expression inside their structure.<br><br>
+	 * 
+	 * For example:<br>
+	 * 	<code>"Text < call(args) tag "expr" > Text"</code>
+	 */
+	EMBEDDING,
+	
+	/**
+	 * Character tokens represent a single character from the ASCII language.
 	 */
 	CHARACTER,
 	
 	/**
-	 * Keyword tokens are words that are literally part of the language grammar.<br><br>
+	 * Keywords are words that are literally part of a language's grammar.<br><br>
 	 * 
 	 * For example, in the below text:<br>
 	 * 	<code>module helloworld</code><br>

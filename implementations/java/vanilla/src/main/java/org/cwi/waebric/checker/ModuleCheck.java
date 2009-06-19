@@ -1,6 +1,6 @@
 package org.cwi.waebric.checker;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
@@ -40,7 +40,7 @@ class ModuleCheck implements IWaebricCheck {
 			// Attempt to process file
 			AbstractSyntaxTree tree = ModuleRegister.getInstance().loadModule(identifier);
 			checkAST(tree, exceptions); // Check dependent modules
-		} catch(FileNotFoundException e) {
+		} catch(IOException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
 			ModuleRegister.getInstance().cacheModule(identifier, new AbstractSyntaxTree());
 		}
