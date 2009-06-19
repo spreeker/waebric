@@ -79,11 +79,12 @@ public class WaebricScanner implements Iterable<Token> {
 				case StreamTokenizer.CHARACTER:
 					if(tokenizer.getCharacterValue() == '\'') {
 						tokenizeSymbol();
-					} else if(tokenizer.getCharacterValue() == '"') {
-						tokenizeQuote();
 					} else {
 						tokenizeCharacter();
 					} break;
+				case StreamTokenizer.QUOTE:
+					tokenizeQuote();
+					break;
 				case StreamTokenizer.LAYOUT: 
 					next();
 					break; // Layout tokens will not be parsed
@@ -175,35 +176,35 @@ public class WaebricScanner implements Iterable<Token> {
 		int lineno = tokenizer.getTokenLineNumber();
 		int charno = tokenizer.getTokenCharacterNumber();
 		
-		next(); // Skip " opening character
-		
-		String data = "";
-		while(tokenizer.getCharacterValue() != '"') {
-			if(current < 0) {
-				// End of file found before closing ", store as separate tokens
-				WaebricScanner scanner = new WaebricScanner(new StringReader(data));
-				exceptions.addAll(scanner.tokenizeStream());
-				
-				// Attach opening double quote as character
-				tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
-				
-				// Attach sub-tokens with absolute positions
-				for(Token token: scanner.getTokens()) {
-					token.setLine(lineno + token.getLine() - 1);
-					token.setCharacter(charno + token.getCharacter());
-					tokens.add(token);
-				}
-				
-				return; // Quit scanning quote, as it is not a quote
-			}
+		if(tokenizer.getStringValue().equals("" + WaebricSymbol.DQUOTE)) {
+			// Token is not a quote but a single " character
+			Token quote = new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno);
+			tokens.add(quote);
+		} else if(tokenizer.getStringValue().endsWith("" + WaebricSymbol.DQUOTE)) {
+			// Remove opening and closure " characters
+			String value = tokenizer.getStringValue().substring(1, tokenizer.getStringValue().length()-1);
+					
+			// Construct token
+			Token quote = new Token(value, WaebricTokenSort.QUOTE, lineno, charno);
+			tokens.add(quote); // Attach quote to collection
+		} else {
+			// Quote is not closed with a ", thus it should be further decomposed
+			String value = tokenizer.getStringValue().substring(1);
+			WaebricScanner scanner = new WaebricScanner(new StringReader(value));
+			exceptions.addAll(scanner.tokenizeStream());
 			
-			data += tokenizer.toString(); // Build quote data
-			next(); // Retrieve next token
+			// Attach opening double quote as character
+			tokens.add(new Token(WaebricSymbol.DQUOTE, WaebricTokenSort.CHARACTER, lineno, charno));
+			
+			// Attach sub-tokens with absolute positions
+			for(Token token: scanner.getTokens()) {
+				token.setLine(lineno + token.getLine() - 1);
+				token.setCharacter(charno + token.getCharacter());
+				tokens.add(token);
+			}
 		}
-
-		next(); // Skip " closure character
-		Token quote = new Token(data, WaebricTokenSort.QUOTE, lineno, charno);
-		tokens.add(quote);
+		
+		next(); // Retrieve next token
 	}
 	
 	/**

@@ -78,7 +78,15 @@ public class TestScanner {
 		assertEquals("text", iterator.next().getLexeme());
 		assertEquals("123", iterator.next().getLexeme());
 		
+		// Unclosed quote
 		iterator = TestUtilities.quickScan("\"text 123 '@@");
+		assertEquals('"', iterator.next().getLexeme());
+		assertEquals("text", iterator.next().getLexeme());
+		assertEquals(123, iterator.next().getLexeme());
+		assertEquals("@@", iterator.next().getLexeme());
+		
+		// Single double-quote
+		iterator = TestUtilities.quickScan("\"");
 		assertEquals('"', iterator.next().getLexeme());
 	}
 	

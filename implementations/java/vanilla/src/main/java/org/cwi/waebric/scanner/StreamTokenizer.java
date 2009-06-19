@@ -23,6 +23,7 @@ public class StreamTokenizer {
 	public static final int WORD = 2;
 	public static final int LAYOUT = 3;
 	public static final int COMMENT = 4;
+	public static final int QUOTE = 5;
 	
 	// Current character properties
 	private int current;
@@ -30,9 +31,9 @@ public class StreamTokenizer {
 	private int charno = 0;
 	
 	// Current token properties
-	private String sval;
-	private char cval;
-	private int ival;
+	private String sval = "";
+	private char cval = 0;
+	private int ival = -1;
 	
 	private int tlineno = 1;
 	private int tcharno = 0;
@@ -107,12 +108,15 @@ public class StreamTokenizer {
 		} else if(isLetter(current)) {
 			// Word token
 			return nextWord();
+		} else if(current == '"') {
+			// Quote token
+			return nextQuote();
 		} else {
 			// Symbol character
 			return nextCharacter();
 		}
 	}
-	
+
 	/**
 	 * Retrieve next comment token.
 	 * 
@@ -150,6 +154,18 @@ public class StreamTokenizer {
 			cval = '/';
 			return CHARACTER;
 		}
+	}
+
+	private int nextQuote() throws IOException {
+		sval += "\"";
+		
+		do {
+			read(); // Retrieve next symbol
+			if(current > 0) { sval += (char) current; }
+		} while(current != '"' && current > 0);
+		
+		read(); // Retrieve next character
+		return QUOTE;
 	}
 	
 	/**

@@ -86,4 +86,16 @@ public class TestTokenizer {
 		assertEquals(1, tokenizer.getTokenCharacterNumber());
 	}
 	
+	@Test
+	public void testQuote() throws IOException {
+		StringReader reader = new StringReader("\"123lol'\\/!@#$%");
+		StreamTokenizer tokenizer = new StreamTokenizer(reader);
+
+		int quote = tokenizer.nextToken();
+		assertEquals(StreamTokenizer.QUOTE, quote);
+		assertEquals("\"123lol'\\/!@#$%", tokenizer.getStringValue());
+		assertEquals(1, tokenizer.getTokenLineNumber());
+		assertEquals(1, tokenizer.getTokenCharacterNumber());
+	}
+	
 }
