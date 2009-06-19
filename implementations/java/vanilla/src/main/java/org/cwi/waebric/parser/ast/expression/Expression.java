@@ -82,6 +82,12 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		private SymbolCon symbol;
 		
+		public SymbolExpression() { }
+		
+		public SymbolExpression(SymbolCon symbol) {
+			this.symbol = symbol;
+		}
+		
 		public SymbolCon getSymbol() {
 			return symbol;
 		}

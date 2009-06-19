@@ -205,15 +205,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testExpressionMarkupsStatement() throws SyntaxException {
-		// Natural expression (easy example)
-		iterator = TestUtilities.quickScan("func1 func2 123;");
-		parser = new StatementParser(iterator, exceptions);
-		
-		MarkupExp natstm = (MarkupExp) parser.parseMarkupStatements();
-		assertEquals(2, natstm.getMarkups().size());
-		assertEquals(Expression.NatExpression.class, natstm.getExpression().getClass());
-		
-		// Var expression (resembles mark-up)
+		// Var expression
 		iterator = TestUtilities.quickScan("func1 func2 var;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -228,6 +220,14 @@ public class TestStatementParser {
 		MarkupExp estatement = (MarkupExp) parser.parseMarkupStatements();
 		assertEquals(2, estatement.getMarkups().size());
 		assertEquals(Expression.TextExpression.class, estatement.getExpression().getClass());
+		
+		// Field expression
+		iterator = TestUtilities.quickScan("func1 func2 var.id;");
+		parser = new StatementParser(iterator, exceptions);
+		
+		MarkupExp fieldstm = (MarkupExp) parser.parseMarkupStatements();
+		assertEquals(2, fieldstm.getMarkups().size());
+		assertEquals(Expression.Field.class, fieldstm.getExpression().getClass());
 	}
 	
 	@Test

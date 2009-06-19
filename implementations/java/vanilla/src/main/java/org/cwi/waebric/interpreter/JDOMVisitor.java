@@ -638,8 +638,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Execute left and right expression after each other.
 	 */
 	public void visit(CatExpression expression) {
+		String result = "";
+		
 		expression.getLeft().accept(this);
+		result += text; // Retrieve left value
+		
 		expression.getRight().accept(this);
+		result += text; // Retrieve right value
+		
+		// Store result
+		text = result;
 	}
 
 	/**

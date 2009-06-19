@@ -16,6 +16,13 @@ public class KeyValuePair extends AbstractSyntaxNode {
 	private IdCon identifier;
 	private Expression expression;
 	
+	public KeyValuePair() { }
+	
+	public KeyValuePair(IdCon identifier, Expression expression) {
+		this.identifier = identifier;
+		this.expression = expression;
+	}
+	
 	public IdCon getIdentifier() {
 		return identifier;
 	}

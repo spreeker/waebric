@@ -15,8 +15,12 @@ public class SymbolCon extends AbstractSyntaxNode {
 	
 	private StringLiteral literal;
 	
-	public SymbolCon(StringLiteral symbol) {
-		this.literal = symbol;
+	public SymbolCon(StringLiteral literal) {
+		this.literal = literal;
+	}
+	
+	public SymbolCon(String literal) {
+		this.literal = new StringLiteral(literal);
 	}
 
 	public StringLiteral getLiteral() {
