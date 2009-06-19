@@ -11,15 +11,5 @@ namespace Parser.Ast.Markup
     /// </summary>
     public class Argument : ISyntaxNode
     {
-        #region Private Members
-
-        private Expression ArgumentExpression;
-        private String Identifier;
-
-        #endregion
-
-        #region Public Methods
-
-        #endregion
     }
 }
