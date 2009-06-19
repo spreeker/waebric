@@ -55,7 +55,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 	public static class If extends Statement {
 		
 		protected Predicate predicate;
-		protected Statement statement;
+		protected Statement trueStatement;
+		
+		public If() { }
+		
+		public If(Predicate predicate, Statement trueStatement) {
+			this.predicate = predicate;
+			this.trueStatement = trueStatement;
+		}
 		
 		public Predicate getPredicate() {
 			return predicate;
@@ -66,11 +73,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 		}
 		
 		public Statement getStatement() {
-			return statement;
+			return trueStatement;
 		}
 		
-		public void setStatement(Statement statement) {
-			this.statement = statement;
+		public void setTrueStatement(Statement trueStatement) {
+			this.trueStatement = trueStatement;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
@@ -79,7 +86,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				predicate,
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
-				statement
+				trueStatement
 			};
 		}
 		
@@ -105,7 +112,11 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Statement elseStatement;
 		
-		public IfElse(Statement elseStatement) {
+		public IfElse() { }
+		
+		public IfElse(Predicate predicate, Statement trueStatement, Statement elseStatement) {
+			this.predicate = predicate;
+			this.trueStatement = trueStatement;
 			this.elseStatement = elseStatement;
 		}
 		
@@ -119,7 +130,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
 				predicate,
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
-				statement,
+				trueStatement,
 				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.ELSE)),
 				elseStatement
 			};
@@ -331,6 +342,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 		
 		private Expression expression;
 
+		public Echo() { }
+		
+		public Echo(Expression expression) {
+			this.expression = expression;
+		}
+		
 		public Expression getExpression() {
 			return expression;
 		}

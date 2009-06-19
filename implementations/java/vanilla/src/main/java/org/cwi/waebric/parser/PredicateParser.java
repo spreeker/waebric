@@ -7,7 +7,6 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
@@ -92,12 +91,15 @@ class PredicateParser extends AbstractParser {
 		next(WaebricTokenSort.KEYWORD, "Predicate type definition", "Predicate \".\" Type \"?\"");
 
 		final WaebricKeyword lexeme = (WaebricKeyword) tokens.current().getLexeme();
-		if(lexeme == WaebricKeyword.LIST || lexeme == WaebricKeyword.RECORD || lexeme == WaebricKeyword.STRING) {
-			Type type = new Type();
-			type.setType(new StringLiteral(WaebricKeyword.getLiteral(lexeme)));
-			return type;
+		if(lexeme == WaebricKeyword.STRING) {
+			return new Type.StringType();
+		} else if(lexeme == WaebricKeyword.LIST) {
+			return new Type.ListType();
+		} else if(lexeme == WaebricKeyword.RECORD) {
+			return new Type.RecordType();
 		} else {
-			reportUnexpectedToken(tokens.current(), "Type definition", "\"list\", \"record\" or \"string\"");
+			reportUnexpectedToken(tokens.current(), 
+					"Type definition", "\"list\", \"record\" or \"string\"");
 		}
 		
 		return null;

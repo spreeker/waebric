@@ -41,6 +41,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
+import org.cwi.waebric.parser.ast.statement.predicate.Type;
 
 import org.jdom.CDATA;
 import org.jdom.Comment;
@@ -287,12 +288,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		if(predicate instanceof Predicate.Is) {
 			// Is predicates checks if an expression has the correct type
 			Predicate.Is is = (Predicate.Is) predicate;
-			String type = is.getType().getName().toString();
-			if(type.equals("string")) {
+			if(is.getType() instanceof Type.StringType) {
 				return is.getExpression().getClass() == Expression.TextExpression.class;
-			} else if(type.equals("list")) {
+			} else if(is.getType() instanceof Type.ListType) {
 				return is.getExpression().getClass() == Expression.ListExpression.class;
-			} else if(type.equals("record")) {
+			} else if(is.getType() instanceof Type.RecordType) {
 				return is.getExpression().getClass() == Expression.RecordExpression.class;
 			} else { return false; } // Invalid type, should not be parsed in the first place
 		} else if(predicate instanceof Predicate.RegularPredicate) {

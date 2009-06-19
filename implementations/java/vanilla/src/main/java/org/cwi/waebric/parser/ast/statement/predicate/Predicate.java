@@ -25,6 +25,12 @@ public abstract class Predicate extends AbstractSyntaxNode {
 
 		protected Expression expression;
 		
+		public RegularPredicate() { }
+		
+		public RegularPredicate(Expression expression) {
+			this.expression = expression;
+		}
+		
 		public Expression getExpression() {
 			return expression;
 		}
@@ -53,6 +59,13 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	public static class Is extends RegularPredicate {
 
 		private Type type;
+		
+		public Is() { }
+		
+		public Is(Expression expression, Type type) {
+			this.expression = expression;
+			this.type = type;
+		}
 		
 		public Type getType() {
 			return type;
@@ -87,6 +100,12 @@ public abstract class Predicate extends AbstractSyntaxNode {
 	public static class Not extends Predicate {
 
 		private Predicate predicate;
+		
+		public Not() { }
+		
+		public Not(Predicate predicate) {
+			this.predicate = predicate;
+		}
 
 		public Predicate getPredicate() {
 			return predicate;
@@ -119,6 +138,13 @@ public abstract class Predicate extends AbstractSyntaxNode {
 
 		private Predicate left;
 		private Predicate right;
+		
+		public And() { }
+		
+		public And(Predicate left, Predicate right) {
+			this.left = left;
+			this.right = right;
+		}
 		
 		public Predicate getLeft() {
 			return left;
@@ -159,6 +185,13 @@ public abstract class Predicate extends AbstractSyntaxNode {
 
 		private Predicate left;
 		private Predicate right;
+		
+		public Or() { }
+		
+		public Or(Predicate left, Predicate right) {
+			this.left = left;
+			this.right = right;
+		}
 		
 		public Predicate getLeft() {
 			return left;

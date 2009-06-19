@@ -108,12 +108,16 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		private NatCon natural;
 		
+		public NatExpression(NatCon natural) {
+			this.natural = natural;
+		}
+		
+		public NatExpression(int natural) {
+			this.natural = new NatCon(natural);
+		}
+		
 		public NatCon getNatural() {
 			return natural;
-		}
-
-		public void setNatural(NatCon natural) {
-			this.natural = natural;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
@@ -251,6 +255,13 @@ public abstract class Expression extends AbstractSyntaxNode {
 
 		private Expression expression;
 		private IdCon identifier;
+		
+		public Field() { }
+		
+		public Field(Expression expression, IdCon identifier) {
+			this.expression = expression;
+			this.identifier = identifier;
+		}
 		
 		public Expression getExpression() {
 			return expression;

@@ -56,7 +56,7 @@ public class TestPredicateParser {
 		
 		Predicate.Is predicate = (Is) parser.parsePredicate();
 		assertEquals(Predicate.Is.class, predicate.getClass()); // Correct type
-		assertEquals("string", predicate.getType().toString()); // Correct type
+		assertEquals(Type.StringType.class, predicate.getType().getClass()); // Correct type
 		assertEquals(Expression.NatExpression.class, predicate.getExpression().getClass());
 	}
 	
@@ -97,7 +97,7 @@ public class TestPredicateParser {
 		parser = new PredicateParser(iterator, exceptions);
 		
 		Type type = parser.parseType();
-		assertEquals("string", type.getName().toString()); // Correct literal stored
+		assertEquals(Type.StringType.class, type.getClass()); // Correct literal stored
 	}
 	
 	@Test

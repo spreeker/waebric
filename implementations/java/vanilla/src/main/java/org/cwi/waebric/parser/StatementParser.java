@@ -137,13 +137,11 @@ class StatementParser extends AbstractParser {
 			} catch(SyntaxException e) {
 				reportUnexpectedToken(tokens.current(), "False statement", "\"else\" Statement");
 			}
-			statement = new Statement.IfElse(elseStatement);
+			statement = new Statement.IfElse(predicate, trueStatement, elseStatement);
 		} else {
-			statement = new Statement.If();
+			statement = new Statement.If(predicate, trueStatement);
 		}
-							
-		statement.setPredicate(predicate);
-		statement.setStatement(trueStatement);
+		
 		return statement;
 	}
 	

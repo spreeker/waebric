@@ -5,47 +5,67 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
- * Type represents a type definition.<br><br>
- * 
- * Grammar:<br>
- * <code>
- * 	"list" -> Type<br>
- * 	"record" -> Type<br>
- * 	"string" -> Type<br>
- * </code>
- * 
+ * Type represents a type definition.
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
-public class Type extends AbstractSyntaxNode {
+public abstract class Type extends AbstractSyntaxNode {
 	
-	private StringLiteral type;
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"string" -> Type<br>
+	 * </code>
+	 */
+	public static class StringType extends Type {
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { new StringLiteral("string") };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"list" -> Type<br>
+	 * </code>
+	 */
+	public static class ListType extends Type {
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { new StringLiteral("list") };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+		
+	}
+	
+	/**
+	 * Grammar:<br>
+	 * <code>
+	 * 	"record" -> Type<br>
+	 * </code>
+	 */
+	public static class RecordType extends Type {
+		
+		public AbstractSyntaxNode[] getChildren() {
+			return new AbstractSyntaxNode[] { new StringLiteral("record") };
+		}
+		
+		@Override
+		public void accept(INodeVisitor visitor) {
+			visitor.visit(this);
+		}
+		
+	}
 
-	public StringLiteral getName() {
-		return type;
-	}
-
-	public void setType(StringLiteral type) {
-		this.type = type;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return type.equals(obj);
-	}
-	
-	@Override
-	public String toString() {
-		return type.toString();
-	}
-
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { type };
-	}
-	
-	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
-	}
-	
 }

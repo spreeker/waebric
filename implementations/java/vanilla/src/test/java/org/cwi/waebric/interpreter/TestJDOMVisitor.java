@@ -4,51 +4,47 @@ import static org.junit.Assert.assertEquals;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.Text;
-import org.cwi.waebric.parser.ast.statement.Statement;
-
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Random boring get-set tests
+ * @author Jeroen van Schagen
+ * 19-06-2009
+ */
 public class TestJDOMVisitor {
 	
-	private JDOMVisitor visitor;
 	private Document document;
+	private JDOMVisitor visitor;
 
 	@Before
 	public void setUp() {
-		this.document = new Document();
-		this.visitor = new JDOMVisitor(document);
+		document = new Document();
+		visitor = new JDOMVisitor(document);
+	}
+
+	@Test
+	public void testGetDocument() {
+		assertEquals(document, visitor.getDocument());
+	}
+
+	@Test
+	public void testGetAddFunction() {
+		assertEquals(null, visitor.getFunction("myfunc"));
+		FunctionDef myfunc = new FunctionDef();
+		myfunc.setIdentifier(new IdCon("myfunc"));
+		visitor.addFunctionDef(myfunc);
+		assertEquals(myfunc, visitor.getFunction("myfunc"));
 	}
 	
 	@Test
-	public void testEach() {
-		Statement.Each each = new Statement.Each();
-		
-		// List expression on which will be iterated
-		Expression.ListExpression list = new Expression.ListExpression();
-		list.addExpression(new Expression.TextExpression(new Text("test ")));
-		list.addExpression(new Expression.TextExpression(new Text("has ")));
-		list.addExpression(new Expression.TextExpression(new Text("succeeded")));
-		each.setExpression(list);
-		
-		// Variable which is constructed per element
-		IdCon var = new IdCon("myvar");
-		each.setVar(var);
-		
-		// Statement which is executed for each element
-		Statement.Echo echo = new Statement.Echo();
-		echo.setExpression(new Expression.VarExpression(var));
-		each.setStatement(echo);
-		
-		// Set root element
-		Element current = new Element("home");
-		visitor.setCurrent(current);
-		visitor.visit(each); // Execute visit
-		
-		assertEquals("test has succeeded", current.getText());
+	public void testGetAddVar() {
+		assertEquals(null, visitor.getVariable("myvar"));
+		Expression myvar = new Expression.TextExpression("test");
+		visitor.addVariable("myvar", myvar);
+		assertEquals(myvar, visitor.getVariable("myvar"));
 	}
 
 }

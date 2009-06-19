@@ -127,9 +127,8 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression.NatExpression parseNatExpression() throws SyntaxException {
 		next(WaebricTokenSort.NATCON, "Natural expression", "NatCon -> Expression");
-		Expression.NatExpression expression = new Expression.NatExpression();
-		expression.setNatural(new NatCon(tokens.current().getLexeme().toString()));
-		return expression;
+		NatCon natural = new NatCon(tokens.current().getLexeme().toString());
+		return new Expression.NatExpression(natural);
 	}
 	
 	/**
