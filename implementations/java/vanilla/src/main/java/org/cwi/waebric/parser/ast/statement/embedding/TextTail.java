@@ -18,7 +18,13 @@ public abstract class TextTail extends AbstractSyntaxNode {
 	public static class PostTail extends TextTail {
 		
 		private PostText post;
+		
+		public PostTail() { }
 
+		public PostTail(PostText post) {
+			this.post = post;
+		}
+		
 		public PostText getPost() {
 			return post;
 		}

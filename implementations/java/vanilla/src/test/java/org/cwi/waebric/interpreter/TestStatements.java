@@ -5,12 +5,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.statement.Statement;
+import org.cwi.waebric.parser.ast.statement.embedding.Embed;
+import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
+import org.cwi.waebric.parser.ast.statement.embedding.PostText;
+import org.cwi.waebric.parser.ast.statement.embedding.PreText;
+import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
+
+import org.jdom.CDATA;
+import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Before;
@@ -30,7 +38,9 @@ public class TestStatements {
 	/**
 	 * Initiate an if-statement with a true predicate. While interpreting the statement
 	 * check if the sub statement (echo "success";) is executed, by comparing the current
-	 * text to "success".
+	 * text to "success".<br><br>
+	 * 
+	 * <code>if(var) echo "success";</code>
 	 */
 	@Test
 	public void testIf() {
@@ -65,7 +75,9 @@ public class TestStatements {
 	 * 
 	 * Consecutively execute the statements with a true and false predicate,
 	 * then compare the current text to "successfail" to verify they statements
-	 * maintained the correct flow.
+	 * maintained the correct flow.<br><br>
+	 * 
+	 * <code>if(predicate) echo "success"; else echo "fail";</code>
 	 */
 	@Test
 	public void testIfElse() {
@@ -94,7 +106,9 @@ public class TestStatements {
 	/**
 	 * Construct a blow statement, with three sub-statements (echo "one"; echo "two";
 	 * echo "three";). While interpreting the block, each sub-statement should be visited, 
-	 * this can be asserted by comparing the current text to "onetwothree".
+	 * this can be asserted by comparing the current text to "onetwothree".<br><br>
+	 * 
+	 * <code>{ echo "one"; echo "two; echo "three"; }</code>
 	 */
 	@Test
 	public void testBlock() {
@@ -110,31 +124,97 @@ public class TestStatements {
 		assertEquals("onetwothree", placeholder.getText());
 	}
 	
+	/**
+	 * Construct a comment statement with the textual value "success". After interpreting
+	 * the statement a comment object is expected in the content. Compare the text of 
+	 * comment to the expected "success".<br><br>
+	 * 
+	 * <code>comment "success";</code>
+	 */
 	@Test
 	public void testComment() {
+		Statement.Comment comment = new Statement.Comment();
+		comment.setComment(new StrCon("success"));
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		comment.accept(visitor);
+		
+		assertEquals(Comment.class, placeholder.getContent(0).getClass());
+		assertEquals("success", ((Comment) placeholder.getContent(0)).getText());
 	}
 	
+	/**
+	 * Construct a CDATA statement with the textual value "success". After interpreting
+	 * the statement a CDATA object is expected in the content. Compare the text of 
+	 * CDATA to the expected "success".<br><br>
+	 * 
+	 * <code>cdata "success";</code>
+	 */
 	@Test
 	public void testCData() {
+		Statement.CData comment = new Statement.CData();
+		comment.setExpression(new Expression.TextExpression("success"));
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		comment.accept(visitor);
+		
+		assertEquals(CDATA.class, placeholder.getContent(0).getClass());
+		assertEquals("success", ((CDATA) placeholder.getContent(0)).getText());
 	}
 	
+	/**
+	 * Construct an echo statement with the textual expression "success". During
+	 * interpretation this statement will store the expression in its current element.
+	 * After interpretation check if the current element indeed has "success" as
+	 * text value.<br><br>
+	 * 
+	 * <code>echo "success";</code>
+	 */
 	@Test
 	public void testEchoExpression() {
+		Statement.Echo echo = new Statement.Echo();
+		echo.setExpression(new Expression.TextExpression("success"));
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		echo.accept(visitor);
+		
+		assertEquals("success", placeholder.getText());
 	}
 	
+    /** 
+     * Construct an echo statement with the embedding "left<"success">right". During
+     * interpretation the text and expression of embedding will be stored into the
+     * current element. After interpretation check if the current element indeed
+     * has "leftsuccessright" as text value.<br><br>
+     * 
+     * <code>echo "left<"success">right";</code>
+	 */
 	@Test
 	public void testEchoEmbedding() {
+		Statement.EchoEmbedding echo = new Statement.EchoEmbedding();
+		Embedding embedding = new Embedding();
+		embedding.setPre(new PreText("left"));
+		embedding.setEmbed(new Embed.ExpressionEmbed(new Expression.TextExpression("success")));
+		embedding.setTail(new TextTail.PostTail(new PostText("right")));
+		echo.setEmbedding(embedding);
 		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		echo.accept(visitor);
+		
+		assertEquals("leftsuccessright", placeholder.getText());
 	}
 	
 	/**
 	 * Create an each statement, which will iterate over the list ["test","has","succeeded"].
 	 * For each element the statement (echo e) will be executed, in which the variable e
 	 * represents an element in the list. The interpretation will be verified by comparing
-	 * the current text to "testhassucceeded".
+	 * the current text to "testhassucceeded".<br><br>
+	 * 
+	 * <code>each(myvar:["test","has","succeeded"]) echo myvar;</code>
 	 */
 	@Test
 	public void testEach() {
@@ -142,9 +222,9 @@ public class TestStatements {
 		
 		// List expression on which will be iterated
 		Expression.ListExpression list = new Expression.ListExpression();
-		list.addExpression(new Expression.TextExpression(new Text("test")));
-		list.addExpression(new Expression.TextExpression(new Text("has")));
-		list.addExpression(new Expression.TextExpression(new Text("succeeded")));
+		list.addExpression(new Expression.TextExpression("test"));
+		list.addExpression(new Expression.TextExpression("has"));
+		list.addExpression(new Expression.TextExpression("succeeded"));
 		each.setExpression(list);
 		
 		// Variable which is constructed per element

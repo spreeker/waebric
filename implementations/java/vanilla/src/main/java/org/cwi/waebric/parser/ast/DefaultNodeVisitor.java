@@ -74,7 +74,8 @@ public class DefaultNodeVisitor implements INodeVisitor {
 	public void visit(Or predicate) { }
 	public void visit(Type type) { }
 	public void visit(Embedding embedding) { }
-	public void visit(Embed embed) { }
+	public void visit(Embed.ExpressionEmbed embed) { }
+	public void visit(Embed.MarkupEmbed embed) { }
 	public void visit(PreText text) { }
 	public void visit(MidText text) { }
 	public void visit(PostText text) { }

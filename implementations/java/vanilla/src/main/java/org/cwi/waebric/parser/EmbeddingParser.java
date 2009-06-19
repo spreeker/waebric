@@ -67,9 +67,8 @@ class EmbeddingParser extends AbstractParser {
 		next(WaebricSymbol.DQUOTE, "Embedding opening quote \"", "\" TextChars* <");
 		
 		// Parse text characters
-		PreText pre = new PreText();
-		pre.setText(parseTextChars());
-		
+		PreText pre = new PreText(parseTextChars());
+
 		next(WaebricSymbol.LESS_THAN, "Embedding pre-text symbol <", "TextChars* < Embed");
 		return pre;
 	}
@@ -125,21 +124,16 @@ class EmbeddingParser extends AbstractParser {
 		if(tokens.hasNext()) {
 			if(tokens.peek(1).getLexeme().equals(WaebricSymbol.DQUOTE)) {
 				// PostText is always closed with a double quote
-				PostText post = new PostText();
-				post.setText(text);
-				
-				TextTail.PostTail tail = new TextTail.PostTail();
-				tail.setPost(post);
-				
+				PostText post = new PostText(text);
+				TextTail.PostTail tail = new TextTail.PostTail(post);
+
 				tokens.next(); // Accept " symbol and jump to next token
 				return tail;
 			} else {
 				// Only remaining alternative is MidText Embed TextTail -> TextTail
 				next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
-				
-				MidText mid = new MidText();
-				mid.setText(text);
-
+			
+				MidText mid = new MidText(text);
 				TextTail.MidTail tail = new TextTail.MidTail();
 				tail.setMid(mid);
 				tail.setEmbed(parseEmbed());
@@ -159,11 +153,7 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public PostText parsePostText() throws SyntaxException {
 		next(WaebricSymbol.GREATER_THAN, "Embedding post-text symbol >", "Embed > TextChars*");
-		
-		// Parse text characters
-		PostText post = new PostText();
-		post.setText(parseTextChars());
-		
+		PostText post = new PostText(parseTextChars());
 		next(WaebricSymbol.DQUOTE, "Embedding closure quote \"", "> TextChars* \"");
 		
 		return post;
@@ -176,11 +166,7 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public MidText parseMidText() throws SyntaxException {
 		next(WaebricSymbol.GREATER_THAN, "Embedding mid-text start symbol >", "> TextChars* <");
-		
-		// Parse text characters
-		MidText mid = new MidText();
-		mid.setText(parseTextChars());
-		
+		MidText mid = new MidText(parseTextChars());
 		next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
 		
 		return mid;

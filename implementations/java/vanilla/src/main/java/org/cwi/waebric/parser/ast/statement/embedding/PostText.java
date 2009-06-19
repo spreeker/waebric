@@ -16,12 +16,16 @@ public class PostText extends AbstractSyntaxNode {
 
 	private StringLiteral text;
 	
+	public PostText(StringLiteral text) {
+		this.text = text;
+	}
+	
+	public PostText(String text) {
+		this.text = new StringLiteral(text);
+	}
+	
 	public StringLiteral getText() {
 		return text;
-	}
-
-	public void setText(StringLiteral text) {
-		this.text = text;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {

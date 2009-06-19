@@ -33,6 +33,15 @@ public abstract class Embed extends AbstractSyntaxNode {
 		public ExpressionEmbed(Collection<Markup> args) {
 			markups.addAll(args);
 		}
+		
+		public ExpressionEmbed(Expression expression) {
+			this.expression = expression;
+		}
+		
+		public ExpressionEmbed(Collection<Markup> args, Expression expression) {
+			markups.addAll(args);
+			this.expression = expression;
+		}
 
 		public Expression getExpression() {
 			return expression;

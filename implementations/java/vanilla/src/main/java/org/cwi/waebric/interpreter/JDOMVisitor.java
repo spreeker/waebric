@@ -446,7 +446,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	
 			// Place text value in current element
 			if(replacement instanceof Expression || replacement instanceof Embedding) {
-				current.setText(text);
+				addContent(new Text(text));
 			}
 		}
 		
@@ -500,7 +500,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		
 		// Interpret expression when mark-up chain is call free
 		statement.getExpression().accept(this);
-		current.setText(text);
+		addContent(new Text(text));
 	}
 	
 	/**
@@ -601,7 +601,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		
 		// Interpret embedding when mark-up chain is call free
 		statement.getEmbedding().accept(this);
-		current.setText(text);
+		addContent(new Text(text));
 	}
 
 	/**

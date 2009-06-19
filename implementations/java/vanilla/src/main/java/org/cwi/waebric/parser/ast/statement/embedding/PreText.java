@@ -16,12 +16,16 @@ public class PreText extends AbstractSyntaxNode {
 
 	private StringLiteral text;
 
+	public PreText(StringLiteral text) {
+		this.text = text;
+	}
+	
+	public PreText(String text) {
+		this.text = new StringLiteral(text);
+	}
+	
 	public StringLiteral getText() {
 		return text;
-	}
-
-	public void setText(StringLiteral text) {
-		this.text = text;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
