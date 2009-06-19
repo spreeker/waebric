@@ -493,12 +493,25 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-			if(markup instanceof Markup.Call) {	return; } // Quit interpreting after call
+			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
 		// Interpret expression when mark-up chain is call free
 		statement.getExpression().accept(this);
 		current.setText(text);
+	}
+	
+	/**
+	 * Check if mark-up is a call, and calls to a valid function.
+	 * @param markup
+	 */
+	public boolean isCall(Markup markup) {
+		if(markup instanceof Call) {
+			String name = markup.getDesignator().getIdentifier().getName();
+			return this.getFunction(name) != null;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -549,7 +562,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-			if(markup instanceof Markup.Call) {	return; } // Quit interpreting after call
+			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
 		// Interpret statement when mark-up chain is call free
@@ -581,7 +594,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 
 			markup.accept(this); // Visit mark-up
-			if(markup instanceof Markup.Call) {	return; }
+			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
 		// Interpret embedding when mark-up chain is call free

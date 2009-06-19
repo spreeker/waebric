@@ -120,7 +120,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 				predicate,
 				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
 				statement,
-				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.IF)),
+				new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.ELSE)),
 				elseStatement
 			};
 		}
