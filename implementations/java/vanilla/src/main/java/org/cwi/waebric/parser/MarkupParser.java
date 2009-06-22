@@ -73,13 +73,6 @@ class MarkupParser extends AbstractParser {
 		
 		while(tokens.hasNext() && isAttribute(tokens.peek(1))) {
 			attributes.add(parseAttribute());
-			
-			// Look-ahead for separator
-			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.COMMA)) {
-				tokens.next(); // Continue parsing and skip comma symbol
-			} else {
-				break; // Quit parsing attributes
-			}
 		}
 		
 		return attributes;

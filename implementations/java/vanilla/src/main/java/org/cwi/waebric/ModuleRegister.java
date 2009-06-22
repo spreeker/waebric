@@ -57,9 +57,11 @@ public class ModuleRegister {
 		WaebricParser parser = new WaebricParser(iterator);
 		List<SyntaxException> e = parser.parseTokens(); // Parse module
 		
-		System.out.println("Error parsing module: " + getPath(identifier));
-		for(SyntaxException exception: e) {
-			exception.printStackTrace();
+		if(e.size() > 0) {
+			System.out.println("Error parsing module: " + getPath(identifier));
+			for(SyntaxException exception: e) {
+				exception.printStackTrace();
+			}
 		}
 		
 		// Retrieve modules

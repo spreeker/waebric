@@ -101,17 +101,18 @@ class FunctionCheck implements IWaebricCheck {
 						for(IdCon variable : bind.getVariables()) {
 							formals.addIdentifier(variable);
 						}
+						definition.setFormals(formals);
 					}
 
 					// Attach definition to collection
 					definitions.add(definition);
 				}
 			}
-		}
-		
-		// Recursively check node children
-		for(AbstractSyntaxNode child: node.getChildren()) {
-			checkCall(child, new ArrayList<FunctionDef>(definitions), exceptions);
+		} else {
+			// Recursively check node children
+			for(AbstractSyntaxNode child: node.getChildren()) {
+				checkCall(child, new ArrayList<FunctionDef>(definitions), exceptions);
+			}
 		}
 	}
 	

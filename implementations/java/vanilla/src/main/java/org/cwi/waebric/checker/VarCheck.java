@@ -55,7 +55,11 @@ class VarCheck implements IWaebricCheck {
 			for(Assignment assignment: stm.getAssignments()) {
 				// Attach variables bound in let assignments
 				if(assignment instanceof Assignment.VarBind) {
-					vars.add(((Assignment.VarBind) assignment).getIdentifier());
+					Assignment.VarBind bind = (Assignment.VarBind) assignment;
+					vars.add(bind.getIdentifier());
+				} else if(assignment instanceof Assignment.FuncBind) {
+					Assignment.FuncBind bind = (Assignment.FuncBind) assignment;
+					vars.addAll(bind.getVariables());
 				}
 			}
 		} else if(node instanceof Statement.Each) {

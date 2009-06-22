@@ -44,7 +44,7 @@ public class TestMarkupParser {
 	@Test
 	public void testMarkup() throws SyntaxException {
 		// Regular mark-up
-		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("myfunction@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup markup = parser.parseMarkup();
@@ -58,18 +58,18 @@ public class TestMarkupParser {
 		assertNotNull(markupa.getDesignator());
 		assertEquals(2, markupa.getArguments().size());
 		
-		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12 (12,\"text!\")");
+		iterator = TestUtilities.quickScan("myfunction@99#myattribute@99%12(12,\"text!\")");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Markup.Call markupaa = (Call) parser.parseMarkup();
-		assertNotNull(markupaa.getDesignator());
-		assertEquals(2, markupaa.getArguments().size());
+		assertEquals("myfunction", markupaa.getDesignator().getIdentifier().getName());
+		assertEquals(3, markupaa.getDesignator().getAttributes().size());
 		assertEquals(2, markupaa.getArguments().size());
 	}
 	
 	@Test
 	public void testDesignator() throws SyntaxException {
-		iterator = TestUtilities.quickScan("myfunction @99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("myfunction@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Designator designator = parser.parseDesignator();
@@ -79,7 +79,7 @@ public class TestMarkupParser {
 	
 	@Test
 	public void testAttributes() throws SyntaxException {
-		iterator = TestUtilities.quickScan("@99,#myattribute,@99%12");
+		iterator = TestUtilities.quickScan("@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attributes attributes = parser.parseAttributes();
