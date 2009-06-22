@@ -255,7 +255,8 @@ public class TestStatementParser {
 	
 	@Test
 	public void testEmbeddingMarkupsStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("func1 func2 \"<123>\";");
+		// TODO: Store text chars as combined text token
+		iterator = TestUtilities.quickScan("div#footer p.legal \"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org/\") \"Free CSS Templates\">\";");
 		parser = new StatementParser(iterator, exceptions);
 		
 		MarkupEmbedding statement = (MarkupEmbedding) parser.parseMarkupStatements();
