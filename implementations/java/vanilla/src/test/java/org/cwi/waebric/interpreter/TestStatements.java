@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
+import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
@@ -15,7 +15,7 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.statement.Assignment;
+import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -29,6 +29,7 @@ import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -276,30 +277,64 @@ public class TestStatements {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testNestedLet() {
-		// Retrieve let statement
-		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/let.wae");
-		Statement stm = ast.getRoot().get(0).getFunctionDefinitions().get(0).getStatements().get(0);
+	public void testVarLet() {
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letvar.wae");
+		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
-		stm.accept(visitor);
+		main.accept(visitor);
 		
-		// Inside second let both func "call1" and "call2" can be called, also var is defined
-		assertEquals("call1varcall2varcall1var", placeholder.getText());
+		assertEquals("undefsuccessundef", placeholder.getText());
+	}
+	
+	@Test
+	public void testFuncLet() {
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfunc.wae");
+		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
-		Iterator<Element> descendants = placeholder.getDescendants();
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		main.accept(visitor);
+	
+		Element func1 = (Element) placeholder.getContent().get(0);
+		assertEquals("func", func1.getName());
 		
-		// In root let call2 is undefined and thus will be stored as tag
-		Element call2 = descendants.next();
-		assertEquals("call2", call2.getName());
-		assertEquals("var", call2.getText());
+		Text success = (Text) placeholder.getContent().get(1);
+		assertEquals("success", success.getText());
 		
-		// In parent statement call1 is undefined, and thus will be stored as tag
-		Element call1 = descendants.next();
-		assertEquals("call1", call1.getName());
-		assertEquals("UNDEFINED", call1.getText());
+		Element func2 = (Element) placeholder.getContent().get(2);
+		assertEquals("func", func2.getName());
+	}
+	
+	@Test
+	public void testVarFuncLet() {
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfuncvar.wae");
+		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		main.accept(visitor);
+	}
+	
+	@Test
+	public void testNestedLet() {
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letnested.wae");
+		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		main.accept(visitor);
+	}
+	
+	@Test
+	public void testRecursiveLet() {
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letrecurssion.wae");
+		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		main.accept(visitor);
 	}
 	
 	/**

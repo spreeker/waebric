@@ -848,6 +848,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param current
 	 */
 	public void setCurrent(Element current) {
+		if(! document.hasRootElement()) { document.setRootElement(current); }
 		this.current = current;
 	}
 	
