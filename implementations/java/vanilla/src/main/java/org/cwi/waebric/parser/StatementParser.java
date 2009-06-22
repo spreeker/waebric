@@ -342,6 +342,7 @@ class StatementParser extends AbstractParser {
 					Markup end = markups.remove(markups.size()-1);
 					Statement.MarkupMarkup statement = new Statement.MarkupMarkup(markups);
 					statement.setMarkup(end);
+					next(WaebricSymbol.SEMICOLON, "Markup markup closure ;", "Markup+ Markup \";\"");
 					return statement;
 				} else if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
 					MarkupEmbedding statement = new MarkupEmbedding(markups);
