@@ -84,6 +84,16 @@
     <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\Module\ModuleList.cs" />
     <Compile Include="Ast\NodeList.cs" />
+    <Compile Include="Ast\Predicates\AndPredicate.cs" />
+    <Compile Include="Ast\Predicates\ExpressionPredicate.cs" />
+    <Compile Include="Ast\Predicates\IsPredicate.cs" />
+    <Compile Include="Ast\Predicates\ListType.cs" />
+    <Compile Include="Ast\Predicates\NotPredicate.cs" />
+    <Compile Include="Ast\Predicates\OrPredicate.cs" />
+    <Compile Include="Ast\Predicates\Predicate.cs" />
+    <Compile Include="Ast\Predicates\RecordType.cs" />
+    <Compile Include="Ast\Predicates\StringType.cs" />
+    <Compile Include="Ast\Predicates\Type.cs" />
     <Compile Include="Ast\Site\Directory.cs" />
     <Compile Include="Ast\Site\DirName.cs" />
     <Compile Include="Ast\Site\FileExt.cs" />
@@ -92,7 +102,18 @@
     <Compile Include="Ast\Site\Path.cs" />
     <Compile Include="Ast\Site\PathElement.cs" />
     <Compile Include="Ast\Site\Site.cs" />
+    <Compile Include="Ast\Statements\Assignment.cs" />
+    <Compile Include="Ast\Statements\BlockStatement.cs" />
+    <Compile Include="Ast\Statements\CdataStatement.cs" />
+    <Compile Include="Ast\Statements\CommentStatement.cs" />
+    <Compile Include="Ast\Statements\EachStatement.cs" />
+    <Compile Include="Ast\Statements\EchoEmbeddingStatement.cs" />
+    <Compile Include="Ast\Statements\EchoStatement.cs" />
+    <Compile Include="Ast\Statements\IfElseStatement.cs" />
+    <Compile Include="Ast\Statements\IfStatement.cs" />
+    <Compile Include="Ast\Statements\LetStatement.cs" />
     <Compile Include="Ast\Statements\Statement.cs" />
+    <Compile Include="Ast\Statements\YieldStatement.cs" />
     <Compile Include="Exceptions\UnexpectedToken.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="MarkupParser.cs" />
@@ -108,7 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ast\Embedding\" />
-    <Folder Include="Ast\Predicates\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
