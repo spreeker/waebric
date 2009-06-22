@@ -67,7 +67,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testVarAssignment() throws SyntaxException {
-		iterator = TestUtilities.quickScan("var=100");
+		iterator = TestUtilities.quickScan("var=100;");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Assignment.VarBind assignment = parser.parseVarAssignment();
@@ -152,7 +152,7 @@ public class TestStatementParser {
 	
 	@Test
 	public void testLetStatement() throws SyntaxException {
-		iterator = TestUtilities.quickScan("let var=100 in comment \"test\"; end");
+		iterator = TestUtilities.quickScan("let var=100; in comment \"test\"; end");
 		parser = new StatementParser(iterator, exceptions);
 		
 		Let statement = parser.parseLetStatement();
