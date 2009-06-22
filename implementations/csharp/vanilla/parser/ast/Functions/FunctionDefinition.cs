@@ -21,6 +21,12 @@ namespace Parser.Ast.Functions
 
         #region Public Methods
 
+        public FunctionDefinition()
+        {
+            //Create statementlist
+            StatementList = new List<Statement>();
+        }
+
         /// <summary>
         /// Set identifier of FunctionDefinition
         /// </summary>
