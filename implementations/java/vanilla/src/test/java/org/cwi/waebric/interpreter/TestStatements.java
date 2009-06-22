@@ -5,12 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
+
+import org.cwi.waebric.TestUtilities;
+import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -268,6 +273,33 @@ public class TestStatements {
 		yield.accept(visitor); // Execute visit
 		
 		assertEquals("success", placeholder.getText());
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testNestedLet() {
+		// Retrieve let statement
+		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/let.wae");
+		Statement stm = ast.getRoot().get(0).getFunctionDefinitions().get(0).getStatements().get(0);
+		
+		Element placeholder = new Element("placeholder");
+		visitor.setCurrent(placeholder);
+		stm.accept(visitor);
+		
+		// Inside second let both func "call1" and "call2" can be called, also var is defined
+		assertEquals("call1varcall2varcall1var", placeholder.getText());
+		
+		Iterator<Element> descendants = placeholder.getDescendants();
+		
+		// In root let call2 is undefined and thus will be stored as tag
+		Element call2 = descendants.next();
+		assertEquals("call2", call2.getName());
+		assertEquals("var", call2.getText());
+		
+		// In parent statement call1 is undefined, and thus will be stored as tag
+		Element call1 = descendants.next();
+		assertEquals("call1", call1.getName());
+		assertEquals("UNDEFINED", call1.getText());
 	}
 	
 	/**

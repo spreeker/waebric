@@ -457,6 +457,7 @@ class StatementParser extends AbstractParser {
 		assignment.setIdentifier(new IdCon(tokens.current()));
 		next(WaebricSymbol.EQUAL_SIGN, "Variable binding \"=\"", "IdCon \"=\"");
 		assignment.setExpression(expressionParser.parseExpression());
+		next(WaebricSymbol.SEMICOLON, "Var binding closure", "IdCon \"=\" Expression \";\"");
 		
 		return assignment;
 	}
@@ -492,7 +493,7 @@ class StatementParser extends AbstractParser {
 		next(WaebricSymbol.EQUAL_SIGN, "Identifier assignment \"=\"", "Formals \"=\" Statement");
 		
 		// Parse sub-statement
-		assignment.setStatement(parseStatement());
+		assignment.setStatement(parseStatement());		
 		return assignment;
 	}
 	

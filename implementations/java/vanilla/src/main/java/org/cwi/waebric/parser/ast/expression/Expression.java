@@ -223,6 +223,13 @@ public abstract class Expression extends AbstractSyntaxNode {
 		private Expression left;
 		private Expression right;
 		
+		public CatExpression() { }
+		
+		public CatExpression(Expression left, Expression right) {
+			this.left = left;
+			this.right = right;
+		}
+		
 		public Expression getLeft() {
 			return left;
 		}
