@@ -65,13 +65,17 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testIdConExpression() throws SyntaxException {
-		iterator = TestUtilities.quickScan("variable1.identifier1");
+	public void testFieldExpression() throws SyntaxException {
+		iterator = TestUtilities.quickScan("exp1.identifier2.identifier");
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.Field expression = (Field) parser.parseExpression();
-		assertEquals("identifier1", expression.getIdentifier().getToken().getLexeme().toString());
-		assertEquals(Expression.VarExpression.class, expression.getExpression().getClass());
+		assertEquals("identifier", expression.getIdentifier().getToken().getLexeme().toString());
+		assertEquals(Expression.Field.class, expression.getExpression().getClass());
+		
+		Expression.Field sub = (Field) expression.getExpression();
+		assertEquals("identifier2", sub.getIdentifier().getToken().getLexeme().toString());
+		assertEquals(Expression.VarExpression.class, sub.getExpression().getClass());
 	}
 	
 	@Test
