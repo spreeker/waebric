@@ -335,12 +335,16 @@ public class WaebricScanner {
 			char c = chars[i];
 			if(! isTextChar(c)) { 
 				if(c == '&' || c == '"') { // Allow "\\&" "\\""
-					if(i > 0) {
-						char previous = chars[i-1];
-						if(previous == '\\') {
-							i++; // Skip checking & or ' and accept
+					if(i > 0 && chars[i-1] == '\\') {
+						// Accept checking & or '
+					} else {
+						String sub = lexeme.substring(i);
+						if(sub.matches("&#[0-9]+;.*") 
+								|| sub.matches("&#x[0-9a-fA-F]+;.*") 
+								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;.*")) { 
+							
 						} else { return false; }
-					} else { return false; }
+					}
 				} else { return false; }
 			}
 		}

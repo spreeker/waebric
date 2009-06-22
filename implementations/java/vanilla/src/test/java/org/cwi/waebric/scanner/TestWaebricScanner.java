@@ -129,6 +129,17 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testIsTextChar() {
+		assertTrue(WaebricScanner.isTextChars("&#123;program"));
+		assertFalse(WaebricScanner.isTextChars("&#;program"));
+		
+		assertTrue(WaebricScanner.isTextChars("&#xaBc123;program"));
+		assertFalse(WaebricScanner.isTextChars("&#xg;program"));
+		
+		assertTrue(WaebricScanner.isTextChars("&amp;volume="));
+		assertFalse(WaebricScanner.isTextChars("&"));
+		assertFalse(WaebricScanner.isTextChars("&;program"));
+		assertFalse(WaebricScanner.isTextChars("&.;program"));
+		
 		assertTrue(WaebricScanner.isTextChars("\\\""));
 		assertTrue(WaebricScanner.isTextChars("\\&"));
 		assertFalse(WaebricScanner.isTextChars("&"));
