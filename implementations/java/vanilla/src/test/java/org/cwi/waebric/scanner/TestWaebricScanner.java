@@ -1,6 +1,8 @@
 package org.cwi.waebric.scanner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -15,27 +17,23 @@ public class TestWaebricScanner {
 
 	@Test
 	public void testText() throws IOException {
-		StringReader reader = new StringReader("\"text\"");
+		StringReader reader = new StringReader("\"t\3xt\\\"works\\\"\"");
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
 		Token text = i.next();
 		assertEquals(WaebricTokenSort.TEXT, text.getSort());
-		assertEquals("text", text.getLexeme());
+		assertEquals("t\3xt\\\"works\\\"", text.getLexeme());
 	}
 	
 	@Test
-	public void testInvalidText() throws IOException {
+	public void testUnclosedText() throws IOException {
 		StringReader reader = new StringReader("\"text");
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
-		Token quote = i.next();
-		assertEquals(WaebricTokenSort.CHARACTER, quote.getSort());
-		assertEquals('"', quote.getLexeme());
-		
 		Token text = i.next();
-		assertEquals(WaebricTokenSort.IDCON, text.getSort());
+		assertEquals(WaebricTokenSort.TEXT, text.getSort());
 		assertEquals("text", text.getLexeme());
 	}
 	
@@ -59,6 +57,19 @@ public class TestWaebricScanner {
 		Token embedding = i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		assertEquals("pre<\">\">post", embedding.getLexeme());
+	}
+	
+	@Test
+	public void testUnclosedEmbed() throws IOException {
+		StringReader reader = new StringReader("\"pre<post");
+		WaebricScanner scanner = new WaebricScanner(reader);
+		TokenIterator i = scanner.tokenizeStream();
+		
+		Token embedding = i.next();
+		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
+		assertEquals("pre<post", embedding.getLexeme());
+		
+		// TODO: Expect lexical exception
 	}
 	
 	@Test
@@ -114,6 +125,14 @@ public class TestWaebricScanner {
 		Token character = i.next();
 		assertEquals(WaebricTokenSort.CHARACTER, character.getSort());
 		assertEquals('@', character.getLexeme());
+	}
+	
+	@Test
+	public void testIsTextChar() {
+		assertTrue(WaebricScanner.isTextChars("\\\""));
+		assertTrue(WaebricScanner.isTextChars("\\&"));
+		assertFalse(WaebricScanner.isTextChars("&"));
+		assertFalse(WaebricScanner.isTextChars("\""));
 	}
 	
 }

@@ -2,7 +2,6 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,22 +238,18 @@ public class WaebricScanner {
 	private void tokenizeText() throws IOException {
 		read(); // Retrieve first character
 		
+		int previous = 0;
 		do {
-			if(curr == EOF) {
-				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
-				tokens.add(quote); // Store " as character token
-				tpos.charno++; // Increment character position for "
-				flushBuffer(); // End-of-file without text closure symbol ("), store re-scan tokens
-				return;
-			} else if(curr == '<') {
-				// Embedding character recognized
+			if(curr == '<') {
+				// Embedding character detected
 				tokenizeEmbedding(); return;
-			} else {
-				// Acceptable character, store in buffer and continue
-				buffer += (char) curr;
-				read();
 			}
-		} while(curr != '"');
+
+			previous = curr; // Store current as previous to detect \
+			buffer += (char) curr; // Acceptable character, store in buffer
+			
+			read(); // Retrieve next character
+		} while((curr != '"' || previous == '\\') && curr != EOF);
 		
 		// Store text as token
 		Token text = new Token(buffer, WaebricTokenSort.TEXT, tpos);
@@ -271,44 +266,28 @@ public class WaebricScanner {
 		boolean quoted = false; // Character in quote? " char "
 		boolean embeded = false; // Character in embed? < char >
 		
+		int previous = 0;
 		do {
 			if(curr == EOF) {
-				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
-				tokens.add(quote); // Store " as character token
-				tpos.charno++; // Increment character position for "
-				flushBuffer(); // End-of-file without embedding closure symbol ("), store re-scan tokens
-				return;
+				break; // TODO: Throw exception for missing >"
 			}
-			
+
+			// Acceptable character, store in buffer
 			buffer += (char) curr;
+			previous = curr;
 			
 			if(curr == '"') { quoted = ! quoted; }
 			if(curr == '<' && ! quoted) { embeded = true; }
 			if(curr == '>' && ! quoted) { embeded = false; }
 			
 			read(); // Retrieve next character
-		} while(curr != '"' || embeded);
+		} while((curr != '"' || previous == '\\') || embeded);
 		
 		// Store embedding as token
 		Token embedding = new Token(buffer, WaebricTokenSort.EMBEDDING, tpos);
 		tokens.add(embedding);
 		
 		read(); // Skip closure " symbol
-	}
-
-	/**
-	 * Convert buffer data in character input stream, which is then converted by a new 
-	 * scanner instance into tokens.
-	 * @param tokens
-	 * @throws IOException 
-	 */
-	private void flushBuffer() throws IOException {
-		if(buffer == null || buffer.equals("")) { return; } // Buffer contains no contents, quit
-		StringReader reader = new StringReader(buffer);
-		WaebricScanner instance = new WaebricScanner(reader);
-		instance.tokenizeStream();
-		tokens.addAll(instance.getTokens());
-		buffer = ""; // Clean buffer
 	}
 	
 	/**
@@ -340,7 +319,7 @@ public class WaebricScanner {
 	 * @return 
 	 */
 	private static boolean isSymbolChar(int c) {
-		return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}' && c != ']';
+		return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}' && c != ']' && c != ')';
 	}
 	
 	/**
