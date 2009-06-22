@@ -159,9 +159,12 @@ class FunctionCheck implements IWaebricCheck {
 		for(Import imprt : module.getImports()) {
 			try {
 				AbstractSyntaxTree ast = ModuleRegister.getInstance().loadModule(imprt.getIdentifier());
-				for(Module sub : ast.getRoot()) {
-					collected.add(sub.getIdentifier());
-					definitions.addAll(getFunctionDefinitions(sub, collected, exceptions));
+				if(ast != null) { 
+					for(Module sub : ast.getRoot()) {
+						collected.add(sub.getIdentifier());
+						definitions.addAll(
+								getFunctionDefinitions(sub, collected, exceptions));
+					} 
 				}
 			} catch (IOException e) {
 				// Invalid file name, these are checked by module check

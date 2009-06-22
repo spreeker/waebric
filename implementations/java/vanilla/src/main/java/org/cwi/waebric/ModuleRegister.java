@@ -3,8 +3,10 @@ package org.cwi.waebric;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Import;
@@ -53,11 +55,16 @@ public class ModuleRegister {
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator iterator = scanner.tokenizeStream(); // Scan module
 		WaebricParser parser = new WaebricParser(iterator);
-		parser.parseTokens(); // Parse module
+		List<SyntaxException> e = parser.parseTokens(); // Parse module
+		
+		System.out.println("Error parsing module: " + getPath(identifier));
+		for(SyntaxException exception: e) {
+			exception.printStackTrace();
+		}
 		
 		// Retrieve modules
 		AbstractSyntaxTree tree = parser.getAbstractSyntaxTree();
-		cacheModule(identifier, tree); // Cache dependent modules
+		if(tree != null) { cacheModule(identifier, tree); } // Cache dependent modules
 		return tree;
 	}
 	

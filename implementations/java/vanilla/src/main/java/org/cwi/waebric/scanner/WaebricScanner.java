@@ -247,9 +247,11 @@ public class WaebricScanner {
 				tokens.add(quote); // Store " as character token
 				tpos.charno++; // Increment character position for "
 				flushBuffer(); return;
-			} else if(curr == '<') {
-				// Embedding character detected
-				tokenizeEmbedding(); return;
+			} else if(curr == '<') { // Embedding character detected
+				// Verify that text is not a string
+				if(tokens.size() == 0 || tokens.get(tokens.size()-1).getLexeme() != WaebricKeyword.COMMENT) {
+					tokenizeEmbedding(); return;
+				}
 			}
 
 			previous = curr; // Store current as previous to detect \

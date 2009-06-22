@@ -39,7 +39,7 @@ class ModuleCheck implements IWaebricCheck {
 		try {
 			// Attempt to process file
 			AbstractSyntaxTree tree = ModuleRegister.getInstance().loadModule(identifier);
-			checkAST(tree, exceptions); // Check dependent modules
+			if(tree != null) { checkAST(tree, exceptions); } // Check dependent modules
 		} catch(IOException e) {
 			exceptions.add(new NonExistingModuleException(identifier));
 			ModuleRegister.getInstance().cacheModule(identifier, new AbstractSyntaxTree());
