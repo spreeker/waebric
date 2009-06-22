@@ -2,6 +2,7 @@ package org.cwi.waebric.scanner;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,7 +241,13 @@ public class WaebricScanner {
 		
 		int previous = 0;
 		do {
-			if(curr == '<') {
+			if(curr == EOF) {
+				// End-of-file without text closure symbol ("), store re-scan tokens
+				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
+				tokens.add(quote); // Store " as character token
+				tpos.charno++; // Increment character position for "
+				flushBuffer(); return;
+			} else if(curr == '<') {
 				// Embedding character detected
 				tokenizeEmbedding(); return;
 			}
@@ -269,7 +276,11 @@ public class WaebricScanner {
 		int previous = 0;
 		do {
 			if(curr == EOF) {
-				break; // TODO: Throw exception for missing >"
+				// End-of-file without text closure symbol ("), store re-scan tokens
+				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
+				tokens.add(quote); // Store " as character token
+				tpos.charno++; // Increment character position for "
+				flushBuffer(); return;
 			}
 
 			// Acceptable character, store in buffer
@@ -288,6 +299,21 @@ public class WaebricScanner {
 		tokens.add(embedding);
 		
 		read(); // Skip closure " symbol
+	}
+	
+	/**
+	 * Convert buffer data in character input stream, which is then converted by a new 
+	 * scanner instance into tokens.
+	 * @param tokens
+	 * @throws IOException 
+	 */
+	private void flushBuffer() throws IOException {
+		if(buffer == null || buffer.equals("")) { return; } // Buffer contains no contents, quit
+		StringReader reader = new StringReader(buffer);
+		WaebricScanner instance = new WaebricScanner(reader);
+		instance.tokenizeStream();
+		tokens.addAll(instance.getTokens());
+		buffer = ""; // Clean buffer
 	}
 	
 	/**
@@ -327,7 +353,7 @@ public class WaebricScanner {
 	 * @param lexeme
 	 * @return
 	 */
-	public static boolean isTextChars(String lexeme) {
+	public static boolean isText(String lexeme) {
 		if(lexeme == null) { return false; }
 		char chars[] = lexeme.toCharArray();
 		
@@ -363,7 +389,7 @@ public class WaebricScanner {
 	 * @param lexeme
 	 * @return
 	 */
-	public static boolean isStringChars(String lexeme) {
+	public static boolean isString(String lexeme) {
 		if(lexeme == null) { return false; }
 		char chars[] = lexeme.toCharArray();
 		

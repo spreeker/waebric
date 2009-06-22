@@ -183,7 +183,7 @@ class EmbeddingParser extends AbstractParser {
 		
 		while(tokens.hasNext()) {
 			String peek = tokens.peek(1).getLexeme().toString();
-			if(! WaebricScanner.isTextChars(peek)) {
+			if(! WaebricScanner.isText(peek)) {
 				break; // No more text chars found, quit parse
 			} else {
 				data += peek; // Build string

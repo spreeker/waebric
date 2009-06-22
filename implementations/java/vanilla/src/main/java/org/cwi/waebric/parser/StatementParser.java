@@ -232,7 +232,7 @@ class StatementParser extends AbstractParser {
 		
 		Statement.Comment statement = new Statement.Comment();
 		next(WaebricTokenSort.TEXT, "Comments text", "\"comments\" Text");
-		if(WaebricScanner.isStringChars(tokens.current().getLexeme().toString())) {
+		if(WaebricScanner.isString(tokens.current().getLexeme().toString())) {
 			StrCon comment = new StrCon(tokens.current().getLexeme().toString());
 			statement.setComment(comment);
 		} else {

@@ -137,7 +137,7 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression.TextExpression parseTextExpression() throws SyntaxException {
 		next(WaebricTokenSort.TEXT, "Textual expression","Text -> Expression");
-		if(WaebricScanner.isTextChars(tokens.current().getLexeme().toString())) {
+		if(WaebricScanner.isText(tokens.current().getLexeme().toString())) {
 			Text text = new Text(new StringLiteral(tokens.current().getLexeme().toString()));
 			Expression.TextExpression expression = new Expression.TextExpression(text);
 			return expression;

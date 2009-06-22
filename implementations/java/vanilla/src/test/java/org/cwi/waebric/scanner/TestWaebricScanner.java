@@ -65,11 +65,9 @@ public class TestWaebricScanner {
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
-		Token embedding = i.next();
-		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
-		assertEquals("pre<post", embedding.getLexeme());
-		
-		// TODO: Expect lexical exception
+		Token opening = i.next();
+		assertEquals(WaebricTokenSort.CHARACTER, opening.getSort());
+		assertEquals('"', opening.getLexeme());
 	}
 	
 	@Test
@@ -129,21 +127,21 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testIsTextChar() {
-		assertTrue(WaebricScanner.isTextChars("&#123;program"));
-		assertFalse(WaebricScanner.isTextChars("&#;program"));
+		assertTrue(WaebricScanner.isText("&#123;program"));
+		assertFalse(WaebricScanner.isText("&#;program"));
 		
-		assertTrue(WaebricScanner.isTextChars("&#xaBc123;program"));
-		assertFalse(WaebricScanner.isTextChars("&#xg;program"));
+		assertTrue(WaebricScanner.isText("&#xaBc123;program"));
+		assertFalse(WaebricScanner.isText("&#xg;program"));
 		
-		assertTrue(WaebricScanner.isTextChars("&amp;volume="));
-		assertFalse(WaebricScanner.isTextChars("&"));
-		assertFalse(WaebricScanner.isTextChars("&;program"));
-		assertFalse(WaebricScanner.isTextChars("&.;program"));
+		assertTrue(WaebricScanner.isText("&amp;volume="));
+		assertFalse(WaebricScanner.isText("&"));
+		assertFalse(WaebricScanner.isText("&;program"));
+		assertFalse(WaebricScanner.isText("&.;program"));
 		
-		assertTrue(WaebricScanner.isTextChars("\\\""));
-		assertTrue(WaebricScanner.isTextChars("\\&"));
-		assertFalse(WaebricScanner.isTextChars("&"));
-		assertFalse(WaebricScanner.isTextChars("\""));
+		assertTrue(WaebricScanner.isText("\\\""));
+		assertTrue(WaebricScanner.isText("\\&"));
+		assertFalse(WaebricScanner.isText("&"));
+		assertFalse(WaebricScanner.isText("\""));
 	}
 	
 }
