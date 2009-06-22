@@ -46,13 +46,13 @@ public class TestExpressionParser {
 	
 	@Test
 	public void testCat() throws SyntaxException {
-		iterator = TestUtilities.quickScan("var+my.field");
+		iterator = TestUtilities.quickScan("\"http://www.cwi.nl/?site=\" + var + \",user=\" + my.field");
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		// Class type is checked in cast
 		Expression.CatExpression expression = (Expression.CatExpression) parser.parseExpression();
-		assertEquals(Expression.VarExpression.class, expression.getLeft().getClass());
-		assertEquals(Expression.Field.class, expression.getRight().getClass());
+		assertEquals(Expression.TextExpression.class, expression.getLeft().getClass());
+		assertEquals(Expression.CatExpression.class, expression.getRight().getClass());
 	}
 	
 	@Test

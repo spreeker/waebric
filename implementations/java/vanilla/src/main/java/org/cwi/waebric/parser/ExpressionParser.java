@@ -142,7 +142,7 @@ class ExpressionParser extends AbstractParser {
 			Expression.TextExpression expression = new Expression.TextExpression(text);
 			return expression;
 		} else {
-			reportUnexpectedToken(tokens.current(), "Text expression", "Text -> Expression");
+			reportUnexpectedToken(tokens.current(), "Text expression", "TextChar*");
 		}
 	
 		return null;

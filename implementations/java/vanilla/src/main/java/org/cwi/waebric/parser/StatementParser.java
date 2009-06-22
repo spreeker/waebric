@@ -330,7 +330,7 @@ class StatementParser extends AbstractParser {
 			// Retrieve remaining mark-up tokens (Markup+)
 			NodeList<Markup> markups = new NodeList<Markup>();
 			markups.add(markup);
-			while(isMarkup(1)) {
+			while(isMarkup(1, false)) {
 				markups.add(markupParser.parseMarkup());
 			}
 			
@@ -384,10 +384,11 @@ class StatementParser extends AbstractParser {
 	
 	/**
 	 * Check if next token is mark-up.
-	 * @param token
-	 * @return
+	 * @param k Tokens look-ahead position in iterator
+	 * @param first First in mark-up chain?
+	 * @return Mark-up?
 	 */
-	public boolean isMarkup(int k) {
+	public boolean isMarkup(int k, boolean first) {
 		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
 			if(tokens.hasNext(k+2) // Parentheses can be used to force an identifier as mark-up
 					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
@@ -396,9 +397,8 @@ class StatementParser extends AbstractParser {
 			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.PERIOD)) {
 				return false; // Only field expressions are followed by a .
 			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				// Check if mark-up is first in chain
-				boolean first = ! tokens.hasNext(k-1) || tokens.peek(k-1).getSort() != WaebricTokenSort.IDCON; 
-				return first; // Semicolon marks the end of a mark-up chain, the last identifier is a variable by default unless it is alone
+				// Semicolon marks the end of a mark-up chain, the last identifier is a variable unless it is alone
+				return first; 
 			} else {
 				// All identifiers not at tail are seen as mark-up
 				return true;

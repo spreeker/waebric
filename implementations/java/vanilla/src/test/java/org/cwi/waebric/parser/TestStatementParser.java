@@ -271,23 +271,23 @@ public class TestStatementParser {
 	public void testCaveat() {
 		// Mark-up
 		parser = new StatementParser(TestUtilities.quickScan("p;"), exceptions);
-		assertTrue(parser.isMarkup(1));
+		assertTrue(parser.isMarkup(1, true));
 		
 		// Mark-up, variable
 		parser = new StatementParser(TestUtilities.quickScan("p p;"), exceptions);
-		assertTrue(parser.isMarkup(1));
-		assertFalse(parser.isMarkup(2));
+		assertTrue(parser.isMarkup(1, true));
+		assertFalse(parser.isMarkup(2, false));
 		
 		// Mark-up, mark-up
 		parser = new StatementParser(TestUtilities.quickScan("p p();"), exceptions);
-		assertTrue(parser.isMarkup(1));
-		assertTrue(parser.isMarkup(2));
+		assertTrue(parser.isMarkup(1, true));
+		assertTrue(parser.isMarkup(2, false));
 		
 		// Markup, mark-up, natural
 		parser = new StatementParser(TestUtilities.quickScan("p p 123;"), exceptions);
-		assertTrue(parser.isMarkup(1));
-		assertTrue(parser.isMarkup(2));
-		assertFalse(parser.isMarkup(3));
+		assertTrue(parser.isMarkup(1, true));
+		assertTrue(parser.isMarkup(2, false));
+		assertFalse(parser.isMarkup(3, false));
 	}
 
 }
