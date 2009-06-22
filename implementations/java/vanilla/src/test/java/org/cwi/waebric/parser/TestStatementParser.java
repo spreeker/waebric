@@ -199,8 +199,31 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testIsMarkup() {
+	public void testCaveat() {
+		// Mark-up
+		parser = new StatementParser(TestUtilities.quickScan("p;"), exceptions);
+		assertTrue(parser.isMarkup(1, true));
 		
+		// Mark-up, variable
+		parser = new StatementParser(TestUtilities.quickScan("p p;"), exceptions);
+		assertTrue(parser.isMarkup(1, true));
+		assertFalse(parser.isMarkup(2, false));
+		
+		// Mark-up, mark-up
+		parser = new StatementParser(TestUtilities.quickScan("p p();"), exceptions);
+		assertTrue(parser.isMarkup(1, true));
+		assertTrue(parser.isMarkup(2, false));
+		
+		// Mark-up, mark-up, natural
+		parser = new StatementParser(TestUtilities.quickScan("p p 123;"), exceptions);
+		assertTrue(parser.isMarkup(1, true));
+		assertTrue(parser.isMarkup(2, false));
+		assertFalse(parser.isMarkup(3, false));
+		
+		// Mark-up (double class), field expression (field expression, id)
+		parser = new StatementParser(TestUtilities.quickScan("p.class1.class2 expr.id2.id;"), exceptions);
+		assertTrue(parser.isMarkup(1, true));
+		assertFalse(parser.isMarkup(6, false));
 	}
 	
 	@Test
@@ -265,29 +288,6 @@ public class TestStatementParser {
 		
 		MarkupMarkup statement = (MarkupMarkup) parser.parseMarkupStatements();
 		assertEquals(2, statement.getMarkups().size());
-	}
-	
-	@Test
-	public void testCaveat() {
-		// Mark-up
-		parser = new StatementParser(TestUtilities.quickScan("p;"), exceptions);
-		assertTrue(parser.isMarkup(1, true));
-		
-		// Mark-up, variable
-		parser = new StatementParser(TestUtilities.quickScan("p p;"), exceptions);
-		assertTrue(parser.isMarkup(1, true));
-		assertFalse(parser.isMarkup(2, false));
-		
-		// Mark-up, mark-up
-		parser = new StatementParser(TestUtilities.quickScan("p p();"), exceptions);
-		assertTrue(parser.isMarkup(1, true));
-		assertTrue(parser.isMarkup(2, false));
-		
-		// Markup, mark-up, natural
-		parser = new StatementParser(TestUtilities.quickScan("p p 123;"), exceptions);
-		assertTrue(parser.isMarkup(1, true));
-		assertTrue(parser.isMarkup(2, false));
-		assertFalse(parser.isMarkup(3, false));
 	}
 
 }

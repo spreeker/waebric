@@ -61,14 +61,18 @@ class ExpressionParser extends AbstractParser {
 				expression = parseRecordExpression();
 			} 
 			
-			if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+			if(tokens.hasNext(2) 
+					&& tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)
+					&& tokens.peek(2).getSort().equals(WaebricTokenSort.IDCON)) {
 				Expression.Field field = new Expression.Field(); // Parse field expression
 				field.setExpression(expression);
 				next(WaebricSymbol.PERIOD, "Period separator", "Expression \".\" IdCon -> Expression");
 				next(WaebricTokenSort.IDCON, "Identifier", "Expression \".\" IdCon -> Expression");
 				field.setIdentifier(new IdCon(tokens.current()));
 
-				while(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)) {
+				while(tokens.hasNext() 
+						&& tokens.peek(1).getLexeme().equals(WaebricSymbol.PERIOD)
+						&& tokens.peek(2).getSort().equals(WaebricTokenSort.IDCON)) {
 					// Store clone of field in expression
 					Expression.Field clone = new Expression.Field();
 					clone.setExpression(field.getExpression());

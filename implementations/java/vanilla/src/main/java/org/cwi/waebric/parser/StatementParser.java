@@ -282,7 +282,7 @@ class StatementParser extends AbstractParser {
 	}
 	
 	/**
-	 * @see Statement.CData
+	 * @see Statement.CDatadiv.span-3.prepend-1 
 	 * @return CData collection
 	 * @throws SyntaxException 
 	 */
@@ -390,25 +390,29 @@ class StatementParser extends AbstractParser {
 	 * @return Mark-up?
 	 */
 	public boolean isMarkup(int k, boolean first) {
-		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
-			if(tokens.hasNext(k+2) // Parentheses can be used to force an identifier as mark-up
-					&& tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)
-					&& tokens.peek(k+2).getLexeme().equals(WaebricSymbol.RPARANTHESIS)) {
-				return true;
-			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.PERIOD)) {
-				return false; // Only field expressions are followed by a .
-			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
-				// Semicolon marks the end of a mark-up chain, the last identifier is a variable unless it is alone
-				return first; 
+		// Absorb attributes
+		while(tokens.hasNext(k+1)) {
+			Token peek = tokens.peek(k+1);
+			if(MarkupParser.isAttribute(peek)) {
+				if(tokens.hasNext(k+2)) { k+=2; } // Skip attribute symbol and value
+				else { break; } // Invalid token space left
 			} else {
-				// All identifiers not at tail are seen as mark-up
-				return true;
+				break; // No attribute detected
 			}
 		}
-		
-		return false;
+
+		// Perform mark-up check
+		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
+				return true; // Parenthesis determines a call and is thus a mark-up
+			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
+				return first; // Semicolon marks the end of a mark-up chain, the last element is a variable unless it is alone
+			} return true; // Valid mark-up tag
+		} else {
+			return false; // Invalid token type
+		}
 	}
-	
+
 	/**
 	 * Check if token is a mark-up free statement.
 	 * @param token
