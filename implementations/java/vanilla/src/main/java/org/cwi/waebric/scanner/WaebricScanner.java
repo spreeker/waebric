@@ -334,16 +334,14 @@ public class WaebricScanner {
 		for(int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if(! isTextChar(c)) { 
-				if(c == '&' || c == '"') { // Allow "\\&" "\\""
-					if(i > 0 && chars[i-1] == '\\') {
-						// Accept checking & or '
-					} else {
+				if(c == '&' || c == '"') { 
+					// Allow \& and \"
+					if(i == 0 || chars[i-1] != '\\') {
+						// Allow text from XML grammar
 						String sub = lexeme.substring(i);
-						if(sub.matches("&#[0-9]+;.*") 
+						return sub.matches("&#[0-9]+;.*") 
 								|| sub.matches("&#x[0-9a-fA-F]+;.*") 
-								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;.*")) { 
-							
-						} else { return false; }
+								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;.*");
 					}
 				} else { return false; }
 			}
