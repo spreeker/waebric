@@ -56,7 +56,7 @@ namespace Parser.Ast.Site
         /// Get fileextension as string
         /// </summary>
         /// <returns>String</returns>
-        public String ToString()
+        public override String ToString()
         {
             return FileExtension;
         }

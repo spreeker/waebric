@@ -51,8 +51,6 @@
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
     <Compile Include="Ast\Basic\IdCon.cs" />
-    <Compile Include="Ast\Basic\NatCon.cs" />
-    <Compile Include="Ast\Basic\SymbolCon.cs" />
     <Compile Include="Ast\Expressions\CatExpression.cs" />
     <Compile Include="Ast\Expressions\Expression.cs" />
     <Compile Include="Ast\Expressions\FieldExpression.cs" />
@@ -63,11 +61,9 @@
     <Compile Include="Ast\Expressions\SymExpression.cs" />
     <Compile Include="Ast\Expressions\TextExpression.cs" />
     <Compile Include="Ast\Expressions\VarExpression.cs" />
-    <Compile Include="Ast\Functions\EmptyFormal.cs" />
     <Compile Include="Ast\Functions\Formal.cs" />
     <Compile Include="Ast\Functions\Formals.cs" />
     <Compile Include="Ast\Functions\FunctionDefinition.cs" />
-    <Compile Include="Ast\Functions\IdentifierFormal.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
     <Compile Include="Ast\Markup\Argument.cs" />
     <Compile Include="Ast\Markup\Arguments.cs" />
@@ -97,7 +93,6 @@
     <Compile Include="Ast\Site\PathElement.cs" />
     <Compile Include="Ast\Site\Site.cs" />
     <Compile Include="Ast\Statements\Statement.cs" />
-    <Compile Include="Ast\Statements\Statements.cs" />
     <Compile Include="Exceptions\UnexpectedToken.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="MarkupParser.cs" />

@@ -47,7 +47,7 @@ namespace Parser.Ast.Markup
         /// Get Type
         /// </summary>
         /// <returns>Type</returns>
-        public String GetType()
+        public new String GetType()
         {
             return Type;
         }

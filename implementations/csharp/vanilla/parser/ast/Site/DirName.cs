@@ -40,7 +40,7 @@ namespace Parser.Ast.Site
         /// Returns directory as string
         /// </summary>
         /// <returns>Directory</returns>
-        public String ToString()
+        public override String ToString()
         {
             return DirectoryInstance.ToString();
         }

@@ -15,7 +15,7 @@ namespace Parser.Ast.Functions
 
         private String Identifier;
         private Formals Frmls;
-        private Statements.Statement Stmts;
+        private List<Statement> StatementList;
 
         #endregion
 
@@ -58,30 +58,31 @@ namespace Parser.Ast.Functions
         }
 
         /// <summary>
-        /// Set statements of FunctionDefinition
+        /// Add statement to FunctionDefinition
         /// </summary>
-        /// <param name="statement">Statements to set</param>
-        public void SetStatements(Statements.Statement statements)
+        /// <param name="statement">Statement to add</param>
+        public void AddStatement(Statement statement)
         {
-            Stmts = statements;
+            StatementList.Add(statement);
         }
 
         /// <summary>
         /// Get statements of FunctionDefinition
         /// </summary>
-        /// <returns>Statements</returns>
-        public Statements.Statement GetStatements()
+        /// <returns>StatementList</returns>
+        public List<Statement> GetStatements()
         {
-            return Stmts;
+            return StatementList;
         }
 
         /// <summary>
-        /// To Implement
+        /// Get string representation of FunctionDefinition
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String</returns>
         public override String ToString()
         {
-            return null;
+            return null; //TO IMPLEMENT!
+            //return "def" + Identifier + "(" + Frmls.ToString() + ")" + StatementList.ToString() + "end";
         }
 
         #endregion

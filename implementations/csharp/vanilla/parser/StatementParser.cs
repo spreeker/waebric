@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lexer.Tokenizer;
+using Parser.Ast.Statements;
 
 namespace Parser
 {
@@ -22,6 +23,15 @@ namespace Parser
             : base(iterator, exceptionList)
         {
 
+        }
+
+        /// <summary>
+        /// Parser for Statements
+        /// </summary>
+        /// <returns>Parsed Statements</returns>
+        public Statement ParseStatement()
+        {
+            return new Statement();
         }
 
         #endregion

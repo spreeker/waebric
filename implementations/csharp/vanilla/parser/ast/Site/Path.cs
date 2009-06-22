@@ -60,7 +60,7 @@ namespace Parser.Ast.Site
         /// Gives complete path back as string
         /// </summary>
         /// <returns>String</returns>
-        public String ToString()
+        public override String ToString()
         {
             return DirectoryName.ToString() + Filename.ToString();
         }
