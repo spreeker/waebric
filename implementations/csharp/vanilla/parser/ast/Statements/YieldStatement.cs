@@ -6,9 +6,9 @@ using System.Text;
 namespace Parser.Ast.Statements
 {
     /// <summary>
-    /// Node wich holds an statement
+    /// Node which contains an YieldStatement
     /// </summary>
-    public class Statement : ISyntaxNode
+    public class YieldStatement : Statement
     {
     }
 }
