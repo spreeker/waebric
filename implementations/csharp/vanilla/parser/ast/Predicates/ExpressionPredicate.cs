@@ -7,14 +7,13 @@ using Parser.Ast.Expressions;
 namespace Parser.Ast.Predicates
 {
     /// <summary>
-    /// Node which contains an IsPredicate
+    /// Node which contains an ExpressionPredicate
     /// </summary>
-    public class IsPredicate : Predicate
+    public class ExpressionPredicate : Predicate
     {
         #region Private Members
 
         private Expression Expression;
-        private Type Type;
 
         #endregion
 
@@ -39,26 +38,12 @@ namespace Parser.Ast.Predicates
         }
 
         /// <summary>
-        /// Set type of ExpressionPredicate
+        /// Get string representation of ExpressionPredicate
         /// </summary>
-        /// <param name="type">Type to set</param>
-        public void SetType(Type type)
-        {
-            Type = type;
-        }
-
-        /// <summary>
-        /// Get type of ExpressionPredicate
-        /// </summary>
-        /// <returns>Type</returns>
-        public Type GetType()
-        {
-            return Type;
-        }
-
+        /// <returns>String</returns>
         public override String ToString()
         {
-            return Expression.ToString() + "." + Type.ToString() + "?";
+            return Expression.ToString();
         }
 
         #endregion
