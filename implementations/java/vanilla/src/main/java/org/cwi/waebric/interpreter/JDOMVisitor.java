@@ -1,9 +1,6 @@
 package org.cwi.waebric.interpreter;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Stack;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
@@ -60,39 +57,38 @@ import org.jdom.Text;
  */
 public class JDOMVisitor extends DefaultNodeVisitor {
 
-	// Currently defined variables and functions
-	private final Map<String, FunctionDef> functions;
-	private final Map<String, Expression> variables;
-	
-	// JDOM instances
 	private final Document document;
 	private Element current;
 	private String text = "";
 	
-	// Yield related
+	/**
+	 * Default environment
+	 */
+	private Environment environment;
+	
+	/**
+	 * Stack of yield statements.
+	 */
 	private Stack<AbstractSyntaxNode> yield;
 
 	/**
 	 * Construct JDOM visitor
-	 * @param document Document
+	 * @param document
 	 */
 	public JDOMVisitor(Document document) {
-		this.document = document;
-		functions = new HashMap<String, FunctionDef>();
-		variables = new HashMap<String, Expression>();
-		yield = new Stack<AbstractSyntaxNode>();
+		this(document, new Environment());
 	}
 	
 	/**
-	 * Construct JDOM visitor based on function definitions.
-	 * @param document
-	 * @param functions
+	 * Construct JDOM visitor
+	 * @param document Document
 	 */
-	public JDOMVisitor(Document document, Collection<FunctionDef> functions) {
-		this(document);
-		addFunctionDefs(functions);
+	public JDOMVisitor(Document document, Environment environment) {
+		this.document = document;
+		this.environment = environment;
+		yield = new Stack<AbstractSyntaxNode>();
 	}
-	
+
 	/**
 	 * Attach content to current element, in-case element
 	 * does not exist create root element.
@@ -135,15 +131,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Call markup) {
 		String name = markup.getDesignator().getIdentifier().getName();
 
-		if(functions.containsKey(name)) { // Call to defined function
-			FunctionDef function = functions.get(name); // Retrieve function definition
+		if(environment.containsFunction(name)) { // Call to defined function
+			FunctionDef function = environment.getFunction(name); // Retrieve function definition
 			
 			// Store function variables
 			int index = 0; 
 			for(Argument argument: markup.getArguments()) {
 				if(argument instanceof Argument.RegularArgument) {
 					IdCon variable = function.getFormals().getIdentifiers().get(index);
-					variables.put(variable.getName(), argument.getExpression());
+					environment.setVariable(variable.getName(), argument.getExpression());
 					index++;
 				}
 			}
@@ -152,7 +148,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			
 			// Terminate function variables
 			for(IdCon identifier: function.getFormals().getIdentifiers()) {
-				variables.remove(identifier.toString());
+				environment.removeVariable(identifier.toString());
 			}
 		} else { // Call to undefined function
 			// Interpret designator similar to tag
@@ -185,7 +181,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Tag markup) {
 		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
 		addContent(tag); // Store tag as element in JDOM structure
-
 		visit(markup.getDesignator().getAttributes()); // Process attributes
 	}
 	
@@ -303,7 +298,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			} else if(reg.getExpression() instanceof Expression.VarExpression) {
 				// Variable predicates check if the referenced variable is defined
 				String name = ((Expression.VarExpression) reg.getExpression()).getVar().getName();
-				return variables.containsKey(name);
+				return environment.containsVariable(name);
 			} else { return true; }
 		} else if(predicate instanceof Predicate.And) {
 			// And predicate return Left && Right
@@ -346,13 +341,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Element root = current;
 			for(Expression e: list.getExpressions()) {
 				current = root;
-				variables.put(statement.getVar().getName(), e);
+				environment.setVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
-				variables.remove(statement.getVar().getName());
+				environment.removeVariable(statement.getVar().getName());
 			}
 		} else if(expression instanceof Expression.VarExpression) {
+			Expression.VarExpression var = (Expression.VarExpression) expression;
+			
 			// Retrieve actual expression from variable cache
-			expression = variables.get(((Expression.VarExpression) expression).getVar().getName());
+			expression = environment.getVariable(var.getVar().getName());
 			
 			// Execute function again
 			Statement.Each each = new Statement.Each();
@@ -422,9 +419,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		// Destroy let assignments
 		for(Assignment assignment: statement.getAssignments()) {
 			if(assignment instanceof VarBind) {
-				variables.remove(((VarBind) assignment).getIdentifier().getName());
+				environment.removeVariable(((VarBind) assignment).getIdentifier().getName());
 			} else if(assignment instanceof FuncBind) {
-				functions.remove(((FuncBind) assignment).getIdentifier().getName());
+				environment.removeFunction(((FuncBind) assignment).getIdentifier().getName());
 			}
 		}
 	}
@@ -511,7 +508,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public boolean isCall(Markup markup) {
 		if(markup instanceof Call) {
 			String name = markup.getDesignator().getIdentifier().getName();
-			return this.getFunction(name) != null;
+			return environment.getFunction(name) != null;
 		}
 		
 		return false;
@@ -525,19 +522,26 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	private boolean containsYield(AbstractSyntaxNode node) {
 		if(node instanceof Statement.Yield) { 
-			return true; // Yield found!
+			return true;
 		} else if(node instanceof Markup.Call) {
 			// Retrieve called function and check if that contains a yield statement
 			String call = ((Markup.Call) node).getDesignator().getIdentifier().getName();
-			if(functions.containsKey(call)) { 
-				return containsYield(functions.get(call));
+			if(environment.containsFunction(call)) { 
+				return containsYield(environment.getFunction(call));
 			} return false; // Invalid call, stop checking
-		} else {
-			// Delegate check to children
-			for(AbstractSyntaxNode child: node.getChildren()) {
-				if(containsYield(child)) { return true; }
-			} return false; // Nothing found
+		} else if(node instanceof FunctionDef) {
+			for(Statement stm: ((FunctionDef) node).getStatements()) {
+				if(containsYield(stm)) { return true; }
+			}
+		} else if(node instanceof Assignment.FuncBind) {
+			return containsYield(((Assignment.FuncBind) node).getStatement());
+		} else if(node instanceof Statement.Block) {
+			for(Statement stm: ((Statement.Block) node).getStatements()) {
+				if(containsYield(stm)) { return true; }
+			}
 		}
+		
+		return false;
 	}
 
 	/**
@@ -621,9 +625,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			for(IdCon variable : bind.getVariables()) {
 				formals.addIdentifier(variable);
 			}
+			definition.setFormals(formals);
 		}
 
-		functions.put(bind.getIdentifier().getName(), definition);
+		environment.setFunctionDef(definition);
 	}
 
 	/**
@@ -631,7 +636,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * already exists its value will be overwritten.
 	 */
 	public void visit(VarBind bind) {
-		variables.put(bind.getIdentifier().getName(), bind.getExpression());
+		environment.setVariable(bind.getIdentifier().getName(), bind.getExpression());
 	}
 
 	/**
@@ -670,7 +675,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		while(expression instanceof Expression.VarExpression) {
 			// Browse over variable expressions until a raw type is detected
 			Expression.VarExpression var = (Expression.VarExpression) expression;
-			expression = variables.get(var.getVar().getName());
+			expression = environment.getVariable(var.getVar().getName());
 		}
 		
 		if(expression instanceof Expression.RecordExpression) {
@@ -763,7 +768,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		Expression variable = variables.get(expression.getVar().getName());
+		Expression variable = environment.getVariable(expression.getVar().getName());
 		if(variable != null) { variable.accept(this); }
 		else { this.text = "undef"; }
 	}
@@ -863,56 +868,19 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * Retrieve function definition.
-	 * @param name
-	 * @return
-	 */
-	public FunctionDef getFunction(String name) {
-		return functions.get(name);
-	}
-	
-	/**
-	 * Retrieve variable expression.
-	 * @param name
-	 * @return
-	 */
-	public Expression getVariable(String name) {
-		return variables.get(name);
-	}
-	
-	/**
-	 * Extend current function definitions with a function.
-	 * @param name
-	 * @param function
-	 */
-	public void addFunctionDef(FunctionDef function) {
-		String identifier = function.getIdentifier().getName();
-		if(! functions.containsKey(identifier)) { functions.put(identifier, function); }
-	}
-	
-	/**
-	 * Extend current function definitions with a collection of functions.
-	 * @param functions
-	 */
-	public void addFunctionDefs(Collection<FunctionDef> functions) {
-		for(FunctionDef function: functions) { addFunctionDef(function); }
-	}
-	
-	/**
-	 * Extend current variable definitions with a variable.
-	 * @param name
-	 * @param value
-	 */
-	public void addVariable(String name, Expression value) {
-		variables.put(name, value);
-	}
-	
-	/**
-	 * Push node in yield stack.
-	 * @param node
+	 * 
+	 * @param statement
 	 */
 	public void addYield(AbstractSyntaxNode node) {
 		yield.push(node);
+	}
+	
+	/**
+	 * Return environment.
+	 * @return
+	 */
+	public Environment getEnvironment() {
+		return environment;
 	}
 	
 }

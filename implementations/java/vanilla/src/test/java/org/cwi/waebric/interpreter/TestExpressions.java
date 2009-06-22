@@ -31,7 +31,7 @@ public class TestExpressions {
 	@Test
 	public void testVarExpression() {
 		Expression.VarExpression expr = new Expression.VarExpression(new IdCon("var"));
-		visitor.addVariable("var", new Expression.TextExpression("success"));
+		visitor.getEnvironment().setVariable("var", new Expression.TextExpression("success"));
 		expr.accept(visitor);
 		assertEquals("success", visitor.getText());
 	}

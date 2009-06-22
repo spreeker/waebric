@@ -87,8 +87,9 @@ public class WaebricInterpreter {
 			Document document = new Document();
 			
 			// Start interpreting main function
-			JDOMVisitor visitor = new JDOMVisitor(document, functions);
-			visitor.getFunction("main").accept(visitor);
+			Environment environment = new Environment(functions);
+			JDOMVisitor visitor = new JDOMVisitor(document, environment);
+			environment.getFunction("main").accept(visitor);
 
 			try {
 				// Output document
@@ -104,7 +105,8 @@ public class WaebricInterpreter {
 				Document document = new Document();
 				
 				// Start interpreting mark-up
-				JDOMVisitor visitor = new JDOMVisitor(document, functions);
+				Environment environment = new Environment(functions);
+				JDOMVisitor visitor = new JDOMVisitor(document, environment);
 				mapping.getMarkup().accept(visitor);
 
 				// Retrieve relative file path
