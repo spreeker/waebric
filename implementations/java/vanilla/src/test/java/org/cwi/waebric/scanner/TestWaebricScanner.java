@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.Token;
@@ -57,6 +58,18 @@ public class TestWaebricScanner {
 		Token embedding = i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		assertEquals("pre<\">\">post", embedding.getLexeme());
+	}
+	
+	@Test
+	public void testComplicatedEmbed() throws IOException {
+		StringReader reader = new StringReader("\"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org\") \"Free CSS Templates\">\"\"");
+		WaebricScanner scanner = new WaebricScanner(reader);
+		TokenIterator i = scanner.tokenizeStream();
+
+		Token embedding = i.next();
+		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
+		
+		List<Token> content = (List<Token>) embedding.getLexeme();
 	}
 	
 	@Test

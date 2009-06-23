@@ -241,15 +241,9 @@ public class WaebricScanner {
 		
 		int previous = 0;
 		do {
-			if(curr == EOF) {
-				// End-of-file without text closure symbol ("), store re-scan tokens
-				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
-				tokens.add(quote); // Store " as character token
-				tpos.charno++; // Increment character position for "
-				flushBuffer(); return;
-			} else if(curr == '<') { // Embedding character detected
-				// Verify that text is not a string
+			if(curr == '<') { // Embedding character detected
 				if(tokens.size() == 0 || tokens.get(tokens.size()-1).getLexeme() != WaebricKeyword.COMMENT) {
+					// Verify that text is not a string
 					tokenizeEmbedding(); return;
 				}
 			}
@@ -272,32 +266,43 @@ public class WaebricScanner {
 	 * @throws IOException
 	 */
 	private void tokenizeEmbedding() throws IOException {
-		boolean quoted = false; // Character in quote? " char "
-		boolean embeded = false; // Character in embed? < char >
+		List<Token> content = new ArrayList<Token>();
 		
+		// Attach opening quote token
+		content.add(new Token('"', WaebricTokenSort.CHARACTER, tpos));
+
 		int previous = 0;
+		boolean quoted = false, embeded = false;
 		do {
-			if(curr == EOF) {
-				// End-of-file without text closure symbol ("), store re-scan tokens
-				Token quote = new Token('"', WaebricTokenSort.CHARACTER, tpos);
-				tokens.add(quote); // Store " as character token
-				tpos.charno++; // Increment character position for "
-				flushBuffer(); return;
+			if(curr == '"') { quoted = ! quoted; }
+			
+			if(curr == '<' && ! quoted) { 
+				// Start of embed, store buffered data as text token
+				content.add(new Token(buffer, WaebricTokenSort.TEXT, cpos));
+				buffer = ""; // Clean buffer
+				embeded = true;
 			}
 
 			// Acceptable character, store in buffer
 			buffer += (char) curr;
 			previous = curr;
 			
-			if(curr == '"') { quoted = ! quoted; }
-			if(curr == '<' && ! quoted) { embeded = true; }
-			if(curr == '>' && ! quoted) { embeded = false; }
-			
+			if(curr == '>' && ! quoted) { 
+				// End of embed, flush buffered data
+				flushBuffer(content);
+				embeded = false;
+			}
+
 			read(); // Retrieve next character
-		} while((curr != '"' || previous == '\\') || embeded);
+		} while(((curr != '"' || previous == '\\') || embeded) && curr != EOF);
+		
+		if(curr != EOF) { 
+			// Attach closure quote token
+			content.add(new Token('"', WaebricTokenSort.CHARACTER, cpos));
+		}
 		
 		// Store embedding as token
-		Token embedding = new Token(buffer, WaebricTokenSort.EMBEDDING, tpos);
+		Token embedding = new Token(content, WaebricTokenSort.EMBEDDING, tpos);
 		tokens.add(embedding);
 		
 		read(); // Skip closure " symbol
@@ -309,12 +314,24 @@ public class WaebricScanner {
 	 * @param tokens
 	 * @throws IOException 
 	 */
-	private void flushBuffer() throws IOException {
-		if(buffer == null || buffer.equals("")) { return; } // Buffer contains no contents, quit
+	private void flushBuffer(List<Token> tokens) throws IOException {
+		// Buffer contains no contents, quit
+		if(buffer == null || buffer.equals("")) { return; } 
+
+		// Initiate scanner
 		StringReader reader = new StringReader(buffer);
 		WaebricScanner instance = new WaebricScanner(reader);
+		
+		// Set absolute start position
+		if(! tokens.isEmpty()) { 
+			Token last = tokens.get(tokens.size()-1);
+			instance.setPosition(new Position(last.getLine(), last.getCharacter()));
+		}
+		
+		// Process buffer and store tokens
 		instance.tokenizeStream();
 		tokens.addAll(instance.getTokens());
+		
 		buffer = ""; // Clean buffer
 	}
 	
@@ -441,6 +458,14 @@ public class WaebricScanner {
 	 */
 	public List<Token> getTokens() {
 		return tokens;
+	}
+	
+	/**
+	 * Modify current position
+	 * @param cpos
+	 */
+	public void setPosition(Position cpos) {
+		this.cpos = cpos;
 	}
 	
 }

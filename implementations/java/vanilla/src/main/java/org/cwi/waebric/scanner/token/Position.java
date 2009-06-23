@@ -14,4 +14,9 @@ public class Position {
 		this.charno = charno;
 	}
 	
+	public Position(Position position) {
+		this.lineno = position.lineno;
+		this.charno = position.charno;
+	}
+	
 }

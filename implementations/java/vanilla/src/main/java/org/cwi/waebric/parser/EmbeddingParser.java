@@ -204,7 +204,6 @@ class EmbeddingParser extends AbstractParser {
 		String data = embedding.getLexeme().toString(); // Embedded token stream
 		
 		try {
-			// Decompose embedding data in sub-tokens
 			StringReader reader = new StringReader(data);
 			WaebricScanner scanner = new WaebricScanner(reader);
 			scanner.tokenizeStream();

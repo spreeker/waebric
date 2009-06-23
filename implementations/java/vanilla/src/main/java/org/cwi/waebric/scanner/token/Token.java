@@ -1,5 +1,10 @@
 package org.cwi.waebric.scanner.token;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.cwi.waebric.WaebricKeyword;
+
 
 /**
  * A token is a categorized block of text. This block of text, corresponding to the 
@@ -10,53 +15,21 @@ package org.cwi.waebric.scanner.token;
  * @author Jeroen van Schagen
  * @date 18-05-2009
  */
-public class Token {
+public abstract class Token {
 
-	private Object lexeme;
-	private WaebricTokenSort sort;
-	private int lineno;
-	private int charno;
-	
-	/**
-	 * Initialize token
-	 * 
-	 * @param lexeme Block of text
-	 * @param sort Token type
-	 * @param line Line number
-	 */
-	public Token(Object lexeme, WaebricTokenSort sort, int lineno, int charno) {
-		this.lexeme = lexeme;
-		this.sort = sort;
+	protected int lineno;
+	protected int charno;
+
+	public Token(int lineno, int charno) {
 		this.lineno = lineno;
 		this.charno = charno;
-	}		
+	}
 	
 	/**
-	 * Initialize token
-	 * 
-	 * @param lexeme Block of text
-	 * @param sort Token type
-	 * @param line Line number
-	 */
-	public Token(Object lexeme, WaebricTokenSort sort, Position position) {
-		this(lexeme, sort, position.lineno, position.charno);
-	}
-
-	/**
-	 * Retrieve lexeme
+	 * Retrieve data
 	 * @return
 	 */
-	public Object getLexeme() {
-		return lexeme;
-	}
-
-	/**
-	 * Retrieve token sort
-	 * @return
-	 */
-	public WaebricTokenSort getSort() {
-		return sort;
-	}
+	public abstract Object getLexeme();
 
 	/**
 	 * Retrieve line number
@@ -65,7 +38,7 @@ public class Token {
 	public int getLine() {
 		return lineno;
 	}
-	
+		
 	/**
 	 * Modify line number
 	 * @param lineno
@@ -93,11 +66,10 @@ public class Token {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Token) {
-			Token token = (Token) obj;
-			if(token.getSort() != this.getSort()) { return false; }
+			Token token = (Token) obj; // Cast object
 			if(token.getLine() != this.getLine()) { return false; }
-			if(token.getCharacter() != this.getCharacter()) { return false; }
-			return token.getLexeme().equals(this.getLexeme());
+			else if(token.getCharacter() != this.getCharacter()) { return false; }
+			else return token.getLexeme().equals(this.getLexeme());
 		}
 		
 		return false;
@@ -105,8 +77,154 @@ public class Token {
 	
 	@Override
 	public String toString() {
-		return "\"" + lexeme.toString() + "\" " + sort.name() + 
-		" (line: " + getLine() + ", character: " + getCharacter() + ")";
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class IdentifierToken extends Token {
+
+		public String identifier;
+		
+		public IdentifierToken(String identifier, int lineno, int charno) {
+			super(lineno, charno);
+			this.identifier = identifier;
+		}
+		
+		@Override
+		public String getLexeme() {
+			return identifier;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class KeywordToken extends Token {
+
+		public WaebricKeyword keyword;
+		
+		public KeywordToken(WaebricKeyword keyword, int lineno, int charno) {
+			super(lineno, charno);
+			this.keyword = keyword;
+		}
+		
+		@Override
+		public WaebricKeyword getLexeme() {
+			return keyword;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class NaturalToken extends Token {
+
+		public Integer number;
+		
+		public NaturalToken(int number, int lineno, int charno) {
+			super(lineno, charno);
+			this.number = new Integer(number);
+		}
+		
+		@Override
+		public Integer getLexeme() {
+			return number;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class SymbolToken extends Token {
+		
+		public String symbol;
+		
+		public SymbolToken(String symbol, int lineno, int charno) {
+			super(lineno, charno);
+			this.symbol = symbol;
+		}
+		
+		@Override
+		public Object getLexeme() {
+			return symbol;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class CharacterToken extends Token {
+
+		public Character character;
+		
+		public CharacterToken(char character, int lineno, int charno) {
+			super(lineno, charno);
+		}
+		
+		@Override
+		public Character getLexeme() {
+			return character;
+		}
+
+	}
+	
+	public class TextToken extends Token {
+		
+		private String text;
+		
+		public TextToken(String text, int lineno, int charno) {
+			super(lineno, charno);
+			this.text = text;
+		}
+		
+		@Override
+		public Object getLexeme() {
+			return text;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @author schagen
+	 *
+	 */
+	public class EmbeddingToken extends Token implements Iterable<Token> {
+
+		private List<Token> content;
+		
+		public EmbeddingToken(List<Token> content, int lineno, int charno) {
+			super(lineno, charno);
+			this.content = content;
+		}
+		
+		@Override
+		public List<Token> getLexeme() {
+			return content;
+		}
+		
+		@Override
+		public Iterator<Token> iterator() {
+			return new TokenIterator(content);
+		}
+
 	}
 
 }
