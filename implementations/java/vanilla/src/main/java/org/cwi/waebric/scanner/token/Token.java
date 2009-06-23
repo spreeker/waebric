@@ -30,6 +30,12 @@ public abstract class Token {
 	 * @return
 	 */
 	public abstract Object getLexeme();
+	
+	/**
+	 * Retrieve token sort
+	 * @return
+	 */
+	public abstract WaebricTokenSort getSort();
 
 	/**
 	 * Retrieve line number
@@ -77,16 +83,16 @@ public abstract class Token {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		return "\"" + getLexeme().toString() + "\" " + getSort().name()
+			+ " (line: " + lineno + ", character: " + charno + ")";
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Identifier token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class IdentifierToken extends Token {
+	public static class IdentifierToken extends Token {
 
 		public String identifier;
 		
@@ -100,14 +106,19 @@ public abstract class Token {
 			return identifier;
 		}
 		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.IDCON;
+		}
+		
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Keyword token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class KeywordToken extends Token {
+	public static class KeywordToken extends Token {
 
 		public WaebricKeyword keyword;
 		
@@ -121,14 +132,19 @@ public abstract class Token {
 			return keyword;
 		}
 		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.KEYWORD;
+		}
+		
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Natural token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class NaturalToken extends Token {
+	public static class NaturalToken extends Token {
 
 		public Integer number;
 		
@@ -142,14 +158,19 @@ public abstract class Token {
 			return number;
 		}
 		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.NATCON;
+		}
+		
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Symbol token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class SymbolToken extends Token {
+	public static class SymbolToken extends Token {
 		
 		public String symbol;
 		
@@ -163,29 +184,45 @@ public abstract class Token {
 			return symbol;
 		}
 		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.SYMBOLCON;
+		}
+		
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Character token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class CharacterToken extends Token {
+	public static class CharacterToken extends Token {
 
 		public Character character;
 		
 		public CharacterToken(char character, int lineno, int charno) {
 			super(lineno, charno);
+			this.character = new Character(character);
 		}
 		
 		@Override
 		public Character getLexeme() {
 			return character;
 		}
+		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.CHARACTER;
+		}
 
 	}
 	
-	public class TextToken extends Token {
+	/**
+	 * Text token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
+	 */
+	public static class TextToken extends Token {
 		
 		private String text;
 		
@@ -199,14 +236,19 @@ public abstract class Token {
 			return text;
 		}
 		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.TEXT;
+		}
+		
 	}
 	
 	/**
-	 * 
-	 * @author schagen
-	 *
+	 * Embedding token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
 	 */
-	public class EmbeddingToken extends Token implements Iterable<Token> {
+	public static class EmbeddingToken extends Token implements Iterable<Token> {
 
 		private List<Token> content;
 		
@@ -223,6 +265,11 @@ public abstract class Token {
 		@Override
 		public Iterator<Token> iterator() {
 			return new TokenIterator(content);
+		}
+		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.EMBEDDING;
 		}
 
 	}

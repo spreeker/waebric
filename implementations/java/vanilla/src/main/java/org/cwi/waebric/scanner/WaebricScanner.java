@@ -10,7 +10,6 @@ import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.Position;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 public class WaebricScanner {
 	
@@ -155,7 +154,7 @@ public class WaebricScanner {
 		
 			read(); // Retrieve next character
 		} else { // Symbol character /
-			Token slash = new Token('/', WaebricTokenSort.CHARACTER, tpos);
+			Token slash = new Token.CharacterToken('/', tpos.lineno, tpos.charno);
 			tokens.add(slash);
 		}
 	}
@@ -176,11 +175,11 @@ public class WaebricScanner {
 			WaebricKeyword element = WaebricKeyword.valueOf(buffer.toUpperCase());
 			
 			// Store keyword
-			Token keyword = new Token(element, WaebricTokenSort.KEYWORD, tpos);
+			Token keyword = new Token.KeywordToken(element, tpos.lineno, tpos.charno);
 			tokens.add(keyword);
 		} else {
 			// Store word
-			Token identifier = new Token(buffer, WaebricTokenSort.IDCON, tpos);
+			Token identifier = new Token.IdentifierToken(buffer, tpos.lineno, tpos.charno);
 			tokens.add(identifier);
 		}
 	}
@@ -199,7 +198,7 @@ public class WaebricScanner {
 		}
 		
 		// Store natural
-		Token natural = new Token(number, WaebricTokenSort.NATCON, tpos);
+		Token natural = new Token.NaturalToken(number, tpos.lineno, tpos.charno);
 		tokens.add(natural);
 	}
 	
@@ -209,7 +208,7 @@ public class WaebricScanner {
 	 */
 	private void tokenizeCharacter() throws IOException {
 		// Store character
-		Token character = new Token((char) curr, WaebricTokenSort.CHARACTER, tpos);
+		Token character = new Token.CharacterToken((char) curr, tpos.lineno, tpos.charno);
 		tokens.add(character);
 		
 		read(); // Retrieve next character
@@ -228,7 +227,7 @@ public class WaebricScanner {
 		}
 		
 		// Store symbol
-		Token symbol = new Token(buffer, WaebricTokenSort.SYMBOLCON, tpos);
+		Token symbol = new Token.SymbolToken(buffer, tpos.lineno, tpos.charno);
 		tokens.add(symbol);
 	}
 	
@@ -255,7 +254,7 @@ public class WaebricScanner {
 		} while((curr != '"' || previous == '\\') && curr != EOF);
 		
 		// Store text as token
-		Token text = new Token(buffer, WaebricTokenSort.TEXT, tpos);
+		Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
 		tokens.add(text);
 		
 		read(); // Skip closure " symbol
@@ -269,16 +268,17 @@ public class WaebricScanner {
 		List<Token> content = new ArrayList<Token>();
 		
 		// Attach opening quote token
-		content.add(new Token('"', WaebricTokenSort.CHARACTER, tpos));
+		content.add(new Token.CharacterToken('"', tpos.lineno, tpos.charno));
 
 		int previous = 0;
 		boolean quoted = false, embeded = false;
 		do {
-			if(curr == '"') { quoted = ! quoted; }
+			if(curr == EOF) { flushBuffer(content); break; } // End-of-file
+			if(curr == '"' && previous != '\\') { quoted = ! quoted; }
 			
 			if(curr == '<' && ! quoted) { 
-				// Start of embed, store buffered data as text token
-				content.add(new Token(buffer, WaebricTokenSort.TEXT, cpos));
+				// Detected start of embed, process pre-text
+				content.add(new Token.TextToken(buffer, cpos.lineno, cpos.charno));
 				buffer = ""; // Clean buffer
 				embeded = true;
 			}
@@ -288,21 +288,26 @@ public class WaebricScanner {
 			previous = curr;
 			
 			if(curr == '>' && ! quoted) { 
-				// End of embed, flush buffered data
+				// Detected end of embed, process content
 				flushBuffer(content);
 				embeded = false;
 			}
 
 			read(); // Retrieve next character
-		} while(((curr != '"' || previous == '\\') || embeded) && curr != EOF);
+		} while(((curr != '"' || previous == '\\') || embeded));
 		
+		// Process post text
+		if(! buffer.equals("")) {
+			content.add(new Token.TextToken(buffer, cpos.lineno, cpos.charno));
+		}
+		
+		// Attach closure quote
 		if(curr != EOF) { 
-			// Attach closure quote token
-			content.add(new Token('"', WaebricTokenSort.CHARACTER, cpos));
+			content.add(new Token.CharacterToken('"', cpos.lineno, cpos.charno));
 		}
 		
 		// Store embedding as token
-		Token embedding = new Token(content, WaebricTokenSort.EMBEDDING, tpos);
+		Token embedding = new Token.EmbeddingToken(content, tpos.lineno, tpos.charno);
 		tokens.add(embedding);
 		
 		read(); // Skip closure " symbol

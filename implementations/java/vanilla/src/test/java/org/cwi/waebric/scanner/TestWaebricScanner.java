@@ -6,12 +6,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.List;
+import java.util.Iterator;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
+import org.cwi.waebric.scanner.token.Token.EmbeddingToken;
 import org.junit.Test;
 
 public class TestWaebricScanner {
@@ -44,20 +45,38 @@ public class TestWaebricScanner {
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
-		Token embedding = i.next();
+		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
-		assertEquals("pre<123>post", embedding.getLexeme());
+		
+		Iterator<Token> content = embedding.iterator();
+		assertEquals('"', content.next().getLexeme());
+		assertEquals("pre", content.next().getLexeme());
+		assertEquals('<', content.next().getLexeme());
+		assertEquals(123, content.next().getLexeme());
+		assertEquals('>', content.next().getLexeme());
+		assertEquals("post", content.next().getLexeme());
+		assertEquals('"', content.next().getLexeme());
+		assertFalse(content.hasNext());
 	}
 	
 	@Test
 	public void testQuotedEmbed() throws IOException {
-		StringReader reader = new StringReader("\"pre<\">\">post\"");
+		StringReader reader = new StringReader("\"pre<\"\\\">\">post\"");
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
-		Token embedding = i.next();
+		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
-		assertEquals("pre<\">\">post", embedding.getLexeme());
+		
+		Iterator<Token> content = embedding.iterator();
+		assertEquals('"', content.next().getLexeme());
+		assertEquals("pre", content.next().getLexeme());
+		assertEquals('<', content.next().getLexeme());
+		assertEquals("\\\">", content.next().getLexeme());
+		assertEquals('>', content.next().getLexeme());
+		assertEquals("post", content.next().getLexeme());
+		assertEquals('"', content.next().getLexeme());
+		assertFalse(content.hasNext());
 	}
 	
 	@Test
@@ -66,10 +85,23 @@ public class TestWaebricScanner {
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 
-		Token embedding = i.next();
+		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		
-		List<Token> content = (List<Token>) embedding.getLexeme();
+		Iterator<Token> content = embedding.iterator();
+		assertEquals('"', content.next().getLexeme());
+		assertEquals("&copy;2007 All Rights Reserved. Design by ", content.next().getLexeme());
+		assertEquals('<', content.next().getLexeme());
+		assertEquals("a", content.next().getLexeme());
+		assertEquals('(', content.next().getLexeme());
+		assertEquals("href", content.next().getLexeme());
+		assertEquals('=', content.next().getLexeme());
+		assertEquals("http://www.freecsstemplates.org", content.next().getLexeme());
+		assertEquals(')', content.next().getLexeme());
+		assertEquals("Free CSS Templates", content.next().getLexeme());
+		assertEquals('>', content.next().getLexeme());
+		assertEquals('"', content.next().getLexeme());
+		assertFalse(content.hasNext());
 	}
 	
 	@Test
@@ -78,9 +110,15 @@ public class TestWaebricScanner {
 		WaebricScanner scanner = new WaebricScanner(reader);
 		TokenIterator i = scanner.tokenizeStream();
 		
-		Token opening = i.next();
-		assertEquals(WaebricTokenSort.CHARACTER, opening.getSort());
-		assertEquals('"', opening.getLexeme());
+		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
+		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
+		
+		Iterator<Token> content = embedding.iterator();
+		assertEquals('"', content.next().getLexeme());
+		assertEquals("pre", content.next().getLexeme());
+		assertEquals('<', content.next().getLexeme());
+		assertEquals("post", content.next().getLexeme());
+		assertFalse(content.hasNext());
 	}
 	
 	@Test

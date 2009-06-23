@@ -4,7 +4,6 @@ import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.token.TokenNode;
 import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}
@@ -25,7 +24,7 @@ public class IdCon extends AbstractSyntaxNode {
 	 * @param name
 	 */
 	public IdCon(String name) {
-		this(new Token(name, WaebricTokenSort.IDCON, -1, -1));
+		this(new Token.IdentifierToken(name, -1, -1));
 	}
 	
 	/**

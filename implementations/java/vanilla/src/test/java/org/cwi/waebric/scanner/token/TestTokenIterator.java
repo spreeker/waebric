@@ -20,12 +20,12 @@ public class TestTokenIterator {
 	@Before
 	public void setUp() throws IOException {
 		ArrayList<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token(123, WaebricTokenSort.NATCON, 1, 2)); // Number
-		tokens.add(new Token("identifier1", WaebricTokenSort.IDCON, 3, 4)); // Identifier
-		tokens.add(new Token(WaebricKeyword.DEF, WaebricTokenSort.KEYWORD, 5, 6)); // Keyword
-		tokens.add(new Token("text", WaebricTokenSort.TEXT, 7, 8)); // Quote
-		tokens.add(new Token('@', WaebricTokenSort.CHARACTER, 9, 10)); // Character
-		tokens.add(new Token("symbol1", WaebricTokenSort.SYMBOLCON, 11, 12)); // Symbol
+		tokens.add(new Token.NaturalToken(123, 1, 2)); // Number
+		tokens.add(new Token.IdentifierToken("identifier1", 3, 4)); // Identifier
+		tokens.add(new Token.KeywordToken(WaebricKeyword.DEF, 5, 6)); // Keyword
+		tokens.add(new Token.TextToken("text", 7, 8)); // Quote
+		tokens.add(new Token.CharacterToken('@', 9, 10)); // Character
+		tokens.add(new Token.SymbolToken("symbol1", 11, 12)); // Symbol
 		iterator = new TokenIterator(tokens);
 	}
 	
@@ -72,14 +72,14 @@ public class TestTokenIterator {
 	
 	@Test
 	public void testAdd() {
-		Token newbie = new Token("test", WaebricTokenSort.TEXT, 1, 2);
+		Token newbie = new Token.TextToken("test", 1, 2);
 		iterator.add(newbie);
 		assertEquals(newbie, iterator.next());
 	}
 	
 	@Test
 	public void testAddAll() {
-		Token newbie = new Token("test", WaebricTokenSort.TEXT, 1, 2);
+		Token newbie = new Token.TextToken("test", 1, 2);
 		ArrayList<Token> list = new ArrayList<Token>();
 		list.add(newbie);
 		iterator.addAll(list);
