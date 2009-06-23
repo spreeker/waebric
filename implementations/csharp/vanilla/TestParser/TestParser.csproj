@@ -51,11 +51,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionParserTest.cs" />
+    <Compile Include="FunctionParserTest.cs" />
     <Compile Include="MarkupParserTest.cs" />
     <Compile Include="ModuleParserTest.cs" />
     <Compile Include="Ast\NodeListTest.cs" />
+    <Compile Include="PredicateParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteParserTest.cs" />
+    <Compile Include="StatementParserTest.cs" />
     <Compile Include="SyntaxTreeTest.cs" />
   </ItemGroup>
   <ItemGroup>

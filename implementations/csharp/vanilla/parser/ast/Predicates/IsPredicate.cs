@@ -51,7 +51,7 @@ namespace Parser.Ast.Predicates
         /// Get type of ExpressionPredicate
         /// </summary>
         /// <returns>Type</returns>
-        public Type GetType()
+        public new Type GetType()
         {
             return Type;
         }
