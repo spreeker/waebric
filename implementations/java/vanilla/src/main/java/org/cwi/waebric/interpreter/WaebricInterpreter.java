@@ -12,6 +12,7 @@ import java.util.Date;
 import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
+import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
@@ -107,9 +108,15 @@ public class WaebricInterpreter {
 			for(Mapping mapping: site.getMappings()) {
 				Document document = new Document();
 				
+				Markup markup = mapping.getMarkup();
+				if(markup instanceof Markup.Tag) {
+					// Interpret mapping tag as call
+					markup = new Markup.Call(markup.getDesignator());
+				}
+				
 				// Visit mapping
 				JDOMVisitor visitor = new JDOMVisitor(document, environment);
-				mapping.getMarkup().accept(visitor);
+				markup.accept(visitor);
 
 				// Retrieve relative file path
 				String path = getPath(mapping.getPath());

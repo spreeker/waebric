@@ -40,11 +40,7 @@ public abstract class Markup extends AbstractSyntaxNode {
 		public Call(Designator designator) {
 			this.designator = designator;
 		}
-		
-		public Call(Arguments arguments) {
-			this.arguments.addAll(arguments);
-		}
-		
+
 		public Call(Designator designator, Arguments arguments) {
 			this.designator = designator;
 			this.arguments.addAll(arguments);
