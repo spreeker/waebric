@@ -177,7 +177,12 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				} else if(argument instanceof Argument.Attr) {
 					// Attribute arguments are stored as separate attribute
 					argument.getExpression().accept(this);
-					current.setAttribute(((Argument.Attr) argument).getIdentifier().getName(), text);
+					String attribute = ((Argument.Attr) argument).getIdentifier().getName();
+					if(attribute.equals("xmlns")) {
+						current.setNamespace(Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
+					} else {
+						current.setAttribute(attribute, text);
+					}
 				}
 			}
 			
@@ -776,8 +781,19 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(VarExpression expression) {
 		Expression variable = environment.getVariable(expression.getVar().getName());
-		if(variable != null) { variable.accept(this); }
-		else { this.text = "undef"; }
+		if(variable instanceof Expression.VarExpression) {
+			if(environment.getParent() != null) { 
+				environment.getParent().getVariable(expression.getVar().getName());
+			} else {
+				this.text = "undef"; // Undeclared variable reference
+			}
+		} else {
+			if(variable != null) {
+				variable.accept(this);
+			} else {
+				this.text = "undef"; // Undeclared variable reference
+			}
+		}	
 	}
 
 	/**
