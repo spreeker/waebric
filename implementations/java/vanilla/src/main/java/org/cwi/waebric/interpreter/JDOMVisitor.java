@@ -62,7 +62,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	private String text = "";
 	
 	/**
-	 * Default environment
+	 * Current environment
 	 */
 	private Environment environment;
 	
@@ -134,22 +134,23 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		if(environment.containsFunction(name)) { // Call to defined function
 			FunctionDef function = environment.getFunction(name); // Retrieve function definition
 			
+			// Create new environment for function
+			environment = new Environment(environment);
+			
 			// Store function variables
 			int index = 0; 
 			for(Argument argument: markup.getArguments()) {
 				if(argument instanceof Argument.RegularArgument) {
 					IdCon variable = function.getFormals().getIdentifiers().get(index);
-					environment.setVariable(variable.getName(), argument.getExpression());
+					environment.storeVariable(variable.getName(), argument.getExpression());
 					index++;
 				}
 			}
 
 			function.accept(this); // Visit function
 			
-			// Terminate function variables
-			for(IdCon identifier: function.getFormals().getIdentifiers()) {
-				environment.removeVariable(identifier.toString());
-			}
+			// Restore parent environment
+			environment = environment.getParent();
 		} else { // Call to undefined function
 			// Interpret designator similar to tag
 			Tag tag = new Tag(markup.getDesignator());
@@ -341,9 +342,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Element root = current;
 			for(Expression e: list.getExpressions()) {
 				current = root;
-				environment.setVariable(statement.getVar().getName(), e);
+				environment = new Environment(environment);
+				environment.storeVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
-				environment.removeVariable(statement.getVar().getName());
+				environment = environment.getParent();
 			}
 		} else if(expression instanceof Expression.VarExpression) {
 			Expression.VarExpression var = (Expression.VarExpression) expression;
@@ -416,13 +418,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			sub.accept(this);
 		}
 		
-		// Destroy let assignments
-		for(Assignment assignment: statement.getAssignments()) {
-			if(assignment instanceof VarBind) {
-				environment.removeVariable(((VarBind) assignment).getIdentifier().getName());
-			} else if(assignment instanceof FuncBind) {
-				environment.removeFunction(((FuncBind) assignment).getIdentifier().getName());
-			}
+		// Restore actual environment
+		for(int i = 0; i < statement.getAssignments().size(); i++) {
+			environment = environment.getParent();
 		}
 	}
 
@@ -621,7 +619,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			definition.setFormals(formals);
 		}
 
-		environment.setFunctionDef(definition);
+		environment.storeFunctionDef(definition);
 	}
 
 	/**
@@ -629,7 +627,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * already exists its value will be overwritten.
 	 */
 	public void visit(VarBind bind) {
-		environment.setVariable(bind.getIdentifier().getName(), bind.getExpression());
+		environment.storeVariable(bind.getIdentifier().getName(), bind.getExpression());
 	}
 
 	/**

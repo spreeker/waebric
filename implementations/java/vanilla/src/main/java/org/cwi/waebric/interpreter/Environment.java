@@ -3,6 +3,7 @@ package org.cwi.waebric.interpreter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
@@ -14,6 +15,7 @@ import org.cwi.waebric.parser.ast.module.function.FunctionDef;
  */
 public class Environment {
 
+	private final Environment parent;
 	private final Map<String, FunctionDef> functions;
 	private final Map<String, Expression> variables;
 	
@@ -21,37 +23,27 @@ public class Environment {
 	 * Construct environment.
 	 */
 	public Environment() {
-		functions = new HashMap<String, FunctionDef>();
-		variables = new HashMap<String, Expression>();
+		this(null);
 	}
 	
 	/**
-	 * Construct environment and store function definitions.
-	 * @param functions
-	 */
-	public Environment(Collection<FunctionDef> functions) {
-		this(); // Construct maps
-		this.setFunctionDefs(functions); // Store functions
-	}
-	
-	/**
-	 * Construct environment and similar data to parent environment.
+	 * Construct environment and store parent environment.
 	 * @param e Parent environment
 	 */
-	public Environment(Environment e) {
-		this(e.getFunctionDefs()); // Construct maps and store functions
-		for(String variable: e.getVariableNames()) {
-			// Store variables
-			this.setVariable(variable, e.getVariable(variable));
-		}
+	public Environment(Environment parent) {
+		this.parent = parent;
+		functions = new HashMap<String, FunctionDef>();
+		variables = new HashMap<String, Expression>();
 	}
 	
 	/**
 	 * Retrieve function names.
 	 * @return
 	 */
-	public String[] getFunctionNames() {
-		return functions.keySet().toArray(new String[0]);
+	public Collection<String> getFunctionNames() {
+		Set<String> names = functions.keySet();
+		if(parent != null) { names.addAll(parent.getFunctionNames()); }
+		return names;
 	}
 	
 	/**
@@ -60,7 +52,9 @@ public class Environment {
 	 * @return
 	 */
 	public FunctionDef getFunction(String name) {
-		return functions.get(name);
+		if(functions.containsKey(name)) { return functions.get(name); }
+		if(parent != null) { return parent.getFunction(name); }
+		return null;
 	}
 	
 	/**
@@ -69,24 +63,19 @@ public class Environment {
 	 * @return
 	 */
 	public boolean containsFunction(String name) {
-		return functions.containsKey(name);
-	}
-	
-	/**
-	 * Remove function from environment.
-	 * @param name
-	 * @return
-	 */
-	public FunctionDef removeFunction(String name) {
-		return functions.remove(name);
+		boolean contains = functions.containsKey(name);
+		if(! contains && parent != null) { return parent.containsFunction(name); }
+		return contains;
 	}
 	
 	/**
 	 * Retrieve variable names.
 	 * @return
 	 */
-	public String[] getVariableNames() {
-		return variables.keySet().toArray(new String[0]);
+	public Collection<String> getVariableNames() {
+		Set<String> names = variables.keySet();
+		if(parent != null) { names.addAll(parent.getFunctionNames()); }
+		return names;
 	}
 	
 	/**
@@ -95,7 +84,9 @@ public class Environment {
 	 * @return
 	 */
 	public Expression getVariable(String name) {
-		return variables.get(name);
+		if(variables.containsKey(name)) { return variables.get(name); }
+		if(parent != null) { return parent.getVariable(name); }
+		return null;
 	}
 	
 	/**
@@ -104,16 +95,9 @@ public class Environment {
 	 * @return
 	 */
 	public boolean containsVariable(String name) {
-		return variables.containsKey(name);
-	}
-	
-	/**
-	 * Remove variable from environment.
-	 * @param name
-	 * @return
-	 */
-	public Expression removeVariable(String name) {
-		return variables.remove(name);
+		boolean contains = variables.containsKey(name);
+		if(! contains && parent != null) { return parent.containsVariable(name); }
+		return contains;
 	}
 	
 	/**
@@ -121,17 +105,18 @@ public class Environment {
 	 * @param name
 	 * @param function
 	 */
-	public void setFunctionDef(FunctionDef function) {
-		String identifier = function.getIdentifier().getName();
-		if(! functions.containsKey(identifier)) { functions.put(identifier, function); }
+	public void storeFunctionDef(FunctionDef function) {
+		if(function == null) { return; } // Retrieve function identifier
+		String identifier = function.getIdentifier() == null ? "" : function.getIdentifier().getName();
+		functions.put(identifier, function);
 	}
 	
 	/**
 	 * Extend current function definitions with a collection of functions.
 	 * @param functions
 	 */
-	public void setFunctionDefs(Collection<FunctionDef> functions) {
-		for(FunctionDef function: functions) { setFunctionDef(function); }
+	public void storeFunctionDefs(Collection<FunctionDef> functions) {
+		for(FunctionDef function: functions) { storeFunctionDef(function); }
 	}
 	
 	/**
@@ -147,8 +132,16 @@ public class Environment {
 	 * @param name
 	 * @param value
 	 */
-	public void setVariable(String name, Expression value) {
+	public void storeVariable(String name, Expression value) {
 		variables.put(name, value);
+	}
+	
+	/**
+	 * Retrieve parent environment.
+	 * @return
+	 */
+	public Environment getParent() {
+		return parent;
 	}
 	
 }

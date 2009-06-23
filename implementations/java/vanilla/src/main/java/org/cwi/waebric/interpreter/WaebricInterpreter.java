@@ -82,12 +82,15 @@ public class WaebricInterpreter {
 			functions.addAll(dependancy.getFunctionDefinitions());
 		}
 		
-		// Interpret "main" function
+		// Create environment
+		Environment environment = new Environment();
+		environment.storeFunctionDefs(functions);
+		
+		// Interpret "main" function and write to output stream
 		if(containsMain(module)) {
 			Document document = new Document();
 			
-			// Start interpreting main function
-			Environment environment = new Environment(functions);
+			// Visit function
 			JDOMVisitor visitor = new JDOMVisitor(document, environment);
 			environment.getFunction("main").accept(visitor);
 
@@ -99,13 +102,12 @@ public class WaebricInterpreter {
 			}
 		}
 		
-		// Interpret sites
+		// Interpret sites and store in files
 		for(Site site: module.getSites()) {
 			for(Mapping mapping: site.getMappings()) {
 				Document document = new Document();
 				
-				// Start interpreting mark-up
-				Environment environment = new Environment(functions);
+				// Visit mapping
 				JDOMVisitor visitor = new JDOMVisitor(document, environment);
 				mapping.getMarkup().accept(visitor);
 
