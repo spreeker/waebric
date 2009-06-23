@@ -114,6 +114,7 @@
     <Compile Include="Ast\Statements\LetStatement.cs" />
     <Compile Include="Ast\Statements\Statement.cs" />
     <Compile Include="Ast\Statements\YieldStatement.cs" />
+    <Compile Include="EmbeddingParser.cs" />
     <Compile Include="Exceptions\UnexpectedToken.cs" />
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="MarkupParser.cs" />
