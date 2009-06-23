@@ -57,7 +57,8 @@ namespace Parser
                 expression = ParseRecordExpression();
             }
             //Check if it is maybe an catenation or field
-            if(TokenStream.HasNext(2) && TokenStream.Peek(1).GetValue().ToString() == "." && TokenStream.Peek(2).GetType()== TokenType.IDENTIFIER)
+            if(TokenStream.HasNext(2) && TokenStream.Peek(1).GetValue().ToString() == "." && TokenStream.Peek(2).GetType()== TokenType.IDENTIFIER && 
+                TokenStream.Peek(3).GetValue().ToString() != "?")
             { //Field
                 return ParseFieldExpression(expression);
             }
