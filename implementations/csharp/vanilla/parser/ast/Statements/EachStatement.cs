@@ -9,7 +9,7 @@ namespace Parser.Ast.Statements
     /// <summary>
     /// Node which contains an EachStatement
     /// </summary>
-    public class EachStatement : ISyntaxNode
+    public class EachStatement : Statement
     {
         #region Private Members
 
