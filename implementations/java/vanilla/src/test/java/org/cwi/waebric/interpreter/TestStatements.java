@@ -274,6 +274,10 @@ public class TestStatements {
 		assertEquals("success", placeholder.getText());
 	}
 	
+	/**
+	 * Check if let correctly initiates a variable definition 
+	 * and destroys it afterwards.
+	 */
 	@Test
 	public void testVarLet() {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letvar.wae");
@@ -286,6 +290,10 @@ public class TestStatements {
 		assertEquals("undefsuccessundef", placeholder.getText());
 	}
 	
+	/**
+	 * Check if let correctly initiates a function definition 
+	 * and destroys it afterwards.
+	 */
 	@Test
 	public void testFuncLet() {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfunc.wae");
@@ -295,16 +303,19 @@ public class TestStatements {
 		visitor.setCurrent(placeholder);
 		main.accept(visitor);
 	
+		// <func/>success<func/>
 		Element func1 = (Element) placeholder.getContent().get(0);
 		assertEquals("func", func1.getName());
-		
 		Text success = (Text) placeholder.getContent().get(1);
 		assertEquals("success", success.getText());
-		
 		Element func2 = (Element) placeholder.getContent().get(2);
 		assertEquals("func", func2.getName());
 	}
 	
+	/**
+	 * Check if let correctly initiates both a function and variable
+	 * definition and destroys it afterwards.
+	 */
 	@Test
 	public void testVarFuncLet() {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfuncvar.wae");
@@ -313,6 +324,16 @@ public class TestStatements {
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
 		main.accept(visitor);
+		
+		// <func value="UNDEFINED" />success<func value="UNDEFINED" />
+		Element func1 = (Element) placeholder.getContent().get(0);
+		assertEquals("func", func1.getName());
+		assertEquals("UNDEFINED", func1.getAttributeValue("value"));
+		Text success = (Text) placeholder.getContent().get(1);
+		assertEquals("success", success.getText());
+		Element func2 = (Element) placeholder.getContent().get(2);
+		assertEquals("func", func2.getName());
+		assertEquals("UNDEFINED", func2.getAttributeValue("value"));
 	}
 	
 	@Test

@@ -162,7 +162,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				if(argument instanceof Argument.RegularArgument) {
 					// The combined value of regular arguments are stored as value attribute
 					argument.getExpression().accept(this);
-					value += text;
+					if(text.equals("undef")) { text = "UNDEFINED"; } // Convert undef to UNDEFINED to match reference impl
+					if(! value.equals("") && ! text.equals("")) { value += " "; } // Attach separator
+					value += text; // Store text in value
 				} else if(argument instanceof Argument.Attr) {
 					// Attribute arguments are stored as separate attribute
 					argument.getExpression().accept(this);
@@ -408,8 +410,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * definitions after completion of the let statement.
 	 */
 	public void visit(Statement.Let statement) {
-		// Extend function and variable definitions with assignments
+		// Create new environment for each assignment
 		for(Assignment assignment: statement.getAssignments()) {
+			environment = new Environment(environment);
 			assignment.accept(this);
 		}
 		
@@ -418,7 +421,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			sub.accept(this);
 		}
 		
-		// Restore actual environment
+		// Restore previous state by removing each assignment environment
 		for(int i = 0; i < statement.getAssignments().size(); i++) {
 			environment = environment.getParent();
 		}
