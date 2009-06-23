@@ -538,7 +538,25 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	private boolean containsYield(AbstractSyntaxNode node) {
 		if(node instanceof Statement.Yield) { 
 			return true; // Yield found!
-		} else {
+		} else if(node instanceof Markup.Call) {
+			// Retrieve called function and check if that contains a yield statement
+			String call = ((Markup.Call) node).getDesignator().getIdentifier().getName();
+			if(environment.containsFunction(call)) { 
+				return containsYield(environment.getFunction(call));
+			} return false; // Invalid call, stop checking
+		} else if(node instanceof FunctionDef) {
+			Environment previous = environment;
+			environment = functionEnvs.get(node);
+			
+			boolean success = false;
+			for(Statement stm: ((FunctionDef) node).getStatements()) {
+				// Delegate check to statements
+				if(containsYield(stm)) { success = true; }
+			}
+			
+			environment = previous;
+			return success;
+		} else {	
 			// Delegate check to children
 			for(AbstractSyntaxNode child: node.getChildren()) {
 				if(containsYield(child)) { return true; }

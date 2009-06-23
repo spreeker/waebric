@@ -18,8 +18,7 @@ import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
- * Statements, the biggest blob of all Waebric
- * 
+ * Statements
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
