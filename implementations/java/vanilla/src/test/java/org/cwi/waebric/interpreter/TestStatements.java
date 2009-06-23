@@ -344,6 +344,19 @@ public class TestStatements {
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
 		main.accept(visitor);
+		
+		// <func value="UNDEFINED" />success<func value="success" /><func value="UNDEFINED" />
+		Element func1 = (Element) placeholder.getContent().get(0);
+		assertEquals("func", func1.getName());
+		assertEquals("UNDEFINED", func1.getAttributeValue("value"));
+		Text success = (Text) placeholder.getContent().get(1);
+		assertEquals("success", success.getText());
+		Element func2 = (Element) placeholder.getContent().get(2);
+		assertEquals("func", func2.getName());
+		assertEquals("success", func2.getAttributeValue("value"));
+		Element func3 = (Element) placeholder.getContent().get(3);
+		assertEquals("func", func3.getName());
+		assertEquals("UNDEFINED", func3.getAttributeValue("value"));
 	}
 	
 	@Test
@@ -354,6 +367,9 @@ public class TestStatements {
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
 		main.accept(visitor);
+		
+		// success
+		assertEquals("success", placeholder.getText());
 	}
 	
 	/**
