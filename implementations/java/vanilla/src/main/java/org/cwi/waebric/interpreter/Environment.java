@@ -3,7 +3,6 @@ package org.cwi.waebric.interpreter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
@@ -13,7 +12,7 @@ import org.cwi.waebric.parser.ast.module.function.FunctionDef;
  * @author Jeroen van Schagen
  * @date 22-06-2009
  */
-public class Environment {
+public class Environment implements Cloneable {
 
 	private final Environment parent;
 	private final Map<String, FunctionDef> functions;
@@ -37,13 +36,25 @@ public class Environment {
 	}
 	
 	/**
+	 * Create a hard-copy of the current environment instance.
+	 * @return Cloned environment
+	 */
+	public Environment clone() {
+		Environment clone = new Environment(this.getParent());
+		clone.storeFunctionDefs(this.getFunctionDefs());
+		for(String variable: this.getVariableNames()) {
+			clone.storeVariable(variable, this.getVariable(variable));
+		}
+		
+		return clone;
+	}
+	
+	/**
 	 * Retrieve function names.
 	 * @return
 	 */
 	public Collection<String> getFunctionNames() {
-		Set<String> names = functions.keySet();
-		if(parent != null) { names.addAll(parent.getFunctionNames()); }
-		return names;
+		return functions.keySet();
 	}
 	
 	/**
@@ -73,9 +84,7 @@ public class Environment {
 	 * @return
 	 */
 	public Collection<String> getVariableNames() {
-		Set<String> names = variables.keySet();
-		if(parent != null) { names.addAll(parent.getFunctionNames()); }
-		return names;
+		return variables.keySet();
 	}
 	
 	/**
@@ -142,6 +151,12 @@ public class Environment {
 	 */
 	public Environment getParent() {
 		return parent;
+	}
+	
+	@Override
+	public String toString() {
+		return "Functions: " + functions.keySet().toString() 
+					+ "\nVariables: " + variables.keySet().toString();
 	}
 	
 }

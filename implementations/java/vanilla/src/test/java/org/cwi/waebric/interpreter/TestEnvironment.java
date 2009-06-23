@@ -125,5 +125,14 @@ public class TestEnvironment {
 		
 		assertEquals(func1, env.getFunction("func1"));
 	}
+	
+	@Test
+	public void testClone() {
+		Environment curr = new Environment(env);
+		Environment clone = curr.clone();
+		assertEquals(curr.getParent(), clone.getParent());
+		assertEquals(curr.getFunctionNames().size(), clone.getFunctionNames().size());
+		assertEquals(curr.getVariableNames().size(), clone.getVariableNames().size());
+	}
 
 }

@@ -1,6 +1,8 @@
 package org.cwi.waebric.interpreter;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
@@ -62,15 +64,20 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	private String text = "";
 	
 	/**
+	 * Function specific environments
+	 */
+	private final Map<FunctionDef, Environment> functionEnvs;
+	
+	/**
 	 * Current environment
 	 */
 	private Environment environment;
 	
 	/**
-	 * Stack of yield statements.
+	 * Current yield stack
 	 */
 	private Stack<AbstractSyntaxNode> yield;
-
+	
 	/**
 	 * Construct JDOM visitor
 	 * @param document
@@ -87,6 +94,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		this.document = document;
 		this.environment = environment;
 		yield = new Stack<AbstractSyntaxNode>();
+		functionEnvs = new HashMap<FunctionDef, Environment>();
 	}
 
 	/**
@@ -135,7 +143,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			FunctionDef function = environment.getFunction(name); // Retrieve function definition
 			
 			// Create new environment for function
-			environment = new Environment(environment);
+			Environment previous = environment; // Store previous environment
+			environment = new Environment(getEnvironment(function)); 
 			
 			// Store function variables
 			int index = 0; 
@@ -150,7 +159,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			function.accept(this); // Visit function
 			
 			// Restore parent environment
-			environment = environment.getParent();
+			environment = previous;
 		} else { // Call to undefined function
 			// Interpret designator similar to tag
 			Tag tag = new Tag(markup.getDesignator());
@@ -622,6 +631,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			definition.setFormals(formals);
 		}
 
+		// Store hard-copy of current environment
+		functionEnvs.put(definition, environment.clone()); 
+		
+		// Extend current environment with new function definition
 		environment.storeFunctionDef(definition);
 	}
 
@@ -875,6 +888,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @return
 	 */
 	public Environment getEnvironment() {
+		return environment;
+	}
+	
+	/**
+	 * Return environment specific to function.
+	 * @param function
+	 * @return
+	 */
+	private Environment getEnvironment(FunctionDef function) {
+		if(functionEnvs.containsKey(function)) { return functionEnvs.get(function); }
 		return environment;
 	}
 	
