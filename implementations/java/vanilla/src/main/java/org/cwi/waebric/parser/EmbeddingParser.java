@@ -1,7 +1,5 @@
 package org.cwi.waebric.parser;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
@@ -51,12 +49,6 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Embedding parseEmbedding() throws SyntaxException {
-		Token peek = tokens.peek(1);
-		if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
-			// Decompose stream when first token is embedding
-			tokenizeEmbedding();
-		}
-		
 		Embedding embedding = new Embedding();
 		embedding.setPre(parsePreText());
 		embedding.setEmbed(parseEmbed());
@@ -70,12 +62,12 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public PreText parsePreText() throws SyntaxException {
-		next(WaebricSymbol.DQUOTE, "Embedding opening quote \"", "\" TextChars* <");
+		decomposeEmbedding();
 		
-		// Parse text characters
+		next(WaebricSymbol.DQUOTE, "Embedding opening quote \"", "\" TextChars* <");
 		PreText pre = new PreText(parseTextChars());
-
 		next(WaebricSymbol.LESS_THAN, "Embedding pre-text symbol <", "TextChars* < Embed");
+		
 		return pre;
 	}
 	
@@ -85,6 +77,8 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Embed parseEmbed() throws SyntaxException {
+		decomposeEmbedding();
+		
 		// Parse mark-up tokens
 		NodeList<Markup> markups = new NodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
@@ -117,9 +111,9 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public TextTail parseTextTail() throws SyntaxException {
-		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
+		decomposeEmbedding();
 		
-		// Parse text characters
+		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
 		StringLiteral text = parseTextChars();
 		
 		// Determine tail type based on look-ahead information
@@ -154,6 +148,8 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public PostText parsePostText() throws SyntaxException {
+		decomposeEmbedding();
+		
 		next(WaebricSymbol.GREATER_THAN, "Embedding post-text symbol >", "Embed > TextChars*");
 		PostText post = new PostText(parseTextChars());
 		next(WaebricSymbol.DQUOTE, "Embedding closure quote \"", "> TextChars* \"");
@@ -167,6 +163,8 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public MidText parseMidText() throws SyntaxException {
+		decomposeEmbedding();
+		
 		next(WaebricSymbol.GREATER_THAN, "Embedding mid-text start symbol >", "> TextChars* <");
 		MidText mid = new MidText(parseTextChars());
 		next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
@@ -179,8 +177,9 @@ class EmbeddingParser extends AbstractParser {
 	 * @return
 	 */
 	public StringLiteral parseTextChars() {
-		String data = "";
+		decomposeEmbedding();
 		
+		String data = "";
 		while(tokens.hasNext()) {
 			String peek = tokens.peek(1).getLexeme().toString();
 			if(! WaebricScanner.isText(peek)) {
@@ -192,35 +191,6 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		return new StringLiteral(data);
-	}
-	
-	/**
-	 * Convert next token(s) to sub-tokens. For example:<br>
-	 * "<123>" is converted to [ ", <, 123, >, " ]
-	 * @throws SyntaxException 
-	 */
-	public void tokenizeEmbedding() throws SyntaxException {
-		Token embedding = tokens.next(); // Retrieve embedding token
-		String data = embedding.getLexeme().toString(); // Embedded token stream
-		
-		try {
-			StringReader reader = new StringReader(data);
-			WaebricScanner scanner = new WaebricScanner(reader);
-			scanner.tokenizeStream();
-			
-			// Make position of all tokens relative
-			for(Token token: scanner.getTokens()) {
-				token.setLine(embedding.getLine() + token.getLine());
-				token.setCharacter(embedding.getCharacter() + token.getCharacter());
-			}
-			
-			tokens.add(new Token('"', WaebricTokenSort.CHARACTER, embedding.getLine(), embedding.getCharacter()));
-			tokens.addAll(scanner.getTokens());
-			tokens.add(new Token('"', WaebricTokenSort.CHARACTER, embedding.getLine(), embedding.getCharacter()));
-			tokens.remove(); // Remove embedding token
-		} catch(IOException e) {
-			throw new InternalError();
-		}
 	}
 	
 	/**
@@ -244,6 +214,17 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Decompose stream when first token is embedding
+	 */
+	private void decomposeEmbedding() {
+		if(tokens.peek(1).getSort() == WaebricTokenSort.EMBEDDING) {
+			Token.EmbeddingToken embedding = (Token.EmbeddingToken) tokens.next();
+			tokens.remove(); // Remove embedding token
+			tokens.addAll(embedding.getLexeme()); // Attach sub-tokens
+		}
 	}
 	
 }

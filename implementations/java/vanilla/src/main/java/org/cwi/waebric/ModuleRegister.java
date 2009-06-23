@@ -13,8 +13,8 @@ import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
-import org.cwi.waebric.scanner.token.TokenIterator;
 
 /**
  * Module register allows users a clean interface to load the AST of modules based on
@@ -53,13 +53,17 @@ public class ModuleRegister {
 		// Attempt to process file
 		FileReader reader = new FileReader(getPath(identifier));
 		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator iterator = scanner.tokenizeStream(); // Scan module
-		WaebricParser parser = new WaebricParser(iterator);
-		List<SyntaxException> e = parser.parseTokens(); // Parse module
+		List<LexicalException> le = scanner.tokenizeStream(); // Scan module
+		WaebricParser parser = new WaebricParser(scanner.iterator());
+		List<SyntaxException> se = parser.parseTokens(); // Parse module
 		
-		if(e.size() > 0) {
+		if(le.size() + se.size() > 0) {
 			System.out.println("Error parsing module: " + getPath(identifier));
-			for(SyntaxException exception: e) {
+			for(LexicalException exception: le) {
+				exception.printStackTrace();
+			}
+			
+			for(SyntaxException exception: se) {
 				exception.printStackTrace();
 			}
 		}

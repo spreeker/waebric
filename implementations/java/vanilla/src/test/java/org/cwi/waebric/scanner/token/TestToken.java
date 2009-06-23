@@ -21,7 +21,7 @@ public class TestToken {
 		Token module = new Token.KeywordToken(WaebricKeyword.MODULE, 123, 321);
 		Token similar = new Token.KeywordToken(WaebricKeyword.MODULE, 123, 321);
 		Token difflit = new Token.KeywordToken(WaebricKeyword.END, 123, 321);
-		Token diffsort = new Token.KeywordToken(WaebricKeyword.MODULE, 123, 321);
+		Token diffsort = new Token.IdentifierToken("module", 123, 321);
 		Token diffline = new Token.KeywordToken(WaebricKeyword.MODULE, 124, 321);
 		Token diffchar = new Token.KeywordToken(WaebricKeyword.MODULE, 123, 1337);
 		

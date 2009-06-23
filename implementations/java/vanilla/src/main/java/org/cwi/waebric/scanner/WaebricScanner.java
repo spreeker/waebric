@@ -13,14 +13,7 @@ import org.cwi.waebric.scanner.token.TokenIterator;
 
 public class WaebricScanner {
 	
-	/**
-	 * Character value to indicate EOF
-	 */
 	public static final int EOF = -1;
-	
-	/**
-	 * Default tab character length
-	 */
 	public static final int TAB_LENGTH = 5;
 	
 	/**
@@ -47,6 +40,11 @@ public class WaebricScanner {
 	 * Collection of tokens
 	 */
 	private final List<Token> tokens;
+	
+	/**
+	 * Collection of lexical exceptions
+	 */
+	private final List<LexicalException> exceptions;
 
 	/**
 	 * Input stream
@@ -72,7 +70,8 @@ public class WaebricScanner {
 		cpos = new Position();
 		tpos = new Position();
 		
-		this.tokens = new ArrayList<Token>(); // Initiate collection
+		this.exceptions = new ArrayList<LexicalException>();
+		this.tokens = new ArrayList<Token>();
 		this.reader = reader; // Store reader reference
 		
 		read(); // Buffer first character
@@ -97,8 +96,8 @@ public class WaebricScanner {
 	 * @return
 	 * @throws IOException 
 	 */
-	public TokenIterator tokenizeStream() throws IOException {
-		if(tokens.size() > 0) { return new TokenIterator(tokens); }
+	public List<LexicalException> tokenizeStream() throws IOException {
+		if(tokens.size() > 0) { return exceptions; }
 		
 		while(curr != EOF) {
 			buffer = ""; // Clean buffer
@@ -117,7 +116,7 @@ public class WaebricScanner {
 			else { tokenizeCharacter(); }
 		}
 		
-		return new TokenIterator(tokens);
+		return exceptions;
 	}
 	
 	/**
@@ -240,23 +239,32 @@ public class WaebricScanner {
 		
 		int previous = 0;
 		do {
-			if(curr == '<') { // Embedding character detected
+			if(curr == EOF) {
+				// Unclosed text token, store exception
+				exceptions.add(new LexicalException.UnclosedText(buffer, tpos));
+				return;
+			}
+			
+			// Embedding character detected
+			if(curr == '<') {
+				// Scan further as embedding when not placed in string context
 				if(tokens.size() == 0 || tokens.get(tokens.size()-1).getLexeme() != WaebricKeyword.COMMENT) {
-					// Verify that text is not a string
 					tokenizeEmbedding(); return;
 				}
 			}
 
-			previous = curr; // Store current as previous to detect \
+			previous = curr; // Store current as previous to look for '\'
 			buffer += (char) curr; // Acceptable character, store in buffer
 			
 			read(); // Retrieve next character
-		} while((curr != '"' || previous == '\\') && curr != EOF);
+		} while(curr != '"' || previous == '\\');
 		
-		// Store text as token
-		Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
-		tokens.add(text);
-		
+		// Create token from buffered text
+		if(! buffer.equals("")) {
+			Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
+			tokens.add(text);
+		}
+
 		read(); // Skip closure " symbol
 	}
 	
@@ -273,9 +281,13 @@ public class WaebricScanner {
 		int previous = 0;
 		boolean quoted = false, embeded = false;
 		do {
-			if(curr == EOF) { flushBuffer(content); break; } // End-of-file
-			if(curr == '"' && previous != '\\') { quoted = ! quoted; }
+			if(curr == EOF) {
+				// Unclosed embedding token, store exception
+				exceptions.add(new LexicalException.UnclosedEmbedding(buffer, cpos));
+				return;
+			}
 			
+			if(curr == '"' && previous != '\\') { quoted = ! quoted; }
 			if(curr == '<' && ! quoted) { 
 				// Detected start of embed, process pre-text
 				content.add(new Token.TextToken(buffer, cpos.lineno, cpos.charno));
@@ -295,18 +307,18 @@ public class WaebricScanner {
 
 			read(); // Retrieve next character
 		} while(((curr != '"' || previous == '\\') || embeded));
-		
-		// Process post text
+
 		if(! buffer.equals("")) {
+			// Process post text
 			content.add(new Token.TextToken(buffer, cpos.lineno, cpos.charno));
 		}
-		
-		// Attach closure quote
+
 		if(curr != EOF) { 
+			// Attach closure quote
 			content.add(new Token.CharacterToken('"', cpos.lineno, cpos.charno));
 		}
 		
-		// Store embedding as token
+		// Create token from buffered content
 		Token embedding = new Token.EmbeddingToken(content, tpos.lineno, tpos.charno);
 		tokens.add(embedding);
 		
@@ -459,10 +471,18 @@ public class WaebricScanner {
 	
 	/**
 	 * Retrieve tokens
-	 * @return
+	 * @return list
 	 */
 	public List<Token> getTokens() {
 		return tokens;
+	}
+	
+	/**
+	 * Retrieve token iterator
+	 * @return iterator
+	 */
+	public TokenIterator iterator() {
+		return new TokenIterator(tokens);
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import java.util.List;
 import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
+import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -22,7 +23,9 @@ public class TestUtilities {
 		try {
 			Reader reader = new StringReader(data);
 			WaebricScanner scanner = new WaebricScanner(reader);
-			return scanner.tokenizeStream();
+			List<LexicalException> e = scanner.tokenizeStream();
+			assertEquals(0, e.size());
+			return scanner.iterator();
 		} catch(IOException e) {
 			return new TokenIterator(new ArrayList<Token>());
 		}
@@ -32,11 +35,11 @@ public class TestUtilities {
 		try {
 			FileReader reader = new FileReader(path);
 			WaebricScanner scanner = new WaebricScanner(reader);
-			TokenIterator iterator = scanner.tokenizeStream();
-			WaebricParser parser = new WaebricParser(iterator);
-			List<SyntaxException> e = parser.parseTokens();
-			assertEquals(0, e.size());
-	
+			List<LexicalException> le = scanner.tokenizeStream();
+			WaebricParser parser = new WaebricParser(scanner.iterator());
+			List<SyntaxException> se = parser.parseTokens();
+			assertEquals(0, le.size());
+			assertEquals(0, se.size());
 			// Retrieve root node
 			return parser.getAbstractSyntaxTree();
 		} catch(IOException e) {

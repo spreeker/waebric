@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
 
+import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -19,9 +21,7 @@ public class TestWaebricScanner {
 
 	@Test
 	public void testText() throws IOException {
-		StringReader reader = new StringReader("\"t\3xt\\\"works\\\"\"");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
+		TokenIterator i = TestUtilities.quickScan("\"t\3xt\\\"works\\\"\"");
 		
 		Token text = i.next();
 		assertEquals(WaebricTokenSort.TEXT, text.getSort());
@@ -32,19 +32,13 @@ public class TestWaebricScanner {
 	public void testUnclosedText() throws IOException {
 		StringReader reader = new StringReader("\"text");
 		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
-		Token text = i.next();
-		assertEquals(WaebricTokenSort.TEXT, text.getSort());
-		assertEquals("text", text.getLexeme());
+		List<LexicalException> e = scanner.tokenizeStream();
+		assertEquals(LexicalException.UnclosedText.class, e.get(0).getClass());
 	}
 	
 	@Test
 	public void testRegularEmbed() throws IOException {
-		StringReader reader = new StringReader("\"pre<123>post\"");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("\"pre<123>post\"");
 		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		
@@ -61,10 +55,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testQuotedEmbed() throws IOException {
-		StringReader reader = new StringReader("\"pre<\"\\\">\">post\"");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("\"pre<\"\\\">\">post\"");
 		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		
@@ -81,10 +72,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testComplicatedEmbed() throws IOException {
-		StringReader reader = new StringReader("\"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org\") \"Free CSS Templates\">\"\"");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-
+		TokenIterator i = TestUtilities.quickScan("\"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org\") \"Free CSS Templates\">\"");
 		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
 		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
 		
@@ -108,25 +96,13 @@ public class TestWaebricScanner {
 	public void testUnclosedEmbed() throws IOException {
 		StringReader reader = new StringReader("\"pre<post");
 		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
-		Token.EmbeddingToken embedding = (EmbeddingToken) i.next();
-		assertEquals(WaebricTokenSort.EMBEDDING, embedding.getSort());
-		
-		Iterator<Token> content = embedding.iterator();
-		assertEquals('"', content.next().getLexeme());
-		assertEquals("pre", content.next().getLexeme());
-		assertEquals('<', content.next().getLexeme());
-		assertEquals("post", content.next().getLexeme());
-		assertFalse(content.hasNext());
+		List<LexicalException> e = scanner.tokenizeStream();
+		assertEquals(LexicalException.UnclosedEmbedding.class, e.get(0).getClass());
 	}
 	
 	@Test
 	public void testIdCon() throws IOException {
-		StringReader reader = new StringReader("identifier1");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("identifier1");
 		Token identifier = i.next();
 		assertEquals(WaebricTokenSort.IDCON, identifier.getSort());
 		assertEquals("identifier1", identifier.getLexeme());
@@ -134,10 +110,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testNatCon() throws IOException {
-		StringReader reader = new StringReader("1337");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("1337");
 		Token natural = i.next();
 		assertEquals(WaebricTokenSort.NATCON, natural.getSort());
 		assertEquals(1337, natural.getLexeme());
@@ -145,10 +118,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testSymbolCon() throws IOException {
-		StringReader reader = new StringReader("'symbol");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("'symbol");
 		Token symbol = i.next();
 		assertEquals(WaebricTokenSort.SYMBOLCON, symbol.getSort());
 		assertEquals("symbol", symbol.getLexeme());
@@ -156,10 +126,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testKeyword() throws IOException {
-		StringReader reader = new StringReader("module");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("module");
 		Token keyword = i.next();
 		assertEquals(WaebricTokenSort.KEYWORD, keyword.getSort());
 		assertEquals(WaebricKeyword.MODULE, keyword.getLexeme());
@@ -167,10 +134,7 @@ public class TestWaebricScanner {
 	
 	@Test
 	public void testCharacter() throws IOException {
-		StringReader reader = new StringReader("@");
-		WaebricScanner scanner = new WaebricScanner(reader);
-		TokenIterator i = scanner.tokenizeStream();
-		
+		TokenIterator i = TestUtilities.quickScan("@");
 		Token character = i.next();
 		assertEquals(WaebricTokenSort.CHARACTER, character.getSort());
 		assertEquals('@', character.getLexeme());
