@@ -143,7 +143,7 @@ public class WaebricInterpreter {
 		if(path instanceof Path.PathWithDir) {
 			Directory dir = ((Path.PathWithDir) path).getDirName().getDirectory();
 			for(AbstractSyntaxNode element: dir.getChildren()) {
-				result += element.toString();
+				result += element.toString().toLowerCase();
 			}
 		}
 		

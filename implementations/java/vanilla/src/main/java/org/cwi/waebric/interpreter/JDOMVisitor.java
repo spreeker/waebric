@@ -538,12 +538,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	private boolean containsYield(AbstractSyntaxNode node) {
 		if(node instanceof Statement.Yield) { 
 			return true; // Yield found!
-		} else if(node instanceof Markup.Call) {
-			// Retrieve called function and check if that contains a yield statement
-			String call = ((Markup.Call) node).getDesignator().getIdentifier().getName();
-			if(environment.containsFunction(call)) { 
-				return containsYield(environment.getFunction(call));
-			} return false; // Invalid call, stop checking
 		} else {
 			// Delegate check to children
 			for(AbstractSyntaxNode child: node.getChildren()) {
@@ -780,20 +774,18 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		Expression variable = environment.getVariable(expression.getVar().getName());
-		if(variable instanceof Expression.VarExpression) {
-			if(environment.getParent() != null) { 
-				environment.getParent().getVariable(expression.getVar().getName());
-			} else {
-				this.text = "undef"; // Undeclared variable reference
-			}
+		String name = expression.getVar().getName();
+		
+		Expression reference = environment.getVariable(name);
+		if(reference == expression && environment.getParent() != null) {
+			reference = environment.getParent().getVariable(name);
+		}
+		
+		if(reference != null) {
+			reference.accept(this);
 		} else {
-			if(variable != null) {
-				variable.accept(this);
-			} else {
-				this.text = "undef"; // Undeclared variable reference
-			}
-		}	
+			this.text = "undef"; // Undeclared variable reference
+		}
 	}
 
 	/**
