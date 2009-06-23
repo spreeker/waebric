@@ -17,9 +17,15 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	private int curr;
 	
 	/**
+	 * Construct empty token iterator.
+	 */
+	public TokenIterator() {
+		this(new ArrayList<Token>());
+	}
+	
+	/**
 	 * Construct token iterator based on token collection. Current
 	 * position will by default be set on -1.
-	 * 
 	 * @param collection
 	 */
 	public TokenIterator(List<Token> collection) {
@@ -28,7 +34,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Construct token iterator based on a token collection and current position.
-	 * 
 	 * @param collection
 	 * @param curr
 	 */
@@ -44,7 +49,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Determine if iterator has next element
-	 * 
 	 * @return Boolean
 	 */
 	public boolean hasNext() {
@@ -53,7 +57,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Determine if iterator has k next element(s)
-	 * 
 	 * @param k Lookahead
 	 * @return Boolean
 	 */
@@ -63,7 +66,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 
 	/**
 	 * Retrieve next token and increment current position.
-	 * 
 	 * @return Token at current+1
 	 */
 	public Token next() {
@@ -73,7 +75,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Retrieve token which is positioned current+k.
-	 * 
 	 * @param k Lookahead
 	 * @return Token at current+k
 	 */
@@ -84,7 +85,6 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	
 	/**
 	 * Retrieve current token.
-	 * 
 	 * @return Current token
 	 */
 	public Token current() {

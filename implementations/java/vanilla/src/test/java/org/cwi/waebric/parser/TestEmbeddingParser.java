@@ -21,6 +21,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
+import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
@@ -106,7 +107,11 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPreText() throws SyntaxException {
-		iterator = TestUtilities.quickScan("\"left<");
+		// "left<
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('<', -1, -1));
+		iterator.add(new Token.TextToken("left", -1, -1));
+		iterator.add(new Token.CharacterToken('"', -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		PreText text = parser.parsePreText();
@@ -115,13 +120,24 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextTail() throws SyntaxException {
-		iterator = TestUtilities.quickScan(">right\"");
+		// >right"
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('"', -1, -1));
+		iterator.add(new Token.TextToken("right", -1, -1));
+		iterator.add(new Token.CharacterToken('>', -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		TextTail.PostTail post = (PostTail) parser.parseTextTail();
 		assertEquals("right", post.getPost().getText().toString());
 		
-		iterator = TestUtilities.quickScan(">mid<123>\"");
+		// >mid<123>"
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('"', -1, -1));
+		iterator.add(new Token.CharacterToken('>', -1, -1));
+		iterator.add(new Token.NaturalToken(123, -1, -1));
+		iterator.add(new Token.CharacterToken('<', -1, -1));
+		iterator.add(new Token.TextToken("mid", -1, -1));
+		iterator.add(new Token.CharacterToken('>', -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		TextTail.MidTail mid = (MidTail) parser.parseTextTail();
@@ -131,7 +147,11 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testPostTest() throws SyntaxException {
-		iterator = TestUtilities.quickScan(">right\"");
+		// >right"
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('"', -1, -1));
+		iterator.add(new Token.TextToken("right", -1, -1));
+		iterator.add(new Token.CharacterToken('>', -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		PostText text = parser.parsePostText();
