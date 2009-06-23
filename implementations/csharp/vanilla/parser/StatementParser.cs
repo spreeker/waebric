@@ -211,7 +211,26 @@ namespace Parser
         /// <returns>Parsed BlockStatement</returns>
         public BlockStatement ParseBlockStatement()
         {
-            return null;
+            BlockStatement blockStatement = new BlockStatement();
+
+            //Skip { token
+            NextToken("{", "{ statements* }", '{');
+
+            //Parse statements
+            while (TokenStream.HasNext())
+            {
+                if (TokenStream.Peek(1).GetValue().ToString() == "}")
+                {   //End of blockstatement
+                    break;
+                }
+
+                blockStatement.AddStatement(ParseStatement());
+            }
+
+            //Skip } token
+            NextToken("}", "{ statements* }", '}');
+
+            return blockStatement;
         }
 
         /// <summary>
@@ -220,7 +239,19 @@ namespace Parser
         /// <returns>Parsed CommentStatement</returns>
         public CommentStatement ParseCommentStatement()
         {
-            return null;
+            CommentStatement commentStatement = new CommentStatement();
+
+            //Skip comment token
+            NextToken("comment", "comment thisisacomment;", "comment");
+
+            //Parse comment
+            CurrentToken = TokenStream.NextToken();
+            commentStatement.SetCommentString(CurrentToken.ToString());
+
+            //Skip ; token
+            NextToken(";", "comment thisisacomment;", ';');
+            
+            return commentStatement;
         }
 
         /// <summary>
@@ -228,15 +259,6 @@ namespace Parser
         /// </summary>
         /// <returns>Parsed EchoStatement</returns>
         public EchoStatement ParseEchoStatement()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Parser for EchoEmbeddingStatement
-        /// </summary>
-        /// <returns>Parsed EchoEmbeddingStatement</returns>
-        public EchoEmbeddingStatement ParseEchoEmbeddingStatement()
         {
             return null;
         }
