@@ -15,7 +15,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -231,14 +230,9 @@ class StatementParser extends AbstractParser {
 		next(WaebricKeyword.COMMENT, "Comment keyword", "\"comment\"");
 		
 		Statement.Comment statement = new Statement.Comment();
-		next(WaebricTokenSort.TEXT, "Comments text", "\"comments\" Text");
-		if(WaebricScanner.isString(tokens.current().getLexeme().toString())) {
-			StrCon comment = new StrCon(tokens.current().getLexeme().toString());
-			statement.setComment(comment);
-		} else {
-			reportUnexpectedToken(tokens.current(), "comments text", "\"comments\" \" Text \"");
-		}
-		
+		next(WaebricTokenSort.STRING, "Comments text", "\"comments\" String");
+		StrCon comment = new StrCon(tokens.current().getLexeme().toString());
+		statement.setComment(comment);
 		next(WaebricSymbol.SEMICOLON, "Comment closure \";\"", "\"comment\" StrCon \";\"");
 		return statement;
 	}

@@ -41,6 +41,15 @@ public enum WaebricTokenSort {
 	TEXT,
 	
 	/**
+	 * Text token contains characters between two double quotes, 
+	 * always placed after a comment keyword.<br><br>
+	 * 
+	 * For example:<br>
+	 * 	<code>comment "This is a text"</code>
+	 */
+	STRING,
+	
+	/**
 	 * Embedding tokens are an extension to text tokens, which include mark-up and
 	 * sometimes an expression inside their structure.<br><br>
 	 * 

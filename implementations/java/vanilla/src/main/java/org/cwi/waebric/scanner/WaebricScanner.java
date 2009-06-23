@@ -243,14 +243,9 @@ public class WaebricScanner {
 				// Unclosed text token, store exception
 				exceptions.add(new LexicalException.UnclosedText(buffer, tpos));
 				return;
-			}
-			
-			// Embedding character detected
-			if(curr == '<') {
-				// Scan further as embedding when not placed in string context
-				if(tokens.size() == 0 || tokens.get(tokens.size()-1).getLexeme() != WaebricKeyword.COMMENT) {
-					tokenizeEmbedding(); return;
-				}
+			} else if(curr == '<' && ! inStringContext()) {
+				// Embedding character detected, scan as embed and quit text
+				tokenizeEmbedding(); return;
 			}
 
 			previous = curr; // Store current as previous to look for '\'
@@ -261,11 +256,33 @@ public class WaebricScanner {
 		
 		// Create token from buffered text
 		if(! buffer.equals("")) {
-			Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
-			tokens.add(text);
+			if(inStringContext()) {
+				if(isString(buffer)) {
+					Token string = new Token.StringToken(buffer, tpos.lineno, tpos.charno);
+					tokens.add(string);
+				} else {
+					
+				}
+			} else {
+				if(isText(buffer)) {
+					Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
+					tokens.add(text);
+				} else {
+					
+				}
+			}
 		}
 
 		read(); // Skip closure " symbol
+	}
+	
+	/**
+	 * Check if current token is in string context
+	 * @return
+	 */
+	private boolean inStringContext() {
+		return tokens.size() > 0 
+			&& tokens.get(tokens.size()-1).getLexeme() == WaebricKeyword.COMMENT;
 	}
 	
 	/**
@@ -403,7 +420,7 @@ public class WaebricScanner {
 						String sub = lexeme.substring(i);
 						return sub.matches("&#[0-9]+;.*") 
 								|| sub.matches("&#x[0-9a-fA-F]+;.*") 
-								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;.*");
+								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:\n\t\r ]*;.*");
 					}
 				} else { return false; }
 			}

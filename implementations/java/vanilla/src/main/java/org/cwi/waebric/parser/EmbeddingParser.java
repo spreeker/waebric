@@ -12,7 +12,6 @@ import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -81,7 +80,7 @@ class EmbeddingParser extends AbstractParser {
 		
 		// Parse mark-up tokens
 		NodeList<Markup> markups = new NodeList<Markup>();
-		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
+		while(tokens.hasNext() && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 			markups.add(markupParser.parseMarkup());
 		}
 		
@@ -180,14 +179,10 @@ class EmbeddingParser extends AbstractParser {
 		decomposeEmbedding();
 		
 		String data = "";
-		while(tokens.hasNext()) {
+		while(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.TEXT) {
 			String peek = tokens.peek(1).getLexeme().toString();
-			if(! WaebricScanner.isText(peek)) {
-				break; // No more text chars found, quit parse
-			} else {
-				data += peek; // Build string
-				tokens.next(); // Iterate to next token
-			}
+			data += peek; // Build string
+			tokens.next(); // Iterate to next token
 		}
 		
 		return new StringLiteral(data);

@@ -244,6 +244,32 @@ public abstract class Token {
 	}
 	
 	/**
+	 * String token
+	 * @author Jeroen van Schagen
+	 * @date 23-06-2009
+	 */
+	public static class StringToken extends Token {
+		
+		private String text;
+		
+		public StringToken(String text, int lineno, int charno) {
+			super(lineno, charno);
+			this.text = text;
+		}
+		
+		@Override
+		public Object getLexeme() {
+			return text;
+		}
+		
+		@Override
+		public WaebricTokenSort getSort() {
+			return WaebricTokenSort.STRING;
+		}
+		
+	}
+	
+	/**
 	 * Embedding token
 	 * @author Jeroen van Schagen
 	 * @date 23-06-2009

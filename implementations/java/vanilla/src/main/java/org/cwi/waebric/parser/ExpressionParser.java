@@ -10,7 +10,6 @@ import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
-import org.cwi.waebric.scanner.WaebricScanner;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -151,15 +150,9 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression.TextExpression parseTextExpression() throws SyntaxException {
 		next(WaebricTokenSort.TEXT, "Textual expression","Text -> Expression");
-		if(WaebricScanner.isText(tokens.current().getLexeme().toString())) {
-			Text text = new Text(new StringLiteral(tokens.current().getLexeme().toString()));
-			Expression.TextExpression expression = new Expression.TextExpression(text);
-			return expression;
-		} else {
-			reportUnexpectedToken(tokens.current(), "Text expression", "TextChar*");
-		}
-	
-		return null;
+		Text text = new Text(new StringLiteral(tokens.current().getLexeme().toString()));
+		Expression.TextExpression expression = new Expression.TextExpression(text);
+		return expression;
 	}
 	
 	/**
