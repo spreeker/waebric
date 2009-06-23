@@ -7,6 +7,6 @@ namespace Waebric
 {
     public enum  WaebricKeyword
     {
-        IF, COMMENT, ECHO, CDATA, EACH, LET, YIELD, MODULE, IMPORT, DEF, END, SITE,
+        IF, COMMENT, ECHO, CDATA, EACH, LET, YIELD, MODULE, IMPORT, DEF, END, SITE, STRING, RECORD, LIST
     };
 }
