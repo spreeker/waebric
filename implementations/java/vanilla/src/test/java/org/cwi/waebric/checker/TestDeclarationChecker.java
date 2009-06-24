@@ -2,7 +2,7 @@ package org.cwi.waebric.checker;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class TestDeclarationChecker {
 	}
 	
 	@Test
-	public void testDuplicateFunction() throws FileNotFoundException {
+	public void testDuplicateFunction() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/duplicate.wae");
 		checker.visit(ast.getRoot()); // Check modules
 		assertEquals(2, exceptions.size());
@@ -36,7 +36,7 @@ public class TestDeclarationChecker {
 	}
 	
 	@Test
-	public void testArityMismatch() throws FileNotFoundException {
+	public void testArityMismatch() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/aritymm.wae");
 		checker.visit(ast.getRoot()); // Check modules
 		assertEquals(2, exceptions.size());
@@ -45,7 +45,7 @@ public class TestDeclarationChecker {
 	}
 	
 	@Test
-	public void testUndefinedFunction() throws FileNotFoundException {
+	public void testUndefinedFunction() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/undeffunc.wae");
 		checker.visit(ast.getRoot()); // Check modules
 		assertEquals(3, exceptions.size());
@@ -55,14 +55,14 @@ public class TestDeclarationChecker {
 	}
 	
 	@Test
-	public void testVarCheck() throws FileNotFoundException {
+	public void testVarCheck() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/var/correctvar.wae");
 		checker.visit(ast.getRoot()); // Check modules
 		assertEquals(0, exceptions.size()); // No faults
 	}
 	
 	@Test
-	public void testUndefinedVar() throws FileNotFoundException {
+	public void testUndefinedVar() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/var/undefinedvar.wae");
 		checker.visit(ast.getRoot()); // Check modules
 		assertEquals(2, exceptions.size());

@@ -2,6 +2,7 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testMarkup() throws SyntaxException {
+	public void testMarkup() throws SyntaxException, IOException {
 		// Regular mark-up
 		iterator = TestUtilities.quickScan("myfunction@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
@@ -68,7 +69,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testDesignator() throws SyntaxException {
+	public void testDesignator() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("myfunction@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
@@ -78,7 +79,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testAttributes() throws SyntaxException {
+	public void testAttributes() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("@99#myattribute@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
@@ -90,7 +91,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testAttribute() throws SyntaxException {
+	public void testAttribute() throws SyntaxException, IOException {
 		// Identifier attribute
 		iterator = TestUtilities.quickScan("#myattribute");
 		parser = new MarkupParser(iterator, exceptions);
@@ -115,7 +116,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testArguments() throws SyntaxException {
+	public void testArguments() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("(var1=argument1,argument2)");
 		parser = new MarkupParser(iterator, exceptions);
 		
@@ -125,7 +126,7 @@ public class TestMarkupParser {
 	}
 	
 	@Test
-	public void testArgument() throws SyntaxException {
+	public void testArgument() throws SyntaxException, IOException {
 		// Variable argument
 		iterator = TestUtilities.quickScan("var1=12");
 		parser = new MarkupParser(iterator, exceptions);

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testFormals() throws SyntaxException {
+	public void testFormals() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("(var1,var2)");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -66,7 +67,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testVarAssignment() throws SyntaxException {
+	public void testVarAssignment() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("var=100;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -76,7 +77,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testIdConAssignment() throws SyntaxException {
+	public void testIdConAssignment() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("identifier1(var1,var2) = yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -89,7 +90,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testIfStatement() throws SyntaxException {
+	public void testIfStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("if(123) comment \"succes\";");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -99,7 +100,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testIfElseStatement() throws SyntaxException {
+	public void testIfElseStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("if(123) comment \"succes\"; else yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -110,7 +111,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testEchoEmbeddingStatement() throws SyntaxException {
+	public void testEchoEmbeddingStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("echo \"<\"text\">\";");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -119,7 +120,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testEchoExpressionStatement() throws SyntaxException {
+	public void testEchoExpressionStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("echo 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -128,7 +129,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testEachStatement() throws SyntaxException {
+	public void testEachStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("each(var1:10) comment \"test\";");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -139,7 +140,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testStatementCollection() throws SyntaxException {
+	public void testStatementCollection() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("{ yield; comment \"text\"; markup1 markup2 var; }");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -151,7 +152,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testLetStatement() throws SyntaxException {
+	public void testLetStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("let var=100; in comment \"test\"; end");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -163,7 +164,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testCDataStatement() throws SyntaxException {
+	public void testCDataStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("cdata 10;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -172,7 +173,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testCommentStatement() throws SyntaxException {
+	public void testCommentStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("comment \"OH NOES TEH HAXZOR\";");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -181,7 +182,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testYieldStatement() throws SyntaxException {
+	public void testYieldStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -190,7 +191,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testMarkupStatement() throws SyntaxException {
+	public void testMarkupStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -199,7 +200,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testCaveat() {
+	public void testCaveat() throws IOException {
 		// Mark-up
 		parser = new StatementParser(TestUtilities.quickScan("p;"), exceptions);
 		assertTrue(parser.isMarkup(1, true));
@@ -227,7 +228,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testExpressionMarkupsStatement() throws SyntaxException {
+	public void testExpressionMarkupsStatement() throws SyntaxException, IOException {
 		// Var expression
 		iterator = TestUtilities.quickScan("func1 func2 var;");
 		parser = new StatementParser(iterator, exceptions);
@@ -254,7 +255,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testEmbeddingMarkupsStatement() throws SyntaxException {
+	public void testEmbeddingMarkupsStatement() throws SyntaxException, IOException {
 		// TODO: Store text chars as combined text token
 		iterator = TestUtilities.quickScan("div#footer p.legal \"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org/\") \"Free CSS Templates\">\";");
 		parser = new StatementParser(iterator, exceptions);
@@ -265,7 +266,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testStatementMarkupsStatement() throws SyntaxException {
+	public void testStatementMarkupsStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("func1 func2 yield;;");
 		parser = new StatementParser(iterator, exceptions);
 		
@@ -283,7 +284,7 @@ public class TestStatementParser {
 	}
 	
 	@Test
-	public void testMarkupMarkupsStatement() throws SyntaxException {
+	public void testMarkupMarkupsStatement() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("func1 func2 func3();");
 		parser = new StatementParser(iterator, exceptions);
 		

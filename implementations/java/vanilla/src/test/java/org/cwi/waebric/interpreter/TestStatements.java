@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -279,7 +281,7 @@ public class TestStatements {
 	 * and destroys it afterwards.
 	 */
 	@Test
-	public void testVarLet() {
+	public void testVarLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letvar.wae");
 		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
@@ -295,7 +297,7 @@ public class TestStatements {
 	 * and destroys it afterwards.
 	 */
 	@Test
-	public void testFuncLet() {
+	public void testFuncLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfunc.wae");
 		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
@@ -317,7 +319,7 @@ public class TestStatements {
 	 * definition and destroys it afterwards.
 	 */
 	@Test
-	public void testVarFuncLet() {
+	public void testVarFuncLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfuncvar.wae");
 		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
@@ -337,7 +339,7 @@ public class TestStatements {
 	}
 	
 	@Test
-	public void testNestedLet() {
+	public void testNestedLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letnested.wae");
 		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		
@@ -360,7 +362,7 @@ public class TestStatements {
 	}
 	
 	@Test
-	public void testRecursiveLet() {
+	public void testRecursiveLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letrecurssion.wae");
 		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
 		

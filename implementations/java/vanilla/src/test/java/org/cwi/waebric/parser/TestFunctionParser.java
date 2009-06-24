@@ -2,6 +2,7 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class TestFunctionParser {
 	}
 	
 	@Test
-	public void testFunctionDef() throws SyntaxException {
+	public void testFunctionDef() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("home(var1,var2) comment \"lol\"; end");
 		parser = new FunctionParser(iterator, exceptions);
 		

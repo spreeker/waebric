@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testSite() throws SyntaxException {
+	public void testSite() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("site index1.html:function1(1);index2.html:function2 end");
 		parser = new SiteParser(iterator, exceptions);
 		
@@ -52,7 +53,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testMappings() throws SyntaxException {
+	public void testMappings() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("index1.html:function1(1);index2.html:function2");
 		parser = new SiteParser(iterator, exceptions);
 		
@@ -61,7 +62,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testMapping() throws SyntaxException {
+	public void testMapping() throws SyntaxException, IOException {
 		Mapping mapping = null;
 		
 		// Path with directory, mapping with arguments
@@ -81,7 +82,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testPath() throws SyntaxException {
+	public void testPath() throws SyntaxException, IOException {
 		// Path with directory
 		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla/myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
@@ -99,7 +100,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testDirName() throws SyntaxException {
+	public void testDirName() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
@@ -108,7 +109,7 @@ public class TestSiteParser {
 	}
 
 	@Test
-	public void testFileName() throws SyntaxException {
+	public void testFileName() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
@@ -118,7 +119,7 @@ public class TestSiteParser {
 	}
 	
 	@Test
-	public void testDirectory() throws SyntaxException {
+	public void testDirectory() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		

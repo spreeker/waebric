@@ -2,6 +2,7 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testPredicateWithoutType() throws SyntaxException {
+	public void testPredicateWithoutType() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("123");
 		parser = new PredicateParser(iterator, exceptions);
 		
@@ -50,7 +51,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testPredicateWithType() throws SyntaxException {
+	public void testPredicateWithType() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
@@ -61,7 +62,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testNotPredicate() throws SyntaxException {
+	public void testNotPredicate() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("!123");
 		parser = new PredicateParser(iterator, exceptions);
 		
@@ -70,7 +71,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testAndPredicate() throws SyntaxException {
+	public void testAndPredicate() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("123&&123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
@@ -81,7 +82,7 @@ public class TestPredicateParser {
 	
 	
 	@Test
-	public void testOrPredicate() throws SyntaxException {
+	public void testOrPredicate() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("123||123.string?");
 		parser = new PredicateParser(iterator, exceptions);
 		
@@ -91,7 +92,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testCorrectType() throws SyntaxException {
+	public void testCorrectType() throws SyntaxException, IOException {
 		// Correct type
 		iterator = TestUtilities.quickScan("string");
 		parser = new PredicateParser(iterator, exceptions);
@@ -101,7 +102,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testUnknownType() {
+	public void testUnknownType() throws IOException {
 		// Incorrect type: non-existing
 		iterator = TestUtilities.quickScan("unknown");
 		parser = new PredicateParser(iterator, exceptions);
@@ -114,7 +115,7 @@ public class TestPredicateParser {
 	}
 	
 	@Test
-	public void testEmptyType() {
+	public void testEmptyType() throws IOException {
 		// Incorrect type: empty
 		iterator = TestUtilities.quickScan("");
 		parser = new PredicateParser(iterator, exceptions);

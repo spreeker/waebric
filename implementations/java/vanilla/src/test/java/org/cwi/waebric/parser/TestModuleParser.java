@@ -2,6 +2,7 @@ package org.cwi.waebric.parser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testModuleId() throws SyntaxException {
+	public void testModuleId() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -51,7 +52,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testModules() throws SyntaxException {
+	public void testModules() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("module mymodule1\nmodule mymodule2");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -64,7 +65,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testModule() throws SyntaxException {
+	public void testModule() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("module mymodule\nimport src.test.waebric.helloworld\nsite\n\tindex.html: home(1)\nend\ndef home\nend");
 		parser = new ModuleParser(iterator, exceptions);
 		
@@ -79,7 +80,7 @@ public class TestModuleParser {
 	}
 	
 	@Test
-	public void testImport() throws SyntaxException {
+	public void testImport() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("org.cwi.waebric.mymodule");
 		parser = new ModuleParser(iterator, exceptions);
 		

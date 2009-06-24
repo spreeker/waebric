@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testEmbedding() throws SyntaxException {
+	public void testEmbedding() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("\"<markup1(\"txtarg\") \"name\">\"");
 		parser = new EmbeddingParser(iterator, exceptions);
 		
@@ -71,7 +72,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testEmbed() throws SyntaxException {
+	public void testEmbed() throws SyntaxException, IOException {
 		// Expression only embed
 		iterator = TestUtilities.quickScan("123");
 		parser = new EmbeddingParser(iterator, exceptions);
@@ -106,7 +107,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testPreText() throws SyntaxException {
+	public void testPreText() throws SyntaxException, IOException {
 		// "left<
 		iterator = new TokenIterator();
 		iterator.add(new Token.CharacterToken('<', -1, -1));
@@ -119,7 +120,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testTextTail() throws SyntaxException {
+	public void testTextTail() throws SyntaxException, IOException {
 		// >right"
 		iterator = new TokenIterator();
 		iterator.add(new Token.CharacterToken('"', -1, -1));
@@ -146,7 +147,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testPostTest() throws SyntaxException {
+	public void testPostTest() throws SyntaxException, IOException {
 		// >right"
 		iterator = new TokenIterator();
 		iterator.add(new Token.CharacterToken('"', -1, -1));
@@ -160,7 +161,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testMidText() throws SyntaxException {
+	public void testMidText() throws SyntaxException, IOException {
 		// >mid<
 		iterator = new TokenIterator();
 		iterator.add(new Token.CharacterToken('<', -1, -1));
@@ -187,7 +188,7 @@ public class TestEmbeddingParser {
 	}
 	
 	@Test
-	public void testCaveat() {
+	public void testCaveat() throws IOException {
 		// Mark-up
 		parser = new EmbeddingParser(TestUtilities.quickScan("p;"), exceptions);
 		assertFalse(parser.isMarkup(1));

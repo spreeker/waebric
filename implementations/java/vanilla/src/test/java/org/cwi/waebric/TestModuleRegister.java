@@ -19,7 +19,7 @@ public class TestModuleRegister {
 	
 	@Before
 	public void setUp() throws IOException {
-		ast = TestUtilities.quickParse("src/test/waebric/helloworld.wae");
+		ast = TestUtilities.quickParse("src/test/waebric/mod/dependantmod1.wae");
 		identifier = ast.getRoot().get(0).getIdentifier();
 		ModuleRegister.getInstance().cacheModule(identifier, ast);
 	}
@@ -40,7 +40,7 @@ public class TestModuleRegister {
 	public void testLoadDependancies() {
 		assertEquals(1, ast.getRoot().size());
 		AbstractSyntaxTree dependencies = ModuleRegister.getInstance().loadDependancies(ast);
-		assertEquals(2, dependencies.getRoot().size()); // Sub module is imported
+		assertEquals(3, dependencies.getRoot().size()); // Sub module is imported
 	}
 	
 	@Test

@@ -2,7 +2,7 @@ package org.cwi.waebric.checker;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class TestModuleChecker {
 	}
 
 	@Test
-	public void testInvalidImport() throws FileNotFoundException {
+	public void testInvalidImport() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/invalidimport.wae");
 		checker.visit(ast.getRoot());
 		assertEquals(1, exceptions.size());
@@ -37,7 +37,7 @@ public class TestModuleChecker {
 	}
 	
 	@Test
-	public void testInfiniteImportLoop() throws FileNotFoundException {
+	public void testInfiniteImportLoop() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/selfloop.wae");
 		checker.visit(ast.getRoot());
 		assertEquals(0, exceptions.size()); // No faults

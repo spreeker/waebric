@@ -3,6 +3,7 @@ package org.cwi.waebric.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TestExpressionParser {
 	}
 
 	@Test
-	public void testParseExpression() throws SyntaxException {
+	public void testParseExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -45,7 +46,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testCat() throws SyntaxException {
+	public void testCat() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("\"http://www.cwi.nl/?site=\" + var + \",user=\" + my.field");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -56,7 +57,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testVarExpression() throws SyntaxException {
+	public void testVarExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("variable1");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -65,7 +66,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testFieldExpression() throws SyntaxException {
+	public void testFieldExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("exp1.identifier2.identifier");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -79,7 +80,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testSymbolExpression() throws SyntaxException {
+	public void testSymbolExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("'abc");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -88,7 +89,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testNatExpression() throws SyntaxException {
+	public void testNatExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("123");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -97,7 +98,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testTextExpression() throws SyntaxException {
+	public void testTextExpression() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("\"bla\"");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -106,7 +107,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testExpressionCollection() throws SyntaxException {
+	public void testExpressionCollection() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("[variable1,variable2]");
 		parser = new ExpressionParser(iterator, exceptions);
 		
@@ -117,7 +118,7 @@ public class TestExpressionParser {
 	}
 	
 	@Test
-	public void testVarKeyValuePairCollection() throws SyntaxException {
+	public void testVarKeyValuePairCollection() throws SyntaxException, IOException {
 		iterator = TestUtilities.quickScan("{identifier1: variable1, identifier2: variable2}");
 		parser = new ExpressionParser(iterator, exceptions);
 		
