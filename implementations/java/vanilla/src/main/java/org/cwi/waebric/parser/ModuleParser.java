@@ -42,18 +42,16 @@ class ModuleParser extends AbstractParser {
 	 * Module* -> Modules
 	 * @throws SyntaxException 
 	 */
-	public Modules parseModules() {
+	public Modules parseModules() throws SyntaxException  {
 		Modules modules = new Modules();
 		
 		// Parse Module*
-		try {
-			while(tokens.hasNext()) {
-				next(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
-				Module module = parseModule();
-				modules.add(module);
-			}
-		} catch(SyntaxException e) { }
-		
+		while(tokens.hasNext()) {
+			next(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
+			Module module = parseModule();
+			modules.add(module);
+		}
+
 		return modules;
 	}
 	
