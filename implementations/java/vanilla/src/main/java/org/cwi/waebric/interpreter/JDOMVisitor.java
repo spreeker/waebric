@@ -480,45 +480,36 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret mark-ups embedded in statement.
 	 */
 	public void visit(MarkupMarkup statement) {
-		for(Markup markup: statement.getMarkups()) {
-			markup.accept(this);
-			if(isCall(markup)) { return; } // Quit interpreting after valid call
-		}
-		
-		statement.getMarkup().accept(this);
-	}
-
-	/**
-	 * Interpret mark-ups and expression embedded in statement.
-	 */
-	public void visit(MarkupExp statement) {
-		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
-			Markup markup = markups.next();
-
-			if(containsYield(markup)) {
-				// Determine and store yield value
-				if(markups.hasNext()) {
-					// Remainder of mark-up chain
-					NodeList<Markup> remainder = new NodeList<Markup>();
-					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupExp expr = new MarkupExp(remainder);
-					expr.setExpression(statement.getExpression());
-					yield.add(expr);
-				} else {
-					// Single remaining expression
-					yield.add(statement.getExpression());
+			Markup markup = markups.next(); 
+			if(isCall(markup)) {
+				// Retrieve called function
+				FunctionDef function = environment.getFunction(
+						markup.getDesignator().getIdentifier().getName());
+				
+				if(containsYield(function)) {
+					// Remainder of mark-up chain is stored as yield statement
+					if(markups.hasNext()) {
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						MarkupMarkup replacement = new MarkupMarkup(remainder);
+						replacement.setMarkup(statement.getMarkup());
+						yield.add(replacement);
+					} else {
+						yield.add(statement.getMarkup());
+					}
 				}
+				
+				markup.accept(this); // Visit call
+				return;
+			} else {
+				markup.accept(this); // Visit tag
 			}
-
-			markup.accept(this); // Visit mark-up
-			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
 		// Interpret expression when mark-up chain is call free
-		statement.getExpression().accept(this);
-		addContent(new Text(text));
+		statement.getMarkup().accept(this);
 	}
 	
 	/**
@@ -526,12 +517,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param markup
 	 */
 	public boolean isCall(Markup markup) {
-		if(markup instanceof Call) {
-			String name = markup.getDesignator().getIdentifier().getName();
-			return environment.getFunction(name) != null;
-		}
-		
-		return false;
+		String name = markup.getDesignator().getIdentifier().getName();
+		return environment.getFunction(name) != null;
 	}
 	
 	/**
@@ -542,28 +529,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	private boolean containsYield(AbstractSyntaxNode node) {
 		if(node instanceof Statement.Yield) { return true; }
-		else if(node instanceof Markup.Call) {
-			// Retrieve called function and check if that contains a yield statement
-			String call = ((Markup.Call) node).getDesignator().getIdentifier().getName();
-			if(environment.containsFunction(call)) { 
-				return containsYield(environment.getFunction(call));
-			} return false; // Invalid call, stop checking
-		} else if(node instanceof FunctionDef) {
-			FunctionDef function = (FunctionDef) node;
-			
-			// Retrieve function environment to process actual calls
-			Environment previous = environment;
-			environment = getEnvironment(function);
-			
-			boolean success = false;
-			// Delegate check to statements
-			for(Statement stm: function.getStatements()) {
-				if(containsYield(stm)) { success = true; }
-			}
-			
-			environment = previous; // Restore previous environment
-			return success;
-		} else {
+		else {
 			// Delegate check to children
 			for(AbstractSyntaxNode child: node.getChildren()) {
 				if(containsYield(child)) { return true; }
@@ -572,31 +538,72 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 
 	/**
+	 * Interpret mark-ups and expression embedded in statement.
+	 */
+	public void visit(MarkupExp statement) {
+		Iterator<Markup> markups = statement.getMarkups().iterator();
+		while(markups.hasNext()) {
+			Markup markup = markups.next(); 
+			if(isCall(markup)) {
+				// Retrieve called function
+				FunctionDef function = environment.getFunction(
+						markup.getDesignator().getIdentifier().getName());
+				
+				if(containsYield(function)) {
+					// Remainder of mark-up chain is stored as yield statement
+					if(markups.hasNext()) {
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						MarkupExp replacement = new MarkupExp(remainder);
+						replacement.setExpression(statement.getExpression());
+						yield.add(replacement);
+					} else {
+						yield.add(statement.getExpression());
+					}
+				}
+				
+				markup.accept(this); // Visit call
+				return;
+			} else {
+				markup.accept(this); // Visit tag
+			}
+		}
+		
+		// Interpret expression when mark-up chain is call free
+		statement.getExpression().accept(this);
+		addContent(new Text(text));
+	}
+
+	/**
 	 * Interpret mark-ups and sub-statement embedded in statement.
 	 */
 	public void visit(MarkupStat statement) {
-		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
-			Markup markup = markups.next();
-
-			if(containsYield(markup)) {
-				// Determine and store yield value
-				if(markups.hasNext()) {
-					// Remainder of mark-up chain
-					NodeList<Markup> remainder = new NodeList<Markup>();
-					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupStat stm = new MarkupStat(remainder);
-					stm.setStatement(statement.getStatement());
-					yield.add(stm);
-				} else {
-					// Single remaining statement
-					yield.add(statement.getStatement());
+			Markup markup = markups.next(); 
+			if(isCall(markup)) {
+				// Retrieve called function
+				FunctionDef function = environment.getFunction(
+						markup.getDesignator().getIdentifier().getName());
+				
+				if(containsYield(function)) {
+					// Remainder of mark-up chain is stored as yield statement
+					if(markups.hasNext()) {
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						MarkupStat replacement = new MarkupStat(remainder);
+						replacement.setStatement(statement.getStatement());
+						yield.add(replacement);
+					} else {
+						yield.add(statement.getStatement());
+					}
 				}
+				
+				markup.accept(this); // Visit call
+				return;
+			} else {
+				markup.accept(this); // Visit tag
 			}
-
-			markup.accept(this); // Visit mark-up
-			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
 		// Interpret statement when mark-up chain is call free
@@ -607,31 +614,35 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret mark-ups and embedding embedded in statement.
 	 */
 	public void visit(MarkupEmbedding statement) {
-		// Visit mark-ups
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
-			Markup markup = markups.next();
-
-			if(containsYield(markup)) {
-				// Determine and store yield value
-				if(markups.hasNext()) {
-					// Remainder of mark-up chain
-					NodeList<Markup> remainder = new NodeList<Markup>();
-					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupEmbedding embedding = new MarkupEmbedding(remainder);
-					embedding.setEmbedding(statement.getEmbedding());
-					yield.add(embedding);
-				} else {
-					// Single remaining embedding
-					yield.add(statement.getEmbedding());
+			Markup markup = markups.next(); 
+			if(isCall(markup)) {
+				// Retrieve called function
+				FunctionDef function = environment.getFunction(
+						markup.getDesignator().getIdentifier().getName());
+				
+				if(containsYield(function)) {
+					// Remainder of mark-up chain is stored as yield statement
+					if(markups.hasNext()) {
+						NodeList<Markup> remainder = new NodeList<Markup>();
+						while(markups.hasNext()) { remainder.add(markups.next()); }
+						MarkupEmbedding replacement = new MarkupEmbedding(remainder);
+						replacement.setEmbedding(statement.getEmbedding());
+						yield.add(replacement);
+					} else {
+						yield.add(statement.getEmbedding());
+					}
 				}
+				
+				markup.accept(this); // Visit call
+				return;
+			} else {
+				markup.accept(this); // Visit tag
 			}
-
-			markup.accept(this); // Visit mark-up
-			if(isCall(markup)) { return; } // Quit interpreting after valid call
 		}
 		
-		// Interpret embedding when mark-up chain is call free
+		// Interpret statement when mark-up chain is call free
 		statement.getEmbedding().accept(this);
 	}
 
@@ -912,8 +923,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * 
 	 * @param statement
 	 */
-	public void addYield(AbstractSyntaxNode node) {
-		yield.push(node);
+	public void addYield(AbstractSyntaxNode statement) {
+		yield.push(statement);
 	}
 	
 	/**
