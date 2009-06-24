@@ -31,11 +31,6 @@ import org.jdom.output.XMLOutputter;
  * @date 10-06-2009
  */
 public class WaebricInterpreter {
-
-	/**
-	 * Output directory
-	 */
-	public static final String OUTPUT_DIR = "output/";
 	
 	/**
 	 * Output stream in which "main" will be written
@@ -103,30 +98,32 @@ public class WaebricInterpreter {
 			}
 		}
 		
-		// Interpret sites and store in files
-		for(Site site: module.getSites()) {
-			for(Mapping mapping: site.getMappings()) {
-				Document document = new Document();
-				
-				Markup markup = mapping.getMarkup();
-				if(markup instanceof Markup.Tag) {
-					// Interpret mapping tag as call
-					markup = new Markup.Call(markup.getDesignator());
-				}
-				
-				// Visit mapping
-				JDOMVisitor visitor = new JDOMVisitor(document, environment);
-				markup.accept(visitor);
+		// Interpret sites of all used modules and store on file system
+		for(Module mod: dependancies) {
+			for(Site site: mod.getSites()) {
+				for(Mapping mapping: site.getMappings()) {
+					Document document = new Document();
+					
+					Markup markup = mapping.getMarkup();
+					if(markup instanceof Markup.Tag) {
+						// Interpret mapping tag as call
+						markup = new Markup.Call(markup.getDesignator());
+					}
+					
+					// Visit mapping
+					JDOMVisitor visitor = new JDOMVisitor(document, environment);
+					markup.accept(visitor);
 
-				// Retrieve relative file path
-				String path = getPath(mapping.getPath());
-				
-				try {
-					// Output document
-					OutputStream os = getOutputStream(path);
-					outputDocument(document, os);
-				} catch (IOException e) {
-					e.printStackTrace();
+					// Retrieve relative file path
+					String path = getPath(mapping.getPath());
+					
+					try {
+						// Output document
+						OutputStream os = getOutputStream(path);
+						outputDocument(document, os);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -145,14 +142,14 @@ public class WaebricInterpreter {
 			for(AbstractSyntaxNode element: dir.getChildren()) {
 				result += element.toString().toLowerCase();
 			}
+			result += "/";
 		}
 		
-		result += "/";
 		result += path.getFileName().getName().toString();
 		result += ".";
 		result += path.getFileName().getExt().toString();
 		
-		return OUTPUT_DIR + result;
+		return result;
 	}
 
 	/**
