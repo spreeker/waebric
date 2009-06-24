@@ -46,26 +46,21 @@ public class ModuleRegister {
 	 * @param identifier Module identifier, maps on relative file position.
 	 * @throws IOException 
 	 */
-	public AbstractSyntaxTree loadModule(ModuleId identifier) throws IOException {
+	public AbstractSyntaxTree loadModule(ModuleId identifier) throws IOException, ModuleLoadException {
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
 		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 
 		// Attempt to process file
-		FileReader reader = new FileReader(getPath(identifier));
+		String path = getPath(identifier);
+		FileReader reader = new FileReader(path);
 		WaebricScanner scanner = new WaebricScanner(reader);
 		List<LexicalException> le = scanner.tokenizeStream(); // Scan module
 		WaebricParser parser = new WaebricParser(scanner.iterator());
 		List<SyntaxException> se = parser.parseTokens(); // Parse module
 		
+		// Requested module contains lexical, s
 		if(le.size() + se.size() > 0) {
-			System.out.println("Error parsing module: " + getPath(identifier));
-			for(LexicalException exception: le) {
-				exception.printStackTrace();
-			}
-			
-			for(SyntaxException exception: se) {
-				exception.printStackTrace();
-			}
+			throw new ModuleLoadException(path, le, se);
 		}
 		
 		// Retrieve modules
@@ -124,7 +119,7 @@ public class ModuleRegister {
 						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); 
 						loadDependancies(sub.getRoot());
 						result.getRoot().addAll(sub.getRoot());
-					} catch (IOException e) {
+					} catch (Exception e) {
 						// Skip invalid import directives
 					}
 				}
@@ -194,4 +189,22 @@ public class ModuleRegister {
 		return new ModuleRegister();
 	}
 
+	/**
+	 * Thrown when lexical or syntactical exceptions occured during
+	 * the loading of a module.
+	 * @author Jeroen van Schagen
+	 */
+	public class ModuleLoadException extends Exception {
+
+		/**
+		 * Generated ID
+		 */
+		private static final long serialVersionUID = -1908201843040907562L;
+		
+		public ModuleLoadException(String path, List<LexicalException> le, List<SyntaxException> se) {
+			super("Module \"" + path + "\" could not be loaded, because several errors occured: " + le.toString() + se.toString());
+		}
+		
+	}
+	
 }
