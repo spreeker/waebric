@@ -27,7 +27,7 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	
 	@Override
 	public void visit(Module module) {
-		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
+		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		for(Module dependancy: dependancies) {
 			for(Import imprt: dependancy.getImports()) {
 				imprt.accept(this);

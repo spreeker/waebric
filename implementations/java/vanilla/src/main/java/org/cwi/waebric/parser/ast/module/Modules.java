@@ -1,5 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
+import java.util.Collection;
+
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
 
@@ -11,6 +13,19 @@ import org.cwi.waebric.parser.ast.NodeList;
  */
 public class Modules extends NodeList<Module> {
 
+	/**
+	 * Construct empty modules.
+	 */
+	public Modules() { }
+	
+	/**
+	 * Construct modules with a collection of base modules.
+	 * @param modules
+	 */
+	public Modules(Collection<Module> modules) {
+		this.addAll(modules);
+	}
+	
 	/**
 	 * Check if a module identifier is contained by modules.
 	 * @param identifier

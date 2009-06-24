@@ -32,13 +32,13 @@ public class ModuleRegister {
 	/**
 	 * Cached modules
 	 */
-	private final Map<ModuleId, AbstractSyntaxTree> cache;
+	private final Map<ModuleId, Modules> cache;
 	
 	/**
 	 * Construct cache.
 	 */
 	private ModuleRegister() {
-		cache = new HashMap<ModuleId, AbstractSyntaxTree>();
+		cache = new HashMap<ModuleId, Modules>();
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class ModuleRegister {
 	 * @param identifier Module identifier, maps on relative file position.
 	 * @throws IOException 
 	 */
-	public AbstractSyntaxTree loadModule(ModuleId identifier) throws IOException, ModuleLoadException {
+	public Modules requestModules(ModuleId identifier) throws IOException, ModuleLoadException {
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
 		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 
@@ -64,9 +64,9 @@ public class ModuleRegister {
 		}
 		
 		// Retrieve modules
-		AbstractSyntaxTree tree = parser.getAbstractSyntaxTree();
-		if(tree != null) { cacheModule(identifier, tree); } // Cache dependent modules
-		return tree;
+		Modules data = parser.getAbstractSyntaxTree().getRoot();
+		if(data != null) { cacheModules(identifier, data); } // Cache dependent modules
+		return data;
 	}
 	
 	/**
@@ -75,10 +75,10 @@ public class ModuleRegister {
 	 * require a bit more memory to store all loaded modules, when the memory
 	 * consumption gets too high use the clearCache function.
 	 * @param identifier Module identifier
-	 * @param ast Abstract syntax tree
+	 * @param modules Abstract syntax tree
 	 */
-	public void cacheModule(ModuleId identifier, AbstractSyntaxTree ast) {
-		cache.put(identifier, ast);
+	public void cacheModules(ModuleId identifier, Modules modules) {
+		cache.put(identifier, modules);
 	}
 	
 	/**
@@ -91,34 +91,21 @@ public class ModuleRegister {
 	}
 	
 	/**
-	 * Retrieve module from cache, this function only works when the module
-	 * has been stored in cache. Non-cached modules should be retrieved using
-	 * the loadModule procedure, this will automatically cache the AST.
-	 * @param identifier
-	 * @return Module contents
-	 */
-	public AbstractSyntaxTree requestModule(ModuleId identifier) {
-		return cache.get(identifier);
-	}
-	
-	/**
 	 * Retrieve all transitive dependent modules.
 	 * @param modules Modules from which dependent modules are retrieved.
 	 * @return 
 	 * @throws  
 	 */
-	public AbstractSyntaxTree loadDependancies(Modules modules) {
-		AbstractSyntaxTree result = new AbstractSyntaxTree();
-		result.getRoot().addAll(modules); // Clone modules content
-		
+	public Modules loadDependencies(Modules modules) {
+		Modules result = new Modules(modules); // Clone modules content
+
 		for(Module module: modules) {
 			for(Import imprt: module.getImports()) {
-				if(! result.getRoot().contains(imprt.getIdentifier())) {
+				if(! result.contains(imprt.getIdentifier())) {
 					try {
-						// Retrieve and store AST of imported modules
-						AbstractSyntaxTree sub = loadModule(imprt.getIdentifier()); 
-						loadDependancies(sub.getRoot());
-						result.getRoot().addAll(sub.getRoot());
+						// Retrieve dependent modules
+						Modules dependancy = requestModules(imprt.getIdentifier()); 
+						result.addAll(loadDependencies(dependancy)); // Recursively check for other dependencies
 					} catch (Exception e) {
 						// Skip invalid import directives
 					}
@@ -134,10 +121,10 @@ public class ModuleRegister {
 	 * @param module Module from which dependent modules are retrieved.
 	 * @return
 	 */
-	public AbstractSyntaxTree loadDependancies(Module module) {
+	public Modules loadDependencies(Module module) {
 		Modules modules = new Modules();
 		modules.add(module);
-		return loadDependancies(modules);
+		return loadDependencies(modules);
 	}
 	
 	/**
@@ -145,8 +132,8 @@ public class ModuleRegister {
 	 * @param ast Abstract syntax tree from which dependent modules are retrieved.
 	 * @return
 	 */
-	public AbstractSyntaxTree loadDependancies(AbstractSyntaxTree ast) {
-		return loadDependancies(ast.getRoot());
+	public Modules loadDependencies(AbstractSyntaxTree ast) {
+		return loadDependencies(ast.getRoot());
 	}
 	
 	/**

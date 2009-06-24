@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.parser.ast.module.Modules;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,13 +15,13 @@ import org.junit.Test;
 public class TestModuleRegister {
 	
 	private ModuleId identifier;
-	private AbstractSyntaxTree ast;
+	private Modules content;
 	
 	@Before
 	public void setUp() throws IOException {
-		ast = TestUtilities.quickParse("src/test/waebric/mod/dependantmod1.wae");
-		identifier = ast.getRoot().get(0).getIdentifier();
-		ModuleRegister.getInstance().cacheModule(identifier, ast);
+		content = TestUtilities.quickParse("src/test/waebric/mod/dependantmod1.wae").getRoot();
+		identifier = content.get(0).getIdentifier();
+		ModuleRegister.getInstance().cacheModules(identifier, content);
 	}
 	
 	@After
@@ -38,9 +38,9 @@ public class TestModuleRegister {
 	
 	@Test
 	public void testLoadDependancies() {
-		assertEquals(1, ast.getRoot().size());
-		AbstractSyntaxTree dependencies = ModuleRegister.getInstance().loadDependancies(ast);
-		assertEquals(3, dependencies.getRoot().size()); // Sub module is imported
+		assertEquals(1, content.size());
+		Modules dependencies = ModuleRegister.getInstance().loadDependencies(content);
+		assertEquals(3, dependencies.size()); // Sub module is imported
 	}
 	
 	@Test

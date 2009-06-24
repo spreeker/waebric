@@ -45,13 +45,12 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	
 	@Override
 	public void visit(Module module) {
-		// Retrieve all dependent modules
-		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
-		
-		// Store function definitions in current environment
+		// Retrieve all dependent modules and store their definitions
+		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		storeFunctionDefinitions(module, dependancies);
 		
 		for(Module component: dependancies) {
+			// Check each function definition for invalid definitions
 			for(FunctionDef function: component.getFunctionDefinitions()) {
 				function.accept(this);
 			}

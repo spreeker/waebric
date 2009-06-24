@@ -73,7 +73,7 @@ public class WaebricInterpreter {
 	public void interpretModule(Module module) {
 		// Retrieve function definitions
 		Collection<FunctionDef> functions = new ArrayList<FunctionDef>();
-		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
+		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		for(Module dependancy: dependancies) {
 			functions.addAll(dependancy.getFunctionDefinitions());
 		}
