@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.cwi.waebric.checker.SemanticException;
+import org.cwi.waebric.checker.WaebricChecker;
 import org.cwi.waebric.interpreter.WaebricInterpreter;
 import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
@@ -74,22 +76,22 @@ public class CommandLineCompiler {
 				return; // Quit application
 			}
 			
-//			WaebricChecker checker = new WaebricChecker();
-//			
-//			curr = System.currentTimeMillis();
-//			List<SemanticException> seme = checker.checkAST(parser.getAbstractSyntaxTree());
-//			long check_time = System.currentTimeMillis() - curr;
-//			System.out.println("\nChecked in " + check_time + "ms, with " + seme.size() + " semantic exceptions.");
-//
-//			if(seme.size() == 0) {
-//				System.out.println("Program is conform to semantic restrictions.");
-//			} else {
-//				for(SemanticException exception : seme) {
-//					exception.printStackTrace();
-//				}
-//				
-//				return; // Quit application
-//			}
+			WaebricChecker checker = new WaebricChecker();
+			
+			curr = System.currentTimeMillis();
+			List<SemanticException> seme = checker.checkAST(parser.getAbstractSyntaxTree());
+			long check_time = System.currentTimeMillis() - curr;
+			System.out.println("\nChecked in " + check_time + "ms, with " + seme.size() + " semantic exceptions.");
+
+			if(seme.size() == 0) {
+				System.out.println("Program is conform to semantic restrictions.");
+			} else {
+				for(SemanticException exception : seme) {
+					exception.printStackTrace();
+				}
+				
+				return; // Quit application
+			}
 			
 			WaebricInterpreter interpreter = new WaebricInterpreter(System.out);
 
