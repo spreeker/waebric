@@ -26,92 +26,102 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.parser.ast.token.TokenNode;
 
 /**
- * Default implementation for node visiting, all visit functions contain
- * an empty statement collection. Extend this class to prevent massive 
- * implementations of specific visitors.
+ * Default implementation for node visiting, all visit functions delegate
+ * the visit request to children nodes. Only extend visits that are
+ * relevant for your implementations.
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
 public class DefaultNodeVisitor implements INodeVisitor {
 
-	public void visit(Modules modules) { }
-	public void visit(Module module) { }
-	public void visit(ModuleId id) { }
-	public void visit(Import imprt) { }
-	public void visit(Site site) { }
-	public void visit(Mappings mappings) { }
-	public void visit(Mapping mapping) { }
-	public void visit(Path path) { }
-	public void visit(PathElement element) { }
-	public void visit(Directory directory) { }
-	public void visit(DirName name) { }
-	public void visit(FileName name) { }
-	public void visit(FileExt ext) { }
-	public void visit(FunctionDef function) { }
-	public void visit(RegularFormal formals) { }
-	public void visit(EmptyFormal formals) { }
-	public void visit(If statement) { }
-	public void visit(IfElse statement) { }
-	public void visit(Block statement) { }
-	public void visit(CData statement) { }
-	public void visit(Comment statement) { }
-	public void visit(Each statement) { }
-	public void visit(Echo statement) { }
-	public void visit(EchoEmbedding statement) { }
-	public void visit(Let statement) { }
-	public void visit(Yield statement) { }
-	public void visit(RegularMarkupStatement statement) { }
-	public void visit(MarkupMarkup statement) { }
-	public void visit(MarkupExp statement) { }
-	public void visit(MarkupStat statement) { }
-	public void visit(MarkupEmbedding statement) { }
-	public void visit(FuncBind bind) { }
-	public void visit(VarBind bind) { }
-	public void visit(RegularPredicate predicate) { }
-	public void visit(And predicate) { }
-	public void visit(Is predicate) { }
-	public void visit(Not predicate) { }
-	public void visit(Or predicate) { }
-	public void visit(Type type) { }
-	public void visit(Embedding embedding) { }
-	public void visit(Embed.ExpressionEmbed embed) { }
-	public void visit(Embed.MarkupEmbed embed) { }
-	public void visit(PreText text) { }
-	public void visit(MidText text) { }
-	public void visit(PostText text) { }
-	public void visit(MidTail tail) { }
-	public void visit(PostTail tail) { }
-	public void visit(Call markup) { }
-	public void visit(Tag markup) { }
-	public void visit(Designator designator) { }
-	public void visit(Attributes attributes) { }
-	public void visit(Attribute.IdAttribute attribute) { }
-	public void visit(Attribute.NameAttribute attribute) { }
-	public void visit(Attribute.TypeAttribute attribute) { }
-	public void visit(Attribute.WidthAttribute attribute) { }
-	public void visit(Attribute.WidthHeightAttribute attribute) { }
-	public void visit(Attribute.ClassAttribute attribute) { }
-	public void visit(Arguments arguments) { }
-	public void visit(Argument argument) { }
-	public void visit(CatExpression expression) { }
-	public void visit(Field expression) { }
-	public void visit(ListExpression expression) { }
-	public void visit(NatExpression expression) { }
-	public void visit(RecordExpression expression) { }
-	public void visit(SymbolExpression expression) { }
-	public void visit(TextExpression expression) { }
-	public void visit(VarExpression expression) { }
-	public void visit(KeyValuePair pair) { }
-	public void visit(Text text) { }
-	public void visit(IdCon id) { }
-	public void visit(NatCon nat) { }
-	public void visit(StrCon str) { }
-	public void visit(SymbolCon symbol) { }
-	public void visit(NodeList<?> list) { }
-	public void visit(SeparatedNodeList<?> list) { }
-	public void visit(CharacterLiteral literal) { }
-	public void visit(IntegerLiteral literal) { }
-	public void visit(StringLiteral literal) { }
-	public void visit(TokenNode node) { }
+	public void visit(Modules modules) { visitChildren(modules); }
+	public void visit(Module module) { visitChildren(module); }
+	public void visit(ModuleId id) { visitChildren(id); }
+	public void visit(Import imprt) { visitChildren(imprt); }
+	public void visit(Site site) { visitChildren(site); }
+	public void visit(Mappings mappings) { visitChildren(mappings); }
+	public void visit(Mapping mapping) { visitChildren(mapping); }
+	public void visit(Path path) { visitChildren(path); }
+	public void visit(PathElement element) { visitChildren(element); }
+	public void visit(Directory directory) { visitChildren(directory); }
+	public void visit(DirName name) { visitChildren(name); }
+	public void visit(FileName name) { visitChildren(name); }
+	public void visit(FileExt ext) { visitChildren(ext); }
+	public void visit(FunctionDef function) { visitChildren(function); }
+	public void visit(RegularFormal formals) { visitChildren(formals); }
+	public void visit(EmptyFormal formals) { visitChildren(formals); }
+	public void visit(If statement) { visitChildren(statement); }
+	public void visit(IfElse statement) { visitChildren(statement); }
+	public void visit(Block statement) { visitChildren(statement); }
+	public void visit(CData statement) { visitChildren(statement); }
+	public void visit(Comment statement) { visitChildren(statement); }
+	public void visit(Each statement) { visitChildren(statement); }
+	public void visit(Echo statement) { visitChildren(statement); }
+	public void visit(EchoEmbedding statement) { visitChildren(statement); }
+	public void visit(Let statement) { visitChildren(statement); }
+	public void visit(Yield statement) { visitChildren(statement); }
+	public void visit(RegularMarkupStatement statement) { visitChildren(statement); }
+	public void visit(MarkupMarkup statement) { visitChildren(statement); }
+	public void visit(MarkupExp statement) { visitChildren(statement); }
+	public void visit(MarkupStat statement) { visitChildren(statement); }
+	public void visit(MarkupEmbedding statement) { visitChildren(statement); }
+	public void visit(FuncBind bind) { visitChildren(bind); }
+	public void visit(VarBind bind) { visitChildren(bind); }
+	public void visit(RegularPredicate predicate) { visitChildren(predicate); }
+	public void visit(And predicate) { visitChildren(predicate); }
+	public void visit(Is predicate) { visitChildren(predicate); }
+	public void visit(Not predicate) { visitChildren(predicate); }
+	public void visit(Or predicate) { visitChildren(predicate); }
+	public void visit(Type type) { visitChildren(type); }
+	public void visit(Embedding embedding) { visitChildren(embedding); }
+	public void visit(Embed.ExpressionEmbed embed) { visitChildren(embed); }
+	public void visit(Embed.MarkupEmbed embed) { visitChildren(embed); }
+	public void visit(PreText text) { visitChildren(text); }
+	public void visit(MidText text) { visitChildren(text); }
+	public void visit(PostText text) { visitChildren(text); }
+	public void visit(MidTail tail) { visitChildren(tail); }
+	public void visit(PostTail tail) { visitChildren(tail); }
+	public void visit(Call markup) { visitChildren(markup); }
+	public void visit(Tag markup) { visitChildren(markup); }
+	public void visit(Designator designator) { visitChildren(designator); }
+	public void visit(Attributes attributes) { visitChildren(attributes); }
+	public void visit(Attribute.IdAttribute attribute) { visitChildren(attribute); }
+	public void visit(Attribute.NameAttribute attribute) { visitChildren(attribute); }
+	public void visit(Attribute.TypeAttribute attribute) { visitChildren(attribute); }
+	public void visit(Attribute.WidthAttribute attribute) { visitChildren(attribute); }
+	public void visit(Attribute.WidthHeightAttribute attribute) { visitChildren(attribute); }
+	public void visit(Attribute.ClassAttribute attribute) { visitChildren(attribute); }
+	public void visit(Arguments arguments) { visitChildren(arguments); }
+	public void visit(Argument argument) { visitChildren(argument); }
+	public void visit(CatExpression expression) { visitChildren(expression); }
+	public void visit(Field expression) { visitChildren(expression); }
+	public void visit(ListExpression expression) { visitChildren(expression); }
+	public void visit(NatExpression expression) { visitChildren(expression); }
+	public void visit(RecordExpression expression) { visitChildren(expression); }
+	public void visit(SymbolExpression expression) { visitChildren(expression); }
+	public void visit(TextExpression expression) { visitChildren(expression); }
+	public void visit(VarExpression expression) { visitChildren(expression); }
+	public void visit(KeyValuePair pair) { visitChildren(pair); }
+	public void visit(Text text) { visitChildren(text); }
+	public void visit(IdCon id) { visitChildren(id); }
+	public void visit(NatCon nat) { visitChildren(nat); }
+	public void visit(StrCon str) { visitChildren(str); }
+	public void visit(SymbolCon symbol) { visitChildren(symbol); }
+	public void visit(NodeList<?> list) { visitChildren(list); }
+	public void visit(SeparatedNodeList<?> list) { visitChildren(list); }
+	public void visit(CharacterLiteral literal) { visitChildren(literal); }
+	public void visit(IntegerLiteral literal) { visitChildren(literal); }
+	public void visit(StringLiteral literal) { visitChildren(literal); }
+	public void visit(TokenNode node) { visitChildren(node); }
+	
+	/**
+	 * Delegate visit request to children of node.
+	 * @param node Node
+	 */
+	private void visitChildren(AbstractSyntaxNode node) {
+		for(AbstractSyntaxNode child: node.getChildren()) {
+			child.accept(this);
+		}
+	}
 
 }
