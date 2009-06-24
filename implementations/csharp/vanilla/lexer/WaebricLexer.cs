@@ -175,6 +175,7 @@ namespace Lexer
 
                     //Second, scan remaining string
                     WaebricLexer tempLexer = new WaebricLexer(new StringReader(stringBuilder.ToString()));
+                    tempLexer.LexicalizeStream();
                     List<Token> tempTokenList = tempLexer.GetTokenList();
 
                     //Add all tokens to stream
@@ -182,6 +183,8 @@ namespace Lexer
                     {
                         TokenStream.Add(new Token(currentToken.GetValue(), currentToken.GetType(), (currentToken.GetLine()+tempLine)));
                     }
+
+                    return; //Lexicalizing done
                 }
                 
                 //Get next part and add it to stringBuilder

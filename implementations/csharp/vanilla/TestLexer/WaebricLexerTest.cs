@@ -102,6 +102,21 @@ namespace TestLexer
         }
 
         /// <summary>
+        /// Test input with single quote
+        /// </summary>
+        [TestMethod]
+        public void SingleQuoteTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("\" test <"));
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            Assert.AreEqual(3, tokens.GetSize());
+        }
+
+        /// <summary>
         /// Test an more complex form of stream
         /// </summary>
         [TestMethod]
