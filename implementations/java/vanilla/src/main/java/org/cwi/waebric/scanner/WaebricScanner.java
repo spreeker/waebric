@@ -258,11 +258,11 @@ public class WaebricScanner {
 		if(inStringContext()) {
 			if(isString(buffer)) { 
 				tokens.add(new Token.StringToken(buffer, tpos.lineno, tpos.charno)); 
-			} else { exceptions.add(new LexicalException.InvalidString(buffer, cpos)); }
+			} else { exceptions.add(new LexicalException.InvalidString(buffer, tpos)); }
 		} else {
 			if(isText(buffer)) {
 				tokens.add(new Token.TextToken(buffer, tpos.lineno, tpos.charno));
-			} else { exceptions.add(new LexicalException.InvalidText(buffer, cpos)); }
+			} else { exceptions.add(new LexicalException.InvalidText(buffer, tpos)); }
 		}
 
 		read(); // Skip closure " symbol
