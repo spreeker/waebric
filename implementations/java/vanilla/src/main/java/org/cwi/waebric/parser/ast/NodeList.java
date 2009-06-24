@@ -77,8 +77,12 @@ public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode i
 	public boolean equals(Object arg) {
 		if(arg instanceof NodeList) {
 			NodeList<?> nodeList = (NodeList<?>) arg;
+			
+			// Check if size matches
 			if(nodeList.size() != this.size()) { return false; }
+			
 			for(int i = 0; i < this.size(); i++) {
+				// Check if each element matches
 				if(! this.get(i).equals(nodeList.get(i))) { return false; }
 			}
 			

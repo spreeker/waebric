@@ -97,15 +97,21 @@ public class ModuleRegister {
 	 * @throws  
 	 */
 	public Modules loadDependencies(Modules modules) {
-		Modules result = new Modules(modules); // Clone modules content
+		Modules result = new Modules(modules); // Store base content
 
 		for(Module module: modules) {
 			for(Import imprt: module.getImports()) {
 				if(! result.contains(imprt.getIdentifier())) {
 					try {
 						// Retrieve dependent modules
-						Modules dependancy = requestModules(imprt.getIdentifier()); 
-						result.addAll(loadDependencies(dependancy)); // Recursively check for other dependencies
+						Modules dependencies = requestModules(imprt.getIdentifier()); 
+						
+						// Recursively check for additional dependencies
+						for(Module dependency: loadDependencies(dependencies)) {
+							if(! result.contains(dependency.getIdentifier())) {
+								result.add(dependency); // Store dependency
+							}
+						}
 					} catch (Exception e) {
 						// Skip invalid import directives
 					}
