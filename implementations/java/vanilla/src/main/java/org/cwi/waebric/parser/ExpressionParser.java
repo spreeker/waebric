@@ -107,8 +107,7 @@ class ExpressionParser extends AbstractParser {
 	 * @return
 	 */
 	public static boolean isExpression(Token token) {
-		if(token == null || token.getLexeme().equals("")) { return false; }
-		
+		if(token == null) { return false; } // Invalid token
 		if(token.getSort() == WaebricTokenSort.CHARACTER) {
 			return
 				token.getLexeme().equals(WaebricSymbol.LBRACKET) ||

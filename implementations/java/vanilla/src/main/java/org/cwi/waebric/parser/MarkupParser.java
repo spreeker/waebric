@@ -81,7 +81,7 @@ class MarkupParser extends AbstractParser {
 	public static boolean isAttribute(Token token) {
 		if(token.getSort() != WaebricTokenSort.CHARACTER) { return false; }
 		char symbol = token.getLexeme().toString().charAt(0);
-		return symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':' || symbol == '@';
+		return symbol == '#' || symbol == '.' || symbol == '$' || symbol ==':' || symbol == '@' || symbol == '%';
 	}
 
 	/**

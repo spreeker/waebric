@@ -80,7 +80,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("identifier1(var1,var2) = yield;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		Assignment.FuncBind assignment = parser.parseIdConAssignment();
+		Assignment.FuncBind assignment = parser.parseFuncAssignment();
 		assertEquals("identifier1", assignment.getIdentifier().getToken().getLexeme().toString());
 		assertEquals(2, assignment.getVariables().size());
 		assertEquals("var1", assignment.getVariables().get(0).getToken().getLexeme().toString());

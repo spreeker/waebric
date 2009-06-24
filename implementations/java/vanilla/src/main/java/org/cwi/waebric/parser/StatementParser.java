@@ -384,19 +384,17 @@ class StatementParser extends AbstractParser {
 	 * @return Mark-up?
 	 */
 	public boolean isMarkup(int k, boolean first) {
-		// Absorb attributes
-		while(tokens.hasNext(k+1)) {
-			Token peek = tokens.peek(k+1);
-			if(MarkupParser.isAttribute(peek)) {
-				if(tokens.hasNext(k+2)) { k+=2; } // Skip attribute symbol and value
-				else { break; } // Invalid token space left
-			} else {
-				break; // No attribute detected
+		if(tokens.hasNext(k) && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			while(tokens.hasNext(k+1)) { // Absorb attributes
+				Token peek = tokens.peek(k+1);
+				if(MarkupParser.isAttribute(peek)) {
+					if(tokens.hasNext(k+2)) { k+=2; } // Skip attribute symbol and value
+					else { break; } // Invalid token space left
+				} else {
+					break; // No attribute detected
+				}
 			}
-		}
-
-		// Perform mark-up check
-		if(tokens.hasNext() && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			
 			if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
 				return true; // Parenthesis determines a call and is thus a mark-up
 			} else if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
@@ -433,7 +431,7 @@ class StatementParser extends AbstractParser {
 	 */
 	public Assignment parseAssignment() throws SyntaxException {
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.LPARANTHESIS)) {
-			return parseIdConAssignment();
+			return parseFuncAssignment();
 		} else {
 			return parseVarAssignment();
 		}
@@ -461,7 +459,7 @@ class StatementParser extends AbstractParser {
 	 * @return IdConAssignment
 	 * @throws SyntaxException 
 	 */
-	public Assignment.FuncBind parseIdConAssignment() throws SyntaxException {
+	public Assignment.FuncBind parseFuncAssignment() throws SyntaxException {
 		Assignment.FuncBind assignment = new Assignment.FuncBind();
 		
 		// Parse identifier
