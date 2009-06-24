@@ -238,7 +238,7 @@ public class WaebricScanner {
 		read(); // Retrieve first character
 		
 		int previous = 0;
-		do {
+		while(curr != '"' || previous == '\\') {
 			if(curr == EOF) {
 				// Unclosed text token, store exception
 				exceptions.add(new LexicalException.UnclosedText(buffer, tpos));
@@ -252,25 +252,17 @@ public class WaebricScanner {
 			buffer += (char) curr; // Acceptable character, store in buffer
 			
 			read(); // Retrieve next character
-		} while(curr != '"' || previous == '\\');
+		}
 		
 		// Create token from buffered data
-		if(! buffer.equals("")) {
-			if(inStringContext()) {
-				if(isString(buffer)) {
-					Token string = new Token.StringToken(buffer, tpos.lineno, tpos.charno);
-					tokens.add(string);
-				} else {
-					exceptions.add(new LexicalException.InvalidString(buffer, cpos));
-				}
-			} else {
-				if(isText(buffer)) {
-					Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
-					tokens.add(text);
-				} else {
-					exceptions.add(new LexicalException.InvalidText(buffer, cpos));
-				}
-			}
+		if(inStringContext()) {
+			if(isString(buffer)) { 
+				tokens.add(new Token.StringToken(buffer, tpos.lineno, tpos.charno)); 
+			} else { exceptions.add(new LexicalException.InvalidString(buffer, cpos)); }
+		} else {
+			if(isText(buffer)) {
+				tokens.add(new Token.TextToken(buffer, tpos.lineno, tpos.charno));
+			} else { exceptions.add(new LexicalException.InvalidText(buffer, cpos)); }
 		}
 
 		read(); // Skip closure " symbol

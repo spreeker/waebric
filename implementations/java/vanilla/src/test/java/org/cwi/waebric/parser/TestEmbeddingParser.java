@@ -161,7 +161,11 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testMidText() throws SyntaxException {
-		iterator = TestUtilities.quickScan(">mid<");
+		// >mid<
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('<', -1, -1));
+		iterator.add(new Token.TextToken("mid", -1, -1));
+		iterator.add(new Token.CharacterToken('>', -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		MidText text = parser.parseMidText();
@@ -171,7 +175,10 @@ public class TestEmbeddingParser {
 	
 	@Test
 	public void testTextChars() {
-		iterator = TestUtilities.quickScan("left<");
+		// left<
+		iterator = new TokenIterator();
+		iterator.add(new Token.CharacterToken('<', -1, -1));
+		iterator.add(new Token.TextToken("left", -1, -1));
 		parser = new EmbeddingParser(iterator, exceptions);
 		
 		StringLiteral text = parser.parseTextChars();

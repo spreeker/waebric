@@ -21,11 +21,20 @@ public class TestWaebricScanner {
 
 	@Test
 	public void testText() throws IOException {
-		TokenIterator i = TestUtilities.quickScan("\"t3xtworks\\\"\"");
+		TokenIterator i = TestUtilities.quickScan("\"text\\\"\"");
 		
 		Token text = i.next();
 		assertEquals(WaebricTokenSort.TEXT, text.getSort());
-		assertEquals("t3xtworks\\\"", text.getLexeme());
+		assertEquals("text\\\"", text.getLexeme());
+	}
+	
+	@Test
+	public void testEmptyText() throws IOException {
+		TokenIterator i = TestUtilities.quickScan("\"\"");
+		
+		Token text = i.next();
+		assertEquals(WaebricTokenSort.TEXT, text.getSort());
+		assertEquals("", text.getLexeme());
 	}
 	
 	@Test
