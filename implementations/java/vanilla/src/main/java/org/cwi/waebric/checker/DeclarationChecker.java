@@ -40,29 +40,45 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 */
 	public DeclarationChecker(List<SemanticException> exceptions) {
 		this.exceptions = exceptions;
+		environment = new Environment();
 	}
 	
 	@Override
 	public void visit(Module module) {
-		environment = new Environment();
-		
+		// Retrieve all dependent modules
 		Modules dependancies = ModuleRegister.getInstance().loadDependancies(module).getRoot();
-		for(Module dependancy: dependancies) {
-			// Check each function definition for invalid definitions
-			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
-				if(environment.containsFunction(function.getIdentifier().getName())) {
-					exceptions.add(new DuplicateFunctionDefinition(function));
-				} else {
-					environment.storeFunctionDef(function);
-				}
-				
+		
+		// Store function definitions in current environment
+		storeFunctionDefinitions(module, dependancies);
+		
+		for(Module component: dependancies) {
+			for(FunctionDef function: component.getFunctionDefinitions()) {
 				function.accept(this);
 			}
 			
 			// Check each site definition for invalid definitions
-			for(Site site: module.getSites()) {
+			for(Site site: component.getSites()) {
 				for(Mapping mapping: site.getMappings()) {
 					mapping.getMarkup().accept(this);
+				}
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * Store all related function definitions in current environment.
+	 * @param module
+	 */
+	private void storeFunctionDefinitions(Module module, Modules dependancies) {
+		for(Module dependancy: dependancies) {
+			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
+				if(environment.containsFunction(function.getIdentifier().getName())) {
+					// Function is already defined, store exception
+					exceptions.add(new DuplicateFunctionDefinition(function));
+				} else {
+					environment.storeFunctionDef(function);
 				}
 			}
 		}
@@ -148,7 +164,9 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 
 	@Override
 	public void visit(Markup.Tag tag) {
-		new Markup.Call(tag.getDesignator()).accept(this);
+		if(environment.containsFunction(tag.getDesignator().getIdentifier().getName())) {
+			new Markup.Call(tag.getDesignator()).accept(this);
+		}
 	}
 	
 	@Override
