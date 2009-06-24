@@ -1,9 +1,6 @@
 package org.cwi.waebric.scanner;
 
-import java.util.List;
-
 import org.cwi.waebric.scanner.token.Position;
-import org.cwi.waebric.scanner.token.Token;
 
 /**
  * Lexical exceptions are created during the scan phase.
@@ -58,12 +55,35 @@ public abstract class LexicalException extends Exception {
 
 		public UnclosedEmbedding(String buffer, Position pos) {
 			super("Embedding \"" + buffer + "\" at position " + pos.lineno + ", " 
-					+ pos.charno + "is not closed, attach a > and double quote.");
+					+ pos.charno + " is not closed, attach a > and double quote.");
 		}
 		
-		public UnclosedEmbedding(List<Token> content) {
-			super("Embedding " + content.toString() + "is not closed, " +
-					"attach a > and double quote.");
+	}
+	
+	public static class InvalidText extends LexicalException {
+
+		/**
+		 * Generated ID
+		 */
+		private static final long serialVersionUID = -4562789537715438227L;
+		
+		public InvalidText(String buffer, Position pos) {
+			super("\"" + buffer + "\" at position " + pos.lineno + ", "
+					+ pos.charno + " is not a valid text construction.");
+		}
+		
+	}
+	
+	public static class InvalidString extends LexicalException {
+
+		/**
+		 * Generated ID
+		 */
+		private static final long serialVersionUID = -8037309772287571791L;
+		
+		public InvalidString(String buffer, Position pos) {
+			super("\"" + buffer + "\" at position " + pos.lineno + ", "
+					+ pos.charno + " is not a valid string construction.");
 		}
 		
 	}

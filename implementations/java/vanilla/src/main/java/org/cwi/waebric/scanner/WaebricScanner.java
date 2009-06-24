@@ -254,21 +254,21 @@ public class WaebricScanner {
 			read(); // Retrieve next character
 		} while(curr != '"' || previous == '\\');
 		
-		// Create token from buffered text
+		// Create token from buffered data
 		if(! buffer.equals("")) {
 			if(inStringContext()) {
 				if(isString(buffer)) {
 					Token string = new Token.StringToken(buffer, tpos.lineno, tpos.charno);
 					tokens.add(string);
 				} else {
-					
+					exceptions.add(new LexicalException.InvalidString(buffer, cpos));
 				}
 			} else {
 				if(isText(buffer)) {
 					Token text = new Token.TextToken(buffer, tpos.lineno, tpos.charno);
 					tokens.add(text);
 				} else {
-					
+					exceptions.add(new LexicalException.InvalidText(buffer, cpos));
 				}
 			}
 		}
@@ -411,18 +411,21 @@ public class WaebricScanner {
 		char chars[] = lexeme.toCharArray();
 		
 		for(int i = 0; i < chars.length; i++) {
-			char c = chars[i];
-			if(! isTextChar(c)) { 
-				if(c == '&' || c == '"') { 
+			if(! isTextChar(chars[i])) { 
+				if(chars[i] == '&' || chars[i] == '"') {
 					// Allow \& and \"
-					if(i == 0 || chars[i-1] != '\\') {
-						// Allow text from XML grammar
-						String sub = lexeme.substring(i);
-						return sub.matches("&#[0-9]+;.*") 
-								|| sub.matches("&#x[0-9a-fA-F]+;.*") 
-								|| sub.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:\n\t\r ]*;.*");
+					if(i == 0 || chars[i-1] != '\\') { 
+						// Allow XML references
+						int end = lexeme.indexOf(';', i);
+						if(end == -1) { return false; } // Invalid XML reference
+						String reference = lexeme.substring(i, end + 1);
+						if(reference.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;")
+								|| reference.matches("&#x[0-9a-fA-F]+;") 
+								|| reference.matches("&#[0-9]+;")) 
+						{ i += reference.length(); } // Continue check behind ;
+						else { return false;	} // Invalid XML reference
 					}
-				} else { return false; }
+				} else { return false; } // Unacceptable character
 			}
 		}
 		
