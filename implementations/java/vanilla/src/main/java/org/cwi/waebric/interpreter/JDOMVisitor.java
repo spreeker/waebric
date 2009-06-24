@@ -161,12 +161,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			// Restore parent environment
 			environment = previous;
 		} else { // Call to undefined function
-			// Interpret designator similar to tag
-			Tag tag = new Tag(markup.getDesignator());
-			visit(tag);
-			
+			// Delegate mark-up as tag
+			new Tag(markup.getDesignator()).accept(this);
+
 			// Interpret arguments as attributes
-			String value = "";
+			String value = ""; // Value attribute
 			for(Argument argument: markup.getArguments()) {
 				if(argument instanceof Argument.RegularArgument) {
 					// The combined value of regular arguments are stored as value attribute
@@ -196,9 +195,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * when these are specified in the tag mark-up.
 	 */
 	public void visit(Tag markup) {
-		Element tag = new Element(markup.getDesignator().getIdentifier().getName());
-		addContent(tag); // Store tag as element in JDOM structure
-		visit(markup.getDesignator().getAttributes()); // Process attributes
+		String name = markup.getDesignator().getIdentifier().getName();
+		if(environment.containsFunction(name)) { // Call to defined function
+			// Delegate mark-up as call
+			new Markup.Call(markup.getDesignator()).accept(this);
+		} else {
+			Element tag = new Element(name);
+			addContent(tag); // Store tag as element in JDOM structure
+			visit(markup.getDesignator().getAttributes()); // Process attributes
+		}
 	}
 	
 	/**

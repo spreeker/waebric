@@ -66,7 +66,7 @@ public abstract class Markup extends AbstractSyntaxNode {
 	}
 	
 	/**
-	 * Designator -> Argument
+	 * Designator -> Markup
 	 * @author Jeroen van Schagen
 	 * @date 20-05-2009
 	 */
