@@ -19,6 +19,12 @@ namespace Parser.Ast.Embedding
 
         #region Public Methods
 
+        public MarkupEmbed()
+        {
+            //Create members
+            MarkupList = new List<Markup.Markup>();
+        }
+
         public void AddMarkup(Markup.Markup markup)
         {
             MarkupList.Add(markup); 

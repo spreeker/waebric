@@ -26,7 +26,7 @@ namespace Parser.Ast.Embedding
             MarkupList = new List<Markup.Markup>();
         }
 
-        public void AddMarkup(Markup markup)
+        public void AddMarkup(Markup.Markup markup)
         {
             MarkupList.Add(markup);
         }

@@ -51,6 +51,16 @@
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
     <Compile Include="Ast\Basic\IdCon.cs" />
+    <Compile Include="Ast\Embedding\Embed.cs" />
+    <Compile Include="Ast\Embedding\Embedding.cs" />
+    <Compile Include="Ast\Embedding\ExpressionEmbed.cs" />
+    <Compile Include="Ast\Embedding\MarkupEmbed.cs" />
+    <Compile Include="Ast\Embedding\MidText.cs" />
+    <Compile Include="Ast\Embedding\MidTextTail.cs" />
+    <Compile Include="Ast\Embedding\PostText.cs" />
+    <Compile Include="Ast\Embedding\PostTextTail.cs" />
+    <Compile Include="Ast\Embedding\PreText.cs" />
+    <Compile Include="Ast\Embedding\TextTail.cs" />
     <Compile Include="Ast\Expressions\CatExpression.cs" />
     <Compile Include="Ast\Expressions\Expression.cs" />
     <Compile Include="Ast\Expressions\FieldExpression.cs" />
@@ -127,9 +137,6 @@
     <Compile Include="WaebricParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ast\Embedding\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
