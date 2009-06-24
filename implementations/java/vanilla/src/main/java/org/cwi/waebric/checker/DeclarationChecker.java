@@ -145,7 +145,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 			definition.setFormals(formals);
 		}
 
-		bind.getStatement().accept(this); // Check statement
+		definition.accept(this); // Check internal function
 		environment.storeFunctionDef(definition); // Store definition
 	}
 	
