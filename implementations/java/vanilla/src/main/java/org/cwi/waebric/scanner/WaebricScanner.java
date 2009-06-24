@@ -403,19 +403,29 @@ public class WaebricScanner {
 		char chars[] = lexeme.toCharArray();
 		
 		for(int i = 0; i < chars.length; i++) {
-			if(! isTextChar(chars[i])) { 
-				if(chars[i] == '&' || chars[i] == '"') {
-					// Allow \& and \"
-					if(i == 0 || chars[i-1] != '\\') { 
-						// Allow XML references
-						int end = lexeme.indexOf(';', i);
-						if(end == -1) { return false; } // Invalid XML reference
-						String reference = lexeme.substring(i, end + 1);
-						if(reference.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;")
-								|| reference.matches("&#x[0-9a-fA-F]+;") 
-								|| reference.matches("&#[0-9]+;")) 
-						{ i += reference.length(); } // Continue check behind ;
-						else { return false;	} // Invalid XML reference
+			if(! isTextChar(chars[i])) {
+				// Only valid usage of " is in combination with a slash. [\"] -> EscQuote
+				if(chars[i] == '"' && (i == 0 || chars[i-1] != '\\')) { return false; }
+				else if(chars[i] == '&') {
+					// Amp can be used in combination with a slash. [\&] -> Amp
+					if(i == 0 || chars[i-1] == '\\') { i++; }
+					else {
+						// Remaining alternatives require additional characters
+						if(i+1 == chars.length) { return false; }
+
+						// Check if next character is acceptable. Amp -/- [\#0-9a-zA-Z_:]
+						String data = "" + chars[i] + chars[i+1];
+						if(data.matches("&[\\#0-9a-zA-Z_:]")) {
+							// Allow XML references
+							int end = lexeme.indexOf(';', i);
+							if(end == -1) { return false; } // Invalid XML reference
+							String reference = lexeme.substring(i, end + 1);
+							if(reference.matches("&[a-zA-Z_:][a-zA-Z0-9.-_:]*;")
+									|| reference.matches("&#x[0-9a-fA-F]+;") 
+									|| reference.matches("&#[0-9]+;")) 
+							{ i += reference.length(); } // Continue check behind ;
+							else { return false;	} // Invalid XML reference
+						}
 					}
 				} else { return false; } // Unacceptable character
 			}
@@ -424,6 +434,8 @@ public class WaebricScanner {
 		return true;
 	}
 	
+	
+
 	/**
 	 * 
 	 * @param c
