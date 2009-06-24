@@ -158,9 +158,9 @@ public class TestWaebricScanner {
 		assertFalse(WaebricScanner.isText("&#xg;program"));
 		
 		assertTrue(WaebricScanner.isText("&amp;volume="));
+		assertTrue(WaebricScanner.isText("&;program"));
+		assertTrue(WaebricScanner.isText("&.;program"));
 		assertFalse(WaebricScanner.isText("&"));
-		assertFalse(WaebricScanner.isText("&;program"));
-		assertFalse(WaebricScanner.isText("&.;program"));
 		
 		assertTrue(WaebricScanner.isText("\\\""));
 		assertTrue(WaebricScanner.isText("\\&"));

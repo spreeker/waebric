@@ -404,18 +404,19 @@ public class WaebricScanner {
 		
 		for(int i = 0; i < chars.length; i++) {
 			if(! isTextChar(chars[i])) {
-				// Only valid usage of " is in combination with a slash. [\"] -> EscQuote
-				if(chars[i] == '"' && (i == 0 || chars[i-1] != '\\')) { return false; }
-				else if(chars[i] == '&') {
+				if(chars[i] == '"') { 
+					// Only valid usage of " is in combination with a slash. [\"] -> EscQuote
+					if(i == 0 || chars[i-1] != '\\') { return false; }
+				} else if(chars[i] == '&') {
 					// Amp can be used in combination with a slash. [\&] -> Amp
-					if(i == 0 || chars[i-1] == '\\') { i++; }
+					if(i != 0 && chars[i-1] == '\\') { i++; }
 					else {
 						// Remaining alternatives require additional characters
 						if(i+1 == chars.length) { return false; }
 
 						// Check if next character is acceptable. Amp -/- [\#0-9a-zA-Z_:]
 						String data = "" + chars[i] + chars[i+1];
-						if(data.matches("&[\\#0-9a-zA-Z_:]")) {
+						if(data.matches("&[#0-9a-zA-Z_:]")) {
 							// Allow XML references
 							int end = lexeme.indexOf(';', i);
 							if(end == -1) { return false; } // Invalid XML reference
