@@ -288,7 +288,6 @@ public abstract class Token {
 			return content;
 		}
 		
-		@Override
 		public Iterator<Token> iterator() {
 			return new TokenIterator(content);
 		}

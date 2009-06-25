@@ -14,7 +14,7 @@ import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.scanner.LexicalException;
 import org.cwi.waebric.scanner.WaebricScanner;
 
-public class CommandLineCompiler {
+public class WaebricCompiler {
 	
 	/**
 	 * 
