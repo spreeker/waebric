@@ -39,6 +39,12 @@
         /// WAEBRICSYMBOL:
         /// 'symbol
         /// </summary>
-        WAEBRICSYMBOL
+        WAEBRICSYMBOL,
+
+        /// <summary>
+        /// EMBEDDING:
+        /// "<em text> - this is an embedding"
+        /// </summary>
+        EMBEDDING
     };
 }

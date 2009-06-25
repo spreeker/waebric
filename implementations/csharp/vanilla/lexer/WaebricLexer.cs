@@ -101,6 +101,15 @@ namespace Lexer
             return TokenStream;
         }
 
+        /// <summary>
+        /// Set number of scanned lines
+        /// </summary>
+        /// <param name="line">Number of scanned lines to set</param>
+        public void SetLine(int line)
+        {
+            tokenizer.SetScannedLines(line);
+        }
+
         #endregion
 
         #region Private Methods
@@ -159,13 +168,15 @@ namespace Lexer
         {
             //Store current line number location for backtracking
             int tempLine = tokenizer.GetScannedLines();
+            //Hold previous char for recognizing escape chars
+            char previousChar = '\0';
 
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
 
             //Retrieve possible quoted text
             StringBuilder stringBuilder = new StringBuilder();
-            while (tokenizer.GetCharacterValue() != '\"') //Scan until " found
+            while (tokenizer.GetCharacterValue() != '\"' || previousChar == '\\') //Scan until non escaped " found 
             {
                 if(CurrentToken == StreamTokenizer.EOF)
                 {   // End of file, so it wasn't a quoted part but just a single "
@@ -186,9 +197,15 @@ namespace Lexer
 
                     return; //Lexicalizing done
                 }
+                else if(tokenizer.GetCharacterValue() == '<')
+                { //Embedding found, so lexicalize embedding
+                    LexicalizeEmbedding(stringBuilder.ToString());
+                    return;
+                }
                 
                 //Get next part and add it to stringBuilder
                 stringBuilder.Append(tokenizer.ToString());
+                previousChar = tokenizer.GetCharacterValue();
                 CurrentToken = tokenizer.NextToken();
             }
 
@@ -196,6 +213,82 @@ namespace Lexer
             
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
+        }
+
+        /// <summary>
+        /// Lexicalizes an embedding
+        /// </summary>
+        private void LexicalizeEmbedding(String text)
+        {
+            List<Token> embeddingTokens = new List<Token>();
+            String buffer = "";
+            char currentChar = '\0';
+            char previousChar = '\0';
+            bool embedded = false;
+            bool quoted = false;
+
+            //Add " token
+            embeddingTokens.Add(new Token('"', TokenType.SYMBOL, tokenizer.GetScannedLines()));
+
+            //Add text to buffer
+            buffer = text;
+
+            int tempLinenumber = tokenizer.GetScannedLines();
+
+            //Scan until end of embedding found
+            currentChar = tokenizer.GetCharacterValue();
+            do
+            {
+                if (CurrentToken == StreamTokenizer.EOF)
+                {   //Abrupt stop of stream
+                    throw new StreamTokenizerException("Unclosed embedding", tokenizer.GetScannedLines());
+                }
+                if (currentChar == '"' && previousChar != '\\')
+                {
+                    quoted = !quoted;
+                }
+                if (currentChar == '<' && !quoted)
+                {
+                    // Detected start of embed, process pre-text
+                    embeddingTokens.Add(new Token(buffer, TokenType.TEXT ,tokenizer.GetScannedLines()));
+                    buffer = ""; // Clean buffer
+                    embedded = true;
+                }
+
+                buffer += tokenizer.ToString();
+                previousChar = currentChar;
+
+                if (currentChar == '>' && !quoted)
+                {
+                    // Detected end of embed, process content
+                    LexicalizeBuffer(embeddingTokens, buffer, tempLinenumber);
+                    buffer = "";
+                    embedded = false;
+                }
+
+                CurrentToken = tokenizer.NextToken();
+                currentChar = tokenizer.GetCharacterValue();
+
+            } while ((currentChar != '"' || previousChar == '\\') || embedded);
+
+            if (!buffer.Equals(""))
+            {
+                // Process post text
+                embeddingTokens.Add(new Token(buffer, TokenType.TEXT, tokenizer.GetScannedLines()));
+            }
+
+            if (CurrentToken != StreamTokenizer.EOF)
+            {
+                // Attach closure quote
+                embeddingTokens.Add(new Token('"', TokenType.SYMBOL ,tokenizer.GetScannedLines()));
+                
+                //Skip " token
+                CurrentToken = tokenizer.NextToken();
+            }
+
+            // Create token from buffered content
+            Token embedding = new EmbeddingToken(embeddingTokens, TokenType.EMBEDDING, tokenizer.GetScannedLines());
+            TokenStream.Add(embedding);
         }
 
         /// <summary>
@@ -299,6 +392,32 @@ namespace Lexer
             return Char.IsSymbol(c) || Char.IsPunctuation(c);
         }
 
+        /// <summary>
+        /// Lexicalizes a buffer. When lexicalized it adds the tokens to the given list.
+        /// </summary>
+        /// <param name="tokens">TokenList to add new tokens to</param>
+        /// <param name="buffer">Buffer to lexicalize</param>
+        /// <param name="line">Linenumber of startposition</param>
+        private void LexicalizeBuffer(List<Token> tokens, String buffer, int line)
+        {
+            if (buffer == null || buffer == "")
+            {   //no data
+                return;
+            }
+
+            //Create new lexer and lexicalize buffer
+            StringReader stringReader = new StringReader(buffer);
+            WaebricLexer lexer = new WaebricLexer(stringReader);
+            //lexer.SetLine(line);
+            lexer.LexicalizeStream();
+
+            //Add new tokens to list
+            List<Token> scannedTokens = lexer.GetTokenList();
+            for (int i = 0; i <= (scannedTokens.Count - 1); i++)
+            {
+                tokens.Add(scannedTokens[i]);
+            }         
+        }
         #endregion
     }
 }

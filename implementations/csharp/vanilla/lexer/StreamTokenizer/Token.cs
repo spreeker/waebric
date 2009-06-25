@@ -26,6 +26,17 @@ namespace Lexer.Tokenizer
         }
 
         /// <summary>
+        /// Create a new token with type and line
+        /// </summary>
+        /// <param name="type">Type of token</param>
+        /// <param name="line">Linenumber of token in original stream</param>
+        public Token(TokenType type, int line)
+        {
+            this.Type = type;
+            this.Line = line;
+        }
+
+        /// <summary>
         /// Create an empty token
         /// </summary>
         public Token()
@@ -55,7 +66,7 @@ namespace Lexer.Tokenizer
         /// Get type of token
         /// </summary>
         /// <returns>TokenType</returns>
-        public TokenType GetType()
+        public new TokenType GetType()
         {
             return Type;
         }

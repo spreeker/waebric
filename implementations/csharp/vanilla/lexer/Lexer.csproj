@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tokenizer\EmbeddingToken.cs" />
     <Compile Include="Tokenizer\TestStreamTokenizer.cs" />
     <Compile Include="Tokenizer\TestTokenIterator.cs" />
     <Compile Include="Tokenizer\TestToken.cs" />

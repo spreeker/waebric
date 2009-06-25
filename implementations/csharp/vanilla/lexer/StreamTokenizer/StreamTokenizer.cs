@@ -107,6 +107,15 @@ namespace Lexer.Tokenizer
         }
 
         /// <summary>
+        /// Set number of scanned lines
+        /// </summary>
+        /// <param name="line">LineNumber to set</param>
+        public void SetScannedLines(int line)
+        {
+            LineNumber = line;
+        }
+
+        /// <summary>
         /// Get numeric value of last scanned token
         /// </summary>
         /// <returns>Numeric (double) value</returns>
