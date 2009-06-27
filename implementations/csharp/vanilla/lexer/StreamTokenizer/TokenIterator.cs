@@ -89,7 +89,14 @@ namespace Lexer.Tokenizer
         /// <returns></returns>
         public int GetSize()
         {
-            return TokenArray.Length;
+            if (TokenArray == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return TokenArray.Length;
+            }
         }
 
         #endregion

@@ -81,14 +81,7 @@ namespace Lexer
         /// <returns>TokenIterator if stream is filled, otherwise null</returns>
         public TokenIterator GetTokenIterator()
         {
-            if (TokenStream.Count == 0)
-            {
-                return null;
-            }
-            else
-            {
-                return new TokenIterator(TokenStream);
-            }
+            return new TokenIterator(TokenStream);
         }
 
         /// <summary>

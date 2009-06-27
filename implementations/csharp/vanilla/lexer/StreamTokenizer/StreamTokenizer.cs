@@ -29,7 +29,9 @@ namespace Lexer.Tokenizer
         
         //Common members
         private TextReader InputStream; // Inputstream to read from
-        private int CurrentCharacter;  // Current character
+        private int CurrentCharacter = '\0';  // Current character
+        private int PreviousCharacter = '\0'; // Previous character
+        private bool URL = false; // Is character part of URL
 
         //Current character value
         private int LineNumber = 1; // Linenumber of stream
@@ -258,6 +260,27 @@ namespace Lexer.Tokenizer
         /// <returns>Type</returns>
         private int CommentToken()
         {
+            if (PreviousCharacter == ':' && InputStream.Peek() == '/' && !URL)
+            {   //It is an URL and not an comment like http://
+                Read(); //Skip /
+                CharValue = '/';
+                URL = true;
+
+                //Return first / from URL
+                return CHARACTER;
+            }
+            else if (URL && CurrentCharacter == '/')
+            {   //Return second / of URL
+                Read(); //Skip /
+                CharValue = '/';
+                URL = false;
+
+                return CHARACTER;
+            }
+            else if (URL)
+            {   //No second / found after :/
+                throw new StreamTokenizerException("URL not ok", LineNumber);
+            }
             Read(); //Read one ahead to determine we are dealing with comments
 
             if(CurrentCharacter == '/') // Single line comment
@@ -268,7 +291,7 @@ namespace Lexer.Tokenizer
                 do {
                     stringBuilder.Append((char)CurrentCharacter);
                     Read();
-                } while (CurrentCharacter != '\n'); //Read until linefeed
+                } while (CurrentCharacter != '\n' && CurrentCharacter != EOF); //Read until linefeed
 
                 TextValue = stringBuilder.ToString();
 
@@ -276,16 +299,14 @@ namespace Lexer.Tokenizer
             }
             else if (CurrentCharacter == '*') // Multiple line comment /* */
             {
-                int previousCharacter;
                 //Build string to store comment as string
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append('/');
                 
                 do {
-                    previousCharacter = CurrentCharacter;
                     stringBuilder.Append((char) CurrentCharacter);
                     Read();
-                } while (!(previousCharacter == '*' && CurrentCharacter == '/')); //Read until */ found
+                } while (!(PreviousCharacter == '*' && CurrentCharacter == '/') && CurrentCharacter != EOF); //Read until */ foun
                 //Risc: endless loop when incorrect termination of */
                 
                 //Buffer new character and write complete string back
@@ -344,13 +365,17 @@ namespace Lexer.Tokenizer
         /// </summary>
         private void Read()
         {
+            PreviousCharacter = CurrentCharacter;
             CurrentCharacter = InputStream.Read();
             //Check for newline
             if (CurrentCharacter == '\n')
             {
                 LineNumber++;
             }
+
         }
+
+        
 
         #endregion
     }
