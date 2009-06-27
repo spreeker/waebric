@@ -155,7 +155,7 @@ namespace Lexer.Tokenizer
         /// Retrieves whatever the type the value as string
         /// </summary>
         /// <returns>String representation of tokenized value</returns>
-        public String ToString()
+        public override String ToString()
         {
             if (TextValue != "")
             {

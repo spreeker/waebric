@@ -71,7 +71,6 @@ namespace Lexer
                         break;
                     default: //Other tokens are not correct
                         throw new StreamTokenizerException("Invalid token: " + CurrentToken, tokenizer.GetScannedLines());
-                        break;
                 }
             }
         }
