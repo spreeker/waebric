@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmbeddingParserTest.cs" />
     <Compile Include="ExpressionParserTest.cs" />
     <Compile Include="FunctionParserTest.cs" />
     <Compile Include="MarkupParserTest.cs" />
