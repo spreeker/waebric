@@ -102,19 +102,116 @@ namespace TestLexer
         }
 
         /// <summary>
+        /// Test for an Embedding
+        /// </summary>
+        [TestMethod]
+        public void EmbeddingTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("\"pre<\"\\\">\">post\""));
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            //Test token
+            Assert.AreEqual(1, tokens.GetSize());
+            Assert.AreEqual(TokenType.EMBEDDING, tokens.Peek(1).GetType());
+
+            //Get embedding and test inner tokens
+            EmbeddingToken parsedToken = (EmbeddingToken) tokens.NextToken();
+            TokenIterator embeddingTokens = parsedToken.GetTokenIterator();
+
+            Assert.AreEqual(7, embeddingTokens.GetSize());
+            Assert.AreEqual("\"", embeddingTokens.Peek(1).GetValue().ToString());
+            Assert.AreEqual("pre", embeddingTokens.Peek(2).GetValue().ToString());
+            Assert.AreEqual("<", embeddingTokens.Peek(3).GetValue().ToString());
+            Assert.AreEqual("\\\">", embeddingTokens.Peek(4).GetValue().ToString());
+            Assert.AreEqual(">", embeddingTokens.Peek(5).GetValue().ToString());
+            Assert.AreEqual("post", embeddingTokens.Peek(6).GetValue().ToString());
+            Assert.AreEqual("\"", embeddingTokens.Peek(7).GetValue().ToString());
+        }
+
+        [TestMethod]
+        public void ComplexEmbeddingTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("\"<a(href=\"http://www.microsoft.com\") \"Microsoft Corp\">\""));
+
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            //Test token
+            Assert.AreEqual(1, tokens.GetSize());
+            Assert.AreEqual(TokenType.EMBEDDING, tokens.Peek(1).GetType());
+
+            //Test tokens in embedding
+            EmbeddingToken embeddingToken = (EmbeddingToken) tokens.NextToken();
+            TokenIterator embeddingTokens = embeddingToken.GetTokenIterator();
+            
+            Assert.AreEqual(12, embeddingTokens.GetSize());
+            Assert.AreEqual("\"", embeddingTokens.Peek(1).GetValue().ToString());
+            Assert.AreEqual("", embeddingTokens.Peek(2).GetValue().ToString());
+            Assert.AreEqual("<", embeddingTokens.Peek(3).GetValue().ToString());
+            Assert.AreEqual("a", embeddingTokens.Peek(4).GetValue().ToString());
+            Assert.AreEqual("(", embeddingTokens.Peek(5).GetValue().ToString());
+            Assert.AreEqual("href", embeddingTokens.Peek(6).GetValue().ToString());
+            Assert.AreEqual("=", embeddingTokens.Peek(7).GetValue().ToString());
+            Assert.AreEqual("http://www.microsoft.com", embeddingTokens.Peek(8).GetValue().ToString());
+            Assert.AreEqual(")", embeddingTokens.Peek(9).GetValue().ToString());
+            Assert.AreEqual("Microsoft Corp", embeddingTokens.Peek(10).GetValue().ToString());
+            Assert.AreEqual(">", embeddingTokens.Peek(11).GetValue().ToString());
+            Assert.AreEqual("\"", embeddingTokens.Peek(12).GetValue().ToString());
+
+        }
+
+        /// <summary>
         /// Test input with single quote
         /// </summary>
         [TestMethod]
         public void SingleQuoteTest()
         {
             //Set up tokenizer
-            WaebricLexer lexer = new WaebricLexer(new StringReader("\" test <"));
+            WaebricLexer lexer = new WaebricLexer(new StringReader("\""));
             lexer.LexicalizeStream();
 
             TokenIterator tokens = lexer.GetTokenIterator();
 
-            Assert.AreEqual(3, tokens.GetSize());
+            Assert.AreEqual(1, tokens.GetSize());
+            Assert.AreEqual(TokenType.SYMBOL, tokens.Peek(1).GetType());
+            Assert.AreEqual("\"", tokens.Peek(1).GetValue().ToString());
         }
+
+        /// <summary>
+        /// Test input with single line comment
+        /// </summary>
+        [TestMethod]
+        public void SingleLineCommentTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("//this is a comment"));
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            Assert.AreEqual(0, tokens.GetSize());
+        }
+
+        /// <summary>
+        /// Test input with multiple line comment
+        /// </summary>
+        [TestMethod]
+        public void MultipleLineCommentTest()
+        {
+            //Set up tokenizer
+            WaebricLexer lexer = new WaebricLexer(new StringReader("/*this is a comment \n on multiple \n lines*/"));
+            lexer.LexicalizeStream();
+
+            TokenIterator tokens = lexer.GetTokenIterator();
+
+            Assert.AreEqual(0, tokens.GetSize());
+        }
+
 
         /// <summary>
         /// Test an more complex form of stream
