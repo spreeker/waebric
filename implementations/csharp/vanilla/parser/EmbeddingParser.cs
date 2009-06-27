@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Lexer.Tokenizer;
 using Parser.Ast.Embedding;
+using Parser.Exceptions;
+using Parser.Ast.Markup;
 
 namespace Parser
 {
@@ -11,8 +13,9 @@ namespace Parser
     {
         #region Private Members
 
-        MarkupParser markupParser;
-        ExpressionParser expressionParser;
+        private MarkupParser markupParser;
+        private ExpressionParser expressionParser;
+        private TokenIterator EmbeddingTokenStream;
 
         #endregion
 
@@ -21,9 +24,6 @@ namespace Parser
         public EmbeddingParser(TokenIterator iterator, List<Exception> exceptionList)
             : base(iterator, exceptionList)
         {
-            //Create subparsers
-            markupParser = new MarkupParser(iterator, exceptionList);
-            expressionParser = new ExpressionParser(iterator, exceptionList);
         }
 
         /// <summary>
@@ -32,8 +32,25 @@ namespace Parser
         /// <returns>Parsed Embedding</returns>
         public Embedding ParseEmbedding()
         {
+            //Get iterator for specific embedding
+            if (TokenStream.Peek(1).GetType() == TokenType.EMBEDDING)
+            {   //Store embedding in internal tokeniterator to parse internally
+                CurrentToken = TokenStream.NextToken();
+                EmbeddingTokenStream = ((EmbeddingToken)CurrentToken).GetTokenIterator();
+            }
+            else
+            {   //TODO: NORMAL EXCEPTION HANDLING
+                throw new UnexpectedToken();
+            }
+            
+            //Let's parse embedding
             Embedding embedding = new Embedding();
-            return null;
+
+            embedding.SetPreText(ParsePreText());
+            embedding.SetEmbed(ParseEmbed());
+            embedding.SetTextTail(ParseTextTail());
+
+            return embedding;
         }
 
         /// <summary>
@@ -48,11 +65,7 @@ namespace Parser
             NextToken("\"", "\" TextChar* <", '"');
 
             //Parse text
-            if (TokenStream.Peek(1).GetValue().ToString() != "<")
-            {
-                CurrentToken = TokenStream.NextToken();
-                preText.SetText(CurrentToken.GetValue().ToString());
-            }
+            preText.SetText(ParseTextChars());
 
             //Skip < token
             NextToken("<", "\" TextChar* <", '<');
@@ -72,11 +85,7 @@ namespace Parser
             NextToken(">", "> TextChar* <", '>');
 
             //Parse text
-            if (TokenStream.Peek(1).GetValue().ToString() != "<")
-            {
-                CurrentToken = TokenStream.NextToken();
-                midText.SetText(CurrentToken.GetValue().ToString());
-            }
+            midText.SetText(ParseTextChars());
 
             //Skip < token
             NextToken("<", "> TextChar* <", '<');
@@ -96,11 +105,7 @@ namespace Parser
             NextToken(">", "> TextChar* \"", '>');
 
             //Parse text
-            if (TokenStream.Peek(1).GetValue().ToString() != "\"")
-            {
-                CurrentToken = TokenStream.NextToken();
-                postText.SetText(CurrentToken.GetValue().ToString());
-            }
+            postText.SetText(ParseTextChars());
 
             //Skip " token
             NextToken("\"", "> TextChar* \"", '"');
@@ -114,7 +119,48 @@ namespace Parser
         /// <returns>Parsed Embed</returns>
         public Embed ParseEmbed()
         {
-            return null;
+            Embed embed = null;
+            List<Markup> markupList = new List<Markup>();
+
+            //Set up MarkupParser
+            markupParser = new MarkupParser(EmbeddingTokenStream, ExceptionList);
+
+            //Parse Markup*
+            while(EmbeddingTokenStream.HasNext(2) && !(EmbeddingTokenStream.Peek(2).GetValue().ToString() == ">"))
+            {
+                markupList.Add(markupParser.ParseMarkup());
+            }
+            
+            //Determine embed type
+            if (NextTokenIsMarkup())
+            {   //MarkupEmbedding
+                MarkupEmbed markupEmbed = new MarkupEmbed();
+
+                //Add already parsed markups to markupEmbed
+                markupEmbed.SetMarkups(markupList);
+
+                //Parse latest markup 
+                markupEmbed.SetMarkup(markupParser.ParseMarkup());
+
+                embed = markupEmbed;
+            }
+            else
+            {   //ExpressionEmbedding
+                ExpressionEmbed expressionEmbed = new ExpressionEmbed();
+
+                //Add already parsed markups to expressionEmbed
+                expressionEmbed.SetMarkups(markupList);
+
+                //Set up expressionparser
+                expressionParser = new ExpressionParser(EmbeddingTokenStream, ExceptionList);
+
+                //Parse expression
+                expressionEmbed.SetExpression(expressionParser.ParseExpression());
+
+                embed = expressionEmbed;
+            }           
+
+            return embed;
         }
 
         /// <summary>
@@ -123,8 +169,181 @@ namespace Parser
         /// <returns>Parsed TextTail</returns>
         public TextTail ParseTextTail()
         {
-            return null;
-        }       
+            TextTail textTail = null;
+            
+            //Determine TextTail type
+            if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ">" && TokenStream.Peek(3).GetValue().ToString() == "\"")
+            {   //PostTextTail
+                textTail = ParsePostTextTail();
+            }
+            else if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ">")
+            {   //MidTextTail
+                textTail = ParseMidTextTail();
+            }
+
+            return textTail;
+        }
+
+        /// <summary>
+        /// Parser for PostTextTail
+        /// </summary>
+        /// <returns>Parsed PostTextTail</returns>
+        public PostTextTail ParsePostTextTail()
+        {
+            PostTextTail postTextTail = new PostTextTail();
+
+            //Skip > token
+            NextToken(">", "> PostText \"", '>');
+
+            //Parse text
+            postTextTail.SetPostText(ParsePostText());
+
+            //Skip " token
+            NextToken("\"", "> PostText \"", '"');
+
+            return postTextTail;
+        }
+
+        /// <summary>
+        /// Parser for MidTextTail
+        /// </summary>
+        /// <returns>Parsed MidTextTail</returns>
+        public MidTextTail ParseMidTextTail()
+        {
+            MidTextTail midTextTail = new MidTextTail();
+
+            //Skip > token
+            NextToken(">", "MidText Embed TextTail", '>');
+
+            //Parse MidText
+            midTextTail.SetMidText(ParseMidText());
+
+            //Parse Embed
+            midTextTail.SetEmbed(ParseEmbed());
+
+            //Parse TextTail
+            midTextTail.SetTextTail(ParseTextTail());
+
+            return midTextTail;
+        }
+
+        /// <summary>
+        /// Parser for TextChars
+        /// </summary>
+        /// <returns>Parsed TextChars as String</returns>
+        public String ParseTextChars()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            while (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetType() == TokenType.TEXT)
+            {   //Parse all text tokens until different type found
+                CurrentToken = EmbeddingTokenStream.NextToken();
+                stringBuilder.Append(CurrentToken.GetValue().ToString());
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        #endregion
+
+        #region Private Members
+
+        /// <summary>
+        /// Get NextToken and verify if it exists (EmbeddedTokenStream)
+        /// </summary>
+        /// <param name="name">Name of expected token</param>
+        /// <param name="syntax">Syntax of expected token</param>
+        /// <returns>True if new token found, otherwise false</returns>
+        private new bool NextToken(String name, String syntax)
+        {
+            if (TokenStream.HasNext())
+            {
+                CurrentToken = EmbeddingTokenStream.NextToken();
+                return true;
+            }
+            else
+            {
+                //Add exception handling here (add to exception list)
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get NextToken and verify type of token (EmbeddedTokenStream)
+        /// </summary>
+        /// <param name="name">Name of expected token</param>
+        /// <param name="syntax">Syntax of expected token</param>
+        /// <param name="type">Type of expected token</param>
+        /// <returns>True if token found and type matches, otherwise false</returns>
+        private new bool NextToken(String name, String syntax, TokenType type)
+        {
+            if (NextToken(name, syntax))
+            {
+                if (type.Equals(CurrentToken.GetType()))
+                {
+                    return true;
+                }
+                else
+                {
+                    //Add exception handling here
+                    return false;
+                }
+            }
+            //Add exception handling here
+            return false;
+        }
+
+
+        /// <summary>
+        /// Get NextToken and verify it maches matchObject (EmbeddedTokenStream)
+        /// </summary>
+        /// <param name="name">Name of expected token</param>
+        /// <param name="syntax">Type of expected token</param>
+        /// <param name="matchObject">Type of expected token</param>
+        /// <returns>True if token matches, otherwise false</returns>
+        private new bool NextToken(String name, String syntax, Object matchObject)
+        {
+            if (NextToken(name, syntax))
+            {
+                if (CurrentToken.GetValue().Equals(matchObject))
+                {
+                    return true;
+                }
+                else
+                {
+                    //Add exception handling here
+                    return false;
+                }
+            }
+            //Add exception handling here
+            return false;
+        }
+
+        /// <summary>
+        /// Method to check if next token is markup
+        /// </summary>
+        /// <returns>True if next token is markup, otherwise false</returns>
+        private bool NextTokenIsMarkup()
+        {
+            if(EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
+            {   //
+                if (EmbeddingTokenStream.HasNext(3) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == "("
+                   && EmbeddingTokenStream.Peek(4).GetValue().ToString() == ")")
+                {   //CallMarkup
+                    return true;
+                }
+                else if (EmbeddingTokenStream.HasNext(2) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == ";")
+                {   
+                    //Statements are not Markup
+                    return false;
+                }
+                else
+                {
+                    // Everything which is not tail is markup
+                    return true;
+                }
+            }
+            return false;
+        }
 
         #endregion
     }

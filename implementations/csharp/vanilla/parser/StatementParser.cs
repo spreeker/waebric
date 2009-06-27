@@ -18,6 +18,7 @@ namespace Parser
 
         private PredicateParser predicateParser;
         private ExpressionParser expressionParser;
+        private EmbeddingParser embeddingParser;
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace Parser
             //Create subparsers
             predicateParser = new PredicateParser(iterator, exceptionList);
             expressionParser = new ExpressionParser(iterator, exceptionList);
+            embeddingParser = new EmbeddingParser(iterator, exceptionList);
         }
 
         /// <summary>
@@ -260,7 +262,28 @@ namespace Parser
         /// <returns>Parsed EchoStatement</returns>
         public EchoStatement ParseEchoStatement()
         {
-            return null;
+            //Skip echo
+            NextToken("echo", "echo Expression/Embedding ;", "echo");
+
+            //Determine echo type
+            if (TokenStream.HasNext() && TokenStream.Peek(1).GetType() == TokenType.EMBEDDING)
+            {   //EchoEmbeddingStatement
+                EchoEmbeddingStatement echoEmbedding = new EchoEmbeddingStatement();
+                
+                //Parse embedding
+                echoEmbedding.SetEmbedding(embeddingParser.ParseEmbedding());
+
+                return echoEmbedding;
+            }
+            else
+            {   //EchoExpressionStatement
+                EchoExpressionStatement echoExpression = new EchoExpressionStatement();
+
+                //Parse expression
+                echoExpression.SetExpression(expressionParser.ParseExpression());
+
+                return echoExpression;
+            }
         }
 
         /// <summary>
