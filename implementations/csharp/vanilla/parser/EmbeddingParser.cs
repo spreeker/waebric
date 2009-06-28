@@ -21,8 +21,8 @@ namespace Parser
 
         #region Public Methods
 
-        public EmbeddingParser(TokenIterator iterator, List<Exception> exceptionList)
-            : base(iterator, exceptionList)
+        public EmbeddingParser(TokenIterator iterator)
+            : base(iterator)
         {
         }
 
@@ -39,8 +39,8 @@ namespace Parser
                 EmbeddingTokenStream = ((EmbeddingToken)CurrentToken).GetTokenIterator();
             }
             else
-            {   //TODO: NORMAL EXCEPTION HANDLING
-                throw new UnexpectedToken();
+            {   //Raise exception
+                throw new UnexpectedToken("Embedding expected, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
             
             //Let's parse embedding
@@ -123,7 +123,7 @@ namespace Parser
             List<Markup> markupList = new List<Markup>();
 
             //Set up MarkupParser
-            markupParser = new MarkupParser(EmbeddingTokenStream, ExceptionList);
+            markupParser = new MarkupParser(EmbeddingTokenStream);
 
             //Parse Markup*
             while(EmbeddingTokenStream.HasNext(2) && !(EmbeddingTokenStream.Peek(2).GetValue().ToString() == ">"))
@@ -152,7 +152,7 @@ namespace Parser
                 expressionEmbed.SetMarkups(markupList);
 
                 //Set up expressionparser
-                expressionParser = new ExpressionParser(EmbeddingTokenStream, ExceptionList);
+                expressionParser = new ExpressionParser(EmbeddingTokenStream);
 
                 //Parse expression
                 expressionEmbed.SetExpression(expressionParser.ParseExpression());
@@ -262,8 +262,7 @@ namespace Parser
             }
             else
             {
-                //Add exception handling here (add to exception list)
-                return false;
+                throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
         }
 
@@ -284,11 +283,9 @@ namespace Parser
                 }
                 else
                 {
-                    //Add exception handling here
-                    return false;
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
-            //Add exception handling here
             return false;
         }
 
@@ -310,11 +307,9 @@ namespace Parser
                 }
                 else
                 {
-                    //Add exception handling here
-                    return false;
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
-            //Add exception handling here
             return false;
         }
 

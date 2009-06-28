@@ -25,13 +25,13 @@ namespace Parser
         #region Public Methods
 
 
-        public StatementParser(TokenIterator iterator, List<Exception> exceptionList)
-            : base(iterator, exceptionList)
+        public StatementParser(TokenIterator iterator)
+            : base(iterator)
         {
             //Create subparsers
-            predicateParser = new PredicateParser(iterator, exceptionList);
-            expressionParser = new ExpressionParser(iterator, exceptionList);
-            embeddingParser = new EmbeddingParser(iterator, exceptionList);
+            predicateParser = new PredicateParser(iterator);
+            expressionParser = new ExpressionParser(iterator);
+            embeddingParser = new EmbeddingParser(iterator);
         }
 
         /// <summary>
@@ -74,6 +74,10 @@ namespace Parser
                 else if (TokenStream.Peek(1).GetValue().ToString() == "yield")
                 {   //Yield statement
                     return ParseYieldStatement();
+                }
+                else
+                {   //Unexpected token, throw exception
+                    throw new UnexpectedToken("Statement expected, but found:", TokenStream.Peek(1).GetValue().ToString(), TokenStream.Peek(1).GetLine());
                 }
             }
 
@@ -185,7 +189,7 @@ namespace Parser
             if (letStatement.GetAssignments().Count == 0)
             {   //No assignments is not allowed
                 //Todo specify error message
-                throw new UnexpectedToken();
+                //throw new UnexpectedToken();
             }
 
             //Skip in token

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lexer.Tokenizer;
 using System.Collections;
+using Parser.Exceptions;
 
 namespace Parser
 {
@@ -15,7 +16,6 @@ namespace Parser
     {
         #region Private/Protected Members
         
-        protected List<Exception> ExceptionList;
         protected TokenIterator TokenStream;
         protected Token CurrentToken;
 
@@ -28,10 +28,9 @@ namespace Parser
         /// </summary>
         /// <param name="tokenStream">Tokenized Stream</param>
         /// <param name="exceptionList">List of Exceptions</param>
-        public AbstractParser(TokenIterator tokenStream, List<Exception> exceptionList)
+        public AbstractParser(TokenIterator tokenStream)
         {
             this.TokenStream = tokenStream;
-            this.ExceptionList = exceptionList;
         }
 
         #endregion Public Methods
@@ -53,8 +52,8 @@ namespace Parser
             }
             else
             {
-                //Add exception handling here (add to exception list)
-                return false;
+                //Unexpected token
+                throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
         }
 
@@ -75,11 +74,10 @@ namespace Parser
                 }
                 else
                 {
-                    //Add exception handling here
-                    return false;
+                    //Unexpected token
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
-            //Add exception handling here
             return false;
         }
 
@@ -101,11 +99,10 @@ namespace Parser
                 }
                 else
                 {
-                    //Add exception handling here
-                    return false;
+                    //Unexpected token
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
-            //Add exception handling here
             return false;
         }
 

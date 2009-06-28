@@ -21,10 +21,10 @@ namespace Parser
 
         #region Public Methods
 
-        public FunctionParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
+        public FunctionParser(TokenIterator tokenStream) : base(tokenStream)
         {
             //Create subparser
-            statementParser = new StatementParser(tokenStream, exceptionList);
+            statementParser = new StatementParser(tokenStream);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Parser
             functionDefinition.SetIdentifier(CurrentToken.GetValue().ToString());
 
             //Parse Formals
-            functionDefinition.SetFormals(ParseFormals());
+            ParseFormals(functionDefinition);
            
             //Parse Statements
             while (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() != "end")
@@ -57,14 +57,13 @@ namespace Parser
         /// <summary>
         /// Parser for Formals
         /// </summary>
+        /// <param name="functionDefinition">functionDefinition to add formals to</param>
         /// <returns>Parsed Formals</returns>
-        public Formals ParseFormals()
+        public void ParseFormals(FunctionDefinition functionDefinition)
         {
-            Formals formals = new Formals();
-
             if (TokenStream.Peek(1).GetValue().ToString() != "(")
             {
-                return formals; //No formals, so return empty formals
+                return; //No formals, so return empty formals
             }
 
             //Skip ( token
@@ -81,15 +80,17 @@ namespace Parser
                     //Skip , token
                     NextToken(",", "(formal1, formal2)", ',');
                 }
-                formals.AddFormal(ParseFormal());
+                functionDefinition.AddFormal(ParseFormal());
             }
 
             //Skip ) token
             NextToken(")", "(formal1, formal2)", ')');
-
-            return formals;
         }
 
+        /// <summary>
+        /// Parser for Formal
+        /// </summary>
+        /// <returns>Parsed Formal</returns>
         public Formal ParseFormal()
         {
             Formal formal = new Formal();

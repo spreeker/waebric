@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractParser.cs" />
-    <Compile Include="Ast\Basic\IdCon.cs" />
     <Compile Include="Ast\Embedding\Embed.cs" />
     <Compile Include="Ast\Embedding\Embedding.cs" />
     <Compile Include="Ast\Embedding\ExpressionEmbed.cs" />
@@ -72,11 +71,9 @@
     <Compile Include="Ast\Expressions\TextExpression.cs" />
     <Compile Include="Ast\Expressions\VarExpression.cs" />
     <Compile Include="Ast\Functions\Formal.cs" />
-    <Compile Include="Ast\Functions\Formals.cs" />
     <Compile Include="Ast\Functions\FunctionDefinition.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
     <Compile Include="Ast\Markup\Argument.cs" />
-    <Compile Include="Ast\Markup\Arguments.cs" />
     <Compile Include="Ast\Markup\AttrArgument.cs" />
     <Compile Include="Ast\Markup\Attribute.cs" />
     <Compile Include="Ast\Markup\ClassAttribute.cs" />
@@ -118,6 +115,7 @@
     <Compile Include="Ast\Statements\CommentStatement.cs" />
     <Compile Include="Ast\Statements\EachStatement.cs" />
     <Compile Include="Ast\Statements\EchoEmbeddingStatement.cs" />
+    <Compile Include="Ast\Statements\EchoExpressionStatement.cs" />
     <Compile Include="Ast\Statements\EchoStatement.cs" />
     <Compile Include="Ast\Statements\IfElseStatement.cs" />
     <Compile Include="Ast\Statements\IfStatement.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Parser.Ast.Expressions;
 using Lexer.Tokenizer;
+using Parser.Exceptions;
 
 namespace Parser
 {
@@ -18,8 +19,8 @@ namespace Parser
 
         #region Public Members
 
-        public ExpressionParser(TokenIterator iterator, List<Exception> exceptionList)
-            : base(iterator, exceptionList)
+        public ExpressionParser(TokenIterator iterator)
+            : base(iterator)
         {
         }
 
@@ -56,15 +57,21 @@ namespace Parser
             {   //Record expression
                 expression = ParseRecordExpression();
             }
+            
             //Check if it is maybe an catenation or field
             if(TokenStream.HasNext(2) && TokenStream.Peek(1).GetValue().ToString() == "." && TokenStream.Peek(2).GetType()== TokenType.IDENTIFIER && 
                 TokenStream.Peek(3).GetValue().ToString() != "?")
-            { //Field
+            {   //Field
                 return ParseFieldExpression(expression);
             }
             else if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == "+")
-            { //Catenation
+            {   //Catenation
                 return ParseCatExpression(expression);
+            }
+
+            if (expression == null)
+            {   //No expression found, raise exception
+                throw new UnexpectedToken("Expression expected, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
 
             return expression;

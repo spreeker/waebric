@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Lexer.Tokenizer;
 using Parser.Ast.Module;
-using Parser.Ast.Basic;
+using Parser.Exceptions;
 
 namespace Parser
 {
@@ -16,6 +16,7 @@ namespace Parser
         #region Private Members
 
         private SiteParser siteParser;
+        private FunctionParser functionParser;
 
         #endregion
 
@@ -26,10 +27,11 @@ namespace Parser
         /// </summary>
         /// <param name="tokenStream"></param>
         /// <param name="exceptionList"></param>
-        public ModuleParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
+        public ModuleParser(TokenIterator tokenStream) : base(tokenStream)
         {
             //Create parsers for sub elements in a module
-            siteParser = new SiteParser(tokenStream, exceptionList);
+            siteParser = new SiteParser(tokenStream);
+            functionParser = new FunctionParser(tokenStream);
         }
 
         /// <summary>
@@ -51,8 +53,8 @@ namespace Parser
                     modules.Add(module);
                 }
                 else
-                {
-                    //Exception handling here
+                {   //Exception, no module definition found
+                    throw new UnexpectedToken("Expected module, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
             return modules;
@@ -72,12 +74,17 @@ namespace Parser
             //Look for elements like SITE, DEF, etc
             while (TokenStream.HasNext())
             {
+                if (MatchValue(TokenStream.Peek(1).GetValue().ToString(), Waebric.WaebricKeyword.MODULE.ToString()))
+                {   //New module found
+                    break;
+                }
                 CurrentToken = TokenStream.NextToken();
-                //TODO: ADD breaking condition here (END of module found)
+                
+
                 //Check for different elements which may appear in a module
                 if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.DEF.ToString()))
                 {   //Function definition found
-                    module.AddFunctionDefinition(null);
+                    module.AddFunctionDefinition(functionParser.ParseFunctionDefinition());
                 }
                 else if(MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.SITE.ToString()))
                 {   //Site definition found, call siteparser
@@ -89,10 +96,10 @@ namespace Parser
                 }
                 else
                 {
-                    //Exception handling here
+                    //Exception
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
                 }
             }
-            //parse identifiers and so on
 
             return module;
         }
@@ -107,11 +114,12 @@ namespace Parser
             //parse single identifier
             if (NextToken("module identifier", "identifier", TokenType.IDENTIFIER))
             {
-                moduleId.SetIdentifier(new IdentifierCon(CurrentToken.GetValue().ToString()));
+                moduleId.SetIdentifier(CurrentToken.GetValue().ToString());
             }
             else
             {
                 //Raise exception
+                throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
 
             return moduleId;
@@ -126,11 +134,12 @@ namespace Parser
             Import import = new Import();
             if (NextToken("import identifier", "identifier", TokenType.IDENTIFIER))
             {
-                import.SetIdentifier(new ModuleId(new IdentifierCon(CurrentToken.GetValue().ToString())));
+                import.SetModuleId(ParseModuleId());
             }
             else
             {
-                //raise exception
+                //Raise exception
+                throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
             return import;
         }

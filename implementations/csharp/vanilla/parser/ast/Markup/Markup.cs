@@ -12,7 +12,7 @@ namespace Parser.Ast.Markup
     {
         #region Private Members
 
-        private Arguments Args;
+        private List<Argument> ArgumentList;
         private Designator Tag;
 
         #endregion
@@ -21,8 +21,8 @@ namespace Parser.Ast.Markup
 
         public Markup()
         {
-            //Intialize arguments (TO REMOVE)
-            Args = new Arguments();
+            //Intialize members
+            ArgumentList = new List<Argument>();
         }
 
         /// <summary>
@@ -44,22 +44,48 @@ namespace Parser.Ast.Markup
         }
 
         /// <summary>
-        /// Add arguments to markup
+        /// Add argument to markup
         /// </summary>
-        /// <param name="argument">Arguments to add</param>
-        public void AddArguments(Arguments arguments)
+        /// <param name="argument">Argument to add</param>
+        public void AddArgument(Argument argument)
         {
-            Args = arguments;
+            ArgumentList.Add(argument);
         }
 
         /// <summary>
         /// Get arguments
         /// </summary>
-        /// <returns>Arguments</returns>
-        public Arguments GetArguments()
+        /// <returns>ArgumentList</returns>
+        public List<Argument> GetArguments()
         {
-            return Args;
+            return ArgumentList;
         }
+
+        public override String ToString()
+        {
+            if(ArgumentList.Count == 0)
+            {
+                return Tag.ToString();
+            }
+            else
+            {
+                //Get arguments
+                Argument[] argumentArray = ArgumentList.ToArray();
+                StringBuilder stringBuilder = new StringBuilder();
+
+                for (int i = 0; i <= (argumentArray.Length - 1); i++)
+                {
+                    stringBuilder.Append(argumentArray[i].ToString());
+                    if (i != (argumentArray.Length - 1))
+                    {
+                        stringBuilder.Append(",");
+                    }
+                }
+
+                return Tag.ToString() + "(" + stringBuilder.ToString() + ")";
+            }
+        }
+
 
         #endregion
 

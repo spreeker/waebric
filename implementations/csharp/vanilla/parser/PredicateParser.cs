@@ -23,11 +23,11 @@ namespace Parser
 
         #region Public Methods
 
-        public PredicateParser(TokenIterator iterator, List<Exception> exceptions)
-            : base(iterator, exceptions)
+        public PredicateParser(TokenIterator iterator)
+            : base(iterator)
         {
             //Create subparser
-            expressionParser = new ExpressionParser(iterator, exceptions);
+            expressionParser = new ExpressionParser(iterator);
         }
 
         /// <summary>
@@ -124,12 +124,12 @@ namespace Parser
         /// Parser for OrPredicate
         /// </summary>
         /// <returns>Parsed OrPredicate</returns>
-        public OrPredicate ParseOrPredicate(Predicate parsedLefPredicate)
+        public OrPredicate ParseOrPredicate(Predicate parsedLeftPredicate)
         {
             OrPredicate orPredicate = new OrPredicate();
 
             //Add left predicate
-            orPredicate.SetLeftPredicate(parsedLefPredicate);
+            orPredicate.SetLeftPredicate(parsedLeftPredicate);
 
             //Skip || tokens
             NextToken("|", "predicate || predicate", '|');
@@ -165,20 +165,20 @@ namespace Parser
             CurrentToken = TokenStream.NextToken();
 
             if (CurrentToken.GetValue().ToString() == "list")
-            {
+            {   //ListType
                 return new ListType();
             }
             else if (CurrentToken.GetValue().ToString() == "record")
-            {
+            {   //RecordType
                 return new RecordType();
             }
             else if (CurrentToken.GetValue().ToString() == "string")
-            {
+            {   //StringType
                 return new StringType();
             }
             else
-            {
-                throw new UnexpectedToken();
+            {   //Unexpected type, throw exception
+                throw new UnexpectedToken("Type expected, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
         }
 

@@ -27,25 +27,20 @@ namespace Parser
         /// </summary>
         /// <param name="tokenStream"></param>
         public WaebricParser(TokenIterator tokenStream)
-            : base(tokenStream, new List<Exception>())
+            : base(tokenStream)
         {
-            moduleParser = new ModuleParser(tokenStream, ExceptionList);
+            moduleParser = new ModuleParser(tokenStream);
         }
 
         /// <summary>
         /// Parses a waebric program an returns a list of exceptions raised during parsing
         /// </summary>
         /// <returns></returns>
-        public List<Exception> Parse()
+        public void Parse()
         {
-            //Clear exceptions before start parsing
-            ExceptionList.Clear();
-
             //Parse waebric file
             ModuleList moduleList = moduleParser.ParseModules();
             tree.SetRoot(moduleList);
-
-            return ExceptionList;
         }
 
         /// <summary>

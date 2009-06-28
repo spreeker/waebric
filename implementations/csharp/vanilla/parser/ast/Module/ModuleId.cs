@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Parser.Ast.Basic;
 
 namespace Parser.Ast.Module
 {
@@ -13,20 +12,11 @@ namespace Parser.Ast.Module
     {
         #region Private Members
 
-        private IdentifierCon Identifier;
+        private String Identifier;
 
         #endregion
 
         #region Public Methods
-
-        /// <summary>
-        /// Create ModuleId with setting identifier
-        /// </summary>
-        /// <param name="identifier">Identifier to set</param>
-        public ModuleId(IdentifierCon identifier)
-        {
-            this.Identifier = identifier;
-        }
 
         /// <summary>
         /// Create ModuleId without setting identifier
@@ -39,7 +29,7 @@ namespace Parser.Ast.Module
         /// Get identifier
         /// </summary>
         /// <returns>Identifier</returns>
-        public IdentifierCon GetIdentifier()
+        public String GetIdentifier()
         {
             return Identifier;
         }
@@ -48,9 +38,14 @@ namespace Parser.Ast.Module
         /// Set identifier
         /// </summary>
         /// <param name="identifier">Identifier to set</param>
-        public void SetIdentifier(IdentifierCon identifier)
+        public void SetIdentifier(String identifier)
         {
             this.Identifier = identifier;   
+        }
+
+        public override String ToString()
+        {
+            return Identifier;
         }
 
         #endregion

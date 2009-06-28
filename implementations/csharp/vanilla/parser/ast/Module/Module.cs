@@ -107,6 +107,11 @@ namespace Parser.Ast.Module
             return Identifier;
         }
 
+        public override String ToString()
+        {
+            return "module " + Identifier.ToString();
+        }
+
         #endregion
     }
 }

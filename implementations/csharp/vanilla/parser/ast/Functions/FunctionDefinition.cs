@@ -14,7 +14,7 @@ namespace Parser.Ast.Functions
         #region Private Members
 
         private String Identifier;
-        private Formals Frmls;
+        private List<Formal> FormalList;
         private List<Statement> StatementList;
 
         #endregion
@@ -23,7 +23,8 @@ namespace Parser.Ast.Functions
 
         public FunctionDefinition()
         {
-            //Create statementlist
+            //Create lists
+            FormalList = new List<Formal>();
             StatementList = new List<Statement>();
         }
 
@@ -46,21 +47,21 @@ namespace Parser.Ast.Functions
         }
 
         /// <summary>
-        /// Set formals of FunctionDefinition
+        /// Add formal to FunctionDefinition
         /// </summary>
-        /// <param name="formal">Formals to set</param>
-        public void SetFormals(Formals formals)
+        /// <param name="formal">Formal to add</param>
+        public void AddFormal(Formal formal)
         {
-            Frmls = formals;
+            FormalList.Add(formal);
         }
 
         /// <summary>
         /// Get formals of FunctionDefinition
         /// </summary>
-        /// <returns>Formals</returns>
-        public Formals GetFormals()
+        /// <returns>FormalList</returns>
+        public List<Formal> GetFormals()
         {
-            return Frmls;
+            return FormalList;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using Lexer.Tokenizer;
 using Parser.Ast.Site;
 using Parser.Ast.Markup;
 using Attribute = Parser.Ast.Markup.Attribute;
+using Parser.Exceptions;
 
 namespace Parser
 {
@@ -16,18 +17,17 @@ namespace Parser
     {
         #region Private Members
 
-        //TODO: Add subparser instances here
         private ExpressionParser expressionParser;
 
         #endregion
 
         #region Public Methods
 
-        public MarkupParser(TokenIterator iterator, List<Exception> exceptionList)
-            : base(iterator, exceptionList)
+        public MarkupParser(TokenIterator iterator)
+            : base(iterator)
         {
             //Create parsers here
-            expressionParser = new ExpressionParser(iterator, exceptionList);
+            expressionParser = new ExpressionParser(iterator);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Parser
             //Determine if arguments are after designator
             if (TokenStream.Peek(1).GetValue().ToString() == "(")
             {
-                markup.AddArguments(ParseArguments());
+               ParseArguments(markup);
             }
 
             return markup;
@@ -110,8 +110,7 @@ namespace Parser
                     }
                     break;
                 default:
-                    //Add exception handling here
-                    break;
+                    throw new UnexpectedToken("Expected attribute, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
             }
 
             return attribute;
@@ -217,11 +216,10 @@ namespace Parser
         /// <summary>
         /// Parser for Arguments
         /// </summary>
-        /// <returns></returns>
-        public Arguments ParseArguments()
+        /// <param name="markup">Markup to add arguments to</param>
+        /// <returns>Parsed arguments</returns>
+        public void ParseArguments(Markup markup)
         {
-            Arguments arguments = new Arguments();
-
             //Skip ( character
             NextToken("(", "(Argument, Argument)", '(');
 
@@ -238,14 +236,11 @@ namespace Parser
                 }
                 
                 //Parse argument
-                arguments.AddArgument(ParseArgument());
+                markup.AddArgument(ParseArgument());
             }
 
             //Skip ) character
             NextToken(")", "(Argument, Argument)", ')');
-
-            return arguments;
-
         }
 
         /// <summary>

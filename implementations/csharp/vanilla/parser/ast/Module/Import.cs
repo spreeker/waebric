@@ -12,7 +12,7 @@ namespace Parser.Ast.Module
     {
         #region Private Members
 
-        private ModuleId Identifier;
+        private ModuleId ModuleIdentifier;
 
         #endregion
 
@@ -27,18 +27,23 @@ namespace Parser.Ast.Module
         /// Get identifier of import
         /// </summary>
         /// <returns>Identifier</returns>
-        public ModuleId GetIdentifier()
+        public ModuleId GetModuleId()
         {
-            return Identifier;
+            return ModuleIdentifier;
         }
 
         /// <summary>
         /// Set identifier of import
         /// </summary>
         /// <param name="identifier">Identifier for this import</param>
-        public void SetIdentifier(ModuleId identifier)
+        public void SetModuleId(ModuleId identifier)
         {
-            this.Identifier = identifier;
+            ModuleIdentifier = identifier;
+        }
+
+        public override String ToString()
+        {
+            return "import " + ModuleIdentifier.ToString();
         }
 
         #endregion

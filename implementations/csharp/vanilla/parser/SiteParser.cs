@@ -18,10 +18,10 @@ namespace Parser
 
         #endregion
 
-        public SiteParser(TokenIterator tokenStream, List<Exception> exceptionList) : base(tokenStream, exceptionList)
+        public SiteParser(TokenIterator tokenStream) : base(tokenStream)
         {
             //Create parsers
-            markupParser = new MarkupParser(tokenStream, exceptionList);
+            markupParser = new MarkupParser(tokenStream);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Parser
         {
             //Create new site
             Site site = new Site();
-            
+
             //Parse one or more mappings
             site.AddMappings(ParseMappings());
 
@@ -163,12 +163,12 @@ namespace Parser
                     break;
                 }
                 PathElement element = new PathElement();
-                NextToken("directory", "directory/filename.ext");
+                NextToken("directory", "directory/filename.ext", TokenType.IDENTIFIER);
                 element.SetPathElement(CurrentToken.GetValue().ToString());
                 directory.AddDirectoryElement(element);
 
                 //Skip / or \
-                NextToken("/ or \\", "directory/FileName.ext");
+                NextToken("/ or \\", "directory/FileName.ext", TokenType.SYMBOL);
             }
             return directory;
         }
