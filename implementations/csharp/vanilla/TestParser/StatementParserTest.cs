@@ -71,7 +71,7 @@ namespace TestParser
         {
             //Create parser
             List<Exception> exceptions = new List<Exception>();
-            StatementParser statementParser = new StatementParser(Init("yield;"), exceptions);
+            StatementParser statementParser = new StatementParser(Init("yield;"));
             YieldStatement parsedYield = statementParser.ParseYieldStatement();
 
             //Test output
@@ -89,8 +89,7 @@ namespace TestParser
         public void ParseStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             Statement expected = null; // TODO: Initialize to an appropriate value
             Statement actual;
             actual = target.ParseStatement();
@@ -105,8 +104,7 @@ namespace TestParser
         public void ParseLetStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             LetStatement expected = null; // TODO: Initialize to an appropriate value
             LetStatement actual;
             actual = target.ParseLetStatement();
@@ -121,8 +119,7 @@ namespace TestParser
         public void ParseIfStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             Statement expected = null; // TODO: Initialize to an appropriate value
             Statement actual;
             actual = target.ParseIfStatement();
@@ -137,8 +134,7 @@ namespace TestParser
         public void ParseEchoStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             EchoStatement expected = null; // TODO: Initialize to an appropriate value
             EchoStatement actual;
             actual = target.ParseEchoStatement();
@@ -161,8 +157,7 @@ namespace TestParser
         public void ParseEachStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             EachStatement expected = null; // TODO: Initialize to an appropriate value
             EachStatement actual;
             actual = target.ParseEachStatement();
@@ -177,8 +172,7 @@ namespace TestParser
         public void ParseCommentStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             CommentStatement expected = null; // TODO: Initialize to an appropriate value
             CommentStatement actual;
             actual = target.ParseCommentStatement();
@@ -193,8 +187,7 @@ namespace TestParser
         public void ParseCdataStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             CdataStatement expected = null; // TODO: Initialize to an appropriate value
             CdataStatement actual;
             actual = target.ParseCdataStatement();
@@ -209,8 +202,7 @@ namespace TestParser
         public void ParseBlockStatementTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
             BlockStatement expected = null; // TODO: Initialize to an appropriate value
             BlockStatement actual;
             actual = target.ParseBlockStatement();
@@ -225,12 +217,8 @@ namespace TestParser
         public void ParseAssignmentTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            StatementParser statementParser = new StatementParser(Init("var1 = \"test\";"), exceptions);
+            StatementParser statementParser = new StatementParser(Init("var1 = \"test\";"));
             Assignment parsedAssignment = statementParser.ParseAssignment();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test assignment
             Assert.AreEqual("var1", parsedAssignment.GetIdentifier());

@@ -60,7 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteParserTest.cs" />
     <Compile Include="StatementParserTest.cs" />
-    <Compile Include="SyntaxTreeTest.cs" />
+    <Compile Include="Ast\SyntaxTreeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\parser\Parser.csproj">

@@ -68,12 +68,8 @@ namespace TestParser
         public void ParseVarExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("home"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("home"));
             VarExpression expression = expressionParser.ParseVarExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test variable identifier
             Assert.AreEqual("home", expression.GetVariableIdentifier());
@@ -87,12 +83,8 @@ namespace TestParser
         public void ParseSymExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("'symbol"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("'symbol"));
             SymExpression expression = expressionParser.ParseSymExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test variable identifier
             Assert.AreEqual("symbol", expression.GetSym());
@@ -105,12 +97,8 @@ namespace TestParser
         public void ParseRecordExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("{token1:\"token1\", token2:10, token3:'symbol}"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("{token1:\"token1\", token2:10, token3:'symbol}"));
             RecordExpression expression = expressionParser.ParseRecordExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
             
             //Test Record contents
             Assert.AreEqual(3, expression.GetRecords().Count);
@@ -136,12 +124,8 @@ namespace TestParser
         public void ParseNumExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("1230"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("1230"));
             NumExpression expression = expressionParser.ParseNumExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test variable identifier
             Assert.AreEqual(1230, expression.GetNum());
@@ -154,12 +138,8 @@ namespace TestParser
         public void ParseListExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("[var1, var2, var3, var4]"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("[var1, var2, var3, var4]"));
             ListExpression listExpression = expressionParser.ParseListExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
             
             //Test items of list
             Assert.AreEqual(4, listExpression.GetExpressions().Count);
@@ -177,12 +157,8 @@ namespace TestParser
         public void ParseKeyValuePairTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("token1:\"value1\""), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("token1:\"value1\""));
             KeyValuePair keyValuePair = expressionParser.ParseKeyValuePair();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check key
             Assert.AreEqual("token1", keyValuePair.GetKey());
@@ -200,12 +176,8 @@ namespace TestParser
         public void ParseFieldExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"));
             Expression expression = expressionParser.ParseExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test type of expression
             Assert.AreEqual(typeof(FieldExpression), expression.GetType());
@@ -224,12 +196,8 @@ namespace TestParser
         public void ParseExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("expressie.identifier"));
             Expression expression = expressionParser.ParseExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test type of expression
             Assert.AreEqual(typeof(FieldExpression), expression.GetType());
@@ -242,12 +210,8 @@ namespace TestParser
         public void ParseCatExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("expression+'symbol"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("expression+'symbol"));
             Expression expression = expressionParser.ParseExpression();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check type of expression
             Assert.AreEqual(typeof(CatExpression), expression.GetType());
@@ -268,12 +232,8 @@ namespace TestParser
         public void ParseTextExpressionTest()
         {
             //Create parser and parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            ExpressionParser expressionParser = new ExpressionParser(Init("text"), exceptions);
+            ExpressionParser expressionParser = new ExpressionParser(Init("text"));
             TextExpression expression = expressionParser.ParseTextExpression();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test variable identifier
             Assert.AreEqual("text", expression.GetText());

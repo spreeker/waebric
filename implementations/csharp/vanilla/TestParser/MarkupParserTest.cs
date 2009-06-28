@@ -70,8 +70,12 @@ namespace TestParser
         [TestMethod()]
         public void ParseDefaultMarkupTest()
         {
+            //Parse tokens
+            MarkupParser markupParser = new MarkupParser(Init("(\"test\")"));
+            Markup parsedMarkup = markupParser.ParseMarkup();
 
-
+            //Check attributes
+            Assert.AreEqual(0, parsedMarkup.GetArguments().Count);
         }
 
         /// <summary>
@@ -81,12 +85,8 @@ namespace TestParser
         public void ParseAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("#id1"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("#id1"));
             Attribute parsedAttribute = markupParser.ParseAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check attribute
             Assert.AreEqual(typeof(IdAttribute), parsedAttribute.GetType());
@@ -102,12 +102,8 @@ namespace TestParser
         public void ParseHeightAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("120"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("120"));
             HeightAttribute parsedHeightAttribute = markupParser.ParseHeightAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual(120, parsedHeightAttribute.GetHeight());
@@ -120,12 +116,8 @@ namespace TestParser
         public void ParseWidth_HeightAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("80%20"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("80%20"));
             Width_HeightAttribute parsedWidth_HeightAttribute = markupParser.ParseWidth_HeightAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual(80, parsedWidth_HeightAttribute.GetWidth());
@@ -139,12 +131,8 @@ namespace TestParser
         public void ParseTypeAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("type1"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("type1"));
             TypeAttribute parsedTypeAttribute = markupParser.ParseTypeAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual("type1", parsedTypeAttribute.GetType());
@@ -157,12 +145,8 @@ namespace TestParser
         public void ParseNameAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("nametest"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("nametest"));
             NameAttribute parsedNameAttribute = markupParser.ParseNameAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual("nametest", parsedNameAttribute.GetName());
@@ -175,12 +159,8 @@ namespace TestParser
         public void ParseClassAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("classname"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("classname"));
             ClassAttribute parsedClassAttribute = markupParser.ParseClassAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual("classname", parsedClassAttribute.GetClass());
@@ -193,12 +173,8 @@ namespace TestParser
         public void ParseIdAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("testid"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("testid"));
             IdAttribute parsedIdAttribute = markupParser.ParseIdAttribute();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Id Attribute
             Assert.AreEqual("testid",parsedIdAttribute.GetId());
@@ -211,12 +187,8 @@ namespace TestParser
         public void ParseDesignatorWithAttributeTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("img@100%50"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("img@100%50"));
             Designator parsedDesignator = markupParser.ParseDesignator();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check designator
             Assert.AreEqual("img", parsedDesignator.GetIdentifier());
@@ -239,17 +211,13 @@ namespace TestParser
         public void ParseCallNoArgsMarkupTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("home()"), exceptions);
+            MarkupParser markupParser = new MarkupParser(Init("home()"));
             Markup parsedMarkup = markupParser.ParseMarkup();
-
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check markup
             Assert.AreEqual("home", parsedMarkup.GetDesignator().GetIdentifier()); //identifier check
             Assert.AreEqual(0, parsedMarkup.GetDesignator().GetAttributes().Count); //no attributes
-            Assert.AreEqual(0, parsedMarkup.GetArguments().GetArguments().Count); //no arguments
+            Assert.AreEqual(0, parsedMarkup.GetArguments().Count); //no arguments
         }
 
         /// <summary>
@@ -259,15 +227,12 @@ namespace TestParser
         public void ParseNoArgumentsTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("()"), exceptions);
-            Arguments args = markupParser.ParseArguments();
-
-            //Test no exceptions
-            Assert.AreEqual(0, exceptions.Count);
+            MarkupParser markupParser = new MarkupParser(Init("()"));
+            Markup markup = new Markup();
+            markupParser.ParseArguments(markup);
 
             //Test arguments
-            Assert.AreEqual(0, args.GetArguments().Count);
+            Assert.AreEqual(0, markup.GetArguments().Count);
         }
 
         /// <summary>
@@ -277,16 +242,13 @@ namespace TestParser
         public void ParseExpressionArgumentTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("([1234,2345,3556,646])"), exceptions);
-            Arguments args = markupParser.ParseArguments();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
+            MarkupParser markupParser = new MarkupParser(Init("([1234,2345,3556,646])"));
+            Markup markup = new Markup();
+            markupParser.ParseArguments(markup);
 
             //Test argument
-            Assert.AreEqual(1, args.GetArguments().Count);
-            Argument[] arguments = args.GetArguments().ToArray();
+            Assert.AreEqual(1, markup.GetArguments().Count);
+            Argument[] arguments = markup.GetArguments().ToArray();
             Assert.AreEqual(typeof(ExpressionArgument), arguments[0].GetType());
 
             //Test expression argument
@@ -305,16 +267,13 @@ namespace TestParser
         public void ParseAttrArgumentTest()
         {
             //Parse tokens
-            List<Exception> exceptions = new List<Exception>();
-            MarkupParser markupParser = new MarkupParser(Init("(i = 1)"), exceptions);
-            Arguments args = markupParser.ParseArguments();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
+            MarkupParser markupParser = new MarkupParser(Init("(i = 1)"));
+            Markup markup = new Markup();
+            markupParser.ParseArguments(markup);
 
             //Test arguments
-            Assert.AreEqual(1, args.GetArguments().Count);
-            Argument[] arguments = args.GetArguments().ToArray();
+            Assert.AreEqual(1, markup.GetArguments().Count);
+            Argument[] arguments = markup.GetArguments().ToArray();
             Assert.AreEqual(typeof(AttrArgument), arguments[0].GetType());
             
             //Test specific argument

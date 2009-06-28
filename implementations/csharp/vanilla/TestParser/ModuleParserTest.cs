@@ -77,7 +77,6 @@ namespace TestParser
         [TestMethod()]
         public void ModuleParserSingleModuleTest()
         {
-            List<Exception> exceptions;
             SyntaxTree tree;
 
             //Create lexer to tokenize stream
@@ -86,10 +85,7 @@ namespace TestParser
             
             //Retrieve tokenIterator from lexer and lets parse it
             WaebricParser parser = new WaebricParser(lexer.GetTokenIterator());
-            exceptions = parser.Parse();
-
-            //Test no exceptions during parsing
-            Assert.IsTrue(exceptions.Count == 0);
+            parser.Parse();
             
             //Test if root is modulelist and it contains the right module
             tree = parser.GetTree();
@@ -109,7 +105,6 @@ namespace TestParser
         [TestMethod]
         public void ModuleParserImportTest()
         {
-            List<Exception> exceptions;
             SyntaxTree tree;
 
             //Create lexer to tokenize stream
@@ -121,10 +116,7 @@ namespace TestParser
 
             //Retrieve tokenIterator from lexer and lets parse it
             WaebricParser parser = new WaebricParser(lexer.GetTokenIterator());
-            exceptions = parser.Parse();
-
-            //No exceptions should occur
-            Assert.IsTrue(exceptions.Count == 0);
+            parser.Parse();
 
             //Test tree structure
             tree = parser.GetTree();
@@ -149,7 +141,6 @@ namespace TestParser
         [TestMethod]
         public void ModuleParserSiteTest()
         {
-            List<Exception> exceptions = new List<Exception>();
             SyntaxTree tree = new SyntaxTree();
 
             //Create lexer to tokenize stream
@@ -157,7 +148,7 @@ namespace TestParser
             lexer.LexicalizeStream();
 
             //Parse tokenized stream
-            ModuleParser parser = new ModuleParser(lexer.GetTokenIterator(), exceptions);
+            ModuleParser parser = new ModuleParser(lexer.GetTokenIterator());
             tree.SetRoot(parser.ParseModules());
             
             //Check output of parser

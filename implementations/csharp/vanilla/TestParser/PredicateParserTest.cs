@@ -69,14 +69,22 @@ namespace TestParser
         [TestMethod()]
         public void ParsePredicateTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptions = null; // TODO: Initialize to an appropriate value
-            PredicateParser target = new PredicateParser(iterator, exceptions); // TODO: Initialize to an appropriate value
-            Predicate expected = null; // TODO: Initialize to an appropriate value
-            Predicate actual;
-            actual = target.ParsePredicate();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create parser
+            PredicateParser predicateParser = new PredicateParser(Init("condition1 && condition2 || condition3"));
+            Predicate parsedPredicate = predicateParser.ParsePredicate();
+
+            //Check Predicates
+            Assert.AreEqual(typeof(AndPredicate), parsedPredicate.GetType());
+
+            //Check OrPredicate
+            AndPredicate parsedAndPredicate = (AndPredicate)parsedPredicate;
+            Assert.AreEqual(typeof(ExpressionPredicate), parsedAndPredicate.GetLeftPredicate().GetType());
+            Assert.AreEqual(typeof(OrPredicate), parsedAndPredicate.GetRightPredicate().GetType());
+
+            //Check nested OrPredicate
+            OrPredicate parsedNestedOrPredicate = (OrPredicate)parsedAndPredicate.GetRightPredicate();
+            Assert.AreEqual(typeof(ExpressionPredicate), parsedNestedOrPredicate.GetLeftPredicate().GetType());
+            Assert.AreEqual(typeof(ExpressionPredicate), parsedNestedOrPredicate.GetRightPredicate().GetType());
         }
 
         /// <summary>
@@ -86,12 +94,8 @@ namespace TestParser
         public void ParseOrPredicateTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            PredicateParser predicateParser = new PredicateParser(Init("condition1 || condition2 || condition3"), exceptions);
+            PredicateParser predicateParser = new PredicateParser(Init("condition1 || condition2 || condition3"));
             Predicate parsedPredicate = predicateParser.ParsePredicate();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Predicates
             Assert.AreEqual(typeof(OrPredicate), parsedPredicate.GetType());
@@ -114,14 +118,10 @@ namespace TestParser
         public void ParseIsPredicateTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            PredicateParser predicateParser = new PredicateParser(Init(".string?"), exceptions);
-            ExpressionParser expressionParser = new ExpressionParser(Init("test"), exceptions);
+            PredicateParser predicateParser = new PredicateParser(Init(".string?"));
+            ExpressionParser expressionParser = new ExpressionParser(Init("test"));
             Expression parsedExpression = expressionParser.ParseExpression();
             IsPredicate parsedIsPredicate = predicateParser.ParseIsPredicate(parsedExpression);
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check expression
             Assert.AreEqual(typeof(VarExpression), parsedIsPredicate.GetExpression().GetType());
@@ -138,12 +138,8 @@ namespace TestParser
         public void ParseAndPredicateTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            PredicateParser predicateParser = new PredicateParser(Init("condition1 && test.list? && condition2"), exceptions);
+            PredicateParser predicateParser = new PredicateParser(Init("condition1 && test.list? && condition2"));
             Predicate parsedPredicate = predicateParser.ParsePredicate();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Predicates
             Assert.AreEqual(typeof(AndPredicate), parsedPredicate.GetType());
@@ -166,12 +162,8 @@ namespace TestParser
         public void ParseNotPredicateTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            PredicateParser predicateParser = new PredicateParser(Init("! condition1 && test.list?"), exceptions);
+            PredicateParser predicateParser = new PredicateParser(Init("! condition1 && test.list?"));
             Predicate parsedPredicate = predicateParser.ParsePredicate();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check Predicates
             Assert.AreEqual(typeof(NotPredicate), parsedPredicate.GetType());

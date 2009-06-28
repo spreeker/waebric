@@ -73,7 +73,27 @@ namespace TestParser
         [TestMethod()]
         public void ParseSiteTest()
         {
- 
+            //Get tokens and parse it
+            SiteParser siteParser = new SiteParser(Init("site/index.html : home(\"argument\")\nend"));
+            Site parsedSite = siteParser.ParseSite();
+
+            //Test mappings of site
+            Assert.AreEqual(1, parsedSite.GetMappings().Count);
+            Mapping[] mappingArray = parsedSite.GetMappings().ToArray();
+            Mapping mapping = mappingArray[0];
+
+            //Test path of site
+            Assert.AreEqual("site/index.html", mapping.GetPath().ToString());
+            
+            //Test markup of site
+            Markup parsedMarkup = mapping.GetMarkup();
+            Assert.AreEqual("home", parsedMarkup.GetDesignator().GetIdentifier());
+            Assert.AreEqual(1, parsedMarkup.GetArguments().Count);
+
+            //Test argument
+            Argument[] argumentArray = parsedMarkup.GetArguments().ToArray();
+            Assert.AreEqual(typeof(ExpressionArgument), argumentArray[0].GetType());
+            Assert.AreEqual("argument", argumentArray[0].ToString());
         }
 
         /// <summary>
@@ -84,8 +104,7 @@ namespace TestParser
         {
             //Get tokens and parse it
             TokenIterator tokens = Init("site/home.html");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             Pth path = siteParser.ParsePath();
 
             //Get structures of path
@@ -93,8 +112,6 @@ namespace TestParser
             PathElement[] directoryElements = directory.GetDirectoryElements().ToArray();
             FileName filename = path.GetFilename();
 
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check directory
             Assert.AreEqual(1, directory.GetDirectoryElements().Count);
@@ -114,12 +131,8 @@ namespace TestParser
         {
             //Set up parser
             TokenIterator tokens = Init("site/home.html : home(); site2/home.html : home2()");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             Mapping[] parsedMappings = siteParser.ParseMappings().ToArray();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test mappings
             Assert.AreEqual(2, parsedMappings.Length);
@@ -133,12 +146,8 @@ namespace TestParser
         {
             //Set up parser
             TokenIterator tokens = Init("site/home.html : home()");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             Mapping mapping = siteParser.ParseMapping();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test path of site
             Assert.AreEqual("site/home.html", mapping.GetPath().ToString());
@@ -146,7 +155,7 @@ namespace TestParser
             //Test markup of site
             Markup parsedMarkup = mapping.GetMarkup();
             Assert.AreEqual("home", parsedMarkup.GetDesignator().GetIdentifier());
-            Assert.AreEqual(0, parsedMarkup.GetArguments().GetArguments().Count);
+            Assert.AreEqual(0, parsedMarkup.GetArguments().Count);
         }
 
         /// <summary>
@@ -157,12 +166,9 @@ namespace TestParser
         {
             //Get tokens and parse it
             TokenIterator tokens = Init("filename.ext");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             FileName output = siteParser.ParseFileName();
 
-            //Check output
-            Assert.AreEqual(0, exceptions.Count);
             Assert.AreEqual("filename", output.GetName().GetPathElement());
             //TODO: fix strange API
             Assert.AreEqual("ext", output.GetFileExtension().GetFileExtension());
@@ -177,13 +183,11 @@ namespace TestParser
         {
             //Get tokens and parse it
             TokenIterator tokens = Init("home\\site\\test.wae");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             DirName output = siteParser.ParseDirectoryName();
             Dir directory = output.GetDirectory();
 
             //Check output
-            Assert.AreEqual(0, exceptions.Count);
             Assert.AreEqual(2, directory.GetDirectoryElements().Count);
 
             //Get directory's and transfer to array to provide walking
@@ -202,12 +206,10 @@ namespace TestParser
         {
             //Get tokens and parse it
             TokenIterator tokens = Init("directory1\\directory2\\filename.ext");
-            List<Exception> exceptions = new List<Exception>();
-            SiteParser siteParser = new SiteParser(tokens, exceptions);
+            SiteParser siteParser = new SiteParser(tokens);
             Dir output = siteParser.ParseDirectory();
 
             //Check output
-            Assert.AreEqual(0, exceptions.Count);
             Assert.AreEqual(2, output.GetDirectoryElements().Count);
 
             //Get directory's and transfer to array to provide walking
@@ -217,16 +219,5 @@ namespace TestParser
             Assert.AreEqual("directory1", directoryElements[0].GetPathElement());
             Assert.AreEqual("directory2", directoryElements[1].GetPathElement());
         }
-
-        /// <summary>
-        ///A test for SiteParser Constructor
-        ///</summary>
-        [TestMethod()]
-        public void SiteParserConstructorTest()
-        {
-
-        }
-
-     
     }
 }

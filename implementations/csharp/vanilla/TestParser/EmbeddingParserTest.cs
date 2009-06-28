@@ -69,8 +69,7 @@ namespace TestParser
         public void ParseTextTailTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            EmbeddingParser target = new EmbeddingParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            EmbeddingParser target = new EmbeddingParser(iterator); // TODO: Initialize to an appropriate value
             TextTail expected = null; // TODO: Initialize to an appropriate value
             TextTail actual;
             actual = target.ParseTextTail();
@@ -85,12 +84,8 @@ namespace TestParser
         public void ParsePreTextTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            EmbeddingParser embeddingParser = new EmbeddingParser(Init("\" sometext <"),exceptions);
+            EmbeddingParser embeddingParser = new EmbeddingParser(Init("\" sometext <"));
             PreText parsedPreText = embeddingParser.ParsePreText();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Check pretext
             Assert.AreEqual("sometext", parsedPreText.GetText());
@@ -103,12 +98,9 @@ namespace TestParser
         public void ParsePostTextTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            EmbeddingParser embeddingParser = new EmbeddingParser(Init("> post \""), exceptions);
-            PostText parsedPostText = embeddingParser.ParsePostText();
 
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
+            EmbeddingParser embeddingParser = new EmbeddingParser(Init("> post \""));
+            PostText parsedPostText = embeddingParser.ParsePostText();
 
             //Check posttext
             Assert.AreEqual("post", parsedPostText.GetText());
@@ -121,12 +113,15 @@ namespace TestParser
         public void ParseMidTextTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
-            EmbeddingParser embeddingParser = new EmbeddingParser(Init("> midtext <"), exceptions);
-            MidText parsedMidText = embeddingParser.ParseMidText();
+            List<Token> tokenList = new List<Token>();
+            tokenList.Add(new Token('>', TokenType.SYMBOL, 0));
+            tokenList.Add(new Token("midtext", TokenType.TEXT, 0));
+            tokenList.Add(new Token('<', TokenType.TEXT, 0));
 
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
+            TokenIterator tokens = new TokenIterator(tokenList);
+
+            EmbeddingParser embeddingParser = new EmbeddingParser(tokens);
+            MidText parsedMidText = embeddingParser.ParseMidText();
 
             //Check midtext
             Assert.AreEqual("midtext", parsedMidText.GetText());
@@ -138,14 +133,9 @@ namespace TestParser
         [TestMethod()]
         public void ParseEmbeddingTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            EmbeddingParser target = new EmbeddingParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
-            Embedding expected = null; // TODO: Initialize to an appropriate value
-            Embedding actual;
-            actual = target.ParseEmbedding();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create parser
+            EmbeddingParser embeddingParser = new EmbeddingParser(Init("\"left<func1() \"text\">right\""));
+            Embedding parsedEmbedding = embeddingParser.ParseEmbedding();
         }
 
         /// <summary>
@@ -155,8 +145,7 @@ namespace TestParser
         public void ParseEmbedTest()
         {
             TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            List<Exception> exceptionList = null; // TODO: Initialize to an appropriate value
-            EmbeddingParser target = new EmbeddingParser(iterator, exceptionList); // TODO: Initialize to an appropriate value
+            EmbeddingParser target = new EmbeddingParser(iterator); // TODO: Initialize to an appropriate value
             Embed expected = null; // TODO: Initialize to an appropriate value
             Embed actual;
             actual = target.ParseEmbed();
