@@ -43,7 +43,7 @@ namespace Parser.Ast.Statements
         /// <returns></returns>
         public override String ToString()
         {
-            return "echo " + Expression.ToString();
+            return "echo " + Expression.ToString() + ";";
         }
 
         #endregion

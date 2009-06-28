@@ -243,6 +243,15 @@ namespace Parser
             return stringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Function to make testing possible
+        /// </summary>
+        /// <param name="stream">Stream to inject</param>
+        public void SetEmbeddingTokenStream(TokenIterator stream)
+        {
+            EmbeddingTokenStream = stream;
+        }
+
         #endregion
 
         #region Private Members
@@ -255,7 +264,7 @@ namespace Parser
         /// <returns>True if new token found, otherwise false</returns>
         private new bool NextToken(String name, String syntax)
         {
-            if (TokenStream.HasNext())
+            if (EmbeddingTokenStream.HasNext())
             {
                 CurrentToken = EmbeddingTokenStream.NextToken();
                 return true;

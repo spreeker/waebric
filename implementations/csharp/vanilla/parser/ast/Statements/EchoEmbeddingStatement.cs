@@ -30,7 +30,7 @@ namespace Parser.Ast.Statements
 
         public override String ToString()
         {
-            return "echo " + EchoEmbedding.ToString();
+            return "echo " + EchoEmbedding.ToString() + ";";
         }
 
         #endregion
