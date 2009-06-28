@@ -277,6 +277,9 @@ namespace Parser
                 //Parse embedding
                 echoEmbedding.SetEmbedding(embeddingParser.ParseEmbedding());
 
+                //Skip ; token
+                NextToken(";", "echo Expression/Embedding ;", ';');
+
                 return echoEmbedding;
             }
             else
@@ -286,8 +289,12 @@ namespace Parser
                 //Parse expression
                 echoExpression.SetExpression(expressionParser.ParseExpression());
 
+                //Skip ; token
+                NextToken(";", "echo Expression/Embedding ;", ';');
+
                 return echoExpression;
             }
+
         }
 
         /// <summary>
