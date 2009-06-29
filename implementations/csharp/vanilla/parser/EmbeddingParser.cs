@@ -172,11 +172,11 @@ namespace Parser
             TextTail textTail = null;
             
             //Determine TextTail type
-            if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ">" && TokenStream.Peek(3).GetValue().ToString() == "\"")
+            if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == ">" && EmbeddingTokenStream.Peek(3).GetValue().ToString() == "\"")
             {   //PostTextTail
                 textTail = ParsePostTextTail();
             }
-            else if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ">")
+            else if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == ">")
             {   //MidTextTail
                 textTail = ParseMidTextTail();
             }
@@ -192,14 +192,8 @@ namespace Parser
         {
             PostTextTail postTextTail = new PostTextTail();
 
-            //Skip > token
-            NextToken(">", "> PostText \"", '>');
-
             //Parse text
             postTextTail.SetPostText(ParsePostText());
-
-            //Skip " token
-            NextToken("\"", "> PostText \"", '"');
 
             return postTextTail;
         }
@@ -211,9 +205,6 @@ namespace Parser
         public MidTextTail ParseMidTextTail()
         {
             MidTextTail midTextTail = new MidTextTail();
-
-            //Skip > token
-            NextToken(">", "MidText Embed TextTail", '>');
 
             //Parse MidText
             midTextTail.SetMidText(ParseMidText());
