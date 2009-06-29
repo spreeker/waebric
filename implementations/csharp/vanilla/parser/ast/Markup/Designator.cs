@@ -73,6 +73,27 @@ namespace Parser.Ast.Markup
             return AttributeList;
         }
 
+        public override String ToString()
+        {
+            Attribute[] attributeArray = AttributeList.ToArray();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for(int i = 0; i <= (attributeArray.Length - 1); i++)
+            {
+                stringBuilder.Append(attributeArray[i].ToString());
+            }
+
+            if (stringBuilder.ToString() != "")
+            {
+                return Identifier + " " + stringBuilder.ToString();
+            }
+            else
+            {
+                return Identifier + stringBuilder.ToString();
+            }
+            
+        }
+
         #endregion
     }
 }

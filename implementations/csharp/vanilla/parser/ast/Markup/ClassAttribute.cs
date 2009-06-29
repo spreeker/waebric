@@ -58,7 +58,7 @@ namespace Parser.Ast.Markup
         /// <returns>String</returns>
         public override String ToString()
         {
-            return Class;
+            return "." + Class;
         }
 
         #endregion

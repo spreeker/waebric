@@ -79,7 +79,7 @@ namespace Parser.Ast.Markup
         /// <returns>String</returns>
         public override String ToString()
         {
-            return "width:" + Width.ToString() + " height:" + Height.ToString();
+            return "@" + Width.ToString() + "%" + Height.ToString();
         }
 
         #endregion
