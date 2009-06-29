@@ -10,7 +10,6 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
@@ -46,7 +45,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	@Override
 	public void visit(Module module) {
 		// Retrieve all dependent modules and store their definitions
-		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
+		List<Module> dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		storeFunctionDefinitions(module, dependancies);
 		
 		for(Module component: dependancies) {
@@ -70,7 +69,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * Store all related function definitions in current environment.
 	 * @param module
 	 */
-	private void storeFunctionDefinitions(Module module, Modules dependancies) {
+	private void storeFunctionDefinitions(Module module, List<Module> dependancies) {
 		for(Module dependancy: dependancies) {
 			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
 				if(environment.containsFunction(function.getIdentifier().getName())) {

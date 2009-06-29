@@ -8,13 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Directory;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
@@ -61,9 +61,7 @@ public class WaebricInterpreter {
 	 * @param tree
 	 */
 	public void interpretProgram(AbstractSyntaxTree ast) {
-		for(Module module: ast.getRoot()) {
-			interpretModule(module);
-		}
+		interpretModule(ast.getRoot());
 	}
 	
 	/**
@@ -72,8 +70,8 @@ public class WaebricInterpreter {
 	 */
 	public void interpretModule(Module module) {
 		// Retrieve function definitions
+		List<Module> dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		Collection<FunctionDef> functions = new ArrayList<FunctionDef>();
-		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		for(Module dependancy: dependancies) {
 			functions.addAll(dependancy.getFunctionDefinitions());
 		}

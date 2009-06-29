@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.module;
 
 import java.util.Collection;
 
-import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.NodeList;
 
 /**
@@ -27,7 +26,7 @@ public class Modules extends NodeList<Module> {
 	}
 	
 	/**
-	 * Check if a module identifier is contained by modules.
+	 * Check if a module with that specific identity is stored.
 	 * @param identifier
 	 * @return
 	 */
@@ -39,9 +38,13 @@ public class Modules extends NodeList<Module> {
 		return false;
 	}
 	
-	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	/**
+	 * Check if a module is stored.
+	 * @param module
+	 * @return
+	 */
+	public boolean contains(Module module) {
+		return super.contains(module);
 	}
 	
 }

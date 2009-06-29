@@ -8,7 +8,6 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -33,35 +32,17 @@ class ModuleParser extends AbstractParser {
 	public ModuleParser(TokenIterator tokens, List<SyntaxException> exceptions) {
 		super(tokens, exceptions);
 		
-		// Initialize sub-parsers
+		// Construct sub-parsers
 		siteParser = new SiteParser(tokens, exceptions);
 		functionParser = new FunctionParser(tokens, exceptions);
 	}
-	
-	/**
-	 * Module* -> Modules
-	 * @throws SyntaxException 
-	 */
-	public Modules parseModules() throws SyntaxException  {
-		Modules modules = new Modules();
-		
-		// Parse Module*
-		while(tokens.hasNext()) {
-			next(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
-			Module module = parseModule();
-			modules.add(module);
-		}
-
-		return modules;
-	}
-	
 
 	/**
 	 * "module" ModuleId ModuleElement* -> Module
 	 * @throws SyntaxException
 	 */
 	public Module parseModule() throws SyntaxException {
-		current(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
+		next(WaebricKeyword.MODULE, "Module", "\"Module\" ModuleId");
 		
 		Module module = new Module();
 		module.setIdentifier(parseModuleId());

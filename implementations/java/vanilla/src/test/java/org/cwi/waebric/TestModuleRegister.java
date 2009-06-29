@@ -5,9 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,13 +16,13 @@ import org.junit.Test;
 public class TestModuleRegister {
 	
 	private ModuleId identifier;
-	private Modules content;
+	private Module content;
 	
 	@Before
 	public void setUp() throws IOException {
 		content = TestUtilities.quickParse("src/test/waebric/mod/dependantmod1.wae").getRoot();
-		identifier = content.get(0).getIdentifier();
-		ModuleRegister.getInstance().cacheModules(identifier, content);
+		identifier = content.getIdentifier();
+		ModuleRegister.getInstance().cacheModule(identifier, content);
 	}
 	
 	@After
@@ -38,8 +39,7 @@ public class TestModuleRegister {
 	
 	@Test
 	public void testLoadDependancies() {
-		assertEquals(1, content.size());
-		Modules dependencies = ModuleRegister.getInstance().loadDependencies(content);
+		List<Module> dependencies = ModuleRegister.getInstance().loadDependencies(content);
 		assertEquals(3, dependencies.size()); // Sub module is imported
 	}
 	

@@ -34,7 +34,6 @@ import org.cwi.waebric.parser.ast.token.TokenNode;
  */
 public class DefaultNodeVisitor implements INodeVisitor {
 
-	public void visit(Modules modules) { visitChildren(modules); }
 	public void visit(Module module) { visitChildren(module); }
 	public void visit(ModuleId id) { visitChildren(id); }
 	public void visit(Import imprt) { visitChildren(imprt); }

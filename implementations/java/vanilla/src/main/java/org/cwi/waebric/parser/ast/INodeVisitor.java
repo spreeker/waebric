@@ -23,7 +23,6 @@ import org.cwi.waebric.parser.ast.module.function.*;
 public interface INodeVisitor {
 
 	// Module
-	public void visit(Modules modules);
 	public void visit(Module module);
 	public void visit(ModuleId id);
 	public void visit(Import imprt);

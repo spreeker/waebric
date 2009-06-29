@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast;
 
-import org.cwi.waebric.parser.ast.module.Modules;
+import org.cwi.waebric.parser.ast.module.Module;
 
 /**
  * The abstract syntax tree (AST) provides an intermediate form for storing 
@@ -12,21 +12,13 @@ import org.cwi.waebric.parser.ast.module.Modules;
  */
 public class AbstractSyntaxTree {
 
-	private final Modules root;
-	
-	/**
-	 * Construct AST with empty root node.
-	 * @param root Start of tree
-	 */
-	public AbstractSyntaxTree() {
-		this(new Modules());
-	}
+	private final Module root;
 	
 	/**
 	 * Construct AST based on root node.
 	 * @param root Modules
 	 */
-	public AbstractSyntaxTree(Modules root) {
+	public AbstractSyntaxTree(Module root) {
 		this.root = root;
 	}
 	
@@ -34,7 +26,7 @@ public class AbstractSyntaxTree {
 	 * Retrieve root node. 
 	 * @return
 	 */
-	public final Modules getRoot() {
+	public final Module getRoot() {
 		return root;
 	}
 	

@@ -9,7 +9,6 @@ import java.util.List;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
@@ -49,19 +48,6 @@ public class TestModuleParser {
 		assertEquals("cwi", moduleId.get(1).getToken().getLexeme().toString());
 		assertEquals("waebric", moduleId.get(2).getToken().getLexeme().toString());
 		assertEquals("mymodule", moduleId.get(3).getToken().getLexeme().toString());
-	}
-	
-	@Test
-	public void testModules() throws SyntaxException, IOException {
-		iterator = TestUtilities.quickScan("module mymodule1\nmodule mymodule2");
-		parser = new ModuleParser(iterator, exceptions);
-		
-		Modules modules = parser.parseModules();
-		
-		// Assertions
-		assertEquals(2, modules.size());
-		assertEquals(Module.class, modules.getChildren()[0].getClass());
-		assertEquals(Module.class, modules.getChildren()[1].getClass());
 	}
 	
 	@Test

@@ -283,7 +283,7 @@ public class TestStatements {
 	@Test
 	public void testVarLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letvar.wae");
-		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		FunctionDef main = ast.getRoot().getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
@@ -299,7 +299,7 @@ public class TestStatements {
 	@Test
 	public void testFuncLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfunc.wae");
-		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		FunctionDef main = ast.getRoot().getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
@@ -321,7 +321,7 @@ public class TestStatements {
 	@Test
 	public void testVarFuncLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letfuncvar.wae");
-		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		FunctionDef main = ast.getRoot().getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
@@ -341,7 +341,7 @@ public class TestStatements {
 	@Test
 	public void testNestedLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letnested.wae");
-		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		FunctionDef main = ast.getRoot().getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
@@ -364,7 +364,7 @@ public class TestStatements {
 	@Test
 	public void testRecursiveLet() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/stm/letrecurssion.wae");
-		FunctionDef main = ast.getRoot().get(0).getFunctionDefinitions().get(0);
+		FunctionDef main = ast.getRoot().getFunctionDefinitions().get(0);
 		
 		Element placeholder = new Element("placeholder");
 		visitor.setCurrent(placeholder);
