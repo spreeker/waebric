@@ -7,6 +7,7 @@ using Parser.Ast.Statements;
 using Lexer;
 using System.IO;
 using Parser.Ast.Expressions;
+using Parser.Ast.Predicates;
 
 namespace TestParser
 {
@@ -70,12 +71,8 @@ namespace TestParser
         public void ParseYieldStatementTest()
         {
             //Create parser
-            List<Exception> exceptions = new List<Exception>();
             StatementParser statementParser = new StatementParser(Init("yield;"));
             YieldStatement parsedYield = statementParser.ParseYieldStatement();
-
-            //Test output
-            Assert.AreEqual(0, exceptions.Count);
 
             //Test yield instance
             Assert.AreEqual(typeof(YieldStatement), parsedYield.GetType());
@@ -118,28 +115,55 @@ namespace TestParser
         [TestMethod()]
         public void ParseIfStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            Statement expected = null; // TODO: Initialize to an appropriate value
-            Statement actual;
-            actual = target.ParseIfStatement();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("if (condition1 || condition2) echo \"test\";"));
+            Statement parsedStatement = statementParser.ParseIfStatement();
+
+            //Check IfStatement
+            Assert.AreEqual(typeof(IfStatement), parsedStatement.GetType());
+            
+            IfStatement parsedIfStatement = (IfStatement)parsedStatement;
+            Assert.AreEqual(typeof(OrPredicate), parsedIfStatement.GetPredicate().GetType());
+            Assert.AreEqual("condition1||condition2", parsedIfStatement.GetPredicate().ToString());
+            Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfStatement.GetTrueStatement().GetType());
+            Assert.AreEqual("echo test", parsedIfStatement.GetTrueStatement().ToString());
         }
 
         /// <summary>
-        ///A test for ParseEchoStatement
+        ///A test for ParseIfElseStatement
         ///</summary>
         [TestMethod()]
-        public void ParseEchoStatementTest()
+        public void ParseIfElseStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            EchoStatement expected = null; // TODO: Initialize to an appropriate value
-            EchoStatement actual;
-            actual = target.ParseEchoStatement();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("if (condition1 || condition2) echo \"test\"; else echo \"test2\";"));
+            Statement parsedStatement = statementParser.ParseIfStatement();
+
+            //Check IfStatement
+            Assert.AreEqual(typeof(IfElseStatement), parsedStatement.GetType());
+
+            IfElseStatement parsedIfElseStatement = (IfElseStatement)parsedStatement;
+            Assert.AreEqual(typeof(OrPredicate), parsedIfElseStatement.GetPredicate().GetType());
+            Assert.AreEqual("condition1||condition2", parsedIfElseStatement.GetPredicate().ToString());
+            Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfElseStatement.GetTrueStatement().GetType());
+            Assert.AreEqual("echo test", parsedIfElseStatement.GetTrueStatement().ToString());
+            Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfElseStatement.GetFalseStatement().GetType());
+            Assert.AreEqual("echo test2", parsedIfElseStatement.GetFalseStatement().ToString());
+        }
+
+        /// <summary>
+        ///A test for ParseEchoExpressionStatement
+        ///</summary>
+        [TestMethod()]
+        public void ParseEchoExpressionStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("echo \"test\";"));
+            EchoStatement parsedEchoStatement = statementParser.ParseEchoStatement();
+
+            //Check echo statement
+            Assert.AreEqual(typeof(EchoExpressionStatement), parsedEchoStatement.GetType());
+            Assert.AreEqual("echo test;", parsedEchoStatement.ToString());
         }
 
         /// <summary>
@@ -148,6 +172,13 @@ namespace TestParser
         [TestMethod()]
         public void ParseEchoEmbeddingStatementTest()
         {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("echo \"left<func1() \"text\">right\";"));
+            EchoStatement parsedEchoStatement = statementParser.ParseEchoStatement();
+
+            //Check echo statement
+            Assert.AreEqual(typeof(EchoEmbeddingStatement), parsedEchoStatement.GetType());
+            Assert.AreEqual("echo \"left<func1() \"text\">right\";", parsedEchoStatement.ToString());
         }
 
         /// <summary>
