@@ -779,7 +779,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Store symbol name in text field.
 	 */
 	public void visit(SymbolExpression expression) {
-		text = expression.getSymbol().getLiteral().toString();
+		text = expression.getSymbol().getName().toString();
 	}
 
 	/**

@@ -85,7 +85,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.SymbolExpression expression = parser.parseSymbolExpression();
-		assertEquals("abc", expression.getSymbol().getLiteral().toString());
+		assertEquals("abc", expression.getSymbol().getName().toString());
 	}
 	
 	@Test

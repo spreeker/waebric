@@ -19,31 +19,51 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  */
 public class StrCon extends AbstractSyntaxNode {
 	
-	private StringLiteral literal;
+	/**
+	 * String literal value.
+	 */
+	private StringLiteral text;
 
-	public StrCon(StringLiteral string) {
-		this.literal = string;
-	}
+	/**
+	 * Construct empty string.
+	 */
+	public StrCon() { this(""); }
 	
+	/**
+	 * Construct string based on java string instance.
+	 * @param string
+	 */
 	public StrCon(String string) {
-		this.literal = new StringLiteral(string);
+		this.text = new StringLiteral(string);
 	}
 	
+	/**
+	 * Construct string based on literal.
+	 * @param string
+	 */
+	public StrCon(StringLiteral string) {
+		this.text = string;
+	}
+	
+	/**
+	 * Retrieve literal.
+	 * @return
+	 */
 	public StringLiteral getLiteral() {
-		return literal;
+		return text;
 	}
 	
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.DQUOTE),
-			literal,
+			text,
 			new CharacterLiteral(WaebricSymbol.DQUOTE)
 		};
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return literal.equals(obj);
+		return text.equals(obj);
 	}
 	
 	@Override

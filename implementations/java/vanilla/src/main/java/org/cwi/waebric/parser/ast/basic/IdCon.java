@@ -19,6 +19,11 @@ public class IdCon extends AbstractSyntaxNode {
 	private final TokenNode node;
 	
 	/**
+	 * Construct empty identifier.
+	 */
+	public IdCon() { this(""); }
+	
+	/**
 	 * Construct identifier purely based on string name,
 	 * use this constructor when the token is unknown.
 	 * @param name

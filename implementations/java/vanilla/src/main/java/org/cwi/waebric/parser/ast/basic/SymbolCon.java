@@ -13,29 +13,49 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  */
 public class SymbolCon extends AbstractSyntaxNode {
 	
-	private StringLiteral literal;
+	/**
+	 * Symbol name literal.
+	 */
+	private StringLiteral name;
 	
-	public SymbolCon(StringLiteral literal) {
-		this.literal = literal;
-	}
+	/**
+	 * Construct empty symbol.
+	 */
+	public SymbolCon() { this(""); }
 	
+	/**
+	 * Construct symbol based on string value.
+	 * @param literal
+	 */
 	public SymbolCon(String literal) {
-		this.literal = new StringLiteral(literal);
+		this.name = new StringLiteral(literal);
 	}
-
-	public StringLiteral getLiteral() {
-		return literal;
+	
+	/**
+	 * Construct symbol based on literal.
+	 * @param literal
+	 */
+	public SymbolCon(StringLiteral literal) {
+		this.name = literal;
+	}
+	
+	/**
+	 * Retrieve symbol name.
+	 * @return
+	 */
+	public StringLiteral getName() {
+		return name;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return literal.equals(obj);
+		return name.equals(obj);
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {
 			new CharacterLiteral(WaebricSymbol.SQUOTE),
-			literal
+			name
 		};
 	}
 	
