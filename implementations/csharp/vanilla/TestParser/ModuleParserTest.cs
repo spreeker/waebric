@@ -93,10 +93,38 @@ namespace TestParser
             Assert.IsTrue(tree.GetRoot().GetType().Equals(typeof(ModuleList)));
              
             ModuleList modules = (ModuleList) tree.GetRoot();
-            Assert.IsTrue(modules.GetSize() == 1); //Contains only 1 module
+            Assert.AreEqual(1, modules.GetSize()); //Contains only 1 module
 
             Module module = (Module) modules.Get(0);
-            Assert.IsTrue(module.GetModuleId().GetIdentifier().ToString() == "test");
+            String[] identifiers = module.GetModuleId().GetIdentifiers().ToArray();
+            Assert.AreEqual(1, identifiers.Length);
+            Assert.AreEqual("test", identifiers[0]);
+        }
+
+        [TestMethod]
+        public void ModuleParserComplexModuleNameTest()
+        {
+            SyntaxTree tree;
+
+            //Create lexer to tokenize stream
+            WaebricLexer lexer = new WaebricLexer(new StringReader("module test.test2.test3"));
+            lexer.LexicalizeStream();
+
+            //Retrieve tokenIterator from lexer and lets parse it
+            WaebricParser parser = new WaebricParser(lexer.GetTokenIterator());
+            parser.Parse();
+
+            //Test if root is modulelist and it contains the right module
+            tree = parser.GetTree();
+
+            Assert.IsTrue(tree.GetRoot().GetType().Equals(typeof(ModuleList)));
+
+            ModuleList modules = (ModuleList)tree.GetRoot();
+            Assert.IsTrue(modules.GetSize() == 1); //Contains only 1 module
+
+            Module module = (Module)modules.Get(0);
+            Assert.AreEqual(3, module.GetModuleId().GetIdentifiers().Count);
+            Assert.AreEqual("test.test2.test3", module.GetModuleId().ToString());
         }
 
         /// <summary>
@@ -157,7 +185,7 @@ namespace TestParser
 
             //Check module
             Module firstModule = (Module) modules.Get(0);
-            Assert.IsTrue(firstModule.GetModuleId().GetIdentifier().ToString() == "test");
+            Assert.IsTrue(firstModule.GetModuleId().ToString() == "test");
             Assert.AreEqual(0, firstModule.GetImports().Count); //No imports
             Assert.AreEqual(0, firstModule.GetFunctionDefinitions().Count); //No function definitions
             Assert.AreEqual(1, firstModule.GetSites().Count); //One site

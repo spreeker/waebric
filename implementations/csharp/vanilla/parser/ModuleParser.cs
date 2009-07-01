@@ -111,15 +111,28 @@ namespace Parser
         public ModuleId ParseModuleId()
         {
             ModuleId moduleId = new ModuleId();
-            //parse single identifier
-            if (NextToken("module identifier", "identifier", TokenType.IDENTIFIER))
+            
+            //parse module identifier
+            while (TokenStream.HasNext())
             {
-                moduleId.SetIdentifier(CurrentToken.GetValue().ToString());
-            }
-            else
-            {
-                //Raise exception
-                throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+                if (NextToken("identifier", "module identifier.identifier", TokenType.IDENTIFIER))
+                {
+                    moduleId.AddIdentifier(CurrentToken.GetValue().ToString());
+                }
+                else
+                {
+                    //Raise exception
+                    throw new UnexpectedToken("Unexpected token found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+                }
+
+                if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ".")
+                {   //Period, so another identifier will appear after this one
+                    NextToken(".", "module identifier.identifier", '.');
+                }
+                else
+                {
+                    break; //No more module identifier stuff will appear
+                }
             }
 
             return moduleId;

@@ -12,7 +12,7 @@ namespace Parser.Ast.Module
     {
         #region Private Members
 
-        private String Identifier;
+        private List<String> IdentifierList;
 
         #endregion
 
@@ -23,29 +23,42 @@ namespace Parser.Ast.Module
         /// </summary>
         public ModuleId()
         {
+            IdentifierList = new List<String>();
         }
 
         /// <summary>
-        /// Get identifier
+        /// Get identifiers of ModuleId
         /// </summary>
-        /// <returns>Identifier</returns>
-        public String GetIdentifier()
+        /// <returns>IdentifierList</returns>
+        public List<String> GetIdentifiers()
         {
-            return Identifier;
+            return IdentifierList;
         }
 
         /// <summary>
-        /// Set identifier
+        /// Add identifier to ModuleId
         /// </summary>
-        /// <param name="identifier">Identifier to set</param>
-        public void SetIdentifier(String identifier)
+        /// <param name="identifier">Identifier to add</param>
+        public void AddIdentifier(String identifier)
         {
-            this.Identifier = identifier;   
+            IdentifierList.Add(identifier);   
         }
 
         public override String ToString()
         {
-            return Identifier;
+            String[] identifierArray = IdentifierList.ToArray();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (int i = 0; i <= (identifierArray.Length - 1); i++)
+            {
+                stringBuilder.Append(identifierArray[i]);
+                if (i != (identifierArray.Length - 1))
+                {
+                    stringBuilder.Append(".");
+                }
+            }
+
+            return stringBuilder.ToString();
         }
 
         #endregion
