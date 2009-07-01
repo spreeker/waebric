@@ -13,7 +13,7 @@ namespace Parser.Ast
     {
         #region Private Members
 
-        private ModuleList root;
+        private Module.Module root;
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace Parser.Ast
         /// Constructor which fills root with specified rootNode
         /// </summary>
         /// <param name="rootNode">Node to set as root</param>
-        public SyntaxTree(ModuleList rootNode)
+        public SyntaxTree(Module.Module rootNode)
         {
             root = rootNode;
         }
@@ -40,7 +40,7 @@ namespace Parser.Ast
         /// Get root of tree
         /// </summary>
         /// <returns>Root of tree</returns>
-        public ModuleList GetRoot()
+        public Module.Module GetRoot()
         {
             return root;
         }
@@ -49,7 +49,7 @@ namespace Parser.Ast
         /// Set root of tree
         /// </summary>
         /// <param name="rootNode">Node to set as root</param>
-        public void SetRoot(ModuleList rootNode)
+        public void SetRoot(Module.Module rootNode)
         {
             this.root = rootNode;
         }

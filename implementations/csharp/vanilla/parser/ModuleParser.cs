@@ -35,38 +35,16 @@ namespace Parser
         }
 
         /// <summary>
-        /// Parse more than one module
-        /// </summary>
-        /// <param name="modules">Modules to parse</param>
-        public ModuleList ParseModules()
-        {
-            ModuleList modules = new ModuleList();
-
-            //Parse modules until no new modules are found
-            while (TokenStream.HasNext())
-            {
-                CurrentToken = TokenStream.NextToken();
-                if (MatchValue(CurrentToken.GetValue().ToString(), Waebric.WaebricKeyword.MODULE.ToString()))
-                {
-                    //New module found so create new module object and start parsing it
-                    Module module = ParseModule();
-                    modules.Add(module);
-                }
-                else
-                {   //Exception, no module definition found
-                    throw new UnexpectedToken("Expected module, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
-                }
-            }
-            return modules;
-        }
-
-        /// <summary>
         /// Parse one module
         /// </summary>
         /// <param name="module">Module to parse</param>
         public Module ParseModule()
         {
             Module module = new Module();
+
+            //Skip module token
+            NextToken("module", "module identifier", "module");
+
             //Parse first the identifier of the module and set it
             ModuleId moduleIdentifier = ParseModuleId();
             module.SetModuleId(moduleIdentifier);
@@ -75,8 +53,8 @@ namespace Parser
             while (TokenStream.HasNext())
             {
                 if (MatchValue(TokenStream.Peek(1).GetValue().ToString(), Waebric.WaebricKeyword.MODULE.ToString()))
-                {   //New module found
-                    break;
+                {   //New module found, raise exception, only one module per file allowed
+                    throw new UnexpectedToken("Unexpected token, found second module definition:", "module", TokenStream.Peek(1).GetLine());
                 }
                 CurrentToken = TokenStream.NextToken();
                 

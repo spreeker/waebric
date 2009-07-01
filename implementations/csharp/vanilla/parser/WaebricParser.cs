@@ -38,9 +38,8 @@ namespace Parser
         /// <returns></returns>
         public void Parse()
         {
-            //Parse waebric file
-            ModuleList moduleList = moduleParser.ParseModules();
-            tree.SetRoot(moduleList);
+            //Parse waebric file;
+            tree.SetRoot(moduleParser.ParseModule());
         }
 
         /// <summary>
