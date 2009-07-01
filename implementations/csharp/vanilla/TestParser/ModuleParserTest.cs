@@ -90,12 +90,7 @@ namespace TestParser
             //Test if root is modulelist and it contains the right module
             tree = parser.GetTree();
 
-            Assert.IsTrue(tree.GetRoot().GetType().Equals(typeof(ModuleList)));
-             
-            ModuleList modules = (ModuleList) tree.GetRoot();
-            Assert.AreEqual(1, modules.GetSize()); //Contains only 1 module
-
-            Module module = (Module) modules.Get(0);
+            Module module = tree.GetRoot();
             String[] identifiers = module.GetModuleId().GetIdentifiers().ToArray();
             Assert.AreEqual(1, identifiers.Length);
             Assert.AreEqual("test", identifiers[0]);
@@ -117,12 +112,7 @@ namespace TestParser
             //Test if root is modulelist and it contains the right module
             tree = parser.GetTree();
 
-            Assert.IsTrue(tree.GetRoot().GetType().Equals(typeof(ModuleList)));
-
-            ModuleList modules = (ModuleList)tree.GetRoot();
-            Assert.IsTrue(modules.GetSize() == 1); //Contains only 1 module
-
-            Module module = (Module)modules.Get(0);
+            Module module = tree.GetRoot();
             Assert.AreEqual(3, module.GetModuleId().GetIdentifiers().Count);
             Assert.AreEqual("test.test2.test3", module.GetModuleId().ToString());
         }
@@ -149,10 +139,7 @@ namespace TestParser
             //Test tree structure
             tree = parser.GetTree();
 
-            ModuleList modules = (ModuleList)tree.GetRoot();
-            Assert.IsTrue(modules.GetSize() == 1); //Just one module in list
-            Assert.IsTrue(modules.GetElements().Length == 1); //One element
-            Module module = (Module) modules.Get(0);
+            Module module = tree.GetRoot();
 
             //ISyntaxNode[] moduleElements = module.GetElements();
 
@@ -177,21 +164,17 @@ namespace TestParser
 
             //Parse tokenized stream
             ModuleParser parser = new ModuleParser(lexer.GetTokenIterator());
-            tree.SetRoot(parser.ParseModules());
-            
-            //Check output of parser
-            ModuleList modules = tree.GetRoot();
-            Assert.IsTrue(modules.GetSize() == 1);
+            tree.SetRoot(parser.ParseModule());
 
             //Check module
-            Module firstModule = (Module) modules.Get(0);
-            Assert.IsTrue(firstModule.GetModuleId().ToString() == "test");
-            Assert.AreEqual(0, firstModule.GetImports().Count); //No imports
-            Assert.AreEqual(0, firstModule.GetFunctionDefinitions().Count); //No function definitions
-            Assert.AreEqual(1, firstModule.GetSites().Count); //One site
+            Module module = tree.GetRoot();
+            Assert.IsTrue(module.GetModuleId().ToString() == "test");
+            Assert.AreEqual(0, module.GetImports().Count); //No imports
+            Assert.AreEqual(0, module.GetFunctionDefinitions().Count); //No function definitions
+            Assert.AreEqual(1, module.GetSites().Count); //One site
 
             //Check site
-            Site[] sites = firstModule.GetSites().ToArray();
+            Site[] sites = module.GetSites().ToArray();
             Assert.AreEqual(2, sites[0].GetMappings().Count);
         }
     }

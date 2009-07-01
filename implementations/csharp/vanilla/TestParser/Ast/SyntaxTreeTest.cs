@@ -69,10 +69,7 @@ namespace TestParser.Ast
         [TestMethod()]
         public void SetRootTest()
         {
-            SyntaxTree target = new SyntaxTree(); // TODO: Initialize to an appropriate value
-            ModuleList rootNode = null; // TODO: Initialize to an appropriate value
-            target.SetRoot(rootNode);
-            Assert.Inconclusive("A method that does not return a value cannot be verified.");
+
         }
 
         /// <summary>
@@ -81,33 +78,7 @@ namespace TestParser.Ast
         [TestMethod()]
         public void GetRootTest()
         {
-            SyntaxTree target = new SyntaxTree(); // TODO: Initialize to an appropriate value
-            ISyntaxNode expected = null; // TODO: Initialize to an appropriate value
-            ISyntaxNode actual;
-            actual = target.GetRoot();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
 
-        /// <summary>
-        ///A test for SyntaxTree Constructor
-        ///</summary>
-        [TestMethod()]
-        public void SyntaxTreeConstructorTest1()
-        {
-            SyntaxTree target = new SyntaxTree();
-            Assert.Inconclusive("TODO: Implement code to verify target");
-        }
-
-        /// <summary>
-        ///A test for SyntaxTree Constructor
-        ///</summary>
-        [TestMethod()]
-        public void SyntaxTreeConstructorTest()
-        {
-            ModuleList rootNode = null; // TODO: Initialize to an appropriate value
-            SyntaxTree target = new SyntaxTree(rootNode);
-            Assert.Inconclusive("TODO: Implement code to verify target");
         }
     }
 }
