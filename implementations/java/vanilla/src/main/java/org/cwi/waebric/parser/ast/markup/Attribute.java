@@ -34,6 +34,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		private IdCon identifier;
 		
+		public ClassAttribute() { }
+		
+		public ClassAttribute(IdCon identifier) {
+			this.identifier = identifier;
+		}
+		
 		public IdCon getIdentifier() {
 			return identifier;
 		}
@@ -66,6 +72,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	public static class IdAttribute extends Attribute {
 		
 		private IdCon identifier;
+		
+		public IdAttribute() { }
+		
+		public IdAttribute(IdCon identifier) {
+			this.identifier = identifier;
+		}
 		
 		public IdCon getIdentifier() {
 			return identifier;
@@ -100,6 +112,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		private IdCon identifier;
 		
+		public NameAttribute() { }
+		
+		public NameAttribute(IdCon identifier) {
+			this.identifier = identifier;
+		}
+		
 		public IdCon getIdentifier() {
 			return identifier;
 		}
@@ -132,6 +150,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 	public static class TypeAttribute extends Attribute {
 		
 		private IdCon identifier;
+		
+		public TypeAttribute() { }
+		
+		public TypeAttribute(IdCon identifier) {
+			this.identifier = identifier;
+		}
 		
 		public IdCon getIdentifier() {
 			return identifier;
@@ -166,6 +190,12 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		private NatCon width;
 		
+		public WidthAttribute() { }
+		
+		public WidthAttribute(NatCon width) {
+			this.width = width;
+		}
+		
 		public NatCon getWidth() {
 			return width;
 		}
@@ -199,6 +229,13 @@ public abstract class Attribute extends AbstractSyntaxNode {
 		
 		private NatCon width;
 		private NatCon height;
+		
+		public WidthHeightAttribute() { }
+		
+		public WidthHeightAttribute(NatCon width, NatCon height) {
+			this.width = width;
+			this.height = height;
+		}
 		
 		public NatCon getWidth() {
 			return width;

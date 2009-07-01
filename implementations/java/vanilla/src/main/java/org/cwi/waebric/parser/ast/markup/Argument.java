@@ -31,6 +31,12 @@ public abstract class Argument extends AbstractSyntaxNode {
 	 */
 	public static class RegularArgument extends Argument {
 		
+		public RegularArgument() { }
+		
+		public RegularArgument(Expression expression) {
+			setExpression(expression);
+		}
+		
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { expression };
 		}
@@ -52,11 +58,20 @@ public abstract class Argument extends AbstractSyntaxNode {
 		private IdCon identifier;
 		
 		public Attr(IdCon identifier) {
-			this.identifier = identifier;
+			setIdentifier(identifier);
+		}
+		
+		public Attr(IdCon identifier, Expression expression) {
+			setIdentifier(identifier);
+			setExpression(expression);
 		}
 		
 		public IdCon getIdentifier() {
 			return identifier;
+		}
+		
+		public void setIdentifier(IdCon identifier) {
+			this.identifier = identifier;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {

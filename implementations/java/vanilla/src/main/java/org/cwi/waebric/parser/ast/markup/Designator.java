@@ -21,8 +21,12 @@ public class Designator extends AbstractSyntaxNode {
 	protected Attributes attributes;
 
 	public Designator(IdCon identifier) {
+		this(identifier, new Attributes());
+	}
+	
+	public Designator(IdCon identifier, Attributes attributes) {
 		this.identifier = identifier;
-		this.attributes = new Attributes();
+		this.attributes = attributes;
 	}
 	
 	public IdCon getIdentifier() {

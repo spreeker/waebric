@@ -11,14 +11,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
-import org.cwi.waebric.parser.ast.module.site.Directory;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
-import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.jdom.Comment;
 import org.jdom.Document;
@@ -113,7 +110,7 @@ public class WaebricInterpreter {
 					markup.accept(visitor);
 
 					// Retrieve relative file path
-					String path = getPath(mapping.getPath());
+					String path = mapping.getPath().getValue().toString();
 					
 					try {
 						// Output document
@@ -125,29 +122,6 @@ public class WaebricInterpreter {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Convert path in relative file path.
-	 * @param path Path
-	 * @return Relative file path
-	 */
-	public static String getPath(Path path) {
-		String result = "";
-		
-		if(path instanceof Path.PathWithDir) {
-			Directory dir = ((Path.PathWithDir) path).getDirName().getDirectory();
-			for(AbstractSyntaxNode element: dir.getChildren()) {
-				result += element.toString().toLowerCase();
-			}
-			result += "/";
-		}
-		
-		result += path.getFileName().getName().toString();
-		result += ".";
-		result += path.getFileName().getExt().toString();
-		
-		return result;
 	}
 
 	/**

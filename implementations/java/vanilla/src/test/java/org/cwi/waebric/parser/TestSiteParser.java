@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.module.site.DirName;
-import org.cwi.waebric.parser.ast.module.site.Directory;
-import org.cwi.waebric.parser.ast.module.site.FileName;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
@@ -70,7 +67,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = parser.parseMapping();
-		assertTrue(mapping.getPath() instanceof Path.PathWithDir);
+		assertEquals("home/index.html", mapping.getPath().getValue().toString());
 		assertTrue(mapping.getMarkup() instanceof Markup.Call);
 		
 		// Path without directory, mapping without arguments
@@ -78,7 +75,7 @@ public class TestSiteParser {
 		parser = new SiteParser(iterator, exceptions);
 		
 		mapping = parser.parseMapping();
-		assertTrue(mapping.getPath() instanceof Path.PathWithoutDir);
+		assertEquals("index.html", mapping.getPath().getValue().toString());
 	}
 	
 	@Test
@@ -87,35 +84,15 @@ public class TestSiteParser {
 		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla/myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Path.PathWithDir pathdf = (Path.PathWithDir) parser.parsePath();
-		assertNotNull(pathdf.getDirName());
-		assertNotNull(pathdf.getFileName());
+		Path pathdf = parser.parsePath();
+		assertNotNull(pathdf.getValue());
 		
 		// Path without directory
 		iterator = TestUtilities.quickScan("myfile.wae");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Path.PathWithoutDir pathf = (Path.PathWithoutDir) parser.parsePath();
-		assertNotNull(pathf.getFileName());
-	}
-	
-	@Test
-	public void testDirName() throws SyntaxException, IOException {
-		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
-		parser = new SiteParser(iterator, exceptions);
-		
-		DirName dirName = parser.parseDirName();
-		assertEquals(Directory.class, dirName.getDirectory().getClass());
-	}
-
-	@Test
-	public void testFileName() throws SyntaxException, IOException {
-		iterator = TestUtilities.quickScan("myfile.wae");
-		parser = new SiteParser(iterator, exceptions);
-		
-		FileName name = parser.parseFileName();
-		assertEquals("myfile", name.getName().toString());
-		assertEquals("wae", name.getExt().toString());
+		Path pathf = parser.parsePath();
+		assertNotNull(pathf.getValue());
 	}
 	
 	@Test
@@ -123,15 +100,19 @@ public class TestSiteParser {
 		iterator = TestUtilities.quickScan("org/cwi/waebric/java/vanilla");
 		parser = new SiteParser(iterator, exceptions);
 		
-		Directory directory = parser.parseDirectory();
-		assertEquals(5, directory.size());
-		assertEquals("org", directory.get(0).toString());
-		assertEquals("cwi", directory.get(1).toString());
-		assertEquals("waebric", directory.get(2).toString());
-		assertEquals("java", directory.get(3).toString());
-		assertEquals("vanilla", directory.get(4).toString());
+		String dirName = parser.parseDirectory();
+		assertEquals("org/cwi/waebric/java/vanilla", dirName);
 	}
-	
+
+	@Test
+	public void testFileName() throws SyntaxException, IOException {
+		iterator = TestUtilities.quickScan("myfile.wae");
+		parser = new SiteParser(iterator, exceptions);
+		
+		String name = parser.parseFileName();
+		assertEquals("myfile.wae", name);
+	}
+
 	@Test
 	public void testIsPathElement() {
 		assertTrue(SiteParser.isPathElement("directory"));

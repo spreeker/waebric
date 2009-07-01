@@ -35,15 +35,15 @@ public abstract class Markup extends AbstractSyntaxNode {
 	 */
 	public static class Call extends Markup {
 
-		protected Arguments arguments = new Arguments();
+		protected Arguments arguments;
 
 		public Call(Designator designator) {
-			this.designator = designator;
+			this(designator, new Arguments());
 		}
 
 		public Call(Designator designator, Arguments arguments) {
 			this.designator = designator;
-			this.arguments.addAll(arguments);
+			this.arguments = arguments;
 		}
 		
 		/**
@@ -52,6 +52,10 @@ public abstract class Markup extends AbstractSyntaxNode {
 		 */
 		public Arguments getArguments() {
 			return arguments;
+		}
+		
+		public void setArguments(Arguments arguments) {
+			this.arguments = arguments;
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {

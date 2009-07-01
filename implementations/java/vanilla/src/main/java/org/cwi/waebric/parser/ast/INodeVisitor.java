@@ -32,11 +32,6 @@ public interface INodeVisitor {
 	public void visit(Mappings mappings);
 	public void visit(Mapping mapping);
 	public void visit(Path path);
-	public void visit(PathElement element);
-	public void visit(Directory directory);
-	public void visit(DirName name);
-	public void visit(FileName name);
-	public void visit(FileExt ext);
 	
 	// Function
 	public void visit(FunctionDef function);

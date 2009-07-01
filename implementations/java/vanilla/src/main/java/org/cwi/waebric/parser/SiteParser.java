@@ -4,14 +4,9 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.module.site.DirName;
-import org.cwi.waebric.parser.ast.module.site.Directory;
-import org.cwi.waebric.parser.ast.module.site.FileExt;
-import org.cwi.waebric.parser.ast.module.site.FileName;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
-import org.cwi.waebric.parser.ast.module.site.PathElement;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -97,38 +92,27 @@ class SiteParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Path parsePath() throws SyntaxException {
-		Path path = null; // Determine path type based on look-ahead
+		String path = ""; // Determine path type based on look-ahead
 		if(tokens.hasNext(2) && tokens.peek(2).getLexeme().equals(WaebricSymbol.SLASH)) {
-			path = new Path.PathWithDir(parseDirName());
-		} else {
-			path = new Path.PathWithoutDir();
+			path = parseDirectory();
 		}
 
-		path.setFileName(parseFileName());
-		return path;
-	}
-	
-	/**
-	 * Directory -> DirName
-	 * @throws SyntaxException 
-	 */
-	public DirName parseDirName() throws SyntaxException {
-		DirName name = new DirName();
-		name.setDirectory(parseDirectory());
-		return name;
+		path += parseFileName();
+		return new Path(path);
 	}
 	
 	/**
 	 * { PathElement "/" }+ -> Directory
 	 * @throws SyntaxException 
 	 */
-	public Directory parseDirectory() throws SyntaxException {
-		Directory directory = new Directory();
+	public String parseDirectory() throws SyntaxException {
+		String directory = "";
 		
 		do {
-			if(directory.size() != 0) {
+			if(! directory.equals("")) {
 				// Expect slash separator between each path element
 				next(WaebricSymbol.SLASH, "Path separator \"/\"", "Path element \"/\" Path element");
+				directory += "/";
 			}
 			
 			// Detect period separator for potential file names
@@ -138,7 +122,7 @@ class SiteParser extends AbstractParser {
 
 			Token element = tokens.next(); // Retrieve next path element
 			if(isPathElement(element.getLexeme().toString())) {
-				directory.add(new PathElement(element.getLexeme().toString()));
+				directory += element.getLexeme().toString();
 			} else {
 				// Token does not match path element syntax, thus directory is invalid
 				reportUnexpectedToken(element, "Path element", "Identifier without layout");
@@ -161,16 +145,16 @@ class SiteParser extends AbstractParser {
 	 * PathElement "." FileExt -> FileName
 	 * @param File name
 	 */
-	public FileName parseFileName() throws SyntaxException {
-		FileName name = new FileName();
+	public String parseFileName() throws SyntaxException {
+		String name = "";
 		
 		next(WaebricTokenSort.IDCON, "File name", "Name \".\" Extension");
-		name.setName(new PathElement(tokens.current().getLexeme().toString()));
+		name += tokens.current().getLexeme().toString() + "."; // Name
 
 		next(WaebricSymbol.PERIOD, "period", "name \".\" extension");
 		
 		next(WaebricTokenSort.IDCON, "File extension", "Name \".\" Extension");
-		name.setExt(new FileExt(tokens.current().getLexeme().toString()));
+		name += tokens.current().getLexeme().toString(); // Extension
 		
 		return name;
 	}

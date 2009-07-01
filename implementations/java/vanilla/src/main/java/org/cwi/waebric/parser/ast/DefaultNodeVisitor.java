@@ -41,11 +41,6 @@ public class DefaultNodeVisitor implements INodeVisitor {
 	public void visit(Mappings mappings) { visitChildren(mappings); }
 	public void visit(Mapping mapping) { visitChildren(mapping); }
 	public void visit(Path path) { visitChildren(path); }
-	public void visit(PathElement element) { visitChildren(element); }
-	public void visit(Directory directory) { visitChildren(directory); }
-	public void visit(DirName name) { visitChildren(name); }
-	public void visit(FileName name) { visitChildren(name); }
-	public void visit(FileExt ext) { visitChildren(ext); }
 	public void visit(FunctionDef function) { visitChildren(function); }
 	public void visit(RegularFormal formals) { visitChildren(formals); }
 	public void visit(EmptyFormal formals) { visitChildren(formals); }
