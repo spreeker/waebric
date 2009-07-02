@@ -461,7 +461,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup ";" -> Statement
 	 */
-	public static class RegularMarkupStatement extends Statement {
+	public static class MarkupStatement extends Statement {
 		
 		private Markup markup;
 
@@ -490,17 +490,17 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Markup ";" -> Statement
 	 */
-	public static class MarkupMarkup extends AbstractMarkupStatement {
+	public static class MarkupsMarkup extends AbstractMarkupStatement {
 
 		private Markup markup;
 
-		public MarkupMarkup() { }
+		public MarkupsMarkup() { }
 
-		public MarkupMarkup(Markup markup) {
+		public MarkupsMarkup(Markup markup) {
 			markups.add(markup);
 		}
 		
-		public MarkupMarkup(Collection<Markup> args) {
+		public MarkupsMarkup(Collection<Markup> args) {
 			markups.addAll(args);
 		}
 		
@@ -530,17 +530,17 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Statement ";" -> Statement
 	 */
-	public static class MarkupStat extends AbstractMarkupStatement {
+	public static class MarkupsStatement extends AbstractMarkupStatement {
 		
 		private Statement statement;
 		
-		public MarkupStat() { }
+		public MarkupsStatement() { }
 
-		public MarkupStat(Markup markup) {
+		public MarkupsStatement(Markup markup) {
 			markups.add(markup);
 		}
 		
-		public MarkupStat(Collection<Markup> args) {
+		public MarkupsStatement(Collection<Markup> args) {
 			markups.addAll(args);
 		}
 		
@@ -570,17 +570,17 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Expression ";" -> Statement
 	 */
-	public static class MarkupExp extends AbstractMarkupStatement {
+	public static class MarkupsExpression extends AbstractMarkupStatement {
 
 		private Expression expression;
 		
-		public MarkupExp() { }
+		public MarkupsExpression() { }
 
-		public MarkupExp(Markup markup) {
+		public MarkupsExpression(Markup markup) {
 			markups.add(markup);
 		}
 		
-		public MarkupExp(Collection<Markup> args) {
+		public MarkupsExpression(Collection<Markup> args) {
 			markups.addAll(args);
 		}
 
@@ -610,17 +610,17 @@ public abstract class Statement extends AbstractSyntaxNode {
 	/**
 	 * Markup+ Embedding ";" -> Statement
 	 */
-	public static class MarkupEmbedding extends AbstractMarkupStatement {
+	public static class MarkupsEmbedding extends AbstractMarkupStatement {
 		
 		private Embedding embedding;
 		
-		public MarkupEmbedding() { }
+		public MarkupsEmbedding() { }
 
-		public MarkupEmbedding(Markup markup) {
+		public MarkupsEmbedding(Markup markup) {
 			markups.add(markup);
 		}
 		
-		public MarkupEmbedding(Collection<Markup> args) {
+		public MarkupsEmbedding(Collection<Markup> args) {
 			markups.addAll(args);
 		}
 

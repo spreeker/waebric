@@ -381,7 +381,7 @@ public class TestStatements {
 	 */
 	@Test
 	public void testRegularMarkupStatement() {
-		Statement.RegularMarkupStatement stm = new Statement.RegularMarkupStatement();
+		Statement.MarkupStatement stm = new Statement.MarkupStatement();
 		stm.setMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
 		
 		Element placeholder = new Element("placeholder");
@@ -398,7 +398,7 @@ public class TestStatements {
 	 */
 	@Test
 	public void testMarkupMarkup() {
-		Statement.MarkupMarkup stm = new Statement.MarkupMarkup();
+		Statement.MarkupsMarkup stm = new Statement.MarkupsMarkup();
 		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test1"))));
 		stm.setMarkup(new Markup.Tag(new Designator(new IdCon("test2"))));
 		
@@ -418,7 +418,7 @@ public class TestStatements {
 	 */
 	@Test
 	public void testMarkupExpression() {
-		Statement.MarkupExp stm = new Statement.MarkupExp();
+		Statement.MarkupsExpression stm = new Statement.MarkupsExpression();
 		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
 		stm.setExpression(new Expression.TextExpression("success"));
 		
@@ -438,7 +438,7 @@ public class TestStatements {
 	 */
 	@Test
 	public void testMarkupEmbedding() {
-		Statement.MarkupEmbedding stm = new Statement.MarkupEmbedding();
+		Statement.MarkupsEmbedding stm = new Statement.MarkupsEmbedding();
 		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
 		Embedding embedding = new Embedding();
 		embedding.setPre(new PreText("left"));
@@ -462,7 +462,7 @@ public class TestStatements {
 	 */
 	@Test
 	public void testMarkupStatement() {
-		Statement.MarkupStat stm = new Statement.MarkupStat();
+		Statement.MarkupsStatement stm = new Statement.MarkupsStatement();
 		stm.addMarkup(new Markup.Tag(new Designator(new IdCon("test"))));
 		stm.setStatement(new Statement.Echo(new Expression.TextExpression("success")));
 		

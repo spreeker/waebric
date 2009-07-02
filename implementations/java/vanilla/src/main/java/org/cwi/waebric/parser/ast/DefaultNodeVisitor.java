@@ -54,11 +54,11 @@ public class DefaultNodeVisitor implements INodeVisitor {
 	public void visit(EchoEmbedding statement) { visitChildren(statement); }
 	public void visit(Let statement) { visitChildren(statement); }
 	public void visit(Yield statement) { visitChildren(statement); }
-	public void visit(RegularMarkupStatement statement) { visitChildren(statement); }
-	public void visit(MarkupMarkup statement) { visitChildren(statement); }
-	public void visit(MarkupExp statement) { visitChildren(statement); }
-	public void visit(MarkupStat statement) { visitChildren(statement); }
-	public void visit(MarkupEmbedding statement) { visitChildren(statement); }
+	public void visit(MarkupStatement statement) { visitChildren(statement); }
+	public void visit(MarkupsMarkup statement) { visitChildren(statement); }
+	public void visit(MarkupsExpression statement) { visitChildren(statement); }
+	public void visit(MarkupsStatement statement) { visitChildren(statement); }
+	public void visit(MarkupsEmbedding statement) { visitChildren(statement); }
 	public void visit(FuncBind bind) { visitChildren(bind); }
 	public void visit(VarBind bind) { visitChildren(bind); }
 	public void visit(RegularPredicate predicate) { visitChildren(predicate); }

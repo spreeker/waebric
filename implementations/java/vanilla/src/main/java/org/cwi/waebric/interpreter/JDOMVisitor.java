@@ -31,11 +31,11 @@ import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
 import org.cwi.waebric.parser.ast.statement.Assignment.VarBind;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupMarkup;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
-import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsMarkup;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
@@ -472,7 +472,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Interpret mark-up embedded in statement.
 	 */
-	public void visit(RegularMarkupStatement statement) {
+	public void visit(MarkupStatement statement) {
 		if(isCall(statement.getMarkup())) {
 			String name = statement.getMarkup().getDesignator().getIdentifier().getName();
 			if(containsYield(environment.getFunction(name))) {
@@ -486,7 +486,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Interpret mark-ups embedded in statement.
 	 */
-	public void visit(MarkupMarkup statement) {
+	public void visit(MarkupsMarkup statement) {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next(); 
@@ -498,7 +498,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					// Remainder of mark-up chain is stored as yield statement
 					NodeList<Markup> remainder = new NodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupMarkup replacement = new MarkupMarkup(remainder);
+					MarkupsMarkup replacement = new MarkupsMarkup(remainder);
 					replacement.setMarkup(statement.getMarkup());
 					yield.add(replacement);
 				}
@@ -541,7 +541,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Interpret mark-ups and expression embedded in statement.
 	 */
-	public void visit(MarkupExp statement) {
+	public void visit(MarkupsExpression statement) {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next(); 
@@ -553,7 +553,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					// Remainder of mark-up chain is stored as yield statement
 					NodeList<Markup> remainder = new NodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupExp replacement = new MarkupExp(remainder);
+					MarkupsExpression replacement = new MarkupsExpression(remainder);
 					replacement.setExpression(statement.getExpression());
 					yield.add(replacement);
 				}
@@ -572,7 +572,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Interpret mark-ups and sub-statement embedded in statement.
 	 */
-	public void visit(MarkupStat statement) {
+	public void visit(MarkupsStatement statement) {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next(); 
@@ -584,7 +584,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					// Remainder of mark-up chain is stored as yield statement
 					NodeList<Markup> remainder = new NodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupStat replacement = new MarkupStat(remainder);
+					MarkupsStatement replacement = new MarkupsStatement(remainder);
 					replacement.setStatement(statement.getStatement());
 					yield.add(replacement);
 				}
@@ -602,7 +602,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Interpret mark-ups and embedding embedded in statement.
 	 */
-	public void visit(MarkupEmbedding statement) {
+	public void visit(MarkupsEmbedding statement) {
 		Iterator<Markup> markups = statement.getMarkups().iterator();
 		while(markups.hasNext()) {
 			Markup markup = markups.next(); 
@@ -614,7 +614,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					// Remainder of mark-up chain is stored as yield statement
 					NodeList<Markup> remainder = new NodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
-					MarkupEmbedding replacement = new MarkupEmbedding(remainder);
+					MarkupsEmbedding replacement = new MarkupsEmbedding(remainder);
 					replacement.setEmbedding(statement.getEmbedding());
 					yield.add(replacement);
 				}
@@ -825,7 +825,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Embed.ExpressionEmbed embed) {
 		// Interpret similar to mark-up expression
-		Statement.MarkupExp stm = new Statement.MarkupExp(embed.getMarkups());
+		Statement.MarkupsExpression stm = new Statement.MarkupsExpression(embed.getMarkups());
 		stm.setExpression(embed.getExpression());
 		stm.accept(this);
 	}
@@ -836,7 +836,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Embed.MarkupEmbed embed) {
 		// Interpret similar to mark-up mark-up
-		Statement.MarkupMarkup stm = new Statement.MarkupMarkup(embed.getMarkups());
+		Statement.MarkupsMarkup stm = new Statement.MarkupsMarkup(embed.getMarkups());
 		stm.setMarkup(embed.getMarkup());
 		stm.accept(this);
 	}

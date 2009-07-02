@@ -11,9 +11,9 @@ import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
@@ -316,7 +316,7 @@ class StatementParser extends AbstractParser {
 		
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 			// Markup ";"
-			Statement.RegularMarkupStatement statement = new Statement.RegularMarkupStatement();
+			Statement.MarkupStatement statement = new Statement.MarkupStatement();
 			statement.setMarkup(markup);
 			tokens.next(); // Accept ; and jump to next token
 			return statement;
@@ -334,12 +334,12 @@ class StatementParser extends AbstractParser {
 				if(peek.getLexeme().equals(WaebricSymbol.SEMICOLON)) {
 					// Markup+ Markup ";"
 					Markup end = markups.remove(markups.size()-1);
-					Statement.MarkupMarkup statement = new Statement.MarkupMarkup(markups);
+					Statement.MarkupsMarkup statement = new Statement.MarkupsMarkup(markups);
 					statement.setMarkup(end);
 					next(WaebricSymbol.SEMICOLON, "Markup markup closure ;", "Markup+ Markup \";\"");
 					return statement;
 				} else if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
-					MarkupEmbedding statement = new MarkupEmbedding(markups);
+					MarkupsEmbedding statement = new MarkupsEmbedding(markups);
 					try {
 						statement.setEmbedding(embeddingParser.parseEmbedding());
 					} catch(Exception e) {
@@ -350,12 +350,12 @@ class StatementParser extends AbstractParser {
 				} else {
 					if(StatementParser.isMarkupFreeStatement(peek)) {
 						// Markup+ Statement ";"
-						MarkupStat statement = new MarkupStat(markups);
+						MarkupsStatement statement = new MarkupsStatement(markups);
 						statement.setStatement(parseStatement());
 						return statement;
 					} else if(ExpressionParser.isExpression(peek)) {
 						// Markup+ Expression
-						MarkupExp statement = new MarkupExp(markups);
+						MarkupsExpression statement = new MarkupsExpression(markups);
 						try {
 							statement.setExpression(expressionParser.parseExpression());
 						} catch(SyntaxException e) {

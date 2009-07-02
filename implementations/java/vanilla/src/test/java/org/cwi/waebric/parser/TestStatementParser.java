@@ -22,11 +22,11 @@ import org.cwi.waebric.parser.ast.statement.Statement.EchoEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.If;
 import org.cwi.waebric.parser.ast.statement.Statement.IfElse;
 import org.cwi.waebric.parser.ast.statement.Statement.Let;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupEmbedding;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupExp;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupMarkup;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupStat;
-import org.cwi.waebric.parser.ast.statement.Statement.RegularMarkupStatement;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsMarkup;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.TestUtilities;
@@ -148,7 +148,7 @@ public class TestStatementParser {
 		assertEquals(3, statement.getStatements().size());
 		assertEquals(Statement.Yield.class, statement.getStatements().get(0).getClass());
 		assertEquals(Statement.Comment.class, statement.getStatements().get(1).getClass());
-		assertEquals(Statement.MarkupExp.class, statement.getStatements().get(2).getClass());
+		assertEquals(Statement.MarkupsExpression.class, statement.getStatements().get(2).getClass());
 	}
 	
 	@Test
@@ -195,7 +195,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		RegularMarkupStatement statement = (RegularMarkupStatement) parser.parseStatement();
+		MarkupStatement statement = (MarkupStatement) parser.parseStatement();
 		assertEquals("func1", statement.getMarkup().getDesignator().getIdentifier().getToken().getLexeme().toString());
 	}
 	
@@ -233,7 +233,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1 func2 var;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupExp varstm = (MarkupExp) parser.parseMarkupStatements();
+		MarkupsExpression varstm = (MarkupsExpression) parser.parseMarkupStatements();
 		assertEquals(2, varstm.getMarkups().size());
 		assertEquals(Expression.VarExpression.class, varstm.getExpression().getClass());
 		
@@ -241,7 +241,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1 func2 \"123\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupExp estatement = (MarkupExp) parser.parseMarkupStatements();
+		MarkupsExpression estatement = (MarkupsExpression) parser.parseMarkupStatements();
 		assertEquals(2, estatement.getMarkups().size());
 		assertEquals(Expression.TextExpression.class, estatement.getExpression().getClass());
 		
@@ -249,7 +249,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1 func2 var.id;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupExp fieldstm = (MarkupExp) parser.parseMarkupStatements();
+		MarkupsExpression fieldstm = (MarkupsExpression) parser.parseMarkupStatements();
 		assertEquals(2, fieldstm.getMarkups().size());
 		assertEquals(Expression.Field.class, fieldstm.getExpression().getClass());
 	}
@@ -260,7 +260,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("div#footer p.legal \"&copy;2007 All Rights Reserved. Design by <a(href=\"http://www.freecsstemplates.org/\") \"Free CSS Templates\">\";");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupEmbedding statement = (MarkupEmbedding) parser.parseMarkupStatements();
+		MarkupsEmbedding statement = (MarkupsEmbedding) parser.parseMarkupStatements();
 		assertEquals(2, statement.getMarkups().size());
 		assertEquals(Embed.ExpressionEmbed.class, statement.getEmbedding().getEmbed().getClass());
 	}
@@ -270,7 +270,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1 func2 yield;;");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupStat statement = (MarkupStat) parser.parseMarkupStatements();
+		MarkupsStatement statement = (MarkupsStatement) parser.parseMarkupStatements();
 		assertEquals(2, statement.getMarkups().size());
 		assertEquals(Statement.Yield.class, statement.getStatement().getClass());
 		
@@ -278,7 +278,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("markup { func1 func2 var; }");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupStat cstatement = (MarkupStat) parser.parseMarkupStatements();
+		MarkupsStatement cstatement = (MarkupsStatement) parser.parseMarkupStatements();
 		assertEquals(1, cstatement.getMarkups().size());
 		assertEquals(Statement.Block.class, cstatement.getStatement().getClass());
 	}
@@ -288,7 +288,7 @@ public class TestStatementParser {
 		iterator = TestUtilities.quickScan("func1 func2 func3();");
 		parser = new StatementParser(iterator, exceptions);
 		
-		MarkupMarkup statement = (MarkupMarkup) parser.parseMarkupStatements();
+		MarkupsMarkup statement = (MarkupsMarkup) parser.parseMarkupStatements();
 		assertEquals(2, statement.getMarkups().size());
 	}
 
