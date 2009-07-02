@@ -27,6 +27,8 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	
 	@Override
 	public void visit(Module module) {
+		module.getIdentifier().accept(this);
+		
 		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		for(Module dependancy: dependancies) {
 			for(Import imprt: dependancy.getImports()) {
@@ -37,10 +39,15 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	
 	@Override
 	public void visit(Import imprt) {
-		String path = ModuleRegister.getPath(imprt.getIdentifier());
+		imprt.getIdentifier().accept(this);
+	}
+	
+	@Override
+	public void visit(ModuleId identifier) {
+		String path = ModuleRegister.getPath(identifier);
 		File file = new File(path);
 		if(! file.isFile()) {
-			exceptions.add(new NonExistingModuleException(imprt.getIdentifier()));
+			exceptions.add(new NonExistingModuleException(identifier));
 		}
 	}
 	
