@@ -33,6 +33,19 @@ public class IdCon extends AbstractSyntaxNode {
 	}
 	
 	/**
+	 * Construct identifier based on token text, line and
+	 * character position. Using this constructor will 
+	 * allow more detailed error messages during checking
+	 * and interpreting.
+	 * @param name Data
+	 * @param lineno Line number
+	 * @param charno Character number
+	 */
+	public IdCon(String name, int lineno, int charno) {
+		this(new Token.IdentifierToken(name, lineno, charno));
+	}
+	
+	/**
 	 * Construct identifier using the token object, by
 	 * providing a token reference detailed error messages
 	 * can be generated.

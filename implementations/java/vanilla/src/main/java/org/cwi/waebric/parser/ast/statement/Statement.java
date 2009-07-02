@@ -75,7 +75,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.predicate = predicate;
 		}
 		
-		public Statement getStatement() {
+		public Statement getTrueStatement() {
 			return trueStatement;
 		}
 		
@@ -123,8 +123,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.elseStatement = elseStatement;
 		}
 		
-		public Statement getElseStatement() {
+		public Statement getFalseStatement() {
 			return elseStatement;
+		}
+		
+		public void setFalseStatement(Statement elseStatement) {
+			this.elseStatement = elseStatement;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {

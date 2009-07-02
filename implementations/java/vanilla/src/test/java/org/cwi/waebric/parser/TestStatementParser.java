@@ -96,7 +96,7 @@ public class TestStatementParser {
 		
 		If statement = parser.parseIfStatement();
 		assertEquals(Predicate.RegularPredicate.class, statement.getPredicate().getClass());
-		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
+		assertEquals(Statement.Comment.class, statement.getTrueStatement().getClass());
 	}
 	
 	@Test
@@ -106,8 +106,8 @@ public class TestStatementParser {
 		
 		IfElse statement = (IfElse) parser.parseIfStatement();
 		assertEquals(Predicate.RegularPredicate.class, statement.getPredicate().getClass());
-		assertEquals(Statement.Comment.class, statement.getStatement().getClass());
-		assertEquals(Statement.Yield.class, statement.getElseStatement().getClass());
+		assertEquals(Statement.Comment.class, statement.getTrueStatement().getClass());
+		assertEquals(Statement.Yield.class, statement.getFalseStatement().getClass());
 	}
 	
 	@Test

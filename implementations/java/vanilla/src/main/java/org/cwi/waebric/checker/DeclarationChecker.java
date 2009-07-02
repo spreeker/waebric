@@ -46,10 +46,22 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	public void visit(Module module) {
 		// Retrieve all dependent modules and store their definitions
 		List<Module> dependancies = ModuleRegister.getInstance().loadDependencies(module);
-		storeFunctionDefinitions(module, dependancies);
 		
+		// Store function definitions
 		for(Module component: dependancies) {
-			// Check each function definition for invalid definitions
+			for(FunctionDef function: component.getFunctionDefinitions()) {
+				if(environment.containsFunction(function.getIdentifier().getName())) {
+					// Function is already defined, store exception
+					exceptions.add(new DuplicateFunctionDefinition(function));
+				} else {
+					// Store definition
+					environment.storeFunctionDef(function);
+				}
+			}
+		}
+		
+		// Check each function definition for invalid definitions
+		for(Module component: dependancies) {
 			for(FunctionDef function: component.getFunctionDefinitions()) {
 				function.accept(this);
 			}
@@ -60,26 +72,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 					mapping.getMarkup().accept(this);
 				}
 			}
-		}
-		
-		
-	}
-	
-	/**
-	 * Store all related function definitions in current environment.
-	 * @param module
-	 */
-	private void storeFunctionDefinitions(Module module, List<Module> dependancies) {
-		for(Module dependancy: dependancies) {
-			for(FunctionDef function: dependancy.getFunctionDefinitions()) {
-				if(environment.containsFunction(function.getIdentifier().getName())) {
-					// Function is already defined, store exception
-					exceptions.add(new DuplicateFunctionDefinition(function));
-				} else {
-					environment.storeFunctionDef(function);
-				}
-			}
-		}
+		}	
 	}
 	
 	@Override
@@ -89,9 +82,9 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
 			environment.storeVariable(identifier.getName(), null);
 		}
-		
-		// Check statements
+
 		for(Statement statement: function.getStatements()) {
+			// Check statements
 			statement.accept(this);
 		}
 		
@@ -148,18 +141,18 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	}
 	
 	@Override
+	public void visit(VarBind bind) {
+		bind.getExpression().accept(this); // Check expression
+		environment.storeVariable(bind.getIdentifier().getName(), bind.getExpression());
+	}
+	
+	@Override
 	public void visit(VarExpression expression) {
 		if(! environment.containsVariable(expression.getVar().getName())) {
 			exceptions.add(new UndefinedVariableException(expression.getVar()));
 		}
 	}
 	
-	@Override
-	public void visit(VarBind bind) {
-		bind.getExpression().accept(this); // Check expression
-		environment.storeVariable(bind.getIdentifier().getName(), bind.getExpression());
-	}
-
 	@Override
 	public void visit(Markup.Tag tag) {
 		if(environment.containsFunction(tag.getDesignator().getIdentifier().getName())) {

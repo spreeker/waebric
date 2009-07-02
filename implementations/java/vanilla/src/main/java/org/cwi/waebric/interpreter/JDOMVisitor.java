@@ -280,7 +280,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.If statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
-			statement.getStatement().accept(this);
+			statement.getTrueStatement().accept(this);
 		}
 	}
 
@@ -289,9 +289,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.IfElse statement) {
 		if(evaluatePredicate(statement.getPredicate())) {
-			statement.getStatement().accept(this);
+			statement.getTrueStatement().accept(this);
 		} else {
-			statement.getElseStatement().accept(this);
+			statement.getFalseStatement().accept(this);
 		}
 	}
 	

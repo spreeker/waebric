@@ -9,6 +9,7 @@ import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
+import org.cwi.waebric.parser.ast.basic.Text;
 import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**

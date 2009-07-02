@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast;
 
 import org.cwi.waebric.parser.ast.basic.*;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.ast.expression.Text;
 import org.cwi.waebric.parser.ast.expression.Expression.*;
 import org.cwi.waebric.parser.ast.markup.*;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
