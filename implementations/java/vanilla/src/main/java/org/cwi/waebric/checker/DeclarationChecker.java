@@ -60,8 +60,8 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 			}
 		}
 		
-		// Check each function definition for invalid definitions
 		for(Module component: dependancies) {
+			// Check each function definition for invalid definitions
 			for(FunctionDef function: component.getFunctionDefinitions()) {
 				function.accept(this);
 			}
@@ -84,8 +84,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		}
 
 		for(Statement statement: function.getStatements()) {
-			// Check statements
-			statement.accept(this);
+			statement.accept(this); // Check statements
 		}
 		
 		// Restore previous environment
