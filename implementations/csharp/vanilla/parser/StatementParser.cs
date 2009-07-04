@@ -338,22 +338,79 @@ namespace Parser
         /// <returns>ParsedAssignment</returns>
         public Assignment ParseAssignment()
         {
-            Assignment assignment = new Assignment();
+            //Determine type
+            if (TokenStream.HasNext(2) && TokenStream.Peek(2).GetValue().ToString() == "(")
+            {   //FuncBindAssignment
+                return ParseFuncBindAssignment();
+            }
+            else if (TokenStream.HasNext(2) && TokenStream.Peek(2).GetValue().ToString() == "=")
+            {   //VarBindAssignment
+                return ParseVarBindAssignment();
+            }
+            else
+            {
+                throw new UnexpectedToken("Assignment expected, found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+            }
+        }
+
+        public FuncBindAssignment ParseFuncBindAssignment()
+        {
+            FuncBindAssignment funcBindAssignment = new FuncBindAssignment();
 
             //Parse identifier
             CurrentToken = TokenStream.NextToken();
-            assignment.SetIdentifier(CurrentToken.GetValue().ToString());
+            funcBindAssignment.SetIdentifier(CurrentToken.GetValue().ToString());
+
+            //Skip ( token
+            NextToken("(", "identifier(identifier1, identifier2) = statement;", '(');
+
+            //Parse identifiers
+            while (TokenStream.HasNext())
+            {
+                if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ")")
+                {   //No more identifiers
+                    break;
+                }
+                else if (TokenStream.Peek(1).GetValue().ToString() == ",")
+                {
+                    //Skip , token
+                    NextToken(",", "(identifier1, identifier2)", ',');
+                }
+                CurrentToken = TokenStream.NextToken();
+                funcBindAssignment.AddIdentifier(CurrentToken.GetValue().ToString());
+                
+            }
+
+            //Skip ) token
+            NextToken(")", "identifier(identifier1, identifier2) = statement;", ')');
+
+            //Skip = token
+            NextToken("=", "identifier(identifier1, identifier2) = statement;", '=');
+
+            //Parse statement
+            funcBindAssignment.SetStatement(ParseStatement());
+
+            return funcBindAssignment;
+        }
+
+        public VarBindAssignment ParseVarBindAssignment()
+        {
+            VarBindAssignment varBindAssignment = new VarBindAssignment();
+
+            //Parse identifier
+            CurrentToken = TokenStream.NextToken();
+            varBindAssignment.SetIdentifier(CurrentToken.GetValue().ToString());
 
             //Skip = token
             NextToken("=", "identifier = expression;", '=');
 
             //Parse expression
-            assignment.SetExpression(expressionParser.ParseExpression());
+            varBindAssignment.SetExpression(expressionParser.ParseExpression());
 
             //Skip ; token
             NextToken(";", "identifier = expression;", ';');
 
-            return assignment;
+            return varBindAssignment;
         }
 
 

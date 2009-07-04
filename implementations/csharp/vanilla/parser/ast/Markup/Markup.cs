@@ -12,7 +12,7 @@ namespace Parser.Ast.Markup
     {
         #region Private Members
 
-        private List<Argument> ArgumentList;
+        private NodeList ArgumentList;
         private Designator Tag;
 
         #endregion
@@ -22,7 +22,7 @@ namespace Parser.Ast.Markup
         public Markup()
         {
             //Intialize members
-            ArgumentList = new List<Argument>();
+            ArgumentList = new NodeList();
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Parser.Ast.Markup
         /// Get arguments
         /// </summary>
         /// <returns>ArgumentList</returns>
-        public List<Argument> GetArguments()
+        public NodeList GetArguments()
         {
             return ArgumentList;
         }
@@ -70,7 +70,7 @@ namespace Parser.Ast.Markup
             else
             {
                 //Get arguments
-                Argument[] argumentArray = ArgumentList.ToArray();
+                Argument[] argumentArray = (Argument[]) ArgumentList.ToArray();
                 StringBuilder stringBuilder = new StringBuilder();
 
                 for (int i = 0; i <= (argumentArray.Length - 1); i++)
@@ -86,6 +86,18 @@ namespace Parser.Ast.Markup
             }
         }
 
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Tag,
+                ArgumentList
+            };
+        }
 
         #endregion
 

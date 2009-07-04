@@ -9,7 +9,7 @@ namespace Parser.Ast.Statements
     /// <summary>
     /// Node which contains an EchoStatement
     /// </summary>
-    public class EchoStatement : Statement
+    public abstract class EchoStatement : Statement
     {
     }
 }

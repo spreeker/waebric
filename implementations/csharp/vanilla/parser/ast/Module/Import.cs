@@ -8,7 +8,7 @@ namespace Parser.Ast.Module
     /// <summary>
     /// Class which contains import
     /// </summary>
-    public class Import : ModuleElement
+    public class Import : ISyntaxNode
     {
         #region Private Members
 
@@ -44,6 +44,18 @@ namespace Parser.Ast.Module
         public override String ToString()
         {
             return "import " + ModuleIdentifier.ToString();
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                ModuleIdentifier
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

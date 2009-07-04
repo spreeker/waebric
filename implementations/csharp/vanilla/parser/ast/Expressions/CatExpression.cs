@@ -65,6 +65,19 @@ namespace Parser.Ast.Expressions
             return LeftExpression.ToString() + "+" + RightExpression.ToString();
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                LeftExpression,
+                RightExpression
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

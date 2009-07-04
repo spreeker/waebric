@@ -102,7 +102,7 @@ namespace TestParser
             
             //Test Record contents
             Assert.AreEqual(3, expression.GetRecords().Count);
-            KeyValuePair[] recordList = expression.GetRecords().ToArray();
+            KeyValuePair[] recordList = (KeyValuePair[]) expression.GetRecords().ToArray();
             
             Assert.AreEqual("token1", recordList[0].GetKey());
             Assert.AreEqual(typeof(TextExpression), recordList[0].GetValue().GetType());
@@ -143,7 +143,7 @@ namespace TestParser
             
             //Test items of list
             Assert.AreEqual(4, listExpression.GetExpressions().Count);
-            Expression[] expressions = listExpression.GetExpressions().ToArray();
+            Expression[] expressions = (Expression[]) listExpression.GetExpressions().ToArray();
             Assert.AreEqual("var1", expressions[0].ToString());
             Assert.AreEqual("var2", expressions[1].ToString());
             Assert.AreEqual("var3", expressions[2].ToString());

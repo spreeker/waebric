@@ -14,8 +14,8 @@ namespace Parser.Ast.Functions
         #region Private Members
 
         private String Identifier;
-        private List<Formal> FormalList;
-        private List<Statement> StatementList;
+        private NodeList FormalList;
+        private NodeList StatementList;
 
         #endregion
 
@@ -24,8 +24,8 @@ namespace Parser.Ast.Functions
         public FunctionDefinition()
         {
             //Create lists
-            FormalList = new List<Formal>();
-            StatementList = new List<Statement>();
+            FormalList = new NodeList();
+            StatementList = new NodeList();
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Parser.Ast.Functions
         /// Get formals of FunctionDefinition
         /// </summary>
         /// <returns>FormalList</returns>
-        public List<Formal> GetFormals()
+        public NodeList GetFormals()
         {
             return FormalList;
         }
@@ -77,7 +77,7 @@ namespace Parser.Ast.Functions
         /// Get statements of FunctionDefinition
         /// </summary>
         /// <returns>StatementList</returns>
-        public List<Statement> GetStatements()
+        public NodeList GetStatements()
         {
             return StatementList;
         }
@@ -90,6 +90,19 @@ namespace Parser.Ast.Functions
         {
             return null; //TO IMPLEMENT!
             //return "def" + Identifier + "(" + Frmls.ToString() + ")" + StatementList.ToString() + "end";
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                FormalList,
+                StatementList
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

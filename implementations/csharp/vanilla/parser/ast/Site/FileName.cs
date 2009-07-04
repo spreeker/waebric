@@ -64,6 +64,19 @@ namespace Parser.Ast.Site
             return Name.ToString() + "." + FileExtension.ToString();
         }
 
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Name,
+                FileExtension
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

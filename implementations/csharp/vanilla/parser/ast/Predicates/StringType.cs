@@ -17,6 +17,16 @@ namespace Parser.Ast.Predicates
             return "string";
         }
 
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {};
+        }
+
         #endregion
     }
 }

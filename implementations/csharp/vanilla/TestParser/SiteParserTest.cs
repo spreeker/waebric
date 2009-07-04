@@ -79,7 +79,7 @@ namespace TestParser
 
             //Test mappings of site
             Assert.AreEqual(1, parsedSite.GetMappings().Count);
-            Mapping[] mappingArray = parsedSite.GetMappings().ToArray();
+            Mapping[] mappingArray = (Mapping[]) parsedSite.GetMappings().ToArray();
             Mapping mapping = mappingArray[0];
 
             //Test path of site
@@ -91,7 +91,7 @@ namespace TestParser
             Assert.AreEqual(1, parsedMarkup.GetArguments().Count);
 
             //Test argument
-            Argument[] argumentArray = parsedMarkup.GetArguments().ToArray();
+            Argument[] argumentArray = (Argument[]) parsedMarkup.GetArguments().ToArray();
             Assert.AreEqual(typeof(ExpressionArgument), argumentArray[0].GetType());
             Assert.AreEqual("argument", argumentArray[0].ToString());
         }
@@ -109,7 +109,7 @@ namespace TestParser
 
             //Get structures of path
             Dir directory = path.GetDirectoryName().GetDirectory();
-            PathElement[] directoryElements = directory.GetDirectoryElements().ToArray();
+            PathElement[] directoryElements = (PathElement[]) directory.GetDirectoryElements().ToArray();
             FileName filename = path.GetFilename();
 
 
@@ -132,7 +132,7 @@ namespace TestParser
             //Set up parser
             TokenIterator tokens = Init("site/home.html : home(); site2/home.html : home2()");
             SiteParser siteParser = new SiteParser(tokens);
-            Mapping[] parsedMappings = siteParser.ParseMappings().ToArray();
+            Mapping[] parsedMappings = (Mapping[]) siteParser.ParseMappings().ToArray();
 
             //Test mappings
             Assert.AreEqual(2, parsedMappings.Length);
@@ -191,7 +191,7 @@ namespace TestParser
             Assert.AreEqual(2, directory.GetDirectoryElements().Count);
 
             //Get directory's and transfer to array to provide walking
-            PathElement[] directoryElements = directory.GetDirectoryElements().ToArray();
+            PathElement[] directoryElements = (PathElement[]) directory.GetDirectoryElements().ToArray();
 
             //Check directory's
             Assert.AreEqual("home", directoryElements[0].GetPathElement());
@@ -213,7 +213,7 @@ namespace TestParser
             Assert.AreEqual(2, output.GetDirectoryElements().Count);
 
             //Get directory's and transfer to array to provide walking
-            PathElement[] directoryElements = output.GetDirectoryElements().ToArray();
+            PathElement[] directoryElements = (PathElement[]) output.GetDirectoryElements().ToArray();
 
             //Check directory's
             Assert.AreEqual("directory1", directoryElements[0].GetPathElement());

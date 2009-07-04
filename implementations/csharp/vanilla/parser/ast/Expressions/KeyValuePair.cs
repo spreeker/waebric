@@ -65,6 +65,18 @@ namespace Parser.Ast.Expressions
             return Key + ":" + Value.ToString();
         }
 
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Value
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

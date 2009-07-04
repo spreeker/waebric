@@ -16,9 +16,9 @@ namespace Parser.Ast.Module
         #region Private Methods
 
         private ModuleId Identifier;        //Identifier of this module
-        private List<Site.Site> SiteList;        //List containing sites for this module
-        private List<Import> ImportList;    //List of imports
-        private List<FunctionDefinition> FunctionDefinitionList;//List of functions
+        private NodeList SiteList;        //List containing sites for this module
+        private NodeList ImportList;    //List of imports
+        private NodeList FunctionDefinitionList;//List of functions
 
         #endregion
 
@@ -30,16 +30,16 @@ namespace Parser.Ast.Module
         public Module()
         {
             //Initialize list containers
-            SiteList = new List<Site.Site>();
-            ImportList = new List<Import>();
-            FunctionDefinitionList = new List<FunctionDefinition>();
+            SiteList = new NodeList();
+            ImportList = new NodeList();
+            FunctionDefinitionList = new NodeList();
         }
 
         /// <summary>
         /// Get a list of sites of this module
         /// </summary>
         /// <returns>List of sites</returns>
-        public List<Site.Site> GetSites()
+        public NodeList GetSites()
         {
             return SiteList;
         }
@@ -57,7 +57,7 @@ namespace Parser.Ast.Module
         /// Get a list of imports of this module
         /// </summary>
         /// <returns>List of imports</returns>
-        public List<Import> GetImports()
+        public NodeList GetImports()
         {
             return ImportList;
         }
@@ -75,7 +75,7 @@ namespace Parser.Ast.Module
         /// Get a list of functions of this module
         /// </summary>
         /// <returns>List of function defintions</returns>
-        public List<FunctionDefinition> GetFunctionDefinitions()
+        public NodeList GetFunctionDefinitions()
         {
             return FunctionDefinitionList;
         }
@@ -110,6 +110,20 @@ namespace Parser.Ast.Module
         public override String ToString()
         {
             return "module " + Identifier.ToString();
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                Identifier,
+                ImportList,
+                FunctionDefinitionList
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

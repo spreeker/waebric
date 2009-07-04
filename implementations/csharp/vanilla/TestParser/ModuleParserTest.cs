@@ -174,7 +174,7 @@ namespace TestParser
             Assert.AreEqual(1, module.GetSites().Count); //One site
 
             //Check site
-            Site[] sites = module.GetSites().ToArray();
+            Site[] sites = (Site[]) module.GetSites().ToArray();
             Assert.AreEqual(2, sites[0].GetMappings().Count);
         }
     }

@@ -45,6 +45,18 @@ namespace Parser.Ast.Predicates
             return "!" + Predicate.ToString();
         }
 
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                Predicate
+            };
+        }
+
         #endregion
     }
 }

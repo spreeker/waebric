@@ -8,7 +8,13 @@ namespace Parser.Ast.Embedding
     /// <summary>
     /// Node which contains an TextTail
     /// </summary>
-    public class TextTail : ISyntaxNode
+    public abstract class TextTail : ISyntaxNode
     {
+        #region Public Method
+
+        public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
+        public abstract ISyntaxNode[] GetSubNodes();
+
+        #endregion
     }
 }

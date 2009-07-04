@@ -64,6 +64,19 @@ namespace Parser.Ast.Markup
         {
             return Identifier + "=" + Expr.ToString();
         }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Expr
+            };
+        }
+
         #endregion
 
     }

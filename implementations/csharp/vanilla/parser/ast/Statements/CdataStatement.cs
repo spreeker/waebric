@@ -46,6 +46,18 @@ namespace Parser.Ast.Statements
             return "cdata " + Expression.ToString();
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Expression
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

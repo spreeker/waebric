@@ -12,8 +12,8 @@ namespace Parser.Ast.Statements
     {
         #region Private Members
 
-        private List<Assignment> AssignmentList;
-        private List<Statement> StatementList;
+        private NodeList AssignmentList;
+        private NodeList StatementList;
 
         #endregion
 
@@ -22,8 +22,8 @@ namespace Parser.Ast.Statements
         public LetStatement()
         {
             //Create members
-            AssignmentList = new List<Assignment>();
-            StatementList = new List<Statement>();
+            AssignmentList = new NodeList();
+            StatementList = new NodeList();
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Parser.Ast.Statements
         /// Get assignments of LetStatement
         /// </summary>
         /// <returns>AssignmentList</returns>
-        public List<Assignment> GetAssignments()
+        public NodeList GetAssignments()
         {
             return AssignmentList;
         }
@@ -57,7 +57,7 @@ namespace Parser.Ast.Statements
         /// Get statements of LetStatement
         /// </summary>
         /// <returns>StatementList</returns>
-        public List<Statement> GetStatements()
+        public NodeList GetStatements()
         {
             return StatementList;
         }
@@ -70,6 +70,19 @@ namespace Parser.Ast.Statements
         {
             //TODO: Implement this method
             return null;
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                AssignmentList,
+                StatementList
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

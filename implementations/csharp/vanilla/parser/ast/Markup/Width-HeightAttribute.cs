@@ -82,6 +82,16 @@ namespace Parser.Ast.Markup
             return "@" + Width.ToString() + "%" + Height.ToString();
         }
 
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {};
+        }
+
         #endregion
     }
 }

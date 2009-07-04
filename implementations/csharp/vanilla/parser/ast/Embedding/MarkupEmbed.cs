@@ -12,7 +12,7 @@ namespace Parser.Ast.Embedding
     {
         #region Private Members
 
-        private List<Markup.Markup> MarkupList;
+        private NodeList MarkupList;
         private Markup.Markup Markup;
 
         #endregion
@@ -23,12 +23,12 @@ namespace Parser.Ast.Embedding
         {
         }
 
-        public void SetMarkups(List<Markup.Markup> markupList)
+        public void SetMarkups(NodeList markupList)
         {
             MarkupList = markupList;
         }
 
-        public List<Markup.Markup> GetMarkups()
+        public NodeList GetMarkups()
         {
             return MarkupList;
         }
@@ -46,7 +46,7 @@ namespace Parser.Ast.Embedding
         public override String ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            Markup.Markup[] markupArray = MarkupList.ToArray();
+            Markup.Markup[] markupArray = (Markup.Markup[]) MarkupList.ToArray();
 
             //build markup string
             for (int i = 0; i <= (markupArray.Length - 1); i++)
@@ -55,6 +55,19 @@ namespace Parser.Ast.Embedding
             }
 
             return stringBuilder.ToString() + Markup.ToString();
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                MarkupList,
+                Markup
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

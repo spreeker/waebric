@@ -64,6 +64,19 @@ namespace Parser.Ast.Predicates
             return LeftPredicate.ToString() + "||" + RightPredicate.ToString();
         }
 
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                LeftPredicate,
+                RightPredicate
+            };
+        }
+
         #endregion
     }
 }

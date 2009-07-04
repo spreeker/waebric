@@ -45,6 +45,16 @@ namespace Parser.Ast.Functions
             return Identifier;
         }
 
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
 
     }

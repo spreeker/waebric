@@ -8,7 +8,14 @@ namespace Parser.Ast.Statements
     /// <summary>
     /// Node wich holds an statement
     /// </summary>
-    public class Statement : ISyntaxNode
+    public abstract class Statement : ISyntaxNode
     {
+        #region Public Methods
+
+        public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
+        public abstract ISyntaxNode[] GetSubNodes();
+
+        #endregion
+
     }
 }

@@ -33,6 +33,18 @@ namespace Parser.Ast.Statements
             return "echo " + EchoEmbedding.ToString() + ";";
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                EchoEmbedding
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

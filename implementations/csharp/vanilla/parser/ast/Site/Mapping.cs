@@ -9,7 +9,7 @@ namespace Parser.Ast.Site
     /// <summary>
     /// Node which contains a mapping
     /// </summary>
-    public class Mapping
+    public class Mapping : ISyntaxNode
     {
         #region Private Members
 
@@ -62,6 +62,20 @@ namespace Parser.Ast.Site
         {
             return Markup;
         }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                Markup,
+                Path
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
 
         #endregion
     }

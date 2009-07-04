@@ -12,7 +12,7 @@ namespace Parser.Ast.Site
     {
         #region Private Members
 
-        private List<PathElement> DirectoryList;
+        private NodeList DirectoryList;
 
         #endregion
 
@@ -20,7 +20,7 @@ namespace Parser.Ast.Site
 
         public Directory()
         {
-            DirectoryList = new List<PathElement>();
+            DirectoryList = new NodeList();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Parser.Ast.Site
         /// Get list of directory elements
         /// </summary>
         /// <returns>DirectoryElementList</returns>
-        public List<PathElement> GetDirectoryElements()
+        public NodeList GetDirectoryElements()
         {
             return DirectoryList;
         }
@@ -47,7 +47,7 @@ namespace Parser.Ast.Site
         /// <returns>String</returns>
         public override String ToString()
         {
-            PathElement[] elements = DirectoryList.ToArray();
+            PathElement[] elements = (PathElement[]) DirectoryList.ToArray();
             StringBuilder directoryString = new StringBuilder();
             foreach (PathElement current in elements)
             { //rebuild directorypath
@@ -56,6 +56,18 @@ namespace Parser.Ast.Site
             }
             
             return directoryString.ToString();
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                DirectoryList
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

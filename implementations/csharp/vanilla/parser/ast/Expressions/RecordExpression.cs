@@ -13,7 +13,7 @@ namespace Parser.Ast.Expressions
     {
         #region Private Members
 
-        private List<KeyValuePair> RecordList;
+        private NodeList RecordList;
 
         #endregion
 
@@ -21,7 +21,7 @@ namespace Parser.Ast.Expressions
 
         public RecordExpression()
         {
-            RecordList = new List<KeyValuePair>();
+            RecordList = new NodeList();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Parser.Ast.Expressions
         /// Get list of records
         /// </summary>
         /// <returns>RecordList</returns>
-        public List<KeyValuePair> GetRecords()
+        public NodeList GetRecords()
         {
             return RecordList;
         }
@@ -50,7 +50,7 @@ namespace Parser.Ast.Expressions
         {
             //Build string with all items separated by comma
             StringBuilder records = new StringBuilder();
-            KeyValuePair[] recordArray = RecordList.ToArray();
+            KeyValuePair[] recordArray = (KeyValuePair[]) RecordList.ToArray();
             for (int i = 0; i <= (recordArray.Length - 1); i++)
             {
                 records.Append(recordArray[i].ToString());
@@ -60,6 +60,18 @@ namespace Parser.Ast.Expressions
                 }
             }
             return "{" + records.ToString() + "}";
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                RecordList
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

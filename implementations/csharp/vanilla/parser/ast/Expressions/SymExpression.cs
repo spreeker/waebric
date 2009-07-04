@@ -46,6 +46,16 @@ namespace Parser.Ast.Expressions
             return Sym;
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

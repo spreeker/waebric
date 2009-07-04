@@ -65,6 +65,19 @@ namespace Parser.Ast.Statements
             return "if (" + Predicate.ToString() + ")" + TrueStatement.ToString();
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                Predicate,
+                TrueStatement
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion 
     }
 }

@@ -45,6 +45,18 @@ namespace Parser.Ast.Site
             return DirectoryInstance.ToString();
         }
 
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                DirectoryInstance
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

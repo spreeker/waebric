@@ -10,6 +10,20 @@ namespace Parser.Ast
     /// </summary>
     public interface ISyntaxNode
     {
+        #region Public Abstract Methods
 
+        /// <summary>
+        /// Accept the visitor to visit node
+        /// </summary>
+        /// <param name="visitor">Visisor</param>
+        void AcceptVisitor(ISyntaxNodeVisitor visitor);
+
+        /// <summary>
+        /// Get subnodes of specific syntaxnode
+        /// </summary>
+        /// <returns></returns>
+        ISyntaxNode[] GetSubNodes();
+
+        #endregion
     }
 }

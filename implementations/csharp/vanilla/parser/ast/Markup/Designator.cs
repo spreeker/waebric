@@ -13,7 +13,7 @@ namespace Parser.Ast.Markup
         #region Private Members
 
         private String Identifier;
-        private List<Attribute> AttributeList;
+        private NodeList AttributeList;
 
         #endregion
 
@@ -25,7 +25,7 @@ namespace Parser.Ast.Markup
         public Designator()
         {
             //Create containers
-            AttributeList = new List<Attribute>();
+            AttributeList = new NodeList();
         }
 
         /// <summary>
@@ -68,14 +68,14 @@ namespace Parser.Ast.Markup
         /// Get list of attributes
         /// </summary>
         /// <returns>AttributeList</returns>
-        public List<Attribute> GetAttributes()
+        public NodeList GetAttributes()
         {
             return AttributeList;
         }
 
         public override String ToString()
         {
-            Attribute[] attributeArray = AttributeList.ToArray();
+            Attribute[] attributeArray = (Attribute[]) AttributeList.ToArray();
             StringBuilder stringBuilder = new StringBuilder();
 
             for(int i = 0; i <= (attributeArray.Length - 1); i++)
@@ -92,6 +92,18 @@ namespace Parser.Ast.Markup
                 return Identifier + stringBuilder.ToString();
             }
             
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {
+                AttributeList
+            };
         }
 
         #endregion

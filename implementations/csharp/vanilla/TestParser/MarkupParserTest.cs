@@ -195,7 +195,7 @@ namespace TestParser
             Assert.AreEqual(1, parsedDesignator.GetAttributes().Count);
 
             //Check attribute
-            Attribute[] parsedAttributes = parsedDesignator.GetAttributes().ToArray();
+            Attribute[] parsedAttributes = (Attribute[]) parsedDesignator.GetAttributes().ToArray();
             Assert.AreEqual(typeof(Width_HeightAttribute),parsedAttributes[0].GetType());
 
             //Check Width_HeightAttribute contents
@@ -248,7 +248,7 @@ namespace TestParser
 
             //Test argument
             Assert.AreEqual(1, markup.GetArguments().Count);
-            Argument[] arguments = markup.GetArguments().ToArray();
+            Argument[] arguments = (Argument[]) markup.GetArguments().ToArray();
             Assert.AreEqual(typeof(ExpressionArgument), arguments[0].GetType());
 
             //Test expression argument
@@ -273,7 +273,7 @@ namespace TestParser
 
             //Test arguments
             Assert.AreEqual(1, markup.GetArguments().Count);
-            Argument[] arguments = markup.GetArguments().ToArray();
+            Argument[] arguments = (Argument[]) markup.GetArguments().ToArray();
             Assert.AreEqual(typeof(AttrArgument), arguments[0].GetType());
             
             //Test specific argument

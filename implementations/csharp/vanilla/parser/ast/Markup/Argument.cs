@@ -9,7 +9,13 @@ namespace Parser.Ast.Markup
     /// <summary>
     /// Node containing an argument
     /// </summary>
-    public class Argument : ISyntaxNode
+    public abstract class Argument : ISyntaxNode
     {
+        #region Public Methods
+
+        public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
+        public abstract ISyntaxNode[] GetSubNodes();
+
+        #endregion
     }
 }

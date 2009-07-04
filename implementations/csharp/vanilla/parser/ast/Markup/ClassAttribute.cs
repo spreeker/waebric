@@ -61,6 +61,16 @@ namespace Parser.Ast.Markup
             return "." + Class;
         }
 
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] {};
+        }
+
         #endregion
 
     }

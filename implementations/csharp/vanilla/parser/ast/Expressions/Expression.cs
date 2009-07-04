@@ -8,7 +8,13 @@ namespace Parser.Ast.Expressions
     /// <summary>
     /// Node which contains an expression
     /// </summary>
-    public class Expression : ISyntaxNode
+    public abstract class Expression : ISyntaxNode
     {
+        #region Public Methods
+
+        public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
+        public abstract ISyntaxNode[] GetSubNodes();
+
+        #endregion
     }
 }

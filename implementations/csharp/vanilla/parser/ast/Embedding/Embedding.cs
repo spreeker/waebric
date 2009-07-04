@@ -54,6 +54,21 @@ namespace Parser.Ast.Embedding
         {
             return PreText.ToString() + Embed.ToString() + TextTail.ToString();
         }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                PreText,
+                Embed,
+                TextTail
+            };
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

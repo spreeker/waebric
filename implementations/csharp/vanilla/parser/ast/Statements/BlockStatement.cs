@@ -12,7 +12,7 @@ namespace Parser.Ast.Statements
     {
         #region Private Members
 
-        private List<Statement> StatementList;
+        private NodeList StatementList;
 
         #endregion
 
@@ -20,7 +20,7 @@ namespace Parser.Ast.Statements
 
         public BlockStatement()
         {
-            StatementList = new List<Statement>();
+            StatementList = new NodeList();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Parser.Ast.Statements
         /// Get statements of BlockStatement
         /// </summary>
         /// <returns>StatementList</returns>
-        public List<Statement> GetStatements()
+        public NodeList GetStatements()
         {
             return StatementList;
         }
@@ -48,7 +48,7 @@ namespace Parser.Ast.Statements
         public override String ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            Statement[] statementArray = StatementList.ToArray();
+            Statement[] statementArray = (Statement[]) StatementList.ToArray();
 
             //Construct string
             for (int i = 0; i <= statementArray.Length; i++)
@@ -57,6 +57,18 @@ namespace Parser.Ast.Statements
             }
 
             return "{" + stringBuilder.ToString() + "}";
+        }
+
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                StatementList
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         #endregion

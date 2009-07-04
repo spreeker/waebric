@@ -9,11 +9,11 @@ namespace Parser.Ast.Site
     /// <summary>
     /// Site Node
     /// </summary>
-    public class Site : ModuleElement
+    public class Site : ISyntaxNode
     {
         #region Private Members
 
-        private List<Mapping> MappingList;
+        private NodeList MappingList;
 
         #endregion
 
@@ -22,14 +22,14 @@ namespace Parser.Ast.Site
         public Site()
         {
             //Initalize containers
-            MappingList = new List<Mapping>();
+            MappingList = new NodeList();
         }
 
         /// <summary>
         /// Get mappings of site
         /// </summary>
         /// <returns>List of mappings</returns>
-        public List<Mapping> GetMappings()
+        public NodeList GetMappings()
         {
             return MappingList;
         }
@@ -38,7 +38,7 @@ namespace Parser.Ast.Site
         /// Add range of mappings
         /// </summary>
         /// <param name="mappings">MappingList</param>
-        public void AddMappings(List<Mapping> mappings)
+        public void AddMappings(NodeList mappings)
         {
             MappingList.AddRange(mappings);
         }
@@ -50,6 +50,16 @@ namespace Parser.Ast.Site
         public void AddMapping(Mapping mapping)
         {
             MappingList.Add(mapping);
+        }
+
+        public void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { };
         }
 
         #endregion

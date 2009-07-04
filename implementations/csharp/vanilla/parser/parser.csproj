@@ -75,6 +75,7 @@
     <Compile Include="Ast\Functions\Formal.cs" />
     <Compile Include="Ast\Functions\FunctionDefinition.cs" />
     <Compile Include="Ast\ISyntaxNode.cs" />
+    <Compile Include="Ast\ISyntaxNodeVisitor.cs" />
     <Compile Include="Ast\Markup\Argument.cs" />
     <Compile Include="Ast\Markup\AttrArgument.cs" />
     <Compile Include="Ast\Markup\Attribute.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Ast\Markup\Width-HeightAttribute.cs" />
     <Compile Include="Ast\Module\Import.cs" />
     <Compile Include="Ast\Module\Module.cs" />
-    <Compile Include="Ast\Module\ModuleElement.cs" />
     <Compile Include="Ast\Module\ModuleId.cs" />
     <Compile Include="Ast\NodeList.cs" />
     <Compile Include="Ast\Predicates\AndPredicate.cs" />
@@ -118,10 +118,13 @@
     <Compile Include="Ast\Statements\EchoEmbeddingStatement.cs" />
     <Compile Include="Ast\Statements\EchoExpressionStatement.cs" />
     <Compile Include="Ast\Statements\EchoStatement.cs" />
+    <Compile Include="Ast\Statements\FuncBindAssignment.cs" />
     <Compile Include="Ast\Statements\IfElseStatement.cs" />
     <Compile Include="Ast\Statements\IfStatement.cs" />
     <Compile Include="Ast\Statements\LetStatement.cs" />
     <Compile Include="Ast\Statements\Statement.cs" />
+    <Compile Include="Ast\Statements\VarBindAssignment.cs" />
+    <Compile Include="Ast\SyntaxNodeVisitor.cs" />
     <Compile Include="Ast\Statements\YieldStatement.cs" />
     <Compile Include="EmbeddingParser.cs" />
     <Compile Include="Exceptions\UnexpectedToken.cs" />

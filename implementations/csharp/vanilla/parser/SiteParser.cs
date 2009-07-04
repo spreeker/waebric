@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lexer.Tokenizer;
 using Parser.Ast.Site;
+using Parser.Ast;
 
 namespace Parser
 {
@@ -46,9 +47,9 @@ namespace Parser
         /// Parse mappings
         /// </summary>
         /// <returns>A list of parsed mappings</returns>
-        public List<Mapping> ParseMappings()
+        public NodeList ParseMappings()
         {
-            List<Mapping> MappingList = new List<Mapping>();
+            NodeList MappingList = new NodeList();
 
             while (TokenStream.HasNext()) //Parse mappings
             {

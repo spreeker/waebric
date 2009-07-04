@@ -8,7 +8,13 @@ namespace Parser.Ast.Markup
     /// <summary>
     /// Node which contains attribute
     /// </summary>
-    public class Attribute : ISyntaxNode
+    public abstract class Attribute : ISyntaxNode
     {
+        #region Public Methods
+
+        public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
+        public abstract ISyntaxNode[] GetSubNodes();
+
+        #endregion
     }
 }

@@ -90,7 +90,7 @@ namespace TestParser
             Assert.AreEqual(2, parsedFunctionDefinition.GetFormals().Count);
 
             //Check formals
-            Formal[] formalArray = parsedFunctionDefinition.GetFormals().ToArray();
+            Formal[] formalArray = (Formal[]) parsedFunctionDefinition.GetFormals().ToArray();
             Assert.AreEqual("param1", formalArray[0].ToString());
             Assert.AreEqual("param2", formalArray[1].ToString());
         }
@@ -109,7 +109,7 @@ namespace TestParser
 
             //Test formals
             Assert.AreEqual(2, functionDefinition.GetFormals().Count);
-            Formal[] formalArray = functionDefinition.GetFormals().ToArray();
+            Formal[] formalArray = (Formal[]) functionDefinition.GetFormals().ToArray();
 
             Assert.AreEqual("param1", formalArray[0].ToString());
             Assert.AreEqual("param2", formalArray[1].ToString());

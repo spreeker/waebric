@@ -55,6 +55,20 @@ namespace Parser.Ast.Embedding
             return MidText.ToString() + Embed.ToString() + TextTail.ToString();
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+            return new ISyntaxNode[] { 
+                MidText,
+                Embed,
+                TextTail
+            };
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

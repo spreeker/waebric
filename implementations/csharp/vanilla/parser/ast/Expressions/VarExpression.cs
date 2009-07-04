@@ -62,6 +62,16 @@ namespace Parser.Ast.Expressions
             return VariableIdentifier;
         }
 
+        public override ISyntaxNode[] GetSubNodes()
+        {
+           return new ISyntaxNode[] {}; //No more subnodes
+        }
+
+        public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         #endregion
     }
 }

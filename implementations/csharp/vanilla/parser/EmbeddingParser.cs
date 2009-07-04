@@ -6,6 +6,7 @@ using Lexer.Tokenizer;
 using Parser.Ast.Embedding;
 using Parser.Exceptions;
 using Parser.Ast.Markup;
+using Parser.Ast;
 
 namespace Parser
 {
@@ -120,7 +121,7 @@ namespace Parser
         public Embed ParseEmbed()
         {
             Embed embed = null;
-            List<Markup> markupList = new List<Markup>();
+            NodeList markupList = new NodeList();
 
             //Set up MarkupParser
             markupParser = new MarkupParser(EmbeddingTokenStream);
