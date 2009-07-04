@@ -1,0 +1,3 @@
+Problems during implementation:
+- Generics for NodeList gives method overloading problems for Visitor Pattern during lack of <?> in C#. There are only workaround solutions,
+so chosen for cast solution without generics.
