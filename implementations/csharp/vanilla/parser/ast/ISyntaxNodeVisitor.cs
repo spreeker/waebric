@@ -50,6 +50,11 @@ namespace Parser.Ast
         void Visit(YieldStatement statement);
         void Visit(FuncBindAssignment assignment);
         void Visit(VarBindAssignment assignment);
+        void Visit(MarkupStatStatement statement);
+        void Visit(MarkupStatement statement);
+        void Visit(MarkupMarkupStatement statement);
+        void Visit(MarkupExpressionStatement statement);
+        void Visit(MarkupEmbeddingStatement statement);
 
         //Predicate nodes
         void Visit(AndPredicate predicate);

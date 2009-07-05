@@ -122,6 +122,11 @@
     <Compile Include="Ast\Statements\IfElseStatement.cs" />
     <Compile Include="Ast\Statements\IfStatement.cs" />
     <Compile Include="Ast\Statements\LetStatement.cs" />
+    <Compile Include="Ast\Statements\MarkupEmbeddingStatement.cs" />
+    <Compile Include="Ast\Statements\MarkupExpressionStatement.cs" />
+    <Compile Include="Ast\Statements\MarkupMarkupStatement.cs" />
+    <Compile Include="Ast\Statements\MarkupStatement.cs" />
+    <Compile Include="Ast\Statements\MarkupStatStatement.cs" />
     <Compile Include="Ast\Statements\Statement.cs" />
     <Compile Include="Ast\Statements\VarBindAssignment.cs" />
     <Compile Include="Ast\SyntaxNodeVisitor.cs" />

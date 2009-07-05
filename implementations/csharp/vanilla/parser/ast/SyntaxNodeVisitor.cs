@@ -145,6 +145,31 @@ namespace Parser.Ast.Statements
             VisitSubNodes(assignment);
         }
 
+        public void Visit(MarkupStatStatement statement)
+        {
+            VisitSubNodes(statement);
+        }
+
+        public void Visit(MarkupStatement statement)
+        {
+            VisitSubNodes(statement);
+        }
+
+        public void Visit(MarkupMarkupStatement statement)
+        {
+            VisitSubNodes(statement);
+        }
+
+        public void Visit(MarkupExpressionStatement statement)
+        {
+            VisitSubNodes(statement);
+        }
+
+        public void Visit(MarkupEmbeddingStatement statement)
+        {
+            VisitSubNodes(statement);
+        }
+
         public void Visit(AndPredicate predicate)
         {
             VisitSubNodes(predicate);
