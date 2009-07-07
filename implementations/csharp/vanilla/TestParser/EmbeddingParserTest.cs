@@ -90,5 +90,37 @@ namespace TestParser
             PostTextTail postTextTail = (PostTextTail) parsedEmbedding.GetTextTail();
             Assert.AreEqual("right", postTextTail.GetPostText().GetText());
         }
+
+        [TestMethod()]
+        public void ParseNestedEmbeddingTest()
+        {
+            //Create parser
+            EmbeddingParser embeddingParser = new EmbeddingParser(Init("\"pretext<em \"eerste\">midtext <em \"tweede\">posttexttail\""));
+            Embedding parsedEmbedding = embeddingParser.ParseEmbedding();
+
+            //Test pretext
+            Assert.AreEqual("\"pretext<", parsedEmbedding.GetPreText().ToString());
+
+            //Test 1st embed
+            Assert.AreEqual(typeof(ExpressionEmbed), parsedEmbedding.GetEmbed().GetType());
+            ExpressionEmbed expressionEmbed = (ExpressionEmbed)parsedEmbedding.GetEmbed();
+            Assert.AreEqual("em", expressionEmbed.GetMarkups().Get(0).ToString());
+            Assert.AreEqual("\"eerste\"", expressionEmbed.GetExpression().ToString());
+
+            //Test TextTail
+            Assert.AreEqual(typeof(MidTextTail), parsedEmbedding.GetTextTail().GetType());
+            MidTextTail midTextTail = (MidTextTail) parsedEmbedding.GetTextTail();
+            Assert.AreEqual(">midtext <", midTextTail.GetMidText().ToString());
+
+            //Test 2th embed
+            Assert.AreEqual(typeof(ExpressionEmbed), midTextTail.GetEmbed().GetType());
+            ExpressionEmbed expressionEmbed2 = (ExpressionEmbed)midTextTail.GetEmbed();
+            Assert.AreEqual("em", expressionEmbed2.GetMarkups().Get(0).ToString());
+            Assert.AreEqual("\"tweede\"", expressionEmbed2.GetExpression().ToString());
+            
+            //Test PostTextTail
+            Assert.AreEqual(typeof(PostTextTail), midTextTail.GetTextTail().GetType());
+            Assert.AreEqual(">posttexttail\"", midTextTail.GetTextTail().ToString());
+        }
     }
 }
