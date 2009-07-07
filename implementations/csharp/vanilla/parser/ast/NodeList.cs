@@ -18,16 +18,13 @@ namespace Parser.Ast
 
         #endregion
 
-        #region Public Methods
+        #region Public Members
 
-        /// <summary>
-        /// Get size of NodeList
-        /// </summary>
-        /// <returns>Size of NodeList
-        public int GetSize()
-        {
-            return list.Count;
-        }
+        public new int Count = 0;
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Add element to NodeList
@@ -36,6 +33,7 @@ namespace Parser.Ast
         public new void Add(ISyntaxNode element)
         {
             list.Add(element);
+            Count++;
         }
 
 
@@ -56,6 +54,7 @@ namespace Parser.Ast
         public void Remove(int index)
         {
             list.RemoveAt(index);
+            Count--;
         }
 
         /// <summary>
@@ -73,6 +72,7 @@ namespace Parser.Ast
         public new void Clear()
         {
             list.Clear();
+            Count = 0;
         }
 
         /// <summary>

@@ -479,8 +479,8 @@ namespace Parser
                         MarkupMarkupStatement markupStatement = new MarkupMarkupStatement();
 
                         //Get last parsed markup from list and remove it from list
-                        Markup last = (Markup) markups.Get(markups.GetSize() - 1);
-                        markups.Remove(markups.GetSize()-1);
+                        Markup last = (Markup) markups.Get(markups.Count - 1);
+                        markups.Remove(markups.Count-1);
                         
                         markupStatement.SetMarkup(last);
                         markupStatement.SetMarkups(markups);
