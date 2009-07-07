@@ -92,7 +92,7 @@ namespace TestParser
             Assert.AreEqual(typeof(IdAttribute), parsedAttribute.GetType());
 
             //Check id attribute
-            Assert.AreEqual("id1", parsedAttribute.ToString());
+            Assert.AreEqual("#id1", parsedAttribute.ToString());
         }
 
         /// <summary>

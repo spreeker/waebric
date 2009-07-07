@@ -43,7 +43,7 @@ namespace Parser.Ast.Expressions
         /// <returns>String</returns>
         public override String ToString()
         {
-            return Sym;
+            return "'" + Sym;
         }
 
         public override ISyntaxNode[] GetSubNodes()

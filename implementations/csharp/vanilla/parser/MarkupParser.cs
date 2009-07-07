@@ -41,7 +41,7 @@ namespace Parser
             markup.SetDesignator(ParseDesignator());
 
             //Determine if arguments are after designator
-            if (TokenStream.Peek(1).GetValue().ToString() == "(")
+            if (TokenStream.Peek(1).GetType() == TokenType.SYMBOL && TokenStream.Peek(1).GetValue().ToString() == "(")
             {
                ParseArguments(markup);
             }
@@ -63,7 +63,7 @@ namespace Parser
 
             while (TokenStream.HasNext())
             {   //Parse attributes
-                if (IsAttribute(TokenStream.Peek(1).GetValue().ToString()))
+                if (TokenStream.Peek(1).GetType() == TokenType.SYMBOL && IsAttribute(TokenStream.Peek(1).GetValue().ToString()))
                 {
                     tag.AddAttribute(ParseAttribute());
                 }

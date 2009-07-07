@@ -43,7 +43,7 @@ namespace Parser.Ast.Expressions
         /// <returns>String</returns>
         public override String ToString()
         {
-            return Text;
+            return "\"" + Text + "\"";
         }
 
         public override ISyntaxNode[] GetSubNodes()

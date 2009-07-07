@@ -127,27 +127,5 @@ namespace TestParser.Ast
             nodes.Clear();
             Assert.AreEqual(0, nodes.Count);
         }
-
-        /// <summary>
-        ///A test for Add
-        ///</summary>
-        [TestMethod()]
-        public void AddTest()
-        {
-            NodeList target = new NodeList(); // TODO: Initialize to an appropriate value
-            ISyntaxNode element = null; // TODO: Initialize to an appropriate value
-            target.Add(element);
-            Assert.Inconclusive("A method that does not return a value cannot be verified.");
-        }
-
-        /// <summary>
-        ///A test for NodeList Constructor
-        ///</summary>
-        [TestMethod()]
-        public void NodeListConstructorTest()
-        {
-            NodeList target = new NodeList();
-            Assert.Inconclusive("TODO: Implement code to verify target");
-        }
     }
 }

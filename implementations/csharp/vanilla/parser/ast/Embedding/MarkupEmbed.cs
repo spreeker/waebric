@@ -45,16 +45,13 @@ namespace Parser.Ast.Embedding
 
         public override String ToString()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            Markup.Markup[] markupArray = (Markup.Markup[]) MarkupList.ToArray();
+            string Buffer = "";
 
-            //build markup string
-            for (int i = 0; i <= (markupArray.Length - 1); i++)
+            foreach (Markup.Markup node in MarkupList)
             {
-                stringBuilder.Append(markupArray[i].ToString());
+                Buffer += node.ToString();
             }
-
-            return stringBuilder.ToString() + Markup.ToString();
+            return Buffer.ToString() + Markup.ToString();
         }
 
         public override ISyntaxNode[] GetSubNodes()

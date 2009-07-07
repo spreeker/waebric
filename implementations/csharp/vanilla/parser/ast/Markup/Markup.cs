@@ -70,19 +70,18 @@ namespace Parser.Ast.Markup
             else
             {
                 //Get arguments
-                Argument[] argumentArray = (Argument[]) ArgumentList.ToArray();
-                StringBuilder stringBuilder = new StringBuilder();
-
-                for (int i = 0; i <= (argumentArray.Length - 1); i++)
+                String buffer = "";
+                int counter = 0;
+                foreach (Argument node in ArgumentList)
                 {
-                    stringBuilder.Append(argumentArray[i].ToString());
-                    if (i != (argumentArray.Length - 1))
+                    buffer += node.ToString();
+                    if (counter != (ArgumentList.Count - 1))
                     {
-                        stringBuilder.Append(",");
+                        buffer += ",";
                     }
+                    counter++;
                 }
-
-                return Tag.ToString() + "(" + stringBuilder.ToString() + ")";
+                return Tag.ToString() + "(" + buffer + ")";
             }
         }
 

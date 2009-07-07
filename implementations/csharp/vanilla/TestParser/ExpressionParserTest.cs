@@ -110,7 +110,7 @@ namespace TestParser
 
             Assert.AreEqual("token1", current.GetKey());
             Assert.AreEqual(typeof(TextExpression), current.GetValue().GetType());
-            Assert.AreEqual("token1", current.GetValue().ToString());
+            Assert.AreEqual("\"token1\"", current.GetValue().ToString());
 
             recordEnumerator.MoveNext();
             current = (KeyValuePair)recordEnumerator.Current;
@@ -124,7 +124,7 @@ namespace TestParser
 
             Assert.AreEqual("token3", current.GetKey());
             Assert.AreEqual(typeof(SymExpression), current.GetValue().GetType());
-            Assert.AreEqual("symbol", current.GetValue().ToString());
+            Assert.AreEqual("'symbol", current.GetValue().ToString());
         }
 
         /// <summary>

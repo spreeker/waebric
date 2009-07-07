@@ -438,7 +438,7 @@ namespace Parser
             //Start parsing first markup part
             Markup firstMarkup = markupParser.ParseMarkup();
 
-            if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ";")
+            if (TokenStream.HasNext() && TokenStream.Peek(1).GetType() == TokenType.SYMBOL && TokenStream.Peek(1).GetValue().ToString() == ";")
             {   //Just a single markup statement
                 MarkupStatement markupStatement = new MarkupStatement();
                 markupStatement.SetMarkup(firstMarkup);
@@ -555,11 +555,11 @@ namespace Parser
                 }
 
                 //Determine if it is a call
-                if(TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetValue().ToString() == "(")
+                if(TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetType() == TokenType.SYMBOL && TokenStream.Peek(j + 1).GetValue().ToString() == "(")
                 {   //Call markup
                     return true;
                 }
-                else if (TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetValue().ToString() == ";")
+                else if (TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetType() == TokenType.SYMBOL && TokenStream.Peek(j + 1).GetValue().ToString() == ";")
                 {   //No markup in a list
                     return false;
                 }

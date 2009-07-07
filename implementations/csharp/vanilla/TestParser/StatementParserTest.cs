@@ -10,6 +10,7 @@ using Parser.Ast.Expressions;
 using Parser.Ast.Predicates;
 using Parser.Ast.Markup;
 using Parser.Ast;
+using Parser.Ast.Embedding;
 
 namespace TestParser
 {
@@ -117,7 +118,7 @@ namespace TestParser
             Assert.AreEqual(typeof(OrPredicate), parsedIfStatement.GetPredicate().GetType());
             Assert.AreEqual("condition1||condition2", parsedIfStatement.GetPredicate().ToString());
             Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfStatement.GetTrueStatement().GetType());
-            Assert.AreEqual("echo test", parsedIfStatement.GetTrueStatement().ToString());
+            Assert.AreEqual("echo \"test\";", parsedIfStatement.GetTrueStatement().ToString());
         }
 
         /// <summary>
@@ -137,9 +138,9 @@ namespace TestParser
             Assert.AreEqual(typeof(OrPredicate), parsedIfElseStatement.GetPredicate().GetType());
             Assert.AreEqual("condition1||condition2", parsedIfElseStatement.GetPredicate().ToString());
             Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfElseStatement.GetTrueStatement().GetType());
-            Assert.AreEqual("echo test", parsedIfElseStatement.GetTrueStatement().ToString());
+            Assert.AreEqual("echo \"test\";", parsedIfElseStatement.GetTrueStatement().ToString());
             Assert.AreEqual(typeof(EchoExpressionStatement), parsedIfElseStatement.GetFalseStatement().GetType());
-            Assert.AreEqual("echo test2", parsedIfElseStatement.GetFalseStatement().ToString());
+            Assert.AreEqual("echo \"test2\";", parsedIfElseStatement.GetFalseStatement().ToString());
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace TestParser
 
             //Check echo statement
             Assert.AreEqual(typeof(EchoExpressionStatement), parsedEchoStatement.GetType());
-            Assert.AreEqual("echo test;", parsedEchoStatement.ToString());
+            Assert.AreEqual("echo \"test\";", parsedEchoStatement.ToString());
         }
 
         /// <summary>
@@ -205,7 +206,23 @@ namespace TestParser
         [TestMethod()]
         public void ParseBlockStatementTest()
         {
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("{\n\techo \"test\";\n}"));
+            Statement parsedStatement = statementParser.ParseStatement();
+
+            //Test statement
+            Assert.AreEqual(typeof(BlockStatement), parsedStatement.GetType());
+
+            //Test BlockStatement
+            BlockStatement statement = (BlockStatement)parsedStatement;
+            Assert.AreEqual(1, statement.GetStatements().Count);
+
+            //Test substatement
+            List<ISyntaxNode>.Enumerator statementEnum = statement.GetStatements().GetEnumerator();
+            
+            statementEnum.MoveNext();
+            Assert.AreEqual(typeof(EchoExpressionStatement), statementEnum.Current.GetType());
+            Assert.AreEqual("echo \"test\";", statementEnum.Current.ToString());
         }
 
         /// <summary>
@@ -225,7 +242,7 @@ namespace TestParser
             VarBindAssignment parsedVarAssignment = (VarBindAssignment)parsedAssignment;
             Assert.AreEqual("var1", parsedVarAssignment.GetIdentifier());
             Assert.AreEqual(typeof(TextExpression), parsedVarAssignment.GetExpression().GetType());
-            Assert.AreEqual("test", parsedVarAssignment.GetExpression().ToString());
+            Assert.AreEqual("\"test\"", parsedVarAssignment.GetExpression().ToString());
         }
 
         /// <summary>
@@ -241,7 +258,7 @@ namespace TestParser
             //Test VarBindAssignment
             Assert.AreEqual("var1", parsedVarAssignment.GetIdentifier());
             Assert.AreEqual(typeof(TextExpression), parsedVarAssignment.GetExpression().GetType());
-            Assert.AreEqual("test", parsedVarAssignment.GetExpression().ToString());
+            Assert.AreEqual("\"test\"", parsedVarAssignment.GetExpression().ToString());
         }
 
 
@@ -294,7 +311,102 @@ namespace TestParser
 
             Statement stmt = (Statement) statement.GetStatements().Get(0);
             Assert.AreEqual(typeof(EchoExpressionStatement), stmt.GetType());
-            Assert.AreEqual("echo test;", stmt.ToString());
+            Assert.AreEqual("echo \"test\";", stmt.ToString());
+        }
+
+        [TestMethod()]
+        public void ParseMarkupStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("p();"));
+            Statement parsedStatement = statementParser.ParseMarkupStatement();
+
+            //Test statatement
+            Assert.AreEqual(typeof(MarkupStatement), parsedStatement.GetType());
+
+            //Test MarkupStatement
+            MarkupStatement statement = (MarkupStatement)parsedStatement;
+            Assert.AreEqual("p", statement.GetMarkup().GetDesignator().GetIdentifier());
+            Assert.AreEqual(0, statement.GetMarkup().GetArguments().Count);
+        }
+
+        [TestMethod()]
+        public void ParseMarkupMarkupStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("tr td img(src=\"test.png\", width=300);"));
+            Statement parsedStatement = statementParser.ParseMarkupStatement();
+
+            //Test statement
+            Assert.AreEqual(typeof(MarkupMarkupStatement), parsedStatement.GetType());
+
+            //Test MarkupMarkupStatement
+            MarkupMarkupStatement statement = (MarkupMarkupStatement)parsedStatement;
+            List<ISyntaxNode>.Enumerator markupEnumerator = statement.GetMarkups().GetEnumerator();
+
+            //Test TR
+            markupEnumerator.MoveNext();
+            Assert.AreEqual("tr", ((Markup)markupEnumerator.Current).ToString());
+            
+            //Test TD
+            markupEnumerator.MoveNext();
+            Assert.AreEqual("td", ((Markup)markupEnumerator.Current).ToString());
+
+            //Test IMG
+            Assert.AreEqual("img(src=\"test.png\",width=300)", statement.GetMarkup().ToString());
+        }
+
+        [TestMethod()]
+        public void ParseMarkupExpressionStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("tr td p \"test\";"));
+            Statement parsedStatement = statementParser.ParseMarkupStatement();
+            
+            //Test statement
+            Assert.AreEqual(typeof(MarkupExpressionStatement), parsedStatement.GetType());
+
+            //Test MarkupExpressionStatement
+            MarkupExpressionStatement statement = (MarkupExpressionStatement)parsedStatement;
+
+            Assert.AreEqual(typeof(Markup), statement.GetMarkups().Get(0).GetType());
+            Assert.AreEqual("tr", statement.GetMarkups().Get(0).ToString());
+            Assert.AreEqual(typeof(Markup), statement.GetMarkups().Get(1).GetType());
+            Assert.AreEqual("td", statement.GetMarkups().Get(1).ToString());
+
+            Assert.AreEqual(typeof(TextExpression), statement.GetExpression().GetType());
+            Assert.AreEqual("\"test\"", statement.GetExpression().ToString());
+        }
+
+        [TestMethod()]
+        public void ParserMarkupEmbeddingStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("p p \"left<func1() \"text\">right\";"));
+            Statement parsedStatement = statementParser.ParseMarkupStatement();
+            
+            //Test statement
+            Assert.AreEqual(typeof(MarkupEmbeddingStatement), parsedStatement.GetType());
+
+            //Test MarkupEmbeddingStatement
+            MarkupEmbeddingStatement markupEmbeddingStatement = (MarkupEmbeddingStatement)parsedStatement;
+            Assert.AreEqual("p", markupEmbeddingStatement.GetMarkups().Get(0).ToString());
+            Assert.AreEqual("p", markupEmbeddingStatement.GetMarkups().Get(1).ToString());
+
+            //Test embedding
+            Embedding embedding = markupEmbeddingStatement.GetEmbedding();
+            Assert.AreEqual("\"left<", embedding.GetPreText().ToString());
+            Assert.AreEqual(typeof(ExpressionEmbed), embedding.GetEmbed().GetType());
+            
+            ExpressionEmbed embed = (ExpressionEmbed) embedding.GetEmbed();
+            Assert.AreEqual(1, embed.GetMarkups().Count);
+            Assert.AreEqual("func1", embed.GetMarkups().Get(0).ToString());
+            Assert.AreEqual(typeof(TextExpression), embed.GetExpression().GetType());
+            Assert.AreEqual("\"text\"", embed.GetExpression().ToString());
+
+            Assert.AreEqual(typeof(PostTextTail), embedding.GetTextTail().GetType());
+            PostTextTail postTextTail = (PostTextTail) embedding.GetTextTail();
+            Assert.AreEqual(">right\"", postTextTail.GetPostText().ToString());
         }
     }
 }

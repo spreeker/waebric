@@ -75,21 +75,19 @@ namespace Parser.Ast.Markup
 
         public override String ToString()
         {
-            Attribute[] attributeArray = (Attribute[]) AttributeList.ToArray();
-            StringBuilder stringBuilder = new StringBuilder();
-
-            for(int i = 0; i <= (attributeArray.Length - 1); i++)
+            String buffer = "";
+            foreach (Attribute node in AttributeList)
             {
-                stringBuilder.Append(attributeArray[i].ToString());
+                buffer += node.ToString();
             }
 
-            if (stringBuilder.ToString() != "")
+            if (buffer != "")
             {
-                return Identifier + " " + stringBuilder.ToString();
+                return Identifier + " " + buffer;
             }
             else
             {
-                return Identifier + stringBuilder.ToString();
+                return Identifier + buffer;
             }
             
         }

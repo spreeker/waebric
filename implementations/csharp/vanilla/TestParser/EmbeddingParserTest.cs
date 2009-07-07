@@ -78,7 +78,7 @@ namespace TestParser
             //Test Embed
             Assert.AreEqual(typeof(ExpressionEmbed), parsedEmbedding.GetEmbed().GetType());
             ExpressionEmbed expressionEmbed = (ExpressionEmbed) parsedEmbedding.GetEmbed();
-            Assert.AreEqual("text", expressionEmbed.GetExpression().ToString());
+            Assert.AreEqual("\"text\"", expressionEmbed.GetExpression().ToString());
 
             //Test Markup
             Markup[] markupArray = (Markup[]) expressionEmbed.GetMarkups().ToArray();
