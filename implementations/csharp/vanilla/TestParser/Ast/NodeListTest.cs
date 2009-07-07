@@ -61,13 +61,13 @@ namespace TestParser.Ast
         public void GetSizeTest()
         {
             //First check if currently there are 0 items
-            Assert.IsTrue(nodes.GetSize() == 0);
+            Assert.AreEqual(0, nodes.Count);
 
             //Add twoitems and check size again
             nodes.Add(new NodeList());
             nodes.Add(new NodeList());
 
-            Assert.IsTrue(nodes.GetSize() == 2);
+            Assert.AreEqual(2, nodes.Count);
         }
 
         /// <summary>
@@ -121,11 +121,11 @@ namespace TestParser.Ast
             nodes.Add(node1);
 
             //Check if size is bigger than zero
-            Assert.IsTrue(nodes.GetSize() == 1);
+            Assert.AreEqual(1, nodes.Count);
 
             //Clear list and check if zero elements in it
             nodes.Clear();
-            Assert.IsTrue(nodes.GetSize() == 0);
+            Assert.AreEqual(0, nodes.Count);
         }
 
         /// <summary>

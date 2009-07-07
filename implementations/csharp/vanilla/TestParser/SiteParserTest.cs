@@ -9,6 +9,7 @@ using Pth = Parser.Ast.Site.Path;
 using Lexer;
 using System.IO;
 using Parser.Ast.Markup;
+using Parser.Ast;
 
 namespace TestParser
 {
@@ -109,13 +110,13 @@ namespace TestParser
 
             //Get structures of path
             Dir directory = path.GetDirectoryName().GetDirectory();
-            PathElement[] directoryElements = (PathElement[]) directory.GetDirectoryElements().ToArray();
+            PathElement pathElement = (PathElement) directory.GetDirectoryElements().Get(0);
             FileName filename = path.GetFilename();
 
 
             //Check directory
             Assert.AreEqual(1, directory.GetDirectoryElements().Count);
-            Assert.AreEqual("site", directoryElements[0].GetPathElement());
+            Assert.AreEqual("site", pathElement.GetPathElement());
 
             //Check filename
             Assert.AreEqual("home", filename.GetName().GetPathElement());
@@ -191,11 +192,13 @@ namespace TestParser
             Assert.AreEqual(2, directory.GetDirectoryElements().Count);
 
             //Get directory's and transfer to array to provide walking
-            PathElement[] directoryElements = (PathElement[]) directory.GetDirectoryElements().ToArray();
+            List<ISyntaxNode>.Enumerator directoryEnumerator = directory.GetDirectoryElements().GetEnumerator();
 
             //Check directory's
-            Assert.AreEqual("home", directoryElements[0].GetPathElement());
-            Assert.AreEqual("site", directoryElements[1].GetPathElement());
+            directoryEnumerator.MoveNext();
+            Assert.AreEqual("home", ((PathElement)directoryEnumerator.Current).GetPathElement());
+            directoryEnumerator.MoveNext();
+            Assert.AreEqual("site", ((PathElement)directoryEnumerator.Current).GetPathElement());
         }
 
         /// <summary>

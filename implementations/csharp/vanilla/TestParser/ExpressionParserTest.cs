@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Parser.Ast.Expressions;
 using Lexer;
 using System.IO;
+using Parser.Ast;
 
 namespace TestParser
 {
@@ -102,19 +103,28 @@ namespace TestParser
             
             //Test Record contents
             Assert.AreEqual(3, expression.GetRecords().Count);
-            KeyValuePair[] recordList = (KeyValuePair[]) expression.GetRecords().ToArray();
-            
-            Assert.AreEqual("token1", recordList[0].GetKey());
-            Assert.AreEqual(typeof(TextExpression), recordList[0].GetValue().GetType());
-            Assert.AreEqual("token1", recordList[0].GetValue().ToString());
+            List<ISyntaxNode>.Enumerator recordEnumerator = expression.GetRecords().GetEnumerator();
 
-            Assert.AreEqual("token2", recordList[1].GetKey());
-            Assert.AreEqual(typeof(NumExpression), recordList[1].GetValue().GetType());
-            Assert.AreEqual(10, ((NumExpression)recordList[1].GetValue()).GetNum());
+            recordEnumerator.MoveNext();
+            KeyValuePair current = (KeyValuePair) recordEnumerator.Current;
 
-            Assert.AreEqual("token3", recordList[2].GetKey());
-            Assert.AreEqual(typeof(SymExpression), recordList[2].GetValue().GetType());
-            Assert.AreEqual("symbol", recordList[2].GetValue().ToString());
+            Assert.AreEqual("token1", current.GetKey());
+            Assert.AreEqual(typeof(TextExpression), current.GetValue().GetType());
+            Assert.AreEqual("token1", current.GetValue().ToString());
+
+            recordEnumerator.MoveNext();
+            current = (KeyValuePair)recordEnumerator.Current;
+
+            Assert.AreEqual("token2", current.GetKey());
+            Assert.AreEqual(typeof(NumExpression), current.GetValue().GetType());
+            Assert.AreEqual(10, ((NumExpression)current.GetValue()).GetNum());
+
+            recordEnumerator.MoveNext();
+            current = (KeyValuePair)recordEnumerator.Current;
+
+            Assert.AreEqual("token3", current.GetKey());
+            Assert.AreEqual(typeof(SymExpression), current.GetValue().GetType());
+            Assert.AreEqual("symbol", current.GetValue().ToString());
         }
 
         /// <summary>

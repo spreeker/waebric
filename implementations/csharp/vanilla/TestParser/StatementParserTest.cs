@@ -8,6 +8,8 @@ using Lexer;
 using System.IO;
 using Parser.Ast.Expressions;
 using Parser.Ast.Predicates;
+using Parser.Ast.Markup;
+using Parser.Ast;
 
 namespace TestParser
 {
@@ -85,12 +87,7 @@ namespace TestParser
         [TestMethod()]
         public void ParseStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            Statement expected = null; // TODO: Initialize to an appropriate value
-            Statement actual;
-            actual = target.ParseStatement();
-            Assert.AreEqual(expected, actual);
+
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -100,12 +97,6 @@ namespace TestParser
         [TestMethod()]
         public void ParseLetStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            LetStatement expected = null; // TODO: Initialize to an appropriate value
-            LetStatement actual;
-            actual = target.ParseLetStatement();
-            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -187,12 +178,6 @@ namespace TestParser
         [TestMethod()]
         public void ParseEachStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            EachStatement expected = null; // TODO: Initialize to an appropriate value
-            EachStatement actual;
-            actual = target.ParseEachStatement();
-            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -202,12 +187,6 @@ namespace TestParser
         [TestMethod()]
         public void ParseCommentStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            CommentStatement expected = null; // TODO: Initialize to an appropriate value
-            CommentStatement actual;
-            actual = target.ParseCommentStatement();
-            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -217,12 +196,6 @@ namespace TestParser
         [TestMethod()]
         public void ParseCdataStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            CdataStatement expected = null; // TODO: Initialize to an appropriate value
-            CdataStatement actual;
-            actual = target.ParseCdataStatement();
-            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -232,12 +205,6 @@ namespace TestParser
         [TestMethod()]
         public void ParseBlockStatementTest()
         {
-            TokenIterator iterator = null; // TODO: Initialize to an appropriate value
-            StatementParser target = new StatementParser(iterator); // TODO: Initialize to an appropriate value
-            BlockStatement expected = null; // TODO: Initialize to an appropriate value
-            BlockStatement actual;
-            actual = target.ParseBlockStatement();
-            Assert.AreEqual(expected, actual);
             Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
@@ -252,10 +219,82 @@ namespace TestParser
             Assignment parsedAssignment = statementParser.ParseAssignment();
 
             //Test assignment
-            //Assert.AreEqual("var1", parsedAssignment.GetIdentifier());
-            //Assert.AreEqual(typeof(TextExpression), parsedAssignment.GetExpression().GetType());
-            //Assert.AreEqual("test", parsedAssignment.GetExpression().ToString());
-            
+            Assert.AreEqual(typeof(VarBindAssignment), parsedAssignment.GetType());
+
+            //Test VarBindAssignment
+            VarBindAssignment parsedVarAssignment = (VarBindAssignment)parsedAssignment;
+            Assert.AreEqual("var1", parsedVarAssignment.GetIdentifier());
+            Assert.AreEqual(typeof(TextExpression), parsedVarAssignment.GetExpression().GetType());
+            Assert.AreEqual("test", parsedVarAssignment.GetExpression().ToString());
+        }
+
+        /// <summary>
+        /// A test for VarBindAssignment
+        /// </summary>
+        [TestMethod()]
+        public void ParseVarBindAssignmentTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("var1 = \"test\";"));
+            VarBindAssignment parsedVarAssignment = statementParser.ParseVarBindAssignment();
+
+            //Test VarBindAssignment
+            Assert.AreEqual("var1", parsedVarAssignment.GetIdentifier());
+            Assert.AreEqual(typeof(TextExpression), parsedVarAssignment.GetExpression().GetType());
+            Assert.AreEqual("test", parsedVarAssignment.GetExpression().ToString());
+        }
+
+
+        /// <summary>
+        /// A test for FuncBindAssignment
+        /// </summary>
+        [TestMethod()]
+        public void ParseFuncBindAssingmentTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("home(test1, test2) = {}"));
+            FuncBindAssignment parsedFuncAssignment = statementParser.ParseFuncBindAssignment();
+
+            //Test FuncBindAssignment
+            Assert.AreEqual("home", parsedFuncAssignment.GetIdentifier());
+            Assert.AreEqual(2, parsedFuncAssignment.GetIdentifiers().Count);
+
+            String[] identifierArray = parsedFuncAssignment.GetIdentifiers().ToArray();
+            Assert.AreEqual("test1", identifierArray[0]);
+            Assert.AreEqual("test2", identifierArray[1]);
+
+            Assert.AreEqual(typeof(BlockStatement), parsedFuncAssignment.GetStatement().GetType());
+            BlockStatement statement = (BlockStatement) parsedFuncAssignment.GetStatement();
+            Assert.AreEqual(0, statement.GetStatements().Count);
+        }
+
+        [TestMethod()]
+        public void ParseMarkupStatStatementTest()
+        {
+            //Create parser
+            StatementParser statementParser = new StatementParser(Init("p { echo \"test\"; }"));
+            Statement parsedStatement = statementParser.ParseMarkupStatement();
+
+            //Test Statement
+            Assert.AreEqual(typeof(MarkupStatStatement), parsedStatement.GetType());
+
+            //Test MarkupStatStatement
+            MarkupStatStatement markupStatStatement = (MarkupStatStatement)parsedStatement;
+            Assert.AreEqual(1, markupStatStatement.GetMarkups().Count);
+
+            //Test markup
+            Markup markup = (Markup) markupStatStatement.GetMarkups().Get(0);
+            Assert.AreEqual("p", markup.GetDesignator().GetIdentifier());
+            Assert.AreEqual(0, markup.GetArguments().Count);
+
+            //Test statement
+            Assert.AreEqual(typeof(BlockStatement), markupStatStatement.GetStatement().GetType());
+            BlockStatement statement = (BlockStatement)markupStatStatement.GetStatement();
+            Assert.AreEqual(1, statement.GetStatements().Count);
+
+            Statement stmt = (Statement) statement.GetStatements().Get(0);
+            Assert.AreEqual(typeof(EchoExpressionStatement), stmt.GetType());
+            Assert.AreEqual("echo test;", stmt.ToString());
         }
     }
 }

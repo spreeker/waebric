@@ -195,11 +195,11 @@ namespace TestParser
             Assert.AreEqual(1, parsedDesignator.GetAttributes().Count);
 
             //Check attribute
-            Attribute[] parsedAttributes = (Attribute[]) parsedDesignator.GetAttributes().ToArray();
-            Assert.AreEqual(typeof(Width_HeightAttribute),parsedAttributes[0].GetType());
+            Attribute parsedAttribute = (Attribute) parsedDesignator.GetAttributes().Get(0);
+            Assert.AreEqual(typeof(Width_HeightAttribute),parsedAttribute.GetType());
 
             //Check Width_HeightAttribute contents
-            Width_HeightAttribute attribute = (Width_HeightAttribute) parsedAttributes[0];
+            Width_HeightAttribute attribute = (Width_HeightAttribute) parsedAttribute;
             Assert.AreEqual(100, attribute.GetWidth());
             Assert.AreEqual(50, attribute.GetHeight());
         }
@@ -273,11 +273,11 @@ namespace TestParser
 
             //Test arguments
             Assert.AreEqual(1, markup.GetArguments().Count);
-            Argument[] arguments = (Argument[]) markup.GetArguments().ToArray();
-            Assert.AreEqual(typeof(AttrArgument), arguments[0].GetType());
+            Argument argument = (Argument)markup.GetArguments().Get(0);
+            Assert.AreEqual(typeof(AttrArgument), argument.GetType());
             
             //Test specific argument
-            AttrArgument attrArgument = (AttrArgument)arguments[0];
+            AttrArgument attrArgument = (AttrArgument)argument;
             Assert.AreEqual("i", attrArgument.GetIdentifier());
             Assert.AreEqual(typeof(NumExpression), attrArgument.GetExpression().GetType());
         }
