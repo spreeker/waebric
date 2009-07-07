@@ -35,7 +35,7 @@ namespace Parser
             Site site = new Site();
 
             //Parse one or more mappings
-            site.AddMappings(ParseMappings());
+            site.SetMappings(ParseMappings());
 
             //Skip END tag
             NextToken("end", "site end", "end");

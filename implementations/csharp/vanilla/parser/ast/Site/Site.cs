@@ -35,12 +35,12 @@ namespace Parser.Ast.Site
         }
 
         /// <summary>
-        /// Add range of mappings
+        /// Set List of mappings
         /// </summary>
         /// <param name="mappings">MappingList</param>
-        public void AddMappings(NodeList mappings)
+        public void SetMappings(NodeList mappings)
         {
-            MappingList.AddRange(mappings);
+            MappingList = mappings;
         }
 
         /// <summary>
