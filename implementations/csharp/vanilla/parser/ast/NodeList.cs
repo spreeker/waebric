@@ -84,6 +84,11 @@ namespace Parser.Ast
             return list.ToArray();
         }
 
+        public new List<ISyntaxNode>.Enumerator GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
+
         public override String ToString()
         {
             String text = "";

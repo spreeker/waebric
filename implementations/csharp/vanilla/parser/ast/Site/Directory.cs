@@ -47,12 +47,10 @@ namespace Parser.Ast.Site
         /// <returns>String</returns>
         public override String ToString()
         {
-            PathElement[] elements = (PathElement[]) DirectoryList.ToArray();
-            StringBuilder directoryString = new StringBuilder();
-            foreach (PathElement current in elements)
+            String directoryString = "";
+            foreach (PathElement current in DirectoryList)
             { //rebuild directorypath
-                directoryString.Append(current.ToString());
-                directoryString.Append("/");
+                directoryString += current.ToString() + "/";
             }
             
             return directoryString.ToString();
