@@ -170,7 +170,7 @@ namespace TestParser
 
             //Check echo statement
             Assert.AreEqual(typeof(EchoEmbeddingStatement), parsedEchoStatement.GetType());
-            Assert.AreEqual("echo \"left<func1() \"text\">right\";", parsedEchoStatement.ToString());
+            Assert.AreEqual("echo \"left<func1\"text\">right\";", parsedEchoStatement.ToString());
         }
 
         /// <summary>

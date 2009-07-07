@@ -215,12 +215,9 @@ namespace TestParser
             //Check output
             Assert.AreEqual(2, output.GetDirectoryElements().Count);
 
-            //Get directory's and transfer to array to provide walking
-            PathElement[] directoryElements = (PathElement[]) output.GetDirectoryElements().ToArray();
-
             //Check directory's
-            Assert.AreEqual("directory1", directoryElements[0].GetPathElement());
-            Assert.AreEqual("directory2", directoryElements[1].GetPathElement());
+            Assert.AreEqual("directory1", output.GetDirectoryElements().Get(0).ToString());
+            Assert.AreEqual("directory2", output.GetDirectoryElements().Get(1).ToString());
         }
     }
 }

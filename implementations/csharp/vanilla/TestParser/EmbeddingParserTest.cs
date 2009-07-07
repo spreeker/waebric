@@ -81,8 +81,7 @@ namespace TestParser
             Assert.AreEqual("\"text\"", expressionEmbed.GetExpression().ToString());
 
             //Test Markup
-            Markup[] markupArray = (Markup[]) expressionEmbed.GetMarkups().ToArray();
-            Markup markup = markupArray[0];
+            Markup markup = (Markup) expressionEmbed.GetMarkups().Get(0);
             Assert.AreEqual("func1", markup.GetDesignator().ToString());
             Assert.AreEqual(0, markup.GetArguments().Count);
 
