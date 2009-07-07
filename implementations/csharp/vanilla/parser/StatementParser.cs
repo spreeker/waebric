@@ -6,6 +6,8 @@ using Lexer.Tokenizer;
 using Parser.Ast.Statements;
 using Parser.Ast.Predicates;
 using Parser.Exceptions;
+using Parser.Ast.Markup;
+using Parser.Ast;
 
 namespace Parser
 {
@@ -19,6 +21,7 @@ namespace Parser
         private PredicateParser predicateParser;
         private ExpressionParser expressionParser;
         private EmbeddingParser embeddingParser;
+        private MarkupParser markupParser;
 
         #endregion
 
@@ -32,6 +35,7 @@ namespace Parser
             predicateParser = new PredicateParser(iterator);
             expressionParser = new ExpressionParser(iterator);
             embeddingParser = new EmbeddingParser(iterator);
+            markupParser = new MarkupParser(iterator);
         }
 
         /// <summary>
@@ -74,6 +78,10 @@ namespace Parser
                 else if (TokenStream.Peek(1).GetValue().ToString() == "yield")
                 {   //Yield statement
                     return ParseYieldStatement();
+                }
+                else if (TokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
+                {   //Markup statements, starts always with an identifier
+                    return ParseMarkupStatement();
                 }
                 else
                 {   //Unexpected token, throw exception
@@ -335,7 +343,7 @@ namespace Parser
         /// <summary>
         /// Parser for Assignment
         /// </summary>
-        /// <returns>ParsedAssignment</returns>
+        /// <returns>Parsed Assignment</returns>
         public Assignment ParseAssignment()
         {
             //Determine type
@@ -353,6 +361,10 @@ namespace Parser
             }
         }
 
+        /// <summary>
+        /// Parser for FuncBindAssignment
+        /// </summary>
+        /// <returns>Parsed FuncBindAssignment</returns>
         public FuncBindAssignment ParseFuncBindAssignment()
         {
             FuncBindAssignment funcBindAssignment = new FuncBindAssignment();
@@ -393,6 +405,10 @@ namespace Parser
             return funcBindAssignment;
         }
 
+        /// <summary>
+        /// Parser for VarBindAssignment
+        /// </summary>
+        /// <returns>Parsed VarBindAssignment</returns>
         public VarBindAssignment ParseVarBindAssignment()
         {
             VarBindAssignment varBindAssignment = new VarBindAssignment();
@@ -413,6 +429,175 @@ namespace Parser
             return varBindAssignment;
         }
 
+        /// <summary>
+        /// Parser for MarkupStatement types
+        /// </summary>
+        /// <returns>Parsed Statement</returns>
+        public Statement ParseMarkupStatement()
+        {
+            //Start parsing first markup part
+            Markup firstMarkup = markupParser.ParseMarkup();
+
+            if (TokenStream.HasNext() && TokenStream.Peek(1).GetValue().ToString() == ";")
+            {   //Just a single markup statement
+                MarkupStatement markupStatement = new MarkupStatement();
+                markupStatement.SetMarkup(firstMarkup);
+
+                //Skip ; token
+                NextToken(";", "markup;", ';');
+
+                return markupStatement;
+            }
+            else
+            {   
+                //Get other markups
+                NodeList markups = new NodeList();
+
+                markups.Add(firstMarkup);
+
+                while(DetectNextIsMarkup())
+                {
+                    markups.Add(markupParser.ParseMarkup());
+                }
+
+                //Determine statement type
+                if (TokenStream.HasNext())
+                {
+                    if (TokenStream.Peek(1).GetType() == TokenType.EMBEDDING)
+                    {   //Markup Embedding Statement
+                        MarkupEmbeddingStatement markupEmbedding = new MarkupEmbeddingStatement();
+                        markupEmbedding.SetMarkups(markups);
+                        markupEmbedding.SetEmbedding(embeddingParser.ParseEmbedding());
+                        
+                        //Skip ; token
+                        NextToken(";", "Markup+ Embedding;", ';');
+
+                        return markupEmbedding;
+                    }
+                    else if(TokenStream.Peek(1).GetValue().ToString() == ";")
+                    {   //MarkupStatement
+                        MarkupMarkupStatement markupStatement = new MarkupMarkupStatement();
+
+                        //Get last parsed markup from list and remove it from list
+                        Markup last = (Markup) markups.Get(markups.GetSize() - 1);
+                        markups.Remove(markups.GetSize()-1);
+                        
+                        markupStatement.SetMarkup(last);
+                        markupStatement.SetMarkups(markups);
+
+                        //Skip ; token
+                        NextToken(";", "Markup+ Markup;", ';');
+                        
+                        return markupStatement;
+                    }
+                    else if (IsMarkupStatStatement())
+                    {   //MarkupStatStatement
+                        MarkupStatStatement markupStatStatement = new MarkupStatStatement();
+
+                        markupStatStatement.SetMarkups(markups);
+                        markupStatStatement.SetStatement(ParseStatement());
+
+                        return markupStatStatement;
+                    }
+                    else if (IsMarkupExpressionStatement())
+                    {   //MarkupExpressionStatement
+                        MarkupExpressionStatement markupExpressionStatement = new MarkupExpressionStatement();
+
+                        markupExpressionStatement.SetMarkups(markups);
+                        markupExpressionStatement.SetExpression(expressionParser.ParseExpression());
+
+                        return markupExpressionStatement;
+                    }
+                    else
+                    {   //Unexpected token
+                        throw new UnexpectedToken("Markup Statement expected, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+                    }
+                }
+                else
+                {
+                    throw new UnexpectedToken("Expected MarkupStatement type, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+                }
+            }
+        }
+
+        #endregion
+
+        #region Private Members
+
+        /// <summary>
+        /// Detects if next tokens are markup (in a Markup+ form)
+        /// </summary>
+        /// <returns>True if markup otherwise false</returns>
+        private bool DetectNextIsMarkup()
+        {
+            int j = 1; 
+            if (TokenStream.HasNext(1) && TokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
+            {
+                //Determine if arguments exists
+                while (TokenStream.HasNext(j + 1))
+                {
+                    if(IsNextMarkupAttribute(j))
+                    {   
+                        //Attribute is max 2 tokens wide
+                        if(TokenStream.HasNext(j + 2))
+                        {
+                            j+= 2;
+                        }
+                        else
+                        {   //No markup;
+                            return false;
+                        }
+                    }
+                    else
+                    {   //End of attributes
+                        break;
+                    }
+                }
+
+                //Determine if it is a call
+                if(TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetValue().ToString() == "(")
+                {   //Call markup
+                    return true;
+                }
+                else if (TokenStream.HasNext(j + 1) && TokenStream.Peek(j + 1).GetValue().ToString() == ";")
+                {   //No markup in a list
+                    return false;
+                }
+                else
+                {   //Everything else is just markup
+                    return true;
+                }
+            }
+            else
+            {   //No identifier at start, so no markup
+                return false; 
+            }
+        }
+
+        private bool IsNextMarkupAttribute(int index)
+        {
+            String tokenText = TokenStream.Peek(index).GetValue().ToString();
+            return tokenText == "#" || tokenText == "." || tokenText == "$" || tokenText == ":" || tokenText == "@" || tokenText == "%";
+        }
+
+        private bool IsMarkupStatStatement()
+        {
+            String value = TokenStream.Peek(1).GetValue().ToString();
+            return value == "if" || value == "each" || value == "let" || value == "{" || value == "comment" 
+                || value == "echo" || value == "cdata" || value == "yield";
+        }
+
+        private bool IsMarkupExpressionStatement()
+        {
+            if(TokenStream.Peek(1).GetType() == TokenType.SYMBOL)
+            {   //Expression characters are only [ and {
+                return TokenStream.Peek(1).GetValue().ToString() == "[" || TokenStream.Peek(1).GetValue().ToString() == "{";
+            }
+            else
+            {
+                return TokenStream.Peek(1).GetType() != TokenType.KEYWORD;
+            }
+        }
 
         #endregion
     }

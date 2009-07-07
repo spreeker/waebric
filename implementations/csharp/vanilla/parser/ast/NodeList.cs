@@ -50,6 +50,15 @@ namespace Parser.Ast
         }
 
         /// <summary>
+        /// Remove element at specified index
+        /// </summary>
+        /// <param name="index">Index of item to remove</param>
+        public void Remove(int index)
+        {
+            list.RemoveAt(index);
+        }
+
+        /// <summary>
         /// Get all elements of list as array of syntax nodes
         /// </summary>
         /// <returns>Array of ISyntaxNode</returns>

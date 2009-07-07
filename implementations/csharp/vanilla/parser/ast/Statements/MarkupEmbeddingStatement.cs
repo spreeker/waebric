@@ -30,6 +30,11 @@ namespace Parser.Ast.Statements
             MarkupList.Add(markup);
         }
 
+        public void SetMarkups(NodeList markups)
+        {
+            MarkupList = markups;
+        }
+
         public NodeList GetMarkups()
         {
             return MarkupList;

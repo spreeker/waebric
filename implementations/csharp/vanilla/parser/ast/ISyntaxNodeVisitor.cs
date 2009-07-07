@@ -101,6 +101,5 @@ namespace Parser.Ast
 
         //Other
         void Visit(NodeList nodeList);
-        void Test(NodeList list);
     }
 }

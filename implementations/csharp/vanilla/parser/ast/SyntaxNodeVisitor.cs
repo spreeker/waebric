@@ -350,11 +350,6 @@ namespace Parser.Ast.Statements
             VisitSubNodes(list);
         }
 
-       public void Test(NodeList list)
-        {
-            VisitSubNodes(list);
-        }
-
         #endregion
 
         #region Private Members
