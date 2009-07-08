@@ -123,7 +123,7 @@ namespace Parser
         public Import ParseImport()
         {
             Import import = new Import();
-            if (NextToken("import identifier", "identifier", TokenType.IDENTIFIER))
+            if (TokenStream.HasNext() && TokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
             {
                 import.SetModuleId(ParseModuleId());
             }
