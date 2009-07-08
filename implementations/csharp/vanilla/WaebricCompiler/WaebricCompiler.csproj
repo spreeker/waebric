@@ -61,13 +61,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="WaebricCompiler.cs" />
-    <Compile Include="ModuleCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Checker\Checker.csproj">
       <Project>{FE6DDC4A-1B9B-4A29-9EEE-99FDFC00DE26}</Project>
       <Name>Checker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{AC9D6651-517B-4D1A-8C90-EF0843739AED}</Project>
+      <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Interpreter\Interpreter.csproj">
       <Project>{E3E72C1E-5A67-4CA7-A574-AC41AA21ED57}</Project>

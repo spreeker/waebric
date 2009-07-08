@@ -8,6 +8,7 @@ using Lexer.Tokenizer;
 using Parser;
 using Parser.Ast;
 using Checker;
+using Common;
 
 namespace Compiler
 {
@@ -21,6 +22,8 @@ namespace Compiler
         private static String Path; //Path of file to compile
 
         #endregion
+
+        #region Public Methods
 
         public static void Main(string[] args)
         {
@@ -58,8 +61,42 @@ namespace Compiler
 
             SyntaxTree parsedTree = parser.GetTree();
 
+            //Initialize ModuleCache with correct DirectoryPath
+            ModuleCache.Instance.SetDirectoryPath(GetDirectoryPath());
+
             //Lets check the tree
             WaebricChecker checker = new WaebricChecker();
+            checker.CheckSyntaxTree(parsedTree);
         }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Method to retrieve directorypath if there is one
+        /// </summary>
+        /// <returns></returns>
+        private static String GetDirectoryPath()
+        {
+            //Split current path into seperate elements
+            String[] splittedPath = Path.Split(new char[] {'/', '\\'});
+            if (splittedPath.Length == 1)
+            {   //Only filename specified, no additional directoryPath specified
+                return "";
+            }
+            else
+            {   //Return directory
+                String directoryPath = "";
+                for (int i = 0; i <= (splittedPath.Length - 2); i++)
+                {
+                    directoryPath += splittedPath[i];
+                    directoryPath += "\\";
+                }
+                return directoryPath;
+            }
+        }
+
+        #endregion
     }
 }
