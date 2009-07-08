@@ -36,12 +36,13 @@ namespace Checker
             module.GetModuleId().AcceptVisitor(this);
 
             //Get dependencies and check their existence
-            List<Module> DependencyList = ModuleCache.Instance.GetDependencies(module);
+            List<Module> DependencyList = ModuleCache.Instance.RequestDependencies(module);
             foreach (Module moduleDependency in DependencyList)
             {
                 foreach (Import import in moduleDependency.GetImports())
                 {   //Check imports of dependency's
                     import.AcceptVisitor(this);
+                    ModuleCache.Instance.RequestModule(import.GetModuleId());
                 }
             }
         }
