@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FE6DDC4A-1B9B-4A29-9EEE-99FDFC00DE26}</ProjectGuid>
+    <ProjectGuid>{AC9D6651-517B-4D1A-8C90-EF0843739AED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Checker</RootNamespace>
-    <AssemblyName>Checker</AssemblyName>
+    <RootNamespace>Common</RootNamespace>
+    <AssemblyName>Common</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,16 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\NonExistingModule.cs" />
-    <Compile Include="ModuleChecker.cs" />
-    <Compile Include="WaebricChecker.cs" />
+    <Compile Include="ModuleCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{AC9D6651-517B-4D1A-8C90-EF0843739AED}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\lexer\Lexer.csproj">
       <Project>{E9AB8C47-6F18-444E-81CD-9A932E751CE4}</Project>
       <Name>Lexer</Name>
