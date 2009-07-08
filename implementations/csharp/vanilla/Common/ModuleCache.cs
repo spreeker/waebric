@@ -49,7 +49,7 @@ namespace Common
         /// <returns>Requested module if available</returns>
         public Module RequestModule(ModuleId identifier)
         {
-            if (ModuleTable.Contains(identifier))
+            if (ModuleTable.Contains(identifier.ToString()))
             {   //Module already loaded so return instance of module
                 return (Module) ModuleTable[identifier];
             }
@@ -68,7 +68,7 @@ namespace Common
 
             //Add module to hashtable
             Module requestedModule = tree.GetRoot();
-            ModuleTable.Add(requestedModule.GetModuleId(), requestedModule);
+            ModuleTable.Add(requestedModule.GetModuleId().ToString(), requestedModule);
             
             return requestedModule;
         }
@@ -79,20 +79,26 @@ namespace Common
         /// <param name="module"></param>
         public void RequestDependencies(Module module, List<Module> list)
         {
-            Import[] importArray = (Import[]) module.GetImports().ToArray();
-
-            //Retrieve dependencies
-            for (int i = 0; i < (importArray.Length - 1); i++)
+            //Check if module is already in Table
+            if (!ModuleTable.Contains(module.GetModuleId().ToString()))
             {
-                //Get module
-                Module requestedDependency = RequestModule(importArray[i].GetModuleId());
-                if (requestedDependency != null)
-                {   //Not null, so add to list
-                    list.Add(requestedDependency);
+                ISyntaxNode[] importArray = module.GetImports().ToArray();
+
+                foreach(Import import in importArray)
+                {
+                    if(!ModuleTable.Contains(import.GetModuleId().ToString()))
+                    {
+                        //Get module
+                        Module requestedDependency = RequestModule(import.GetModuleId());
+                        if (requestedDependency != null)
+                        {   //Not null, so add to list
+                            list.Add(requestedDependency);
+
+                            //Get dependencies of retrieved module
+                            RequestDependencies(requestedDependency, list);
+                        }
+                    }
                 }
-                
-                //Get dependencies of retrieved module
-                RequestDependencies(requestedDependency, list);
             }
         }
 
@@ -101,7 +107,7 @@ namespace Common
         /// </summary>
         /// <param name="module">Module to get dependencies from</param>
         /// <returns>List of dependencies</returns>
-        public List<Module> GetDependencies(Module module)
+        public List<Module> RequestDependencies(Module module)
         {
             List<Module> moduleList = new List<Module>();
             RequestDependencies(module, moduleList);
@@ -114,7 +120,7 @@ namespace Common
         /// <param name="module"></param>
         public void AddModuleToCache(Module module)
         {
-            ModuleTable.Add(module.GetModuleId(), module);
+            ModuleTable.Add(module.GetModuleId().ToString(), module);
         }
 
         /// <summary>
@@ -123,6 +129,26 @@ namespace Common
         public void ClearModuleCache()
         {
             ModuleTable.Clear();
+        }
+
+        /// <summary>
+        /// Check if ModuleCache contains a specified module
+        /// </summary>
+        /// <param name="module">ModuleId of module</param>
+        /// <returns>True if module is in Cache, otherwise false</returns>
+        public bool ContainsModule(ModuleId module)
+        {
+            return ModuleTable.Contains(module.ToString());
+        }
+
+        /// <summary>
+        /// Check if ModuleCache contains a specified module
+        /// </summary>
+        /// <param name="moduleString">String representation of ModuleId</param>
+        /// <returns>True if module is in Cache, otherwise false</returns>
+        public bool ContainsModule(String moduleString)
+        {
+            return ModuleTable.Contains(moduleString);
         }
 
         /// <summary>
