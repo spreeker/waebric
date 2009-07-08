@@ -9,8 +9,9 @@ using Parser.Ast.Embedding;
 using Parser.Ast.Site;
 using Parser.Ast.Module;
 using Parser.Ast.Functions;
+using Parser.Ast.Statements;
 
-namespace Parser.Ast.Statements
+namespace Parser.Ast
 {
     /// <summary>
     /// Visitor implementation which visits all type of AST nodes
