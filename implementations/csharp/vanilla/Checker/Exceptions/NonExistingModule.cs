@@ -15,7 +15,7 @@ namespace Checker.Exceptions
 
         public NonExistingModule(ModuleId moduleId)
         {
-            Console.WriteLine("Error: Module " + moduleId.ToString() + "not found.");
+            Console.WriteLine("Error: Module " + moduleId.ToString() + " not found.");
         }
 
         #endregion

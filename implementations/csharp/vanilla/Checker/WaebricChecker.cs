@@ -27,7 +27,8 @@ namespace Checker
             moduleChecker.Visit(tree.GetRoot());
 
             //Check function/variable declarations
-
+            DeclarationChecker declarationChecker = new DeclarationChecker(exceptions);
+            declarationChecker.Visit(tree.GetRoot());
 
             return exceptions;
         }

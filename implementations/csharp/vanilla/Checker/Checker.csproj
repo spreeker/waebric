@@ -45,7 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeclarationChecker.cs" />
+    <Compile Include="Exceptions\FunctionAlreadyDefined.cs" />
+    <Compile Include="Exceptions\FunctionCallArityIncorrect.cs" />
     <Compile Include="Exceptions\NonExistingModule.cs" />
+    <Compile Include="Exceptions\UndefinedFunction.cs" />
+    <Compile Include="Exceptions\UndefinedVariable.cs" />
+    <Compile Include="Exceptions\UninitializedVariable.cs" />
     <Compile Include="ModuleChecker.cs" />
     <Compile Include="WaebricChecker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

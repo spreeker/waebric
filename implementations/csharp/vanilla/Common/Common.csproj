@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="ModuleCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SymbolTable.cs" />
+    <Compile Include="XHTMLTags.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lexer\Lexer.csproj">
