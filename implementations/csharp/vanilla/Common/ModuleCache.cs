@@ -82,6 +82,7 @@ namespace Common
             //Check if module is already in Table
             if (!ModuleTable.Contains(module.GetModuleId().ToString()))
             {
+                list.Add(module);
                 ISyntaxNode[] importArray = module.GetImports().ToArray();
 
                 foreach(Import import in importArray)

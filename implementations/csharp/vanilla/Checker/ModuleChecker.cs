@@ -30,7 +30,7 @@ namespace Checker
             ExceptionList = exceptionList;
         }
 
-        public new void Visit(Module module)
+        public override void Visit(Module module)
         {
             //Check filename
             module.GetModuleId().AcceptVisitor(this);
@@ -47,13 +47,13 @@ namespace Checker
             }
         }
 
-        public new void Visit(Import import)
+        public override void Visit(Import import)
         {
             //Check if import exists
             import.GetModuleId().AcceptVisitor(this);
         }
 
-        public new void Visit(ModuleId moduleId)
+        public override void Visit(ModuleId moduleId)
         {
             //Check if path exists
             String path = ModuleCache.Instance.GetPath(moduleId);
