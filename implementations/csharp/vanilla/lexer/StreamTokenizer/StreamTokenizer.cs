@@ -32,6 +32,7 @@ namespace Lexer.Tokenizer
         private int CurrentCharacter = '\0';  // Current character
         private int PreviousCharacter = '\0'; // Previous character
         private bool URL = false; // Is character part of URL
+        private bool IgnoreComments = false; //Ignore comments
 
         //Current character value
         private int LineNumber = 1; // Linenumber of stream
@@ -76,7 +77,7 @@ namespace Lexer.Tokenizer
             {
                 return EOF;
             }
-            else if (CurrentCharacter == '/') //Possible a comment
+            else if (CurrentCharacter == '/' && !IgnoreComments) //Possible a comment
             {
                 return CommentToken();
             }
@@ -174,6 +175,15 @@ namespace Lexer.Tokenizer
             return null; //No value found
         }
 
+        /// <summary>
+        /// Method set state of ignoring comments
+        /// </summary>
+        /// <param name="ignore">True to ignore, false to allow</param>
+        public void SetIgnoreComments(bool ignore)
+        {
+            IgnoreComments = ignore;
+        }
+
         #endregion
 
         #region Private Methods
@@ -202,7 +212,7 @@ namespace Lexer.Tokenizer
             do {
                 stringBuilder.Append((char)CurrentCharacter);
                 Read();
-            } while (IsLetter(CurrentCharacter) || IsNumeric(CurrentCharacter));
+            } while (IsLetter(CurrentCharacter) || IsNumeric(CurrentCharacter) || CurrentCharacter == '-');
             TextValue = stringBuilder.ToString();
 
             return WORD;

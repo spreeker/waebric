@@ -165,6 +165,9 @@ namespace Lexer
 
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
+            
+            //Ignore comments, due urls, etc
+            tokenizer.SetIgnoreComments(true);
 
             //Retrieve possible quoted text
             StringBuilder stringBuilder = new StringBuilder();
@@ -172,6 +175,7 @@ namespace Lexer
             {
                 if(CurrentToken == StreamTokenizer.EOF)
                 {   // End of file, so it wasn't a quoted part but just a single "
+                    tokenizer.SetIgnoreComments(false);
                     
                     //First add a single quote as token
                     TokenStream.Add(new Token("\"", TokenType.SYMBOL, tempLine));
@@ -192,6 +196,7 @@ namespace Lexer
                 else if(tokenizer.GetCharacterValue() == '<')
                 { //Embedding found, so lexicalize embedding
                     LexicalizeEmbedding(stringBuilder.ToString());
+                    tokenizer.SetIgnoreComments(false);
                     return;
                 }
                 
@@ -200,12 +205,14 @@ namespace Lexer
                 previousChar = tokenizer.GetCharacterValue();
                 CurrentToken = tokenizer.NextToken();
             }
-
+            tokenizer.SetIgnoreComments(false);
             TokenStream.Add(new Token(stringBuilder.ToString(),TokenType.TEXT, tempLine));
             
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
         }
+
+
 
         /// <summary>
         /// Lexicalizes an embedding
@@ -335,7 +342,7 @@ namespace Lexer
             char[] stringArray = token.ToCharArray();
             foreach (char c in stringArray)
             {
-                if (!(Char.IsLetterOrDigit(c) || c == '.'))
+                if (!(Char.IsLetterOrDigit(c) || c == '.' || c == '-'))
                 {
                     return false;
                 }
@@ -371,7 +378,7 @@ namespace Lexer
         private bool IsWaebricSymbol(int c)
         {
             //~[0-31] \t\n\r;> [127-255]
-            return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}';
+            return c > 31 && c < 127 && c != ' ' && c != ';' && c != ',' && c != '>' && c != '}' && c != ')' && c != ']';
         }
 
         /// <summary>
