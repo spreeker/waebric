@@ -503,8 +503,12 @@ namespace Parser
                     {   //MarkupExpressionStatement
                         MarkupExpressionStatement markupExpressionStatement = new MarkupExpressionStatement();
 
+                        //Parse MarkupExpressionStatement
                         markupExpressionStatement.SetMarkups(markups);
                         markupExpressionStatement.SetExpression(expressionParser.ParseExpression());
+
+                        //Skip ; token
+                        NextToken(";", "Markup+ Expression;", ';');
 
                         return markupExpressionStatement;
                     }
