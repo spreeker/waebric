@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using Lexer.Tokenizer;
 using System.Text;
@@ -162,12 +163,20 @@ namespace Lexer
             int tempLine = tokenizer.GetScannedLines();
             //Hold previous char for recognizing escape chars
             char previousChar = '\0';
+            bool IsString = false;
 
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
             
             //Ignore comments, due urls, etc
             tokenizer.SetIgnoreComments(true);
+
+            //Check if this text is comment text
+            Token[] tempArray = TokenStream.ToArray();
+            if (tempArray[tempArray.Length - 1].GetType() == TokenType.KEYWORD && tempArray[tempArray.Length - 1].GetValue().ToString() == "comment")
+            {
+                IsString = true;
+            }
 
             //Retrieve possible quoted text
             StringBuilder stringBuilder = new StringBuilder();
@@ -193,7 +202,7 @@ namespace Lexer
 
                     return; //Lexicalizing done
                 }
-                else if(tokenizer.GetCharacterValue() == '<')
+                else if(tokenizer.GetCharacterValue() == '<' && !IsString)
                 { //Embedding found, so lexicalize embedding
                     LexicalizeEmbedding(stringBuilder.ToString());
                     tokenizer.SetIgnoreComments(false);
@@ -206,13 +215,21 @@ namespace Lexer
                 CurrentToken = tokenizer.NextToken();
             }
             tokenizer.SetIgnoreComments(false);
-            TokenStream.Add(new Token(stringBuilder.ToString(),TokenType.TEXT, tempLine));
+
+            //Check if string is correct quote text
+            if (IsString)
+            {
+                if (!IsCorrectString(stringBuilder.ToString()))
+                {
+                    throw new StreamTokenizerException("String Text containts non valid characters", tempLine);
+                }
+            }
+
+            TokenStream.Add(new Token(stringBuilder.ToString(), TokenType.TEXT, tempLine));
             
             //Skip " token, only text is interesting
             CurrentToken = tokenizer.NextToken();
         }
-
-
 
         /// <summary>
         /// Lexicalizes an embedding
@@ -416,6 +433,51 @@ namespace Lexer
             {
                 tokens.Add(scannedTokens[i]);
             }         
+        }
+
+        private bool IsCorrectString(String toCheck)
+        {
+            //Check complete string character for character
+            Char[] stringArray = toCheck.ToCharArray();
+
+            for(int i = 0; i <= (stringArray.Length - 1); i++)
+            {
+                char c = stringArray[i];
+                if (!IsStringChar(c))
+                {
+                    //Check escape character variations
+                    if (c == '\\')
+                    {   
+                        if (i + 1 < stringArray.Length)
+                        {
+                            char peek = stringArray[i + 1];
+                            if (peek == 'n' || peek == 't' || peek == '"' || peek == '\\')
+                            {
+                                i++; 
+                            }
+                            else
+                            {
+                                return false; 
+                            }
+                        }
+                        else 
+                        {
+                            return false; 
+                        }
+                    }
+                    else 
+                    { 
+                        return false; 
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsStringChar(char c)
+        {
+            return c > 31 && c != '\n' && c != '\t' && c != '"' && c != '\\';
         }
         #endregion
     }
