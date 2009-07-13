@@ -6,15 +6,15 @@ using System.Text;
 namespace Checker.Exceptions
 {
     /// <summary>
-    /// Exception when variable is not initialized
+    /// Exception when function is defined more than once
     /// </summary>
-    public class UninitializedVariable : Exception
+    public class FunctionAlreadyDefined : Exception
     {
         #region Public Methods
 
-        public UninitializedVariable()
+        public FunctionAlreadyDefined(String identifier)
         {
-
+            Console.WriteLine("Function already defined: " + identifier);
         }
 
         #endregion

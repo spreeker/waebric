@@ -13,6 +13,11 @@ namespace Checker.Exceptions
     {
         #region Public Methods
 
+        public FunctionCallArityIncorrect(String identifier)
+        {
+            Console.WriteLine("Function " + identifier + " called with wrong number of arguments");
+        }
+
         #endregion
     }
 }

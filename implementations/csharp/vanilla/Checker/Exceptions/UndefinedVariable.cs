@@ -6,15 +6,15 @@ using System.Text;
 namespace Checker.Exceptions
 {
     /// <summary>
-    /// Exception for Undefined Functions
+    /// Exception when non existing variable is called
     /// </summary>
-    public class UndefinedFunction : Exception
+    public class UndefinedVariable : Exception
     {
         #region Public Methods
-        
-        public UndefinedFunction(String identifier)
+
+        public UndefinedVariable(String identifier)
         {
-            Console.WriteLine("Function " + identifier + " called but isn't defined");
+            Console.WriteLine("Variable " + identifier + " used but not declared");
         }
 
         #endregion

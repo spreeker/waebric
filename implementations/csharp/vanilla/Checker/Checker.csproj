@@ -51,7 +51,6 @@
     <Compile Include="Exceptions\NonExistingModule.cs" />
     <Compile Include="Exceptions\UndefinedFunction.cs" />
     <Compile Include="Exceptions\UndefinedVariable.cs" />
-    <Compile Include="Exceptions\UninitializedVariable.cs" />
     <Compile Include="ModuleChecker.cs" />
     <Compile Include="WaebricChecker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

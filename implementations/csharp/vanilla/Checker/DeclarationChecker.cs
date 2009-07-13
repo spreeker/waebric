@@ -53,7 +53,7 @@ namespace Checker
                     //Check if function is not already defined
                     if (SymbolTable.ContainsFunction(functionDef.GetIdentifier()))
                     {
-                        ExceptionList.Add(new FunctionAlreadyDefined());
+                        ExceptionList.Add(new FunctionAlreadyDefined(functionDef.GetIdentifier()));
                     }
                     else
                     {
@@ -196,7 +196,7 @@ namespace Checker
             //Check if expression is assigned to existing variable
             if(!SymbolTable.ContainsVariable(expression.GetVariableIdentifier()))
             {   //Add undefined variable exception
-                ExceptionList.Add(new UndefinedVariable());
+                ExceptionList.Add(new UndefinedVariable(expression.GetVariableIdentifier()));
             }
         }
 
@@ -216,7 +216,7 @@ namespace Checker
 
                 if(referencedDefinition.GetFormals().Count != markup.GetArguments().Count)
                 {   //Arity mismatch
-                    ExceptionList.Add(new FunctionCallArityIncorrect());
+                    ExceptionList.Add(new FunctionCallArityIncorrect(identifier));
                 }
             }
             else
@@ -224,7 +224,7 @@ namespace Checker
                 //Check if it is XHTML, if not its undefined
                 if (!IdentifierIsXHTML(identifier))
                 {
-                    ExceptionList.Add(new UndefinedFunction());
+                    ExceptionList.Add(new UndefinedFunction(identifier));
                 }
             }
         }
