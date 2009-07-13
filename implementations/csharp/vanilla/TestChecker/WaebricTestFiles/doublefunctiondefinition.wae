@@ -1,0 +1,13 @@
+module doublefunctiondefinition
+
+site
+	site/index.html : home()
+end
+
+def home
+	echo "function1";
+end
+
+def home
+	echo "function2";
+end

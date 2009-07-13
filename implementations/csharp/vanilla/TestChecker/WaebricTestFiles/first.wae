@@ -1,0 +1,4 @@
+module first
+
+import common
+import second
