@@ -50,12 +50,12 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		// Store function definitions
 		for(Module component: dependancies) {
 			for(FunctionDef function: component.getFunctionDefinitions()) {
-				if(environment.containsFunction(function.getIdentifier().getName())) {
+				if(environment.isDefinedFunction(function.getIdentifier().getName())) {
 					// Function is already defined, store exception
 					exceptions.add(new DuplicateFunctionDefinition(function));
 				} else {
 					// Store definition
-					environment.storeFunctionDef(function);
+					environment.defineFunction(function);
 				}
 			}
 		}
@@ -80,7 +80,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		// Store formals in local environment
 		environment = new Environment(environment);
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
-			environment.storeVariable(identifier.getName(), null);
+			environment.defineVariable(identifier.getName(), null);
 		}
 
 		for(Statement statement: function.getStatements()) {
@@ -94,7 +94,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	@Override
 	public void visit(Each statement) {
 		environment = new Environment(environment); // Store variable in local environment
-		environment.storeVariable(statement.getVar().getName(), statement.getExpression());
+		environment.defineVariable(statement.getVar().getName(), statement.getExpression());
 		statement.getStatement().accept(this); // Visit sub-statement
 		environment = environment.getParent(); // Restore previous environment
 	}
@@ -136,25 +136,25 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		}
 
 		definition.accept(this); // Check internal function
-		environment.storeFunctionDef(definition); // Store definition
+		environment.defineFunction(definition); // Store definition
 	}
 	
 	@Override
 	public void visit(VarBind bind) {
 		bind.getExpression().accept(this); // Check expression
-		environment.storeVariable(bind.getIdentifier().getName(), bind.getExpression());
+		environment.defineVariable(bind.getIdentifier().getName(), bind.getExpression());
 	}
 	
 	@Override
 	public void visit(VarExpression expression) {
-		if(! environment.containsVariable(expression.getVar().getName())) {
+		if(! environment.isDefinedVariable(expression.getVar().getName())) {
 			exceptions.add(new UndefinedVariableException(expression.getVar()));
 		}
 	}
 	
 	@Override
 	public void visit(Markup.Tag tag) {
-		if(environment.containsFunction(tag.getDesignator().getIdentifier().getName())) {
+		if(environment.isDefinedFunction(tag.getDesignator().getIdentifier().getName())) {
 			new Markup.Call(tag.getDesignator()).accept(this);
 		}
 	}
@@ -164,7 +164,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 		String name = call.getDesignator().getIdentifier().getName();
 		
 		// Check if call is made to a defined function
-		if(environment.containsFunction(name)) {
+		if(environment.isDefinedFunction(name)) {
 			FunctionDef definition = environment.getFunction(name);
 			
 			// Determine expected arguments by counting function formals

@@ -139,7 +139,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(Call markup) {
 		String name = markup.getDesignator().getIdentifier().getName();
 
-		if(environment.containsFunction(name)) { // Call to defined function
+		if(environment.isDefinedFunction(name)) { // Call to defined function
 			FunctionDef function = environment.getFunction(name); // Retrieve function definition
 			
 			// Create new environment for function
@@ -151,7 +151,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			for(Argument argument: markup.getArguments()) {
 				if(argument instanceof Argument.RegularArgument) {
 					IdCon variable = function.getFormals().getIdentifiers().get(index);
-					environment.storeVariable(variable.getName(), argument.getExpression());
+					environment.defineVariable(variable.getName(), argument.getExpression());
 					index++;
 				}
 			}
@@ -196,7 +196,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Tag markup) {
 		String name = markup.getDesignator().getIdentifier().getName();
-		if(environment.containsFunction(name)) { // Call to defined function
+		if(environment.isDefinedFunction(name)) { // Call to defined function
 			// Delegate mark-up as call
 			new Markup.Call(markup.getDesignator()).accept(this);
 		} else {
@@ -320,7 +320,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			} else if(reg.getExpression() instanceof Expression.VarExpression) {
 				// Variable predicates check if the referenced variable is defined
 				String name = ((Expression.VarExpression) reg.getExpression()).getVar().getName();
-				return environment.containsVariable(name);
+				return environment.isDefinedVariable(name);
 			} else { return true; }
 		} else if(predicate instanceof Predicate.And) {
 			// And predicate return Left && Right
@@ -364,7 +364,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			for(Expression e: list.getExpressions()) {
 				current = root;
 				environment = new Environment(environment);
-				environment.storeVariable(statement.getVar().getName(), e);
+				environment.defineVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				environment = environment.getParent();
 			}
@@ -653,7 +653,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		functionEnvs.put(definition, environment.clone()); 
 		
 		// Extend current environment with new function definition
-		environment.storeFunctionDef(definition);
+		environment.defineFunction(definition);
 	}
 
 	/**
@@ -661,7 +661,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * already exists its value will be overwritten.
 	 */
 	public void visit(VarBind bind) {
-		environment.storeVariable(bind.getIdentifier().getName(), bind.getExpression());
+		environment.defineVariable(bind.getIdentifier().getName(), bind.getExpression());
 	}
 
 	/**

@@ -41,20 +41,12 @@ public class Environment implements Cloneable {
 	 */
 	public Environment clone() {
 		Environment clone = new Environment(this.getParent());
-		clone.storeFunctionDefs(this.getFunctionDefs());
+		clone.defineFunctions(this.getFunctionDefinitions());
 		for(String variable: this.getVariableNames()) {
-			clone.storeVariable(variable, this.getVariable(variable));
+			clone.defineVariable(variable, this.getVariable(variable));
 		}
 		
 		return clone;
-	}
-	
-	/**
-	 * Retrieve function names.
-	 * @return
-	 */
-	public Collection<String> getFunctionNames() {
-		return functions.keySet();
 	}
 	
 	/**
@@ -69,22 +61,22 @@ public class Environment implements Cloneable {
 	}
 	
 	/**
+	 * Retrieve function names.
+	 * @return
+	 */
+	public Collection<String> getFunctionNames() {
+		return functions.keySet();
+	}
+	
+	/**
 	 * Check if function is defined in environment.
 	 * @param name
 	 * @return
 	 */
-	public boolean containsFunction(String name) {
+	public boolean isDefinedFunction(String name) {
 		boolean contains = functions.containsKey(name);
-		if(! contains && parent != null) { return parent.containsFunction(name); }
+		if(! contains && parent != null) { return parent.isDefinedFunction(name); }
 		return contains;
-	}
-	
-	/**
-	 * Retrieve variable names.
-	 * @return
-	 */
-	public Collection<String> getVariableNames() {
-		return variables.keySet();
 	}
 	
 	/**
@@ -99,13 +91,21 @@ public class Environment implements Cloneable {
 	}
 	
 	/**
+	 * Retrieve variable names.
+	 * @return
+	 */
+	public Collection<String> getVariableNames() {
+		return functions.keySet();
+	}
+	
+	/**
 	 * Check if variable is defined in environment.
 	 * @param name
 	 * @return
 	 */
-	public boolean containsVariable(String name) {
+	public boolean isDefinedVariable(String name) {
 		boolean contains = variables.containsKey(name);
-		if(! contains && parent != null) { return parent.containsVariable(name); }
+		if(! contains && parent != null) { return parent.isDefinedVariable(name); }
 		return contains;
 	}
 	
@@ -114,7 +114,7 @@ public class Environment implements Cloneable {
 	 * @param name
 	 * @param function
 	 */
-	public void storeFunctionDef(FunctionDef function) {
+	public void defineFunction(FunctionDef function) {
 		if(function == null) { return; } // Retrieve function identifier
 		String identifier = function.getIdentifier() == null ? "" : function.getIdentifier().getName();
 		functions.put(identifier, function);
@@ -124,15 +124,15 @@ public class Environment implements Cloneable {
 	 * Extend current function definitions with a collection of functions.
 	 * @param functions
 	 */
-	public void storeFunctionDefs(Collection<FunctionDef> functions) {
-		for(FunctionDef function: functions) { storeFunctionDef(function); }
+	public void defineFunctions(Collection<FunctionDef> functions) {
+		for(FunctionDef function: functions) { defineFunction(function); }
 	}
 	
 	/**
 	 * Retrieve collection of function definitions.
 	 * @return
 	 */
-	public Collection<FunctionDef> getFunctionDefs() {
+	public Collection<FunctionDef> getFunctionDefinitions() {
 		return functions.values();
 	}
 	
@@ -141,7 +141,7 @@ public class Environment implements Cloneable {
 	 * @param name
 	 * @param value
 	 */
-	public void storeVariable(String name, Expression value) {
+	public void defineVariable(String name, Expression value) {
 		variables.put(name, value);
 	}
 	
@@ -155,8 +155,9 @@ public class Environment implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return "Functions: " + functions.keySet().toString() 
-					+ "\nVariables: " + variables.keySet().toString();
+		return 
+			"Functions: " + functions.keySet().toString() + "\n" +
+			"Variables: " + variables.keySet().toString();
 	}
 	
 }

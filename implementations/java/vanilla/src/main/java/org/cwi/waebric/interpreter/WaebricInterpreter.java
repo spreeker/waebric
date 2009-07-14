@@ -75,7 +75,7 @@ public class WaebricInterpreter {
 		
 		// Create environment
 		Environment environment = new Environment();
-		environment.storeFunctionDefs(functions);
+		environment.defineFunctions(functions);
 		
 		// Interpret "main" function and write to output stream
 		if(containsMain(module)) {

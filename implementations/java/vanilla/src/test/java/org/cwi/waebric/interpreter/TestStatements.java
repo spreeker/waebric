@@ -57,7 +57,7 @@ public class TestStatements {
 		
 		// Create a true predicate
 		Expression.VarExpression var = new Expression.VarExpression(new IdCon("var"));
-		visitor.getEnvironment().storeVariable("var", text);
+		visitor.getEnvironment().defineVariable("var", text);
 		Predicate truePredicate = new Predicate.RegularPredicate(var);
 
 		// Create sub-statement
@@ -92,7 +92,7 @@ public class TestStatements {
 	public void testIfElse() {
 		// Create a true and false predicate
 		Expression.VarExpression var = new Expression.VarExpression(new IdCon("var"));
-		visitor.getEnvironment().storeVariable("var", new Expression.ListExpression());
+		visitor.getEnvironment().defineVariable("var", new Expression.ListExpression());
 		Predicate truePredicate = new Predicate.RegularPredicate(var);
 		Predicate falsePredicate = new Predicate.Not(truePredicate);
 
@@ -529,7 +529,7 @@ public class TestStatements {
 		assertFalse(visitor.evaluatePredicate(invalidField));
 		
 		// Variable predicate, check if variable is defined
-		visitor.getEnvironment().storeVariable("valid", new Expression.TextExpression("success"));
+		visitor.getEnvironment().defineVariable("valid", new Expression.TextExpression("success"));
 		Predicate.RegularPredicate validVar = new Predicate.RegularPredicate();
 		validVar.setExpression(new Expression.VarExpression(new IdCon("valid")));
 		assertTrue(visitor.evaluatePredicate(validVar));
