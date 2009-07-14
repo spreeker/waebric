@@ -1,3 +1,6 @@
 Problems during implementation:
 - Generics for NodeList gives method overloading problems for Visitor Pattern during lack of <?> in C#. There are only workaround solutions,
 so chosen for cast solution without generics.
+- List type is not enumerable which gives overhead when converting to array's
+- No DOM model for XHTML, only for XML which is not simple compatible with XHTML.
+- XHTMLWriter which is available is not friendly to use. It doesn't use an tree based approach but just writes to output buffer
