@@ -89,6 +89,24 @@ namespace Interpreter
         }
 
         /// <summary>
+        /// Write the specified value to stream, like text or something else
+        /// </summary>
+        /// <param name="value">Value to write</param>
+        /// <param name="Encoding">Use encoding</param>
+        public void Write(String value, bool Encoding)
+        {
+            if (Encoding)
+            {
+                XhtmlWriter.WriteEncodedText(value);
+            }
+            else
+            {
+                XhtmlWriter.Write(value);
+            }
+            XhtmlWriter.Flush();
+        }
+
+        /// <summary>
         /// Close specified tag, emptytags are ignored
         /// </summary>
         /// <param name="tag">Tag to close</param>
