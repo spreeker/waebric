@@ -21,10 +21,27 @@ namespace Interpreter
 
         #region Public Methods
 
-        public XHTMLStreamWriter(TextWriter writer)
+        /// <summary>
+        /// Enumeration containing XHTML 1.0 DocTypes
+        /// </summary>
+        public enum DocType {
+            STRICT,
+            TRANSITIONAL,
+            FRAMESET
+        };
+
+        /// <summary>
+        /// Create an XHTMStreamWriter which writes to specified writer in specified XHTML DocType
+        /// </summary>
+        /// <param name="writer">Writer to write to</param>
+        /// <param name="docType">DocType of XHTML document</param>
+        public XHTMLStreamWriter(TextWriter writer, DocType docType)
         {
             XhtmlWriter = new XhtmlTextWriter(writer);
             AttributeMap = new Dictionary<String, String>();
+
+            //Write doctype before starting document
+            WriteDocType(docType);
         }
         
         /// <summary>
@@ -88,6 +105,27 @@ namespace Interpreter
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Method which writes doctype to stream
+        /// </summary>
+        /// <param name="type">DocType of XHTML document</param>
+        private void WriteDocType(DocType type)
+        {
+            switch (type)
+            {
+                case DocType.STRICT:
+                    XhtmlWriter.Write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+                    break;
+                case DocType.TRANSITIONAL:
+                    XhtmlWriter.Write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+                    break;
+                case DocType.FRAMESET:
+                    XhtmlWriter.Write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">");
+                    break;
+            }
+            XhtmlWriter.Flush();
+        }
 
         /// <summary>
         /// Method which determines if the tag needs alternative closing, like <img />, <br />, <hr />
