@@ -71,7 +71,7 @@ namespace Parser.Ast
         void Visit(ClassAttribute attribute);
         void Visit(Designator designator);
         void Visit(ExpressionArgument argument);
-        void Visit(HeightAttribute attribute);
+        void Visit(WidthAttribute attribute);
         void Visit(IdAttribute attribute);
         void Visit(Markup.Markup markup);
         void Visit(NameAttribute attribute);

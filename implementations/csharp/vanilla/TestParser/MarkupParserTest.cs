@@ -99,14 +99,14 @@ namespace TestParser
         /// Test ParseHeightAttributeTest
         /// </summary>
         [TestMethod]
-        public void ParseHeightAttributeTest()
+        public void ParseWidthAttributeTest()
         {
             //Parse tokens
             MarkupParser markupParser = new MarkupParser(Init("120"));
-            HeightAttribute parsedHeightAttribute = markupParser.ParseHeightAttribute();
+            WidthAttribute parsedWidthAttribute = markupParser.ParseWidthAttribute();
 
             //Check Id Attribute
-            Assert.AreEqual(120, parsedHeightAttribute.GetHeight());
+            Assert.AreEqual(120, parsedWidthAttribute.GetWidth());
         }
 
         /// <summary>

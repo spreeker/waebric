@@ -105,8 +105,8 @@ namespace Parser
                         attribute = ParseWidth_HeightAttribute();
                     }
                     else
-                    {   //Only height attribute
-                        attribute = ParseHeightAttribute();
+                    {   //Only width attribute
+                        attribute = ParseWidthAttribute();
                     }
                     break;
                 default:
@@ -199,18 +199,18 @@ namespace Parser
         }
 
         /// <summary>
-        /// Parser for HeightAttribute
+        /// Parser for WidthAttribute
         /// </summary>
         /// <returns>Parsed HeightAttribute</returns>
-        public HeightAttribute ParseHeightAttribute()
+        public WidthAttribute ParseWidthAttribute()
         {
-            HeightAttribute heightAttribute = new HeightAttribute();
+            WidthAttribute widthAttribute = new WidthAttribute();
 
             //Get height
             CurrentToken = TokenStream.NextToken();
-            heightAttribute.SetHeight(ObjectToInt(CurrentToken.GetValue()));
+            widthAttribute.SetWidth(ObjectToInt(CurrentToken.GetValue()));
 
-            return heightAttribute;
+            return widthAttribute;
         }
         
         /// <summary>

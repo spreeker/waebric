@@ -231,7 +231,7 @@ namespace Parser.Ast
             VisitSubNodes(argument);
         }
 
-        public virtual void Visit(HeightAttribute attribute)
+        public virtual void Visit(WidthAttribute attribute)
         {
             VisitSubNodes(attribute);
         }

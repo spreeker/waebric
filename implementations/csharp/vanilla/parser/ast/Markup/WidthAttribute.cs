@@ -6,13 +6,13 @@ using System.Text;
 namespace Parser.Ast.Markup
 {
     /// <summary>
-    /// Node which contains HeightAttribute
+    /// Node which contains WidthAttribute
     /// </summary>
-    public class HeightAttribute : Attribute
+    public class WidthAttribute : Attribute
     {
         #region Private Members
 
-        private int Height;
+        private int Width;
 
         #endregion
 
@@ -21,35 +21,35 @@ namespace Parser.Ast.Markup
         /// <summary>
         /// Empty constructor
         /// </summary>
-        public HeightAttribute()
+        public WidthAttribute()
         {
         }
 
         /// <summary>
-        /// Constructor with width and height specification
+        /// Constructor with width specification
         /// </summary>
-        /// <param name="height">Height</param>
-        public HeightAttribute(int height)
+        /// <param name="height">Width</param>
+        public WidthAttribute(int width)
         {
-            Height = height;
+            Width = width;
         }
 
         /// <summary>
-        /// Get height of attribute
+        /// Get width of attribute
         /// </summary>
         /// <returns>Height</returns>
-        public int GetHeight()
+        public int GetWidth()
         {
-            return Height;
+            return Width;
         }
 
         /// <summary>
-        /// Set height of attribute
+        /// Set width of attribute
         /// </summary>
-        /// <param name="height">Height</param>
-        public void SetHeight(int height)
+        /// <param name="height">Width</param>
+        public void SetWidth(int width)
         {
-            Height = height;
+            Width = width;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Parser.Ast.Markup
         /// <returns>String</returns>
         public override String ToString()
         {
-            return "@" + Height.ToString();
+            return "@" + Width.ToString();
         }
 
         public override void AcceptVisitor(ISyntaxNodeVisitor visitor)

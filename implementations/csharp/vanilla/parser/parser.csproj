@@ -82,7 +82,7 @@
     <Compile Include="Ast\Markup\ClassAttribute.cs" />
     <Compile Include="Ast\Markup\Designator.cs" />
     <Compile Include="Ast\Markup\ExpressionArgument.cs" />
-    <Compile Include="Ast\Markup\HeightAttribute.cs" />
+    <Compile Include="Ast\Markup\WidthAttribute.cs" />
     <Compile Include="Ast\Markup\IdAttribute.cs" />
     <Compile Include="Ast\Markup\Markup.cs" />
     <Compile Include="Ast\Markup\NameAttribute.cs" />
