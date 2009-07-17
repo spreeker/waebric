@@ -110,7 +110,7 @@ namespace Interpreter
         /// Close specified tag, emptytags are ignored
         /// </summary>
         /// <param name="tag">Tag to close</param>
-        public void CloseTag(String tag)
+        public void WriteCloseTag(String tag)
         {
             if (!IsEmptyElement(tag))
             {
@@ -142,6 +142,7 @@ namespace Interpreter
                     XhtmlWriter.Write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">");
                     break;
             }
+            XhtmlWriter.WriteLine();
             XhtmlWriter.Flush();
         }
 
