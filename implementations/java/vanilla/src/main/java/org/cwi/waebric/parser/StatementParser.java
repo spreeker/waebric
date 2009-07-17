@@ -107,35 +107,19 @@ class StatementParser extends AbstractParser {
 		Statement.If statement; 
 		
 		next(WaebricKeyword.IF, "if keyword", "\"if\" \"(\"");
-		
+
 		// Parse "(" Predicate ")
 		next(WaebricSymbol.LPARANTHESIS, "Predicate opening \"(\"", "\"if\" \"(\" Predicate");
-		Predicate predicate = null;
-		try {
-			predicate = predicateParser.parsePredicate();
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Predicate", "\"if(\" Predicate \")\"");
-		}
+		Predicate predicate = predicateParser.parsePredicate();
 		next(WaebricSymbol.RPARANTHESIS, "Predicate closure \")\"", "\"(\" Predicate \")\"");
 
 		// Parse "true" sub-statement
-		Statement trueStatement = null;
-		try {
-			trueStatement = parseStatement();
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "True statement", "\"if(args)\" Statement");
-		}
-
+		Statement trueStatement = parseStatement();
+		
 		// Determine statement type by checking for "else" keyword
 		if(tokens.hasNext() && tokens.peek(1).getLexeme().equals(WaebricKeyword.ELSE)) {
 			tokens.next(); // Accept and skip "else" keyword
-			Statement elseStatement = null;
-			try {
-				// Parse "false" sub-statement
-				elseStatement = parseStatement();
-			} catch(SyntaxException e) {
-				reportUnexpectedToken(tokens.current(), "False statement", "\"else\" Statement");
-			}
+			Statement elseStatement = parseStatement(); // Parse "false" sub-statement
 			statement = new Statement.IfElse(predicate, trueStatement, elseStatement);
 		} else {
 			statement = new Statement.If(predicate, trueStatement);
@@ -160,21 +144,11 @@ class StatementParser extends AbstractParser {
 		statement.setVar(new IdCon(tokens.current()));
 		next(WaebricSymbol.COLON, "Each colon separator", "var \":\" Expression");
 		
-		try {
-			statement.setExpression(expressionParser.parseExpression());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Each expression", "each(Var:Expression)");
-		}
-		
+		statement.setExpression(expressionParser.parseExpression());
 		next(WaebricSymbol.RPARANTHESIS, "Each closure", "Expression \")\" Statement");
 		
 		// Parse sub-statement
-		try {
-			statement.setStatement(parseStatement());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Each sub-statement", "each(Var:Expression) Statement");
-		}
-		
+		statement.setStatement(parseStatement());
 		return statement;
 	}
 	
@@ -227,9 +201,8 @@ class StatementParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Statement.Comment parseCommentStatement() throws SyntaxException {
-		next(WaebricKeyword.COMMENT, "Comment keyword", "\"comment\"");
-		
 		Statement.Comment statement = new Statement.Comment();
+		next(WaebricKeyword.COMMENT, "Comment keyword", "\"comment\"");
 		next(WaebricTokenSort.STRING, "Comments text", "\"comments\" String");
 		StrCon comment = new StrCon(tokens.current().getLexeme().toString());
 		statement.setComment(comment);
@@ -262,15 +235,9 @@ class StatementParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Statement.Echo parseEchoExpressionStatement() throws SyntaxException {
-		next(WaebricKeyword.ECHO, "Echo keyword", "\"echo\"");
-		
 		Statement.Echo statement = new Statement.Echo();
-		try {
-			statement.setExpression(expressionParser.parseExpression());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Embedding echo", "\"echo\" Embedding");
-		}
-
+		next(WaebricKeyword.ECHO, "Echo keyword", "\"echo\"");
+		statement.setExpression(expressionParser.parseExpression());
 		next(WaebricSymbol.SEMICOLON, "Echo closure \";\"", "\"echo\" expression \";\"");
 		return statement;
 	}
@@ -281,15 +248,9 @@ class StatementParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Statement.CData parseCDataStatement() throws SyntaxException {
-		next(WaebricKeyword.CDATA, "Cdata keyword", "\"cdata\"");
-		
 		Statement.CData statement = new Statement.CData();
-		try {
-			statement.setExpression(expressionParser.parseExpression());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Embedding echo", "\"echo\" Expression");
-		}
-		
+		next(WaebricKeyword.CDATA, "Cdata keyword", "\"cdata\"");
+		statement.setExpression(expressionParser.parseExpression());
 		next(WaebricSymbol.SEMICOLON, "Cdata closure", "\"echo\" expression \";\"");
 		return statement;
 	}
@@ -444,13 +405,11 @@ class StatementParser extends AbstractParser {
 	 */
 	public Assignment.VarBind parseVarAssignment() throws SyntaxException {
 		Assignment.VarBind assignment = new Assignment.VarBind();
-		
 		next(WaebricTokenSort.IDCON, "Variable binding identifier", "IdCon \"=\"");
 		assignment.setIdentifier(new IdCon(tokens.current()));
 		next(WaebricSymbol.EQUAL_SIGN, "Variable binding \"=\"", "IdCon \"=\"");
 		assignment.setExpression(expressionParser.parseExpression());
 		next(WaebricSymbol.SEMICOLON, "Var binding closure", "IdCon \"=\" Expression \";\"");
-		
 		return assignment;
 	}
 	

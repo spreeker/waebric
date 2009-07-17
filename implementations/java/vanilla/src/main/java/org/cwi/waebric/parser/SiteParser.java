@@ -42,12 +42,9 @@ class SiteParser extends AbstractParser {
 	 */
 	public Site parseSite() throws SyntaxException {
 		current(WaebricKeyword.SITE, "Site begin", "\"site\" Mapping \"end\"");
-		
 		Site site = new Site();
 		site.setMappings(parseMappings());
-		
 		next(WaebricKeyword.END, "Site end", "\"site\" Mapping \"end\"");
-		
 		return site;
 	}
 	
@@ -147,15 +144,12 @@ class SiteParser extends AbstractParser {
 	 */
 	public String parseFileName() throws SyntaxException {
 		String name = "";
-		
+		// TODO: Create path element token
 		next(WaebricTokenSort.IDCON, "File name", "Name \".\" Extension");
 		name += tokens.current().getLexeme().toString() + "."; // Name
-
 		next(WaebricSymbol.PERIOD, "period", "name \".\" extension");
-		
 		next(WaebricTokenSort.IDCON, "File extension", "Name \".\" Extension");
 		name += tokens.current().getLexeme().toString(); // Extension
-		
 		return name;
 	}
 

@@ -123,14 +123,8 @@ class ExpressionParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Expression.VarExpression parseVarExpression() throws SyntaxException {
-		try {
-			next(WaebricTokenSort.IDCON, "Variable", "Var -> Expression");
-			return new Expression.VarExpression(new IdCon(tokens.current()));
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Var expression", "Var -> Expression");
-		}
-		
-		return null;
+		next(WaebricTokenSort.IDCON, "Variable", "Var -> Expression");
+		return new Expression.VarExpression(new IdCon(tokens.current()));
 	}
 	
 	/**
@@ -179,13 +173,8 @@ class ExpressionParser extends AbstractParser {
 				break; // ] marks the end of collection, quit loop
 			}
 			
-			try {
-				// Parse sub expression
-				expression.addExpression(parseExpression());
-			} catch(SyntaxException e) {
-				reportUnexpectedToken(tokens.current(), 
-						"Expression", "\"[\" { Expression }* \"]\" -> Expression");
-			}
+			// Parse sub expression
+			expression.addExpression(parseExpression());
 			
 			// While not end of expressions, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RBRACKET)) {
@@ -210,13 +199,8 @@ class ExpressionParser extends AbstractParser {
 				break; // End of expression collection found, break while
 			}
 			
-			try {
-				// Parse key value pair
-				expression.addKeyValuePair(parseKeyValuePair());
-			} catch(SyntaxException e) {
-				reportUnexpectedToken(tokens.current(), 
-						"Key value pair", "\"{\" { KeyValuePair \",\" }* \"}\"");
-			}
+			// Parse key value pair
+			expression.addKeyValuePair(parseKeyValuePair());
 			
 			// While not end of expressions, comma separator is expected
 			if(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.RCBRACKET)) {
@@ -234,22 +218,11 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public KeyValuePair parseKeyValuePair() throws SyntaxException {
 		KeyValuePair pair = new KeyValuePair();
-		
-		// Parse identifier
 		next(WaebricTokenSort.IDCON, "Identifier", "IdCon \":\" Expression -> KeyValuePair");
 		IdCon identifier = new IdCon(tokens.current());
 		pair.setIdentifier(identifier);
-		
 		next(WaebricSymbol.COLON, "Colon separator", "IdCon \":\" Expression -> KeyValuePair");
-		
-		try {
-			// Parse expression
-			pair.setExpression(parseExpression());
-		} catch(SyntaxException e) {
-			reportUnexpectedToken(tokens.current(), "Expression", 
-					"IdCon \":\" Expression -> KeyValuePair");
-		}
-		
+		pair.setExpression(parseExpression());
 		return pair;
 	}
 	

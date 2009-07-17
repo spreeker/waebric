@@ -71,7 +71,6 @@ class EmbeddingParser extends AbstractParser {
 		next(WaebricSymbol.DQUOTE, "Embedding opening quote \"", "\" TextChars* <");
 		PreText pre = new PreText(parseTextChars());
 		next(WaebricSymbol.LESS_THAN, "Embedding pre-text symbol <", "TextChars* < Embed");
-		
 		return pre;
 	}
 	
@@ -90,19 +89,11 @@ class EmbeddingParser extends AbstractParser {
 		// Determine type based on look-ahead information
 		if(isMarkup(1)) { // Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
-			try {
-				embed.setMarkup(markupParser.parseMarkup());
-			} catch(SyntaxException e) {
-				reportUnexpectedToken(tokens.current(), "Markup embedding", "Markup+ Markup");
-			}
+			embed.setMarkup(markupParser.parseMarkup());
 			return embed;
 		} else { // Markup* Expression -> Markup
 			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
-			try {
-				embed.setExpression(expressionParser.parseExpression());
-			} catch(SyntaxException e) {
-				reportUnexpectedToken(tokens.current(), "Expression embedding", "Markup+ Expression");
-			}
+			embed.setExpression(expressionParser.parseExpression());
 			return embed;
 		}
 	}
@@ -122,7 +113,6 @@ class EmbeddingParser extends AbstractParser {
 				// PostText is always closed with a double quote
 				PostText post = new PostText(text);
 				TextTail.PostTail tail = new TextTail.PostTail(post);
-
 				tokens.next(); // Accept " symbol and jump to next token
 				return tail;
 			} else {
@@ -164,7 +154,6 @@ class EmbeddingParser extends AbstractParser {
 		next(WaebricSymbol.GREATER_THAN, "Embedding mid-text start symbol >", "> TextChars* <");
 		MidText mid = new MidText(parseTextChars());
 		next(WaebricSymbol.LESS_THAN, "Embedding mid-text end symbol <", "> TextChars* <");
-		
 		return mid;
 	}
 	
