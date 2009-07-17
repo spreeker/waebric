@@ -9,6 +9,7 @@ using Parser.Ast.Functions;
 using Parser.Ast.Markup;
 using Common;
 using Parser.Ast.Statements;
+using Parser.Ast.Expressions;
 
 namespace Interpreter
 {
@@ -188,6 +189,160 @@ namespace Interpreter
             XHTMLWriter.AddAttribute("height", attribute.GetHeight().ToString());
         }
 
+        /// <summary>
+        /// Interpret SymExpression
+        /// </summary>
+        /// <param name="expression">SymExpression to interpret</param>
+        public override void Visit(SymExpression expression)
+        {
+            TextValue = expression.GetSym();
+        }
+
+        /// <summary>
+        /// Interpret TextExpression
+        /// </summary>
+        /// <param name="expression">TextExpression to interpret</param>
+        public override void Visit(TextExpression expression)
+        {
+            TextValue = expression.GetText();
+        }
+
+        /// <summary>
+        /// Interpret NumExpression
+        /// </summary>
+        /// <param name="expression">NumExpression to interpret</param>
+        public override void Visit(NumExpression expression)
+        {
+            TextValue = expression.GetNum().ToString();
+        }
+
+        /// <summary>
+        /// Interpret CatExpression
+        /// </summary>
+        /// <param name="expression">CatExpression to interpret</param>
+        public override void Visit(CatExpression expression)
+        {
+            //Concatenate two expressions
+            String tempExpressionText = "";
+            
+            //Visit left 
+            expression.GetLeftExpression().AcceptVisitor(this);
+            tempExpressionText += TextValue;
+
+            //Visit right
+            expression.GetRightExpression().AcceptVisitor(this);
+            tempExpressionText += TextValue;
+
+            TextValue = tempExpressionText;
+        }
+
+        /// <summary>
+        /// Interpret VarExpression
+        /// </summary>
+        /// <param name="expression">VarExpression to interpret</param>
+        public override void Visit(VarExpression expression)
+        {
+            //Check if variable does exist
+            String varName = expression.GetVariableIdentifier();
+            Expression check = SymbolTable.GetVariableDefinition(varName);
+            //Maybe an additional check should be placed here!!!! TO IMPLEMENT
+
+
+            if (check != null)
+            {   //Visit variable to retrieve current value
+                check.AcceptVisitor(this);
+            }
+            else
+            {
+                TextValue = "undef";
+            }
+
+        }
+
+        /// <summary>
+        /// Interpret FieldExpression
+        /// </summary>
+        /// <param name="expression">FieldExpression to interpret</param>
+        public override void Visit(FieldExpression expression)
+        {
+            //Retrieve expression of field
+            Expression expr = GetExpression(expression);
+            if (expr != null)
+            {
+                expr.AcceptVisitor(this);
+            }
+            else
+            {
+                TextValue = "undef";
+            }
+        }
+
+        /// <summary>
+        /// Interpret ListExpression
+        /// </summary>
+        /// <param name="expression">ListExpression to interpret</param>
+        public override void Visit(ListExpression expression)
+        {
+            //Convert list to textvalue
+            String tempList = "[";
+            for(int i = 0; i < expression.GetExpressions().Count; i++)
+            {
+                Expression currentExpression = (Expression) expression.GetExpressions().Get(i);
+
+                //Store Text and SymExpressions between " to see , as real separator
+                if (currentExpression.GetType() == typeof(TextExpression) || currentExpression.GetType() == typeof(SymExpression))
+                {
+                    tempList += "\"";
+                }
+
+                //Store value in tempList
+                currentExpression.AcceptVisitor(this);
+                tempList += TextValue;
+
+                if (currentExpression.GetType() == typeof(TextExpression) || currentExpression.GetType() == typeof(SymExpression))
+                {
+                    tempList += "\"";
+                }
+
+                //Add , seperator
+                if (i != (expression.GetExpressions().Count - 1))
+                {
+                    tempList += ",";
+                }
+            }
+
+            tempList += "]";
+            TextValue = tempList;
+        }
+
+        /// <summary>
+        /// Interpret RecordExpression
+        /// </summary>
+        /// <param name="expression">RecordExpression to interpret</param>
+        public override void Visit(RecordExpression expression)
+        {
+            //convert record to textvalue
+            String tempRecord = "{";
+            for (int i = 0; i < expression.GetRecords().Count; i++)
+            {
+                KeyValuePair pair = (KeyValuePair)expression.GetRecords().Get(i);
+
+                //Convert KeyValuePair to textual representation
+                tempRecord += pair.GetKey() + ":";
+                pair.GetValue().AcceptVisitor(this);
+                tempRecord += TextValue;
+
+                //Add seperator
+                if (i != (expression.GetRecords().Count - 1))
+                {
+                    tempRecord += ",";
+                }
+            }
+
+            tempRecord += "}";
+            TextValue = tempRecord;
+        }
+
         #endregion
 
         #region Private Methods
@@ -218,6 +373,31 @@ namespace Interpreter
                 return FunctionSymbolTable[function];
             }
             return SymbolTable;
+        }
+
+        private Expression GetExpression(FieldExpression expression)
+        {
+            Expression expr = expression.GetExpression();
+            //Get real expression, not a variable
+            while (expr.GetType() == typeof(VarExpression))
+            {
+                expr = SymbolTable.GetVariableDefinition(((VarExpression)expr).GetVariableIdentifier());
+            }
+
+            //Get specific record from recordExpression
+            if (expr.GetType() == typeof(RecordExpression))
+            {
+                RecordExpression record = (RecordExpression)expr;
+                ISyntaxNode[] recordArray = record.GetRecords().ToArray();
+                foreach (KeyValuePair pair in recordArray)
+                {
+                    if (pair.GetKey() == expression.GetIdentifier())
+                    {
+                        return pair.GetValue();
+                    }
+                }
+            }
+            return null;
         }
 
         #endregion
