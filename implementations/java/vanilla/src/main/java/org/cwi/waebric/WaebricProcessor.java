@@ -39,7 +39,7 @@ public class WaebricProcessor {
 		}
 
 		try {
-			System.out.println("Compiling " + path + "...");
+			System.out.println("Processing " + path + "...");
 
 			FileReader reader = new FileReader(path);
 			WaebricScanner scanner = new WaebricScanner(reader);
