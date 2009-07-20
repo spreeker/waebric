@@ -19,10 +19,6 @@ import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.*;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
-import org.cwi.waebric.parser.ast.token.IntegerLiteral;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
-import org.cwi.waebric.parser.ast.token.TokenNode;
 
 /**
  * Default implementation for node visiting, all visit functions delegate
@@ -100,11 +96,7 @@ public class DefaultNodeVisitor implements INodeVisitor {
 	public void visit(NatCon nat) { visitChildren(nat); }
 	public void visit(StrCon str) { visitChildren(str); }
 	public void visit(SymbolCon symbol) { visitChildren(symbol); }
-	public void visit(NodeList<?> list) { visitChildren(list); }
-	public void visit(SeparatedNodeList<?> list) { visitChildren(list); }
-	public void visit(CharacterLiteral literal) { visitChildren(literal); }
-	public void visit(IntegerLiteral literal) { visitChildren(literal); }
-	public void visit(StringLiteral literal) { visitChildren(literal); }
+	public void visit(AbstractSyntaxNodeList<?> list) { visitChildren(list); }
 	public void visit(TokenNode node) { visitChildren(node); }
 	
 	/**

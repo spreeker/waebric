@@ -16,7 +16,7 @@ import java.util.ListIterator;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements List<E> {
+public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements List<E> {
 
 	/**
 	 * Element collection
@@ -26,7 +26,7 @@ public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode i
 	/**
 	 * Construct syntax node list.
 	 */
-	public NodeList() {
+	public AbstractSyntaxNodeList() {
 		list =  new ArrayList<E>();
 	}
 
@@ -34,7 +34,7 @@ public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode i
 	 * Construct syntax node list.
 	 * @param list Collection of all elements
 	 */
-	public NodeList(List<E> list) {
+	public AbstractSyntaxNodeList(List<E> list) {
 		this.list = list;
 	}
 	
@@ -61,8 +61,8 @@ public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode i
 	}
 	
 	@Override
-	public NodeList<E> clone() {
-		return new NodeList<E>(new ArrayList<E>(list));
+	public AbstractSyntaxNodeList<E> clone() {
+		return new AbstractSyntaxNodeList<E>(new ArrayList<E>(list));
 	}
 	
 	public boolean contains(Object o) {
@@ -75,8 +75,8 @@ public class NodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode i
 	
 	@Override
 	public boolean equals(Object arg) {
-		if(arg instanceof NodeList) {
-			NodeList<?> nodeList = (NodeList<?>) arg;
+		if(arg instanceof AbstractSyntaxNodeList) {
+			AbstractSyntaxNodeList<?> nodeList = (AbstractSyntaxNodeList<?>) arg;
 			
 			// Check if size matches
 			if(nodeList.size() != this.size()) { return false; }

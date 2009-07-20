@@ -6,7 +6,7 @@ import java.util.List;
 import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.token.CharacterLiteral;
@@ -76,7 +76,7 @@ public abstract class Formals extends AbstractSyntaxNode {
 
 		@Override
 		public List<IdCon> getIdentifiers() {
-			return new NodeList<IdCon>();
+			return new AbstractSyntaxNodeList<IdCon>();
 		}
 		
 		@Override

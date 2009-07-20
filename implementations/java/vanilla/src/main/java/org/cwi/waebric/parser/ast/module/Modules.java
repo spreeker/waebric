@@ -2,7 +2,7 @@ package org.cwi.waebric.parser.ast.module;
 
 import java.util.Collection;
 
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 
 /**
  * Module* -> Modules
@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.NodeList;
  * @author Jeroen van Schagen
  * @date 19-05-2009
  */
-public class Modules extends NodeList<Module> {
+public class Modules extends AbstractSyntaxNodeList<Module> {
 
 	/**
 	 * Construct empty modules.

@@ -5,7 +5,7 @@ import java.util.List;
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.token.StringLiteral;
@@ -21,7 +21,7 @@ public class FunctionDef extends AbstractSyntaxNode {
 	private static final String DEF_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.DEF);
 	private static final String END_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.END);
 	
-	private NodeList<Statement> statements = new NodeList<Statement>();
+	private AbstractSyntaxNodeList<Statement> statements = new AbstractSyntaxNodeList<Statement>();
 	
 	private IdCon identifier;
 	private Formals formals;
