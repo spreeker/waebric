@@ -52,8 +52,12 @@ namespace Interpreter
             if (ContainsMainFunction(root))
             {
                 //TODO!!! DETERMINE SITE TO WRITE 
-                XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(Writer, SymbolTable);
+                XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(SymbolTable);
                 SymbolTable.GetFunctionDefinition("main").AcceptVisitor(xhtmlVisitor);
+
+                //Write xhtml output
+                XHTMLStreamWriter writer = new XHTMLStreamWriter(Writer, XHTMLStreamWriter.DocType.TRANSITIONAL, xhtmlVisitor.GetTree());
+                writer.WriteStream();
             }
 
             //Interpret all sites an write to files
@@ -68,8 +72,12 @@ namespace Interpreter
 
                         //Determine site path and open writer and lets interpret it
                         Writer = CreateOutputStream(mapping.GetPath().ToString());
-                        XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(Writer, SymbolTable);
+                        XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(SymbolTable);
                         markup.AcceptVisitor(xhtmlVisitor);
+
+                        //Write xhtml output
+                        XHTMLStreamWriter writer = new XHTMLStreamWriter(Writer, XHTMLStreamWriter.DocType.TRANSITIONAL, xhtmlVisitor.GetTree());
+                        writer.WriteStream();
                     }
                 }
             }

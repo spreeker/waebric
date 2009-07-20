@@ -14,8 +14,9 @@ namespace Interpreter
     {
         #region Private Members
 
+        private XHTMLElement Root;
+        private XHTMLElement Current;
         private XhtmlTextWriter XhtmlWriter;
-        private Dictionary<String, String> AttributeMap;
 
         #endregion
 
@@ -35,89 +36,78 @@ namespace Interpreter
         /// </summary>
         /// <param name="writer">Writer to write to</param>
         /// <param name="docType">DocType of XHTML document</param>
-        public XHTMLStreamWriter(TextWriter writer, DocType docType)
+        public XHTMLStreamWriter(TextWriter writer, DocType docType, XHTMLElement tree)
         {
             XhtmlWriter = new XhtmlTextWriter(writer, "\t");
-            AttributeMap = new Dictionary<String, String>();
+            Root = tree;
 
             //Write doctype before starting document
             WriteDocType(docType);
         }
-        
+
         /// <summary>
-        /// Add the specified attribute to an buffer before WriteTag has been called.
+        /// Writes the complete tree to an HTML file
         /// </summary>
-        /// <param name="name">Name of attribute</param>
-        /// <param name="value">Value of attribute</param>
-        public void AddAttribute(String name, String value)
+        public void WriteStream()
         {
-            AttributeMap.Add(name, value);
+            Visit(Root, 0);
         }
 
-        /// <summary>
-        /// Write specified tag to stream, including added attributes.
-        /// When it is an empty tag like br, closing is also performed, otherwise CloseTag should be called.
-        /// </summary>
-        /// <param name="tag">Tag to write</param>
-        public void WriteTag(String tag)
+        public void Visit(XHTMLElement element, int level)
         {
-            //Write tag
-            XhtmlWriter.WriteBeginTag(tag);
-
-            //Write attributes
-            foreach (KeyValuePair<String, String> pair in AttributeMap)
+            //Write element with attributes
+            XhtmlWriter.Indent = level;
+            XhtmlWriter.WriteBeginTag(element.GetTag());
+            foreach(KeyValuePair<String,String> pair in element.GetAttributes())
             {
                 XhtmlWriter.WriteAttribute(pair.Key, pair.Value);
             }
-            AttributeMap.Clear();
-
-            //Determine closing type
-            if (IsEmptyElement(tag))
-            {   //Use /> closing
-                XhtmlWriter.Write(HtmlTextWriter.SelfClosingTagEnd);
-            }
-            else
-            {   //Use > closing
-                XhtmlWriter.Write(HtmlTextWriter.TagRightChar);
-            }
-
-            //\n to make layout better
-            XhtmlWriter.WriteLine();
-
-            //Flush XHTML writer buffer
-            XhtmlWriter.Flush();
-        }
-
-        /// <summary>
-        /// Write the specified value to stream, like text or something else
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <param name="Encoding">Use encoding</param>
-        public void Write(String value, bool Encoding)
-        {
-            if (Encoding)
-            {
-                XhtmlWriter.WriteEncodedText(value);
+            
+            if(IsEmptyElement(element.GetTag()))
+            {   //Nothing inside element, so write tag end
+                XhtmlWriter.Write(XhtmlTextWriter.SelfClosingTagEnd);
+                XhtmlWriter.WriteLine();
             }
             else
             {
-                XhtmlWriter.Write(value);
-            }
-            XhtmlWriter.Flush();
-        }
+                //Write tag opening closing
+                XhtmlWriter.Write(XhtmlTextWriter.TagRightChar);
 
-        /// <summary>
-        /// Close specified tag, emptytags are ignored
-        /// </summary>
-        /// <param name="tag">Tag to close</param>
-        public void WriteCloseTag(String tag)
-        {
-            if (!IsEmptyElement(tag))
-            {
-                XhtmlWriter.WriteEndTag(tag);
+                //Write content
+                XhtmlWriter.Write(element.GetContent());
+                XhtmlWriter.WriteLine();
+
+                //Visit children
+                foreach(XHTMLElement child in element.GetChildren())
+                {
+                    Visit(child, level+1);
+                }
+                
+                //Write closing tag
+                XhtmlWriter.WriteEndTag(element.GetTag());
                 XhtmlWriter.WriteLine();
                 XhtmlWriter.Flush();
             }
+        }
+        /// <summary>
+        /// Write CData
+        /// </summary>
+        /// <param name="comment">Comment to write in cdata</param>
+        public void WriteCData(String comment)
+        {
+            //TO IMPLEMENT
+        }
+
+        /// <summary>
+        /// Write comment <!-- this is a comment -->
+        /// </summary>
+        /// <param name="comment">Comment to write</param>
+        public void WriteComment(String comment)
+        {
+            XhtmlWriter.Write("<!-- ");
+            XhtmlWriter.Write(comment);
+            XhtmlWriter.Write(" -->");
+            XhtmlWriter.WriteLine();
         }
 
         #endregion

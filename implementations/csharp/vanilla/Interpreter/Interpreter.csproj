@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="WaebricInterpreter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XHTMLElement.cs" />
     <Compile Include="XHTMLStreamWriter.cs" />
     <Compile Include="XHTMLVisitor.cs" />
   </ItemGroup>

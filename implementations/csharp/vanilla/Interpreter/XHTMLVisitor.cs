@@ -10,6 +10,7 @@ using Parser.Ast.Markup;
 using Common;
 using Parser.Ast.Statements;
 using Parser.Ast.Expressions;
+using Parser.Ast.Predicates;
 
 namespace Interpreter
 {
@@ -20,10 +21,10 @@ namespace Interpreter
     {
         #region Private Members
 
-        private StreamWriter Writer;                                            //Writer to write xhtml to
+        //private StreamWriter Writer;                                            //Writer to write xhtml to
         private SymbolTable SymbolTable;                                        //Table which holds functions and variables
-        private XHTMLStreamWriter XHTMLWriter;                                  //Writer wich writes xhtml
-        private bool StartTagWrited = false;                                    //Used to determine if start of tag has been writed
+        private XHTMLElement Root;                                              //Root element of XHTMLTree
+        private XHTMLElement Current;                                           //Pointer to current element in XHTMLTree
         private Dictionary<FunctionDefinition, SymbolTable> FunctionSymbolTable;//Stores symboltables per function
         private String TextValue = "";                                          //Buffer used for buffering values
 
@@ -34,14 +35,14 @@ namespace Interpreter
         /// <summary>
         /// Constructor which creates an XHTMLVisitor with specified outputstream and prefilled symboltable
         /// </summary>
-        /// <param name="outputStream">Stream to write xhtml to</param>
         /// <param name="symbolTable">SymbolTable to use</param>
-        public XHTMLVisitor(StreamWriter outputStream, SymbolTable symbolTable)
+        /// 
+        public XHTMLVisitor(SymbolTable symbolTable)
         {
             //Prepare members to start visiting ISyntaxNodes
-            Writer = outputStream;
+            //Writer = outputStream;
             SymbolTable = symbolTable;
-            XHTMLWriter = new XHTMLStreamWriter(Writer, XHTMLStreamWriter.DocType.TRANSITIONAL);
+            //XHTMLWriter = new XHTMLStreamWriter(Writer, XHTMLStreamWriter.DocType.TRANSITIONAL);
             FunctionSymbolTable = new Dictionary<FunctionDefinition, SymbolTable>();
         }
 
@@ -51,23 +52,12 @@ namespace Interpreter
         /// <param name="functionDefinition">FunctionDefinition to interpret</param>
         public override void Visit(FunctionDefinition functionDefinition)
         {
-            //Create XHTML tag when this function is root function
-            bool root = false;
-		    if(functionDefinition.GetStatements().Count > 0 && ! StartTagWrited)
-            {
-			    WriteBeginXHTMLTag();
-                root = true;
-		    }
-
             //Interpret statements
+            XHTMLElement temp = Current;
             foreach(Statement statement in functionDefinition.GetStatements())
             {
+                Current = temp;
                 statement.AcceptVisitor(this);
-            }
-
-            if (root)
-            {   //Write html end teg, because root function has been interpreted
-                XHTMLWriter.WriteCloseTag("html");
             }
         }
 
@@ -107,6 +97,9 @@ namespace Interpreter
             else
             {   //Dealing with an Tag
                 String tag = markup.GetDesignator().GetIdentifier();
+
+                //Write tag with retrieved attributes
+                AddTag(new XHTMLElement(tag, Current));
                 
                 //Visit the attributes
                 foreach (Parser.Ast.Markup.Attribute attribute in markup.GetDesignator().GetAttributes())
@@ -115,22 +108,29 @@ namespace Interpreter
                 }
 
                 //Interpret arguments also as attributes
+                String attributeValue = "";
                 foreach (Argument argument in markup.GetArguments())
                 {
                     if (argument.GetType() == typeof(AttrArgument))
                     {
+                        //Interpret expression to retrieve value
                         ((AttrArgument)argument).GetExpression().AcceptVisitor(this);
                         
-
+                        //Store attribute
+                        String attr = ((AttrArgument)argument).GetIdentifier();
+                        Current.AddAttribute(attr, TextValue);
                     }
                     else if (argument.GetType() == typeof(ExpressionArgument))
                     {
+                        //Interpret expression
                         ((ExpressionArgument)argument).GetExpression().AcceptVisitor(this);
+                        attributeValue += TextValue;
+                        if (attributeValue == "undef")
+                        {
+                            attributeValue = "UNDEFINED";
+                        }
                     }
                 }
-
-                //Write tag with retrieved attributes
-                XHTMLWriter.WriteTag(tag);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Interpreter
         /// <param name="attribute">ClassAttribute to interpret</param>
         public override void Visit(ClassAttribute attribute)
         {   //Add class attribute
-            XHTMLWriter.AddAttribute("class", attribute.GetClass());
+            Current.AddAttribute("class", attribute.GetClass());
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Interpreter
         /// <param name="attribute">WidthAttribute to interpret</param>
         public override void Visit(WidthAttribute attribute)
         {   //Add height attribute
-            XHTMLWriter.AddAttribute("width", attribute.GetWidth().ToString());
+            Current.AddAttribute("width", attribute.GetWidth().ToString());
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Interpreter
         /// <param name="attribute">IdAttribute to interpret</param>
         public override void Visit(IdAttribute attribute)
         {   //Add id attribute
-            XHTMLWriter.AddAttribute("id", attribute.GetId());
+            Current.AddAttribute("id", attribute.GetId());
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Interpreter
         /// <param name="attribute">NameAttribute to interpret</param>
         public override void Visit(NameAttribute attribute)
         {   //Add name attribute
-            XHTMLWriter.AddAttribute("name", attribute.GetName());
+            Current.AddAttribute("name", attribute.GetName());
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Interpreter
         /// <param name="attribute">TypeAttribute to interpret</param>
         public override void Visit(TypeAttribute attribute)
         {   //Add type attribute
-            XHTMLWriter.AddAttribute("type", attribute.GetType());
+            Current.AddAttribute("type", attribute.GetType());
         }
         
         /// <summary>
@@ -185,8 +185,8 @@ namespace Interpreter
         /// <param name="attribute">Width_HeightAttribute to interpret</param>
         public override void Visit(Width_HeightAttribute attribute)
         {   //Add width and height attribute
-            XHTMLWriter.AddAttribute("width", attribute.GetWidth().ToString());
-            XHTMLWriter.AddAttribute("height", attribute.GetHeight().ToString());
+            Current.AddAttribute("width", attribute.GetWidth().ToString());
+            Current.AddAttribute("height", attribute.GetHeight().ToString());
         }
 
         /// <summary>
@@ -343,6 +343,62 @@ namespace Interpreter
             TextValue = tempRecord;
         }
 
+        /// <summary>
+        /// Interpret IfStatement
+        /// </summary>
+        /// <param name="statement">IfStatement to interpret</param>
+        public override void Visit(IfStatement statement)
+        {
+            if (EvaluatePredicate(statement.GetPredicate()))
+            {
+                statement.GetTrueStatement().AcceptVisitor(this);
+            }
+        }
+
+        /// <summary>
+        /// Interpret IfElseStatement
+        /// </summary>
+        /// <param name="statement">IfElseStatement to interpret</param>
+        public override void Visit(IfElseStatement statement)
+        {
+            if (EvaluatePredicate(statement.GetPredicate()))
+            {
+                statement.GetTrueStatement().AcceptVisitor(this);
+            }
+            else
+            {
+                statement.GetFalseStatement().AcceptVisitor(this);
+            }
+        }
+
+        /// <summary>
+        /// Interpret BlockStatement
+        /// </summary>
+        /// <param name="statement">BlockStatement to interpret</param>
+        public override void Visit(BlockStatement statement)
+        {
+            XHTMLElement temp = Current;
+            foreach(Statement currentStatement in statement.GetStatements())
+            {
+                Current = temp;
+                currentStatement.AcceptVisitor(this);
+            }
+        }
+
+        /// <summary>
+        /// Interpret CommentStatement
+        /// </summary>
+        /// <param name="statement"></param>
+        public override void Visit(CommentStatement statement)
+        {
+            //XHTMLWriter.WriteComment(statement.GetCommentString());
+        }
+
+        public XHTMLElement GetTree()
+        {
+            return Root;
+        }
+
         #endregion
 
         #region Private Methods
@@ -360,10 +416,9 @@ namespace Interpreter
         private void WriteBeginXHTMLTag()
         {
             //Write html tag with xmlns and lang attribute by default
-            StartTagWrited = true;
-            XHTMLWriter.AddAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-            XHTMLWriter.AddAttribute("lang", "en");
-            XHTMLWriter.WriteTag("html");
+            AddTag(new XHTMLElement("html", null));
+            Current.AddAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+            Current.AddAttribute("lang", "en");
         }
 
         private SymbolTable GetSymbolTableOfFunction(FunctionDefinition function)
@@ -398,6 +453,90 @@ namespace Interpreter
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Method which evaluates an predicate and returns true or false
+        /// </summary>
+        /// <param name="predicate">Predicate to evaluate</param>
+        /// <returns>True if predicate is true, otherwise false</returns>
+        private bool EvaluatePredicate(Predicate predicate)
+        {
+            if (predicate.GetType() == typeof(IsPredicate))
+            {   //Evaluate Expression Predicate
+                IsPredicate isPredicate = (IsPredicate)predicate;
+                Expression expression = isPredicate.GetExpression();
+                
+                //If right type return true, otherwise false
+                if (isPredicate.GetType().GetType() == typeof(StringType))
+                {
+                    return isPredicate.GetExpression().GetType() == typeof(TextExpression);
+                }
+                else if (isPredicate.GetType().GetType() == typeof(ListType))
+                {
+                    return isPredicate.GetExpression().GetType() == typeof(ListExpression);
+                }
+                else if (isPredicate.GetType().GetType() == typeof(RecordType))
+                {
+                    return isPredicate.GetExpression().GetType() == typeof(RecordExpression);
+                }
+                else
+                {   //No match between types which could be checked, so false
+                    return false;
+                }
+            }
+            else if (predicate.GetType() == typeof(ExpressionPredicate))
+            {   //Evaluate Expression Predicate
+                ExpressionPredicate expressionPredicate = (ExpressionPredicate)predicate;
+                Expression expression = expressionPredicate.GetExpression();
+
+                if (expression.GetType() == typeof(FieldExpression))
+                {   //Check if specific field exists in record (not null)
+                    Expression expr = GetExpression((FieldExpression)expression);
+                    return expr != null;
+                }
+                else if (expression.GetType() == typeof(VarExpression))
+                {   //Check if specific variable is defined
+                    VarExpression varExpr = (VarExpression)expression;
+                    return SymbolTable.ContainsVariable(varExpr.GetVariableIdentifier());
+                }
+                else
+                {   //Other expressions are always true, because they doesn't refer to something
+                    return true;
+                }
+            }
+            else if (predicate.GetType() == typeof(AndPredicate))
+            {   //Evaluate And Predicate
+                AndPredicate andPredicate = (AndPredicate)predicate;
+                return EvaluatePredicate(andPredicate.GetLeftPredicate()) && EvaluatePredicate(andPredicate.GetLeftPredicate());
+            }
+            else if (predicate.GetType() == typeof(OrPredicate))
+            {   //Evaluate Or Predicate
+                OrPredicate orPredicate = (OrPredicate) predicate;
+                return EvaluatePredicate(orPredicate.GetLeftPredicate()) || EvaluatePredicate(orPredicate.GetRightPredicate());
+            }
+            else if (predicate.GetType() == typeof(NotPredicate))
+            {   //Evaluate Not Predicate
+                NotPredicate notPredicate = (NotPredicate) predicate;
+                return !EvaluatePredicate(notPredicate);
+            }
+            return false;
+        }
+
+        private void AddTag(XHTMLElement element)
+        {
+            //If no root element, new element is root
+            if (Root == null)
+            {
+                Root = element;
+                Current = Root;
+                return;
+            }
+            
+            //Add element as child of current element
+            Current.AddChild(element);
+            //Set current to last added element
+            Current = element;
         }
 
         #endregion
