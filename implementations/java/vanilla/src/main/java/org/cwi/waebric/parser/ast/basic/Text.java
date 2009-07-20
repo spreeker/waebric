@@ -1,10 +1,7 @@
 package org.cwi.waebric.parser.ast.basic;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "\"" TextChar* "\"" -> Text<br>
@@ -15,26 +12,14 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  */
 public class Text extends AbstractSyntaxNode {
 	
-	private StringLiteral literal;
+	private String value;
 
-	public Text(StringLiteral string) {
-		this.literal = string;
+	public Text(String value) {
+		this.value = value;
 	}
 	
-	public Text(String string) {
-		this.literal = new StringLiteral(string);
-	}
-	
-	public StringLiteral getLiteral() {
-		return literal;
-	}
-	
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] {
-			new CharacterLiteral(WaebricSymbol.DQUOTE),
-			literal,
-			new CharacterLiteral(WaebricSymbol.DQUOTE)
-		};
+	public String getLiteral() {
+		return value;
 	}
 	
 	@Override

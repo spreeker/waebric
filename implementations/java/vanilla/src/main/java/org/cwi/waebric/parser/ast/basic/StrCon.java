@@ -1,10 +1,7 @@
 package org.cwi.waebric.parser.ast.basic;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * [\"] StringChar* [\"] -> StrCon<br>
@@ -22,48 +19,29 @@ public class StrCon extends AbstractSyntaxNode {
 	/**
 	 * String literal value.
 	 */
-	private StringLiteral text;
+	private String text;
 
 	/**
 	 * Construct empty string.
 	 */
-	public StrCon() { this(""); }
+	public StrCon() { 
+		this("");
+	}
 	
 	/**
 	 * Construct string based on java string instance.
 	 * @param string
 	 */
-	public StrCon(String string) {
-		this.text = new StringLiteral(string);
-	}
-	
-	/**
-	 * Construct string based on literal.
-	 * @param string
-	 */
-	public StrCon(StringLiteral string) {
-		this.text = string;
+	public StrCon(String text) {
+		this.text = text;
 	}
 	
 	/**
 	 * Retrieve literal.
 	 * @return
 	 */
-	public StringLiteral getLiteral() {
+	public String getLiteral() {
 		return text;
-	}
-	
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] {
-			new CharacterLiteral(WaebricSymbol.DQUOTE),
-			text,
-			new CharacterLiteral(WaebricSymbol.DQUOTE)
-		};
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return text.equals(obj);
 	}
 	
 	@Override

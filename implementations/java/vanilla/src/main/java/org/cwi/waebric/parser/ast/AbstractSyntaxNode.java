@@ -10,17 +10,19 @@ package org.cwi.waebric.parser.ast;
 public abstract class AbstractSyntaxNode {
 	
 	/**
-	 * Retrieve nodes children from parse tree.
-	 * @return Children
-	 */
-	public abstract AbstractSyntaxNode[] getChildren();
-	
-	/**
 	 * Visit node using a node visitor.
 	 * @param visitor
 	 * @param arg
 	 */
 	public abstract void accept(INodeVisitor visitor);
+	
+	/**
+	 * Retrieve nodes children from parse tree.
+	 * @return Children
+	 */
+	public AbstractSyntaxNode[] getChildren() {
+		return new AbstractSyntaxNode[] { /* No children */ };
+	}
 	
 	@Override
 	public String toString() {
