@@ -2,15 +2,13 @@ package org.cwi.waebric.parser.ast.expression;
 
 import java.util.List;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
 import org.cwi.waebric.parser.ast.basic.Text;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * Expression
@@ -143,10 +141,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class ListExpression extends Expression {
 
-		private SeparatedNodeList<Expression> expressions;
+		private AbstractSyntaxNodeList<Expression> expressions;
 		
 		public ListExpression() {
-			expressions = new SeparatedNodeList<Expression>(WaebricSymbol.COMMA);
+			expressions = new AbstractSyntaxNodeList<Expression>();
 		}
 		
 		public boolean addExpression(Expression expression) {
@@ -158,11 +156,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-				new CharacterLiteral(WaebricSymbol.LBRACKET),
-				expressions,
-				new CharacterLiteral(WaebricSymbol.RBRACKET)
-			};
+			return new AbstractSyntaxNode[] { expressions };
 		}
 		
 		@Override
@@ -177,10 +171,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class RecordExpression extends Expression {
 
-		private SeparatedNodeList<KeyValuePair> pairs;
+		private AbstractSyntaxNodeList<KeyValuePair> pairs;
 		
 		public RecordExpression() {
-			pairs = new SeparatedNodeList<KeyValuePair>(WaebricSymbol.COMMA);
+			pairs = new AbstractSyntaxNodeList<KeyValuePair>();
 		}
 		
 		public boolean addKeyValuePair(KeyValuePair pair) {
@@ -202,11 +196,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-				new CharacterLiteral(WaebricSymbol.LCBRACKET),
-				pairs,
-				new CharacterLiteral(WaebricSymbol.RCBRACKET)
-			};
+			return new AbstractSyntaxNode[] { pairs	};
 		}
 		
 		@Override
@@ -248,11 +238,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-				left,
-				new CharacterLiteral(WaebricSymbol.PLUS),
-				right
-			};
+			return new AbstractSyntaxNode[] { left, right };
 		}
 		
 		@Override
@@ -294,11 +280,7 @@ public abstract class Expression extends AbstractSyntaxNode {
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				expression,
-				new CharacterLiteral(WaebricSymbol.PERIOD),
-				identifier
-			};
+			return new AbstractSyntaxNode[] { expression, identifier };
 		}
 		
 		@Override

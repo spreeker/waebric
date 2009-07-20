@@ -104,15 +104,15 @@ public class TestMarkupParser {
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.WidthAttribute attributen = (Attribute.WidthAttribute) parser.parseAttribute();
-		assertEquals(99, attributen.getWidth().getLiteral().toInteger());
+		assertEquals(99, attributen.getWidth().getValue());
 		
 		// Double natural attribute
 		iterator = TestUtilities.quickScan("@99%12");
 		parser = new MarkupParser(iterator, exceptions);
 		
 		Attribute.WidthHeightAttribute attributedn = (Attribute.WidthHeightAttribute) parser.parseAttribute();
-		assertEquals(99, attributedn.getWidth().getLiteral().toInteger());
-		assertEquals(12, attributedn.getHeight().getLiteral().toInteger());
+		assertEquals(99, attributedn.getWidth().getValue());
+		assertEquals(12, attributedn.getHeight().getValue());
 	}
 	
 	@Test

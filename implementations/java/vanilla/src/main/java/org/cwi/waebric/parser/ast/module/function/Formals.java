@@ -3,13 +3,10 @@ package org.cwi.waebric.parser.ast.module.function;
 import java.util.Collection;
 import java.util.List;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
-import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * @see RegularFormals
@@ -29,14 +26,14 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 */
 	public static class RegularFormal extends Formals {
 		
-		private SeparatedNodeList<IdCon> identifiers;
+		private AbstractSyntaxNodeList<IdCon> identifiers;
 		
 		public RegularFormal() {
-			this.identifiers = new SeparatedNodeList<IdCon>(WaebricSymbol.COMMA);
+			this.identifiers = new AbstractSyntaxNodeList<IdCon>();
 		}
 		
 		public RegularFormal(Collection<IdCon> args) {
-			this.identifiers = new SeparatedNodeList<IdCon>(WaebricSymbol.COMMA);
+			this.identifiers = new AbstractSyntaxNodeList<IdCon>();
 			this.identifiers.addAll(args);
 		}
 
@@ -44,16 +41,12 @@ public abstract class Formals extends AbstractSyntaxNode {
 			return identifiers.add(identifier);
 		}
 		
-		public List<IdCon> getIdentifiers() {
+		public AbstractSyntaxNodeList<IdCon> getIdentifiers() {
 			return identifiers.clone();
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
-				identifiers,
-				new CharacterLiteral(WaebricSymbol.RPARANTHESIS)
-			};
+			return new AbstractSyntaxNode[] { getIdentifiers() };
 		}
 		
 		@Override
@@ -69,10 +62,6 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 * @date 09-06-2009
 	 */
 	public static class EmptyFormal extends Formals {
-		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[]{};
-		}
 
 		@Override
 		public List<IdCon> getIdentifiers() {

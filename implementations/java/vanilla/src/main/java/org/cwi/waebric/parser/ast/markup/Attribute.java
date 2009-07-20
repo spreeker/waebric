@@ -1,11 +1,9 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * Waebric provides shorthand notation for common XHTML attributes.<br><br>
@@ -55,10 +53,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.PERIOD), 
-					identifier
-				};
+			return new AbstractSyntaxNode[] { identifier };
 		}
 
 	}
@@ -94,10 +89,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.NUMBER_SIGN), 
-					identifier
-				};
+			return new AbstractSyntaxNode[] { identifier };
 		}
 		
 	}
@@ -133,10 +125,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.DOLLAR_SIGN), 
-					identifier
-				};
+			return new AbstractSyntaxNode[] { identifier };
 		}
 		
 	}
@@ -172,10 +161,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.COLON), 
-					identifier
-				};
+			return new AbstractSyntaxNode[] { identifier };
 		}
 		
 	}
@@ -211,10 +197,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.AT_SIGN), 
-					width
-				};
+			return new AbstractSyntaxNode[] { width	};
 		}
 		
 	}
@@ -260,12 +243,7 @@ public abstract class Attribute extends AbstractSyntaxNode {
 
 		@Override
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-					new CharacterLiteral(WaebricSymbol.AT_SIGN), 
-					width,
-					new CharacterLiteral(WaebricSymbol.PERCENT_SIGN),
-					height
-				};
+			return new AbstractSyntaxNode[] { width, height	};
 		}
 		
 	}

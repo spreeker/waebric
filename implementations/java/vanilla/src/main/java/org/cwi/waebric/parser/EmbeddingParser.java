@@ -3,7 +3,7 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -11,7 +11,6 @@ import org.cwi.waebric.parser.ast.statement.embedding.MidText;
 import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -81,7 +80,7 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public Embed parseEmbed() throws SyntaxException {	
 		// Parse mark-up tokens
-		NodeList<Markup> markups = new NodeList<Markup>();
+		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 			markups.add(markupParser.parseMarkup());
 		}
@@ -105,7 +104,7 @@ class EmbeddingParser extends AbstractParser {
 	 */
 	public TextTail parseTextTail() throws SyntaxException {
 		next(WaebricSymbol.GREATER_THAN, "Embedding tail symbol \">\"", "Embed > TextChars*");
-		StringLiteral text = parseTextChars();
+		String text = parseTextChars();
 		
 		// Determine tail type based on look-ahead information
 		if(tokens.hasNext()) {
@@ -161,7 +160,7 @@ class EmbeddingParser extends AbstractParser {
 	 * 
 	 * @return
 	 */
-	public StringLiteral parseTextChars() {
+	public String parseTextChars() {
 		String data = "";
 		
 		while(tokens.hasNext() && tokens.peek(1).getSort() == WaebricTokenSort.TEXT) {
@@ -170,7 +169,7 @@ class EmbeddingParser extends AbstractParser {
 			tokens.next(); // Iterate to next token
 		}
 		
-		return new StringLiteral(data);
+		return data;
 	}
 	
 	/**

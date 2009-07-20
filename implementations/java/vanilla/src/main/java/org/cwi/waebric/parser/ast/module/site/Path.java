@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.module.site;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * File path
@@ -12,7 +11,7 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  */
 public class Path extends AbstractSyntaxNode {
 
-	private StringLiteral path;
+	private String path;
 	
 	/**
 	 * Default constructor
@@ -23,24 +22,21 @@ public class Path extends AbstractSyntaxNode {
 	 * Construct path based on string value
 	 * @param value
 	 */
-	public Path(String value) { path = new StringLiteral(value); }
+	public Path(String path) { 
+		this.path = path;
+	}
 	
-	public StringLiteral getValue() {
+	public String getValue() {
 		return path;
 	}
 	
-	public void setValue(StringLiteral path) {
+	public void setValue(String path) {
 		this.path = path;
 	}
 	
 	@Override
 	public void accept(INodeVisitor visitor) {
 		this.accept(visitor);
-	}
-	
-	@Override
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { path };
 	}
 	
 }

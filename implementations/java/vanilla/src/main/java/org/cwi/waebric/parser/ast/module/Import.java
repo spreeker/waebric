@@ -1,9 +1,7 @@
 package org.cwi.waebric.parser.ast.module;
 
-import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "import" ModuleId -> Import
@@ -12,9 +10,7 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  * @date 20-05-2009
  */
 public class Import extends AbstractSyntaxNode {
-	
-	private static final String IMPORT_KEYWORD = WaebricKeyword.IMPORT.name().toLowerCase();
-	
+		
 	private ModuleId identifier;
 
 	public ModuleId getIdentifier() {
@@ -26,10 +22,7 @@ public class Import extends AbstractSyntaxNode {
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { 
-			new StringLiteral(IMPORT_KEYWORD), 
-			identifier
-		};
+		return new AbstractSyntaxNode[] { identifier };
 	}
 	
 	@Override

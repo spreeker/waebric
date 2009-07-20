@@ -43,7 +43,7 @@ public class TestModuleParser {
 		ModuleId moduleId = parser.parseModuleId();
 		
 		// Assertions
-		assertEquals(7, moduleId.getChildren().length); // Four elements and three period separators
+		assertEquals(4, moduleId.getChildren().length); // Four elements and three period separators
 		assertEquals("org", moduleId.get(0).getToken().getLexeme().toString());
 		assertEquals("cwi", moduleId.get(1).getToken().getLexeme().toString());
 		assertEquals("waebric", moduleId.get(2).getToken().getLexeme().toString());
@@ -58,8 +58,7 @@ public class TestModuleParser {
 		Module module = parser.parseModule();
 		
 		// Assertions
-		assertEquals("module", module.getChildren()[0].toString());
-		assertEquals(ModuleId.class, module.getChildren()[1].getClass());
+		assertEquals(ModuleId.class, module.getChildren()[0].getClass());
 		assertEquals(1, module.getImports().size());
 		assertEquals(1, module.getSites().size());
 		assertEquals(1, module.getFunctionDefinitions().size());
@@ -73,8 +72,7 @@ public class TestModuleParser {
 		Import imprt = parser.parseImport();
 		
 		// Assertions
-		assertEquals("import", imprt.getChildren()[0].toString());
-		assertEquals(ModuleId.class, imprt.getChildren()[1].getClass());
+		assertEquals(ModuleId.class, imprt.getChildren()[0].getClass());
 	}
 
 }

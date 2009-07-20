@@ -1,10 +1,8 @@
 package org.cwi.waebric.parser.ast.module.site;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * Path ":" Markup -> Mapping
@@ -35,11 +33,7 @@ public class Mapping extends AbstractSyntaxNode {
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { 
-			path, 
-			new CharacterLiteral(WaebricSymbol.COLON), 
-			markup
-		};
+		return new AbstractSyntaxNode[] { path, markup };
 	}
 	
 	@Override

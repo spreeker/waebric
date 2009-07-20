@@ -7,7 +7,6 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "module" ModuleId ModuleElement* -> Module
@@ -103,7 +102,6 @@ public class Module extends AbstractSyntaxNode {
 	@Override
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] {
-			new StringLiteral("module"),
 			identifier,
 			imports,
 			sites,

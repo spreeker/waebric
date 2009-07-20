@@ -1,9 +1,7 @@
 package org.cwi.waebric.parser.ast.module.site;
 
-import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "site" Mappings "end" -> Site
@@ -25,9 +23,7 @@ public class Site extends AbstractSyntaxNode {
 
 	public AbstractSyntaxNode[] getChildren() {
 		return new AbstractSyntaxNode[] { 
-			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.SITE)),
-			mappings,
-			new StringLiteral(WaebricKeyword.getLiteral(WaebricKeyword.END))
+			mappings
 		};
 	}
 	

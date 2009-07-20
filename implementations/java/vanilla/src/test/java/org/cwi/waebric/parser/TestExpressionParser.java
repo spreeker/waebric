@@ -94,7 +94,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.NatExpression expression = parser.parseNatExpression();
-		assertEquals(123, expression.getNatural().getLiteral().toInteger());
+		assertEquals(123, expression.getNatural().getValue());
 	}
 	
 	@Test

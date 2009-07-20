@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
@@ -283,7 +283,7 @@ class StatementParser extends AbstractParser {
 			return statement;
 		} else {
 			// Retrieve remaining mark-up tokens (Markup+)
-			NodeList<Markup> markups = new NodeList<Markup>();
+			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
 			while(isMarkup(1, false)) {
 				markups.add(markupParser.parseMarkup());

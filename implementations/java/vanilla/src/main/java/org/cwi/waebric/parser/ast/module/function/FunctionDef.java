@@ -2,13 +2,11 @@ package org.cwi.waebric.parser.ast.module.function;
 
 import java.util.List;
 
-import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.statement.Statement;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * "def" IdCon Formals? Statement* "end" -> FunctionDef
@@ -16,17 +14,14 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  *
  */
 public class FunctionDef extends AbstractSyntaxNode {
-	
-	// Keyword literals
-	private static final String DEF_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.DEF);
-	private static final String END_LITERAL = WaebricKeyword.getLiteral(WaebricKeyword.END);
-	
-	private AbstractSyntaxNodeList<Statement> statements = new AbstractSyntaxNodeList<Statement>();
-	
+
+	private AbstractSyntaxNodeList<Statement> statements;
 	private IdCon identifier;
 	private Formals formals;
 
-	public FunctionDef() { }
+	public FunctionDef() {
+		this.statements = new AbstractSyntaxNodeList<Statement>();
+	}
 	
 	public FunctionDef(IdCon identifier) {
 		this(identifier, new Formals.EmptyFormal());
@@ -35,6 +30,7 @@ public class FunctionDef extends AbstractSyntaxNode {
 	public FunctionDef(IdCon identifier, Formals formals) {
 		this.identifier = identifier;
 		this.formals = formals;
+		this.statements = new AbstractSyntaxNodeList<Statement>();
 	}
 	
 	public IdCon getIdentifier() {
@@ -62,13 +58,7 @@ public class FunctionDef extends AbstractSyntaxNode {
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] {
-			new StringLiteral(DEF_LITERAL),
-			identifier,
-			formals,
-			statements,
-			new StringLiteral(END_LITERAL)
-		};
+		return new AbstractSyntaxNode[] { identifier, formals, statements };
 	}
 	
 	@Override

@@ -1,11 +1,9 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * Argument
@@ -77,7 +75,6 @@ public abstract class Argument extends AbstractSyntaxNode {
 		public AbstractSyntaxNode[] getChildren() {
 			return new AbstractSyntaxNode[] { 
 				identifier,
-				new StringLiteral("" + WaebricSymbol.EQUAL_SIGN),
 				expression
 			};
 		}

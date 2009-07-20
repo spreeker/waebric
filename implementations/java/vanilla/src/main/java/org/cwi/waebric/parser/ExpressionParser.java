@@ -9,7 +9,6 @@ import org.cwi.waebric.parser.ast.basic.SymbolCon;
 import org.cwi.waebric.parser.ast.basic.Text;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 import org.cwi.waebric.scanner.token.Token;
 import org.cwi.waebric.scanner.token.TokenIterator;
 import org.cwi.waebric.scanner.token.WaebricTokenSort;
@@ -143,7 +142,7 @@ class ExpressionParser extends AbstractParser {
 	 */
 	public Expression.TextExpression parseTextExpression() throws SyntaxException {
 		next(WaebricTokenSort.TEXT, "Textual expression","Text -> Expression");
-		Text text = new Text(new StringLiteral(tokens.current().getLexeme().toString()));
+		Text text = new Text(tokens.current().getLexeme().toString());
 		Expression.TextExpression expression = new Expression.TextExpression(text);
 		return expression;
 	}
@@ -155,7 +154,7 @@ class ExpressionParser extends AbstractParser {
 	public Expression.SymbolExpression parseSymbolExpression() throws SyntaxException {
 		next(WaebricTokenSort.SYMBOLCON, "symbol expression", "\'symbol");
 		Expression.SymbolExpression expression = new Expression.SymbolExpression();
-		SymbolCon symbol = new SymbolCon(new StringLiteral(tokens.current().getLexeme().toString()));
+		SymbolCon symbol = new SymbolCon(tokens.current().getLexeme().toString());
 		expression.setSymbol(symbol);
 		return expression;
 	}

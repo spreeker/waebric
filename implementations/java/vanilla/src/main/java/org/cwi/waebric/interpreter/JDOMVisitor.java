@@ -7,7 +7,7 @@ import java.util.Stack;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
@@ -247,15 +247,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Store width attribute.
 	 */
 	public void visit(Attribute.WidthAttribute attribute) {
-		current.setAttribute("width", attribute.getWidth().getLiteral().toString());
+		current.setAttribute("width", "" + attribute.getWidth().getValue());
 	}
 	
 	/**
 	 * Store width and height attribute.
 	 */
 	public void visit(Attribute.WidthHeightAttribute attribute) {
-		current.setAttribute("width", attribute.getWidth().getLiteral().toString());
-		current.setAttribute("height", attribute.getHeight().getLiteral().toString());
+		current.setAttribute("width", "" + attribute.getWidth().getValue());
+		current.setAttribute("height", "" + attribute.getHeight().getValue());
 	}
 	
 	/**
@@ -496,7 +496,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				String name = markup.getDesignator().getIdentifier().getName();
 				if(containsYield(environment.getFunction(name))) {
 					// Remainder of mark-up chain is stored as yield statement
-					NodeList<Markup> remainder = new NodeList<Markup>();
+					AbstractSyntaxNodeList<Markup> remainder = new AbstractSyntaxNodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsMarkup replacement = new MarkupsMarkup(remainder);
 					replacement.setMarkup(statement.getMarkup());
@@ -551,7 +551,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				String name = markup.getDesignator().getIdentifier().getName();
 				if(containsYield(environment.getFunction(name))) {
 					// Remainder of mark-up chain is stored as yield statement
-					NodeList<Markup> remainder = new NodeList<Markup>();
+					AbstractSyntaxNodeList<Markup> remainder = new AbstractSyntaxNodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsExpression replacement = new MarkupsExpression(remainder);
 					replacement.setExpression(statement.getExpression());
@@ -582,7 +582,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				String name = markup.getDesignator().getIdentifier().getName();
 				if(containsYield(environment.getFunction(name))) {
 					// Remainder of mark-up chain is stored as yield statement
-					NodeList<Markup> remainder = new NodeList<Markup>();
+					AbstractSyntaxNodeList<Markup> remainder = new AbstractSyntaxNodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsStatement replacement = new MarkupsStatement(remainder);
 					replacement.setStatement(statement.getStatement());
@@ -612,7 +612,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				String name = markup.getDesignator().getIdentifier().getName();
 				if(containsYield(environment.getFunction(name))) {
 					// Remainder of mark-up chain is stored as yield statement
-					NodeList<Markup> remainder = new NodeList<Markup>();
+					AbstractSyntaxNodeList<Markup> remainder = new AbstractSyntaxNodeList<Markup>();
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsEmbedding replacement = new MarkupsEmbedding(remainder);
 					replacement.setEmbedding(statement.getEmbedding());
@@ -772,7 +772,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Store number in text field.
 	 */
 	public void visit(NatExpression expression) {
-		text = expression.getNatural().getLiteral().toString();
+		text = "" + expression.getNatural().getValue();
 	}
 
 	/**
