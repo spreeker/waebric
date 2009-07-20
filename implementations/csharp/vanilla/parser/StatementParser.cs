@@ -260,7 +260,7 @@ namespace Parser
 
             //Parse comment
             CurrentToken = TokenStream.NextToken();
-            commentStatement.SetCommentString(CurrentToken.ToString());
+            commentStatement.SetCommentString(CurrentToken.GetValue().ToString());
 
             //Skip ; token
             NextToken(";", "comment thisisacomment;", ';');
