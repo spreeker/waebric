@@ -9,6 +9,7 @@ using Parser;
 using Parser.Ast;
 using Checker;
 using Common;
+using Interpreter;
 
 namespace Compiler
 {
@@ -46,8 +47,10 @@ namespace Compiler
             StreamReader sourceStream = new StreamReader(Path);
             WaebricLexer lexer = new WaebricLexer(sourceStream);
 
+            
             lexer.LexicalizeStream();
             TokenIterator tokens = lexer.GetTokenIterator();
+            Console.WriteLine("Lexicalizing successful");
 
             if (tokens.GetSize() == 0)
             {   //Not tokens parsed
@@ -59,6 +62,8 @@ namespace Compiler
             WaebricParser parser = new WaebricParser(tokens);
             parser.Parse();
 
+            Console.WriteLine("Parsing successful");
+
             SyntaxTree parsedTree = parser.GetTree();
 
             //Initialize ModuleCache with correct DirectoryPath
@@ -67,6 +72,13 @@ namespace Compiler
             //Lets check the tree
             WaebricChecker checker = new WaebricChecker();
             checker.CheckSyntaxTree(parsedTree);
+
+            //Lets interpret the tree and generate XHTML
+            WaebricInterpreter interpreter = new WaebricInterpreter();
+            interpreter.InterpretAST(parsedTree);
+
+            Console.WriteLine("Interpreting successful");
+            Console.Read();
         }
 
         #endregion
