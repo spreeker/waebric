@@ -62,7 +62,7 @@ public class TestExpressionParser {
 		parser = new ExpressionParser(iterator, exceptions);
 		
 		Expression.VarExpression expression = parser.parseVarExpression();
-		assertEquals("variable1", expression.getVar().getToken().getLexeme().toString());
+		assertEquals("variable1", expression.getId().getToken().getLexeme().toString());
 	}
 	
 	@Test

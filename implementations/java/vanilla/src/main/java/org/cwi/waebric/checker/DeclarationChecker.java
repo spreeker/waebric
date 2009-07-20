@@ -147,8 +147,8 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	
 	@Override
 	public void visit(VarExpression expression) {
-		if(! environment.isDefinedVariable(expression.getVar().getName())) {
-			exceptions.add(new UndefinedVariableException(expression.getVar()));
+		if(! environment.isDefinedVariable(expression.getId().getName())) {
+			exceptions.add(new UndefinedVariableException(expression.getId()));
 		}
 	}
 	

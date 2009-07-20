@@ -319,7 +319,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				return value != null;
 			} else if(reg.getExpression() instanceof Expression.VarExpression) {
 				// Variable predicates check if the referenced variable is defined
-				String name = ((Expression.VarExpression) reg.getExpression()).getVar().getName();
+				String name = ((Expression.VarExpression) reg.getExpression()).getId().getName();
 				return environment.isDefinedVariable(name);
 			} else { return true; }
 		} else if(predicate instanceof Predicate.And) {
@@ -372,7 +372,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.VarExpression var = (Expression.VarExpression) expression;
 			
 			// Retrieve actual expression from variable cache
-			expression = environment.getVariable(var.getVar().getName());
+			expression = environment.getVariable(var.getId().getName());
 			
 			// Execute function again
 			Statement.Each each = new Statement.Each();
@@ -700,7 +700,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		while(expression instanceof Expression.VarExpression) {
 			// Browse over variable expressions until a raw type is detected
 			Expression.VarExpression var = (Expression.VarExpression) expression;
-			expression = environment.getVariable(var.getVar().getName());
+			expression = environment.getVariable(var.getId().getName());
 		}
 		
 		if(expression instanceof Expression.RecordExpression) {
@@ -793,7 +793,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		String name = expression.getVar().getName();
+		String name = expression.getId().getName();
 		
 		Expression reference = environment.getVariable(name);
 		if(reference == expression && environment.getParent() != null) {

@@ -53,18 +53,18 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class VarExpression extends Expression {
 
-		private IdCon var;
+		private IdCon identifier;
 		
-		public VarExpression(IdCon var) {
-			this.var = var;
+		public VarExpression(IdCon identifier) {
+			this.identifier = identifier;
 		}
 		
-		public IdCon getVar() {
-			return var;
+		public IdCon getId() {
+			return identifier;
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { var };
+			return new AbstractSyntaxNode[] { identifier };
 		}
 		
 		@Override
