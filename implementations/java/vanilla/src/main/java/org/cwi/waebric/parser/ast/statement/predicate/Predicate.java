@@ -1,11 +1,8 @@
 package org.cwi.waebric.parser.ast.statement.predicate;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * Predicates are conditions, used in if(-else) statement constructs.
@@ -76,12 +73,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
-				expression,
-				new CharacterLiteral(WaebricSymbol.PERIOD),
-				type,
-				new CharacterLiteral(WaebricSymbol.QUESTION_SIGN)
-			};
+			return new AbstractSyntaxNode[] { expression, type };
 		}
 		
 		@Override
@@ -102,7 +94,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 		private Predicate predicate;
 		
 		public Not() { }
-		
+	
 		public Not(Predicate predicate) {
 			this.predicate = predicate;
 		}
@@ -116,9 +108,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 		}
 
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				new CharacterLiteral('!'), predicate
-			};
+			return new AbstractSyntaxNode[] { predicate	};
 		}
 		
 		@Override
@@ -163,9 +153,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				left, new StringLiteral("&&"), right
-			};
+			return new AbstractSyntaxNode[] { left, right };
 		}
 		
 		@Override
@@ -210,9 +198,7 @@ public abstract class Predicate extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				left, new StringLiteral("||"), right
-			};
+			return new AbstractSyntaxNode[] { left, right };
 		}
 		
 		@Override

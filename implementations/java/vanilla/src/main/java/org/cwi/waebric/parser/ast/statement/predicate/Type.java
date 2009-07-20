@@ -2,7 +2,6 @@ package org.cwi.waebric.parser.ast.statement.predicate;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * Type represents a type definition.
@@ -20,7 +19,7 @@ public abstract class Type extends AbstractSyntaxNode {
 	public static class StringType extends Type {
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { new StringLiteral("string") };
+			return new AbstractSyntaxNode[] { /* No children */ };
 		}
 		
 		@Override
@@ -39,7 +38,7 @@ public abstract class Type extends AbstractSyntaxNode {
 	public static class ListType extends Type {
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { new StringLiteral("list") };
+			return new AbstractSyntaxNode[] { /* No children */ };
 		}
 		
 		@Override
@@ -58,7 +57,7 @@ public abstract class Type extends AbstractSyntaxNode {
 	public static class RecordType extends Type {
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { new StringLiteral("record") };
+			return new AbstractSyntaxNode[] { /* No children */ };
 		}
 		
 		@Override

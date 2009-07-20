@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.NodeList;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
@@ -17,7 +17,7 @@ import org.cwi.waebric.parser.ast.markup.Markup;
  */
 public abstract class Embed extends AbstractSyntaxNode {
 
-	protected NodeList<Markup> markups = new NodeList<Markup>();
+	protected AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 
 	public List<Markup> getMarkups() {
 		return markups.clone();

@@ -1,10 +1,7 @@
 package org.cwi.waebric.parser.ast.statement.embedding;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
-import org.cwi.waebric.parser.ast.token.StringLiteral;
 
 /**
  * ">" TextChar* "\""
@@ -14,26 +11,18 @@ import org.cwi.waebric.parser.ast.token.StringLiteral;
  */
 public class PostText extends AbstractSyntaxNode {
 
-	private StringLiteral text;
-	
-	public PostText(StringLiteral text) {
+	private String text;
+
+	public PostText(String text) {
 		this.text = text;
 	}
 	
-	public PostText(String text) {
-		this.text = new StringLiteral(text);
-	}
-	
-	public StringLiteral getText() {
+	public String getText() {
 		return text;
 	}
 
 	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] {
-			new CharacterLiteral(WaebricSymbol.GREATER_THAN),
-			text,
-			new CharacterLiteral(WaebricSymbol.DQUOTE)
-		};
+		return new AbstractSyntaxNode[] { /* No children */ };
 	}
 	
 	@Override

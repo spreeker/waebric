@@ -2,13 +2,11 @@ package org.cwi.waebric.parser.ast.statement;
 
 import java.util.List;
 
-import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.SeparatedNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.token.CharacterLiteral;
 
 /**
  * Assignments
@@ -26,14 +24,14 @@ public abstract class Assignment extends AbstractSyntaxNode {
 	public static class FuncBind extends Assignment {
 	
 		private IdCon identifier;
-		private SeparatedNodeList<IdCon> variables;
+		private AbstractSyntaxNodeList<IdCon> variables;
 		private Statement statement;
 		
 		/**
 		 * Construct default function binding.
 		 */
 		public FuncBind() {
-			variables = new SeparatedNodeList<IdCon>(',');
+			variables = new AbstractSyntaxNodeList<IdCon>();
 		}
 		
 		public IdCon getIdentifier() {
@@ -61,14 +59,7 @@ public abstract class Assignment extends AbstractSyntaxNode {
 		}
 	
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				identifier,
-				new CharacterLiteral(WaebricSymbol.LPARANTHESIS),
-				variables,
-				new CharacterLiteral(WaebricSymbol.RPARANTHESIS),
-				new CharacterLiteral(WaebricSymbol.EQUAL_SIGN),
-				statement
-			};
+			return new AbstractSyntaxNode[] { identifier, variables, statement };
 		}
 		
 		@Override
@@ -105,11 +96,7 @@ public abstract class Assignment extends AbstractSyntaxNode {
 		}
 		
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] {
-				identifier,
-				new CharacterLiteral('='),
-				expression
-			};
+			return new AbstractSyntaxNode[] { identifier, expression };
 		}
 		
 		@Override
