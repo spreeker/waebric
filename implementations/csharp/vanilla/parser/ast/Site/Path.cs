@@ -67,10 +67,17 @@ namespace Parser.Ast.Site
 
         public ISyntaxNode[] GetSubNodes()
         {
-            return new ISyntaxNode[] { 
-                DirectoryName,
-                Filename
-            };
+            if (DirectoryName != null)
+            {
+                return new ISyntaxNode[] { 
+                    DirectoryName,
+                    Filename
+                };
+            }
+            else
+            {
+                return new ISyntaxNode[] { Filename };
+            }
         }
 
         public void AcceptVisitor(ISyntaxNodeVisitor visitor)
