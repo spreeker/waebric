@@ -222,7 +222,7 @@ namespace Checker
             else
             {
                 //Check if it is XHTML, if not its undefined
-                if (!IdentifierIsXHTML(identifier))
+                if (!IdentifierIsXHTML(identifier) && markup.GetCallState())
                 {
                     ExceptionList.Add(new UndefinedFunction(identifier));
                 }
