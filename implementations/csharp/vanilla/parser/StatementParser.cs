@@ -540,7 +540,7 @@ namespace Parser
                 //Determine if arguments exists
                 while (TokenStream.HasNext(j + 1))
                 {
-                    if(IsNextMarkupAttribute(j))
+                    if(IsNextMarkupAttribute(j+1))
                     {   
                         //Attribute is max 2 tokens wide
                         if(TokenStream.HasNext(j + 2))
