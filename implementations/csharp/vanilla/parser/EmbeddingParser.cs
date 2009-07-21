@@ -171,15 +171,47 @@ namespace Parser
         public TextTail ParseTextTail()
         {
             TextTail textTail = null;
+
+            //Skip > token
+            NextToken(">", "> embedding tailsymbol", '>'); 
+
+            //Parse text first to make type determination possible
+            String parsedText = ParseTextChars();
             
             //Determine TextTail type
-            if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == ">" && EmbeddingTokenStream.Peek(3).GetValue().ToString() == "\"")
+            if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == "\"")
             {   //PostTextTail
-                textTail = ParsePostTextTail();
+                
+                //Set PostText
+                PostText postText = new PostText();
+                postText.SetText(parsedText);
+
+                //Create PostTextTail and fill it
+                PostTextTail postTextTail = new PostTextTail();
+                postTextTail.SetPostText(postText);
+
+                //Skip Closing "
+                NextToken("\"", "\"", '\"');
+
+                textTail = postTextTail;
             }
-            else if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == ">")
+            else 
             {   //MidTextTail
-                textTail = ParseMidTextTail();
+
+                //Skip closing < tag of PreText
+                NextToken("<", "< closing PreText", '<');
+
+                //Set MidText
+                MidText midText = new MidText();
+                midText.SetText(parsedText);
+
+                //Create MidTextTail object and fill it
+                MidTextTail midTextTail = new MidTextTail();
+                midTextTail.SetMidText(midText);
+                midTextTail.SetEmbed(ParseEmbed());
+                midTextTail.SetTextTail(ParseTextTail());
+
+                textTail = midTextTail;
             }
 
             return textTail;
