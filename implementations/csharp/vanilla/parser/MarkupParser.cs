@@ -43,7 +43,9 @@ namespace Parser
             //Determine if arguments are after designator
             if (TokenStream.Peek(1).GetType() == TokenType.SYMBOL && TokenStream.Peek(1).GetValue().ToString() == "(")
             {
-               ParseArguments(markup);
+                //We are dealing with an MarkupCall, so set Markup as Call
+                markup.SetCall();
+                ParseArguments(markup);
             }
 
             return markup;

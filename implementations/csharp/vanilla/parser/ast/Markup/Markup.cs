@@ -14,6 +14,7 @@ namespace Parser.Ast.Markup
 
         private NodeList ArgumentList;
         private Designator Tag;
+        private bool IsCall;
 
         #endregion
 
@@ -23,6 +24,7 @@ namespace Parser.Ast.Markup
         {
             //Intialize members
             ArgumentList = new NodeList();
+            IsCall = false;
         }
 
         /// <summary>
@@ -59,6 +61,23 @@ namespace Parser.Ast.Markup
         public NodeList GetArguments()
         {
             return ArgumentList;
+        }
+
+        /// <summary>
+        /// Set Markup as call
+        /// </summary>
+        public void SetCall()
+        {
+            IsCall = true;
+        }
+
+        /// <summary>
+        /// Get state of Call
+        /// </summary>
+        /// <returns></returns>
+        public bool GetCallState()
+        {
+            return IsCall;
         }
 
         public override String ToString()

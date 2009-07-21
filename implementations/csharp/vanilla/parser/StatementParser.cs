@@ -580,6 +580,10 @@ namespace Parser
 
         private bool IsNextMarkupAttribute(int index)
         {
+            if (TokenStream.Peek(index).GetType() != TokenType.SYMBOL)
+            {
+                return false;
+            }
             String tokenText = TokenStream.Peek(index).GetValue().ToString();
             return tokenText == "#" || tokenText == "." || tokenText == "$" || tokenText == ":" || tokenText == "@" || tokenText == "%";
         }
