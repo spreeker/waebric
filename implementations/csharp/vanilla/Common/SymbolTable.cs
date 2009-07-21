@@ -170,7 +170,20 @@ namespace Common
 
         public Object Clone()
         {
-            return null;
+            SymbolTable clonedSymbolTable = new SymbolTable(GetParentSymbolTable());
+            //Copy functions
+            foreach (KeyValuePair<String, FunctionDefinition> def in FunctionDefinitions)
+            {
+                clonedSymbolTable.AddFunctionDefinition(def.Value);
+            }
+
+            //Copy variables
+            foreach (KeyValuePair<String, Expression> pair in VariableDefinitions)
+            {
+                clonedSymbolTable.AddVariableDefinition(pair.Key, pair.Value);
+            }
+
+            return clonedSymbolTable;
         }
 
         #endregion
