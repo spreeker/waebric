@@ -28,6 +28,7 @@ namespace Interpreter
             Tag = tag;
             AttributeMap = new Dictionary<String,String>();
             Children = new List<XHTMLElement>();
+            Content = "";
         }
 
         /// <summary>
