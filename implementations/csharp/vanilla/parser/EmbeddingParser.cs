@@ -127,12 +127,49 @@ namespace Parser
             markupParser = new MarkupParser(EmbeddingTokenStream);
 
             //Parse Markup*
-            while(EmbeddingTokenStream.HasNext(2) && !(EmbeddingTokenStream.Peek(2).GetValue().ToString() == ">"))
+            //EmbeddingTokenStream.HasNext(2) && !(EmbeddingTokenStream.Peek(2).GetValue().ToString() == ">"
+            while(NextTokenIsMarkup())
             {
                 markupList.Add(markupParser.ParseMarkup());
             }
-            
-            //Determine embed type
+
+            //Check if an expression is remaining, otherwise embed is MarkupEmbedding
+            if (IsExpressionRemaining())
+            {   //ExpressionEmbedding
+                ExpressionEmbed expressionEmbed = new ExpressionEmbed();
+
+                //Add already parsed markups to expressionEmbed
+                expressionEmbed.SetMarkups(markupList);
+
+                //Set up expressionparser
+                expressionParser = new ExpressionParser(EmbeddingTokenStream);
+
+                //Parse expression
+                expressionEmbed.SetExpression(expressionParser.ParseExpression());
+
+                embed = expressionEmbed;
+            }
+            else
+            {   //MarkupEmbedding
+                //Get last item from markupList and add it as Markup
+                if (markupList.Count != 0)
+                {
+                    Markup markup = (Markup)markupList.Get(markupList.Count - 1);
+                    markupList.Remove(markupList.Count - 1);
+
+                    MarkupEmbed markupEmbed = new MarkupEmbed();
+                    markupEmbed.SetMarkups(markupList);
+                    markupEmbed.SetMarkup(markup);
+
+                    embed = markupEmbed;
+                }
+                else
+                {   //Markup* Markup must contain at least one markup element
+                    throw new UnexpectedToken("Markup expected, but found:", CurrentToken.GetValue().ToString(), CurrentToken.GetLine());
+                }
+            }
+
+            /*//Determine if remaining embed is Markup or Expression
             if (NextTokenIsMarkup())
             {   //MarkupEmbedding
                 MarkupEmbed markupEmbed = new MarkupEmbed();
@@ -159,7 +196,7 @@ namespace Parser
                 expressionEmbed.SetExpression(expressionParser.ParseExpression());
 
                 embed = expressionEmbed;
-            }           
+            }           */
 
             return embed;
         }
@@ -215,40 +252,6 @@ namespace Parser
             }
 
             return textTail;
-        }
-
-        /// <summary>
-        /// Parser for PostTextTail
-        /// </summary>
-        /// <returns>Parsed PostTextTail</returns>
-        public PostTextTail ParsePostTextTail()
-        {
-            PostTextTail postTextTail = new PostTextTail();
-
-            //Parse text
-            postTextTail.SetPostText(ParsePostText());
-
-            return postTextTail;
-        }
-
-        /// <summary>
-        /// Parser for MidTextTail
-        /// </summary>
-        /// <returns>Parsed MidTextTail</returns>
-        public MidTextTail ParseMidTextTail()
-        {
-            MidTextTail midTextTail = new MidTextTail();
-
-            //Parse MidText
-            midTextTail.SetMidText(ParseMidText());
-
-            //Parse Embed
-            midTextTail.SetEmbed(ParseEmbed());
-
-            //Parse TextTail
-            midTextTail.SetTextTail(ParseTextTail());
-
-            return midTextTail;
         }
 
         /// <summary>
@@ -352,7 +355,7 @@ namespace Parser
         /// <returns>True if next token is markup, otherwise false</returns>
         private bool NextTokenIsMarkup()
         {
-            if(EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
+            if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
             {   //
                 if (EmbeddingTokenStream.HasNext(3) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == "("
                    && EmbeddingTokenStream.Peek(3).GetValue().ToString() == ")")
@@ -360,8 +363,12 @@ namespace Parser
                     return true;
                 }
                 else if (EmbeddingTokenStream.HasNext(2) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == ";")
-                {   
+                {
                     //Statements are not Markup
+                    return false;
+                }
+                else if (EmbeddingTokenStream.HasNext(2) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == ">")
+                {   //Last element is always an 
                     return false;
                 }
                 else
@@ -371,6 +378,22 @@ namespace Parser
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Method to detect if an expression is remaining after parsing Markup in Embed
+        /// </summary>
+        /// <returns>True if expression is remaining, otherwise false</returns>
+        private bool IsExpressionRemaining()
+        {
+            if (EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetValue().ToString() == ">")
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         #endregion
