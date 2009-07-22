@@ -355,7 +355,7 @@ namespace Parser
             if(EmbeddingTokenStream.HasNext() && EmbeddingTokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
             {   //
                 if (EmbeddingTokenStream.HasNext(3) && EmbeddingTokenStream.Peek(2).GetValue().ToString() == "("
-                   && EmbeddingTokenStream.Peek(4).GetValue().ToString() == ")")
+                   && EmbeddingTokenStream.Peek(3).GetValue().ToString() == ")")
                 {   //CallMarkup
                     return true;
                 }
