@@ -37,7 +37,7 @@ namespace Interpreter
         /// <param name="docType">DocType of XHTML document</param>
         public XHTMLStreamWriter(TextWriter writer, DocType docType, XHTMLElement tree)
         {
-            XhtmlWriter = new XhtmlTextWriter(writer, "\t");
+            XhtmlWriter = new XhtmlTextWriter(writer, "    ");
             Root = tree;
 
             //Write doctype before starting document

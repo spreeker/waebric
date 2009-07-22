@@ -520,7 +520,40 @@ namespace Interpreter
         /// <param name="statement">MarkupEmbeddingStatement to interpret</param>
         public override void Visit(MarkupEmbeddingStatement statement)
         {
+            //Iterate through Markup+
+            ISyntaxNode[] MarkupArray = statement.GetMarkups().ToArray();
+            for (int i = 0; i <= (MarkupArray.Length - 1); i++)
+            {
+                if (IsMarkupCall((Markup)MarkupArray[i]))
+                {
+                    //Check if called function contains an yield, if so, add remaining markups/expression to yield stack
+                    String functionIdentifier = ((Markup)MarkupArray[i]).GetDesignator().GetIdentifier();
+                    if (NodeContainsYield(SymbolTable.GetFunctionDefinition(functionIdentifier)))
+                    {
+                        //Get remaining markups
+                        NodeList nonInterpretedMarkups = new NodeList();
+                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        {
+                            nonInterpretedMarkups.Add(MarkupArray[j]);
+                        }
+                        //Create new MarkupExpressionStatement and push it to stack
+                        MarkupEmbeddingStatement markupEmbeddingStatement = new MarkupEmbeddingStatement();
+                        markupEmbeddingStatement.SetMarkups(nonInterpretedMarkups);
+                        markupEmbeddingStatement.SetEmbedding(statement.GetEmbedding());
+                        YieldStack.Push(markupEmbeddingStatement);
+                    }
+                    //Interpret markup
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                    return;
+                }
+                else
+                {   //Interpret Tag
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                }
+            }
             
+            //Interpret Embedding
+            statement.GetEmbedding().AcceptVisitor(this);
         }
 
         /// <summary>
@@ -572,7 +605,40 @@ namespace Interpreter
         /// <param name="statement">MarkupMarkupStatement to interpret</param>
         public override void Visit(MarkupMarkupStatement statement)
         {
-            
+            //Iterate through Markup+
+            ISyntaxNode[] MarkupArray = statement.GetMarkups().ToArray();
+            for (int i = 0; i <= (MarkupArray.Length - 1); i++)
+            {
+                if (IsMarkupCall((Markup)MarkupArray[i]))
+                {
+                    //Check if called function contains an yield, if so, add remaining markups/expression to yield stack
+                    String functionIdentifier = ((Markup)MarkupArray[i]).GetDesignator().GetIdentifier();
+                    if (NodeContainsYield(SymbolTable.GetFunctionDefinition(functionIdentifier)))
+                    {
+                        //Get remaining markups
+                        NodeList nonInterpretedMarkups = new NodeList();
+                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        {
+                            nonInterpretedMarkups.Add(MarkupArray[j]);
+                        }
+                        //Create new MarkupExpressionStatement and push it to stack
+                        MarkupMarkupStatement markupMarkupStatement = new MarkupMarkupStatement();
+                        markupMarkupStatement.SetMarkups(nonInterpretedMarkups);
+                        markupMarkupStatement.SetMarkup(statement.GetMarkup());
+                        YieldStack.Push(markupMarkupStatement);
+                    }
+                    //Interpret markup
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                    return;
+                }
+                else
+                {   //Interpret Tag
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                }
+            }
+
+            //Interpret markup
+            statement.GetMarkup().AcceptVisitor(this);
         }
 
         /// <summary>
@@ -581,7 +647,18 @@ namespace Interpreter
         /// <param name="statement">MarkupStatement to interpret</param>
         public override void Visit(MarkupStatement statement)
         {
-            
+            //Determine if markup is a call
+            if(IsCall(statement.GetMarkup()))
+            {
+                String functionIdentifier = statement.GetMarkup().GetDesignator().GetIdentifier();
+                if (NodeContainsYield(SymbolTable.GetFunctionDefinition(functionIdentifier)))
+                {   //Store null element, because there is nothing to yield in this statement
+                    YieldStack.Push(null);
+                }
+            }
+
+            //Interpret markup
+            statement.GetMarkup().AcceptVisitor(this);
         }
 
         /// <summary>
@@ -590,7 +667,40 @@ namespace Interpreter
         /// <param name="statement">MarkupStatStatement to interpret</param>
         public override void Visit(MarkupStatStatement statement)
         {
+            //Iterate through Markup+
+            ISyntaxNode[] MarkupArray = statement.GetMarkups().ToArray();
+            for (int i = 0; i <= (MarkupArray.Length - 1); i++)
+            {
+                if (IsMarkupCall((Markup)MarkupArray[i]))
+                {
+                    //Check if called function contains an yield, if so, add remaining markups/expression to yield stack
+                    String functionIdentifier = ((Markup)MarkupArray[i]).GetDesignator().GetIdentifier();
+                    if (NodeContainsYield(SymbolTable.GetFunctionDefinition(functionIdentifier)))
+                    {
+                        //Get remaining markups
+                        NodeList nonInterpretedMarkups = new NodeList();
+                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        {
+                            nonInterpretedMarkups.Add(MarkupArray[j]);
+                        }
+                        //Create new MarkupExpressionStatement and push it to stack
+                        MarkupStatStatement markupStatStatement = new MarkupStatStatement();
+                        markupStatStatement.SetMarkups(nonInterpretedMarkups);
+                        markupStatStatement.SetStatement(statement.GetStatement());
+                        YieldStack.Push(markupStatStatement);
+                    }
+                    //Interpret markup
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                    return;
+                }
+                else
+                {   //Interpret Tag
+                    ((Markup)MarkupArray[i]).AcceptVisitor(this);
+                }
+            }
             
+            //Interpret statement
+            statement.GetStatement().AcceptVisitor(this);
         }
 
         /// <summary>
@@ -664,6 +774,70 @@ namespace Interpreter
             SymbolTable.AddVariableDefinition(assignment.GetIdentifier(), assignment.GetExpression());
         }
 
+        /// <summary>
+        /// Interpret Embedding
+        /// </summary>
+        /// <param name="embedding">Embedding to interpret</param>
+        public override void Visit(Embedding embedding)
+        {
+            //Add content of pretext
+            Current.AddContent(embedding.GetPreText().GetText());
+            
+            //Interpret Embed and TextTail
+            embedding.GetEmbed().AcceptVisitor(this);
+            embedding.GetTextTail().AcceptVisitor(this);
+        }
+
+        /// <summary>
+        /// Interpret MarkupEmbed
+        /// </summary>
+        /// <param name="embed">MarkupEmbed to interpret</param>
+        public override void Visit(MarkupEmbed embed)
+        {
+            //Structure is same as MarkupMarkupStatement, so convert and interpret
+            MarkupMarkupStatement markupMarkupStatement = new MarkupMarkupStatement();
+            markupMarkupStatement.SetMarkups(embed.GetMarkups());
+            markupMarkupStatement.SetMarkup(embed.GetMarkup());
+            markupMarkupStatement.AcceptVisitor(this);
+        }
+
+        /// <summary>
+        /// Interpret ExpressionEmbed
+        /// </summary>
+        /// <param name="embed">ExpressionEmbed to interpret</param>
+        public override void Visit(ExpressionEmbed embed)
+        {
+            //Structure is same as MarkupExpressionStatement, so convert and interpret
+            MarkupExpressionStatement markupExpressionStatement = new MarkupExpressionStatement();
+            markupExpressionStatement.SetMarkups(embed.GetMarkups());
+            markupExpressionStatement.SetExpression(embed.GetExpression());
+            markupExpressionStatement.AcceptVisitor(this);
+        }
+
+        /// <summary>
+        /// Interpret MidTextTail
+        /// </summary>
+        /// <param name="textTail">MidTextTail to Interpret</param>
+        public override void Visit(MidTextTail textTail)
+        {
+            Current.AddContent(textTail.GetMidText().GetText());
+            textTail.GetEmbed().AcceptVisitor(this);
+            textTail.GetTextTail().AcceptVisitor(this);
+        }
+
+        /// <summary>
+        /// Interpret PostTextTail
+        /// </summary>
+        /// <param name="textTail">PostTextTail to interpret</param>
+        public override void Visit(PostTextTail textTail)
+        {
+            Current.AddContent(textTail.GetPostText().GetText());
+        }
+
+        /// <summary>
+        /// Get XHTML tree representation
+        /// </summary>
+        /// <returns>XHTMLElement which is root of the tree</returns>
         public XHTMLElement GetTree()
         {
             return Root;
@@ -683,14 +857,11 @@ namespace Interpreter
             return SymbolTable.ContainsFunction(markup.GetDesignator().GetIdentifier());
         }
 
-        private void WriteBeginXHTMLTag()
-        {
-            //Write html tag with xmlns and lang attribute by default
-            AddElement(new XHTMLElement("html", null));
-            Current.AddAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-            Current.AddAttribute("lang", "en");
-        }
-
+        /// <summary>
+        /// Get scoped SymbolTable of specific function
+        /// </summary>
+        /// <param name="function">FunctionDefinition</param>
+        /// <returns>SymbolTable of specific function</returns>
         private SymbolTable GetSymbolTableOfFunction(FunctionDefinition function)
         {
             if (FunctionSymbolTable.ContainsKey(function))
@@ -700,6 +871,11 @@ namespace Interpreter
             return SymbolTable;
         }
 
+        /// <summary>
+        /// Retrieve concrete expression of an fieldexpression
+        /// </summary>
+        /// <param name="expression">FieldExpression</param>
+        /// <returns>Concrete expression</returns>
         private Expression GetExpression(FieldExpression expression)
         {
             Expression expr = expression.GetExpression();

@@ -56,7 +56,7 @@ namespace Interpreter
                 SymbolTable.GetFunctionDefinition("main").AcceptVisitor(xhtmlVisitor);
 
                 //Write xhtml output
-                XHTMLStreamWriter writer = new XHTMLStreamWriter(Writer, XHTMLStreamWriter.DocType.TRANSITIONAL, xhtmlVisitor.GetTree());
+                XHTMLStreamWriter writer = new XHTMLStreamWriter(Console.Out, XHTMLStreamWriter.DocType.TRANSITIONAL, xhtmlVisitor.GetTree());
                 writer.WriteStream();
             }
 
