@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E9AB8C47-6F18-444E-81CD-9A932E751CE4}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -48,10 +48,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\TestDriven.NET 2.0\NUnit\2.4\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -66,14 +62,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tokenizer\EmbeddingToken.cs" />
-    <Compile Include="Tokenizer\TokenIterator.cs" />
-    <Compile Include="Tokenizer\StreamTokenizer.cs" />
-    <Compile Include="Tokenizer\Token.cs" />
-    <Compile Include="Tokenizer\StreamTokenizerException.cs" />
+    <Compile Include="StreamTokenizer\EmbeddingToken.cs" />
+    <Compile Include="StreamTokenizer\StreamTokenizer.cs" />
+    <Compile Include="StreamTokenizer\StreamTokenizerException.cs" />
+    <Compile Include="StreamTokenizer\Token.cs" />
+    <Compile Include="StreamTokenizer\TokenIterator.cs" />
+    <Compile Include="StreamTokenizer\TokenType.cs" />
     <Compile Include="WaebricLexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tokenizer\TokenType.cs" />
     <Compile Include="Waebric\WaebricKeyword.cs" />
   </ItemGroup>
   <ItemGroup>
