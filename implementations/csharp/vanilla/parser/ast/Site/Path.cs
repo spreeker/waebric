@@ -62,7 +62,14 @@ namespace Parser.Ast.Site
         /// <returns>String</returns>
         public override String ToString()
         {
-            return DirectoryName.ToString() + Filename.ToString();
+            if (DirectoryName != null)
+            {
+                return DirectoryName.ToString() + Filename.ToString();
+            }
+            else
+            {
+                return Filename.ToString();
+            }
         }
 
         public ISyntaxNode[] GetSubNodes()
