@@ -28,6 +28,7 @@ namespace Lexer
         public WaebricLexer(TextReader inputStream)
         {
             this.Stream = inputStream;
+            tokenizer = new StreamTokenizer(Stream);
         }
 
         /// <summary>
@@ -35,8 +36,6 @@ namespace Lexer
         /// </summary>
         public void LexicalizeStream()
         {
-            tokenizer = new StreamTokenizer(Stream);
-
             TokenStream.Clear(); //Clean stream before inserting items
             
             CurrentToken = tokenizer.NextToken();
@@ -424,7 +423,7 @@ namespace Lexer
             //Create new lexer and lexicalize buffer
             StringReader stringReader = new StringReader(buffer);
             WaebricLexer lexer = new WaebricLexer(stringReader);
-            //lexer.SetLine(line);
+            lexer.SetLine(line);
             lexer.LexicalizeStream();
 
             //Add new tokens to list
