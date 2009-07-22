@@ -257,8 +257,12 @@ namespace Interpreter
             //Check if variable does exist
             String varName = expression.GetVariableIdentifier();
             Expression check = SymbolTable.GetVariableDefinition(varName);
-            //Maybe an additional check should be placed here!!!! TO IMPLEMENT
-
+            
+            //If reference has been made to parent variable with same name, take parent reference
+            if (check == expression && SymbolTable.GetParentSymbolTable() != null)
+            {
+                check = SymbolTable.GetParentSymbolTable().GetVariableDefinition(varName);
+            }
 
             if (check != null)
             {   //Visit variable to retrieve current value

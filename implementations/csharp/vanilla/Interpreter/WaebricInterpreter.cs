@@ -51,7 +51,6 @@ namespace Interpreter
             //Interpret the main function
             if (ContainsMainFunction(root))
             {
-                //TODO!!! DETERMINE SITE TO WRITE 
                 XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(SymbolTable);
                 SymbolTable.GetFunctionDefinition("main").AcceptVisitor(xhtmlVisitor);
 
@@ -81,9 +80,6 @@ namespace Interpreter
                     }
                 }
             }
-            
-            
-
         }
 
         #endregion
