@@ -125,13 +125,12 @@ namespace Interpreter
                     {
                         //Interpret expression
                         ((ExpressionArgument)argument).GetExpression().AcceptVisitor(this);
-                        attributeValue += TextValue;
                         if (TextValue == "undef")
                         {
                             TextValue = "UNDEFINED";
                         }
                         //Store value
-                        if (attributeValue != "" && TextValue != "")
+                        if (!(attributeValue == "") && !(TextValue != ""))
                         {
                             attributeValue += " ";
                         }
