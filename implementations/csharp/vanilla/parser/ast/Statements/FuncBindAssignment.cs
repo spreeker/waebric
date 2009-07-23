@@ -61,7 +61,7 @@ namespace Parser.Ast.Statements
 
         public override ISyntaxNode[] GetSubNodes()
         {
-            return null;
+            return new ISyntaxNode[] {};
         }
 
         public override void AcceptVisitor(ISyntaxNodeVisitor visitor)
