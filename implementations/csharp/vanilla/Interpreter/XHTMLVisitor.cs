@@ -585,7 +585,7 @@ namespace Interpreter
                     {
                         //Get remaining markups
                         NodeList nonInterpretedMarkups = new NodeList();
-                        for(int j = i; j <= (MarkupArray.Length - 1); j++)
+                        for(int j = i + 1; j <= (MarkupArray.Length - 1); j++)
                         {
                             nonInterpretedMarkups.Add(MarkupArray[j]);
                         }
@@ -607,7 +607,9 @@ namespace Interpreter
             
             //Interpret expression
             statement.GetExpression().AcceptVisitor(this);
-            Current.AddContent(TextValue);
+            XHTMLElement element = new XHTMLElement(TextValue, Current);
+            element.SetTagState(false);
+            Current.AddChild(element);
         }
 
         /// <summary>
@@ -744,7 +746,9 @@ namespace Interpreter
                 //Add some content when node is an expression or embedding
                 if (node is Expression || node is Embedding)
                 {
-                    Current.AddContent(TextValue);
+                    XHTMLElement element = new XHTMLElement(TextValue, Current);
+                    element.SetTagState(false);
+                    AddElement(element);
                 }
 
                 //Restore YieldStack in original shape before interpreting
@@ -792,10 +796,14 @@ namespace Interpreter
         public override void Visit(Embedding embedding)
         {
             //Add content of pretext
-            Current.AddContent(embedding.GetPreText().GetText());
+            XHTMLElement element = new XHTMLElement(embedding.GetPreText().GetText(), Current);
+            element.SetTagState(false);
+            Current.AddChild(element);
             
             //Interpret Embed and TextTail
+            XHTMLElement temp = Current;
             embedding.GetEmbed().AcceptVisitor(this);
+            Current = temp;
             embedding.GetTextTail().AcceptVisitor(this);
         }
 
@@ -831,8 +839,13 @@ namespace Interpreter
         /// <param name="textTail">MidTextTail to Interpret</param>
         public override void Visit(MidTextTail textTail)
         {
-            Current.AddContent(textTail.GetMidText().GetText());
+            XHTMLElement element = new XHTMLElement(textTail.GetMidText().GetText(), Current);
+            element.SetTagState(false);
+            Current.AddChild(element);
+
+            XHTMLElement temp = Current;
             textTail.GetEmbed().AcceptVisitor(this);
+            Current = temp;
             textTail.GetTextTail().AcceptVisitor(this);
         }
 
@@ -842,7 +855,9 @@ namespace Interpreter
         /// <param name="textTail">PostTextTail to interpret</param>
         public override void Visit(PostTextTail textTail)
         {
-            Current.AddContent(textTail.GetPostText().GetText());
+            XHTMLElement element = new XHTMLElement(textTail.GetPostText().GetText(), Current);
+            element.SetTagState(false);
+            Current.AddChild(element);
         }
 
         /// <summary>

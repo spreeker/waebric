@@ -40,6 +40,22 @@ namespace Interpreter
         /// <param name="value">Value of attribute</param>
         public void AddAttribute(String name, String value)
         {
+            if (AttributeMap.ContainsKey(name))
+            {   //Attribute already exists, so add new value after existing value
+                
+                //Get current value and create new value
+                String tempValue = AttributeMap[name];
+                tempValue += " " + value;
+
+                //Remove current value
+                AttributeMap.Remove(name);
+                
+                //Store new value
+                AttributeMap.Add(name, tempValue);
+
+                return;
+            }
+
             AttributeMap.Add(name, value);
         }
 
