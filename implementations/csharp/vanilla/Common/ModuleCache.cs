@@ -93,8 +93,6 @@ namespace Common
                         Module requestedDependency = RequestModule(import.GetModuleId());
                         if (requestedDependency != null)
                         {   //Not null, so add to list
-                            list.Add(requestedDependency);
-
                             //Get dependencies of retrieved module
                             RequestDependencies(requestedDependency, list);
                         }
