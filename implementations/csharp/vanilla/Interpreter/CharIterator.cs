@@ -28,7 +28,7 @@ namespace Interpreter
         public String ParseText(String text)
         {
             //Reset index
-            Index = 0;
+            Index = -1;
 
             //Put text in buffer
             TextArray = text.ToCharArray();

@@ -78,7 +78,12 @@ namespace Interpreter
                 if (!element.GetTagState())
                 {
                     XhtmlWriter.BeginRender();
-                    XhtmlWriter.Write(element.GetTag());
+                    
+                    //Get escape chars out of this tag
+                    CharIterator charIterator = new CharIterator();
+                    String tag = charIterator.ParseText(element.GetTag());
+                    XhtmlWriter.Write(tag);
+                    
                     XhtmlWriter.EndRender();
                     XhtmlWriter.Flush();
                     return;
