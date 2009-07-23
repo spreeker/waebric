@@ -461,8 +461,10 @@ namespace Interpreter
             }
 
             //Interpret statements
+            XHTMLElement temp = Current;
             foreach (Statement stmt in statement.GetStatements())
             {
+                Current = temp;
                 stmt.AcceptVisitor(this);
             }
 
@@ -607,6 +609,7 @@ namespace Interpreter
             
             //Interpret expression
             statement.GetExpression().AcceptVisitor(this);
+
             XHTMLElement element = new XHTMLElement(TextValue, Current);
             element.SetTagState(false);
             Current.AddChild(element);
@@ -746,9 +749,10 @@ namespace Interpreter
                 //Add some content when node is an expression or embedding
                 if (node is Expression || node is Embedding)
                 {
+                    //TODO, MAYBE TEMP ELEMENT IS NEEDED!!!
                     XHTMLElement element = new XHTMLElement(TextValue, Current);
                     element.SetTagState(false);
-                    AddElement(element);
+                    Current.AddChild(element);
                 }
 
                 //Restore YieldStack in original shape before interpreting
