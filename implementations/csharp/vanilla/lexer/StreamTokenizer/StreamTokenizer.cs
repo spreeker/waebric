@@ -33,6 +33,7 @@ namespace Lexer.Tokenizer
         private int PreviousCharacter = '\0'; // Previous character
         private bool URL = false; // Is character part of URL
         private bool IgnoreComments = false; //Ignore comments
+        private bool IgnoreNumeric = false; //Ignore numeric values
 
         //Current character value
         private int LineNumber = 1; // Linenumber of stream
@@ -85,7 +86,7 @@ namespace Lexer.Tokenizer
             {
                 return LayoutToken();
             }
-            else if (IsNumeric(CurrentCharacter)) //Numeric token
+            else if (IsNumeric(CurrentCharacter) && !IgnoreNumeric) //Numeric token
             {
                 return NumericToken();
             }
@@ -122,7 +123,7 @@ namespace Lexer.Tokenizer
         /// Get numeric value of last scanned token
         /// </summary>
         /// <returns>Numeric (double) value</returns>
-        public double GetNumericValue()
+        public int GetNumericValue()
         {
             return NumValue;
         }
@@ -182,6 +183,15 @@ namespace Lexer.Tokenizer
         public void SetIgnoreComments(bool ignore)
         {
             IgnoreComments = ignore;
+        }
+
+        /// <summary>
+        /// Method set state of ignoring numerics
+        /// </summary>
+        /// <param name="ignore">True to ignore, false to allow</param>
+        public void SetIgnoreNumeric(bool ignore)
+        {
+            IgnoreNumeric = ignore;
         }
 
         #endregion

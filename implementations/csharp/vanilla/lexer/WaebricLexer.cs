@@ -179,12 +179,14 @@ namespace Lexer
 
             //Retrieve possible quoted text
             StringBuilder stringBuilder = new StringBuilder();
+            tokenizer.SetIgnoreNumeric(true);
             while (tokenizer.GetCharacterValue() != '\"' || previousChar == '\\') //Scan until non escaped " found 
             {
                 if(CurrentToken == StreamTokenizer.EOF)
                 {   // End of file, so it wasn't a quoted part but just a single "
                     tokenizer.SetIgnoreComments(false);
-                    
+                    tokenizer.SetIgnoreNumeric(false);
+
                     //First add a single quote as token
                     TokenStream.Add(new Token("\"", TokenType.SYMBOL, tempLine));
 
@@ -210,11 +212,12 @@ namespace Lexer
                 
                 //Get next part and add it to stringBuilder
                 stringBuilder.Append(tokenizer.ToString());
+
                 previousChar = tokenizer.GetCharacterValue();
                 CurrentToken = tokenizer.NextToken();
             }
             tokenizer.SetIgnoreComments(false);
-
+            tokenizer.SetIgnoreNumeric(false);
             //Check if string is correct quote text
             if (IsString)
             {
@@ -314,12 +317,14 @@ namespace Lexer
             //Create a string with symbol
             StringBuilder stringBuilder = new StringBuilder();
             CurrentToken = tokenizer.NextToken(); //Skip ' token
- 
+
+            tokenizer.SetIgnoreNumeric(true);
             while(IsWaebricSymbol(tokenizer.ToString()) && CurrentToken != StreamTokenizer.EOF) 
             {
                 stringBuilder.Append(tokenizer.ToString());
                 CurrentToken = tokenizer.NextToken();
             }
+            tokenizer.SetIgnoreNumeric(false);
 
             TokenStream.Add(new Token(stringBuilder.ToString(), TokenType.WAEBRICSYMBOL, tokenizer.GetScannedLines()));
         }
