@@ -83,7 +83,8 @@ namespace Interpreter
                     CharIterator charIterator = new CharIterator();
                     String tag = charIterator.ParseText(element.GetTag());
                     XhtmlWriter.Write(tag);
-                    
+
+                    XhtmlWriter.WriteLine();
                     XhtmlWriter.EndRender();
                     XhtmlWriter.Flush();
                     return;

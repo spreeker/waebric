@@ -489,6 +489,7 @@ namespace Interpreter
                 XHTMLElement temp = Current;
                 foreach (Expression currentExpr in listExpression.GetExpressions())
                 {
+                    Current = temp;
                     //New scope
                     SymbolTable = new SymbolTable(SymbolTable);
 
