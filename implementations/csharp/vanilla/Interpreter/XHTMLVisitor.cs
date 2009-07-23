@@ -366,7 +366,13 @@ namespace Interpreter
         public override void Visit(EchoExpressionStatement statement)
         {
             statement.GetExpression().AcceptVisitor(this);
-            Current.AddContent(TextValue);
+            
+            //Add just an tag to current as parent
+            XHTMLElement echoElement = new XHTMLElement(TextValue, Current);
+            echoElement.SetTagState(false);
+
+            Current.AddChild(echoElement);
+            
         }
 
         /// <summary>

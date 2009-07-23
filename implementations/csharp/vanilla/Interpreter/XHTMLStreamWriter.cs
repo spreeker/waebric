@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.IO;
+using Common;
 
 namespace Interpreter
 {
@@ -69,12 +70,24 @@ namespace Interpreter
             }
             else
             {   //Normal XHTML tag handling
-                //Write element with attributes
+                
                 XhtmlWriter.Indent = level;
+                XhtmlWriter.BeginRender();
+
+                //Check if element is tag, if not write tag, otherwise handle as XHTML tag
+                if (!element.GetTagState())
+                {
+                    XhtmlWriter.BeginRender();
+                    XhtmlWriter.Write(element.GetTag());
+                    XhtmlWriter.EndRender();
+                    XhtmlWriter.Flush();
+                    return;
+                }
+
                 XhtmlWriter.WriteBeginTag(element.GetTag());
                 foreach (KeyValuePair<String, String> pair in element.GetAttributes())
                 {
-                    XhtmlWriter.WriteAttribute(pair.Key, pair.Value);
+                    XhtmlWriter.WriteAttribute(pair.Key, pair.Value, false);
                 }
 
                 if (IsEmptyElement(element.GetTag()))
@@ -82,7 +95,7 @@ namespace Interpreter
                     XhtmlWriter.Write(XhtmlTextWriter.SelfClosingTagEnd);
                     XhtmlWriter.WriteLine();
                 }
-                else
+                else if (IsXHTMLTag(element.GetTag()))
                 {
                     //Write tag opening closing
                     XhtmlWriter.Write(XhtmlTextWriter.TagRightChar);
@@ -105,6 +118,13 @@ namespace Interpreter
                     XhtmlWriter.WriteLine();
                     XhtmlWriter.Flush();
                 }
+                else
+                {
+                    //Just write it
+                    XhtmlWriter.Write(element.GetTag());
+                    XhtmlWriter.EndRender();
+                    XhtmlWriter.Flush();
+                }
             }
         }
         /// <summary>
@@ -113,8 +133,10 @@ namespace Interpreter
         /// <param name="element">Element containing CData</param>
         public void WriteCData(XHTMLElement element)
         {
+            XhtmlWriter.BeginRender();
             XhtmlWriter.Write("<![CDATA[" + element.GetContent() + "]]>");
             XhtmlWriter.WriteLine();
+            XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
 
@@ -124,8 +146,19 @@ namespace Interpreter
         /// <param name="element">Element containing element</param>
         public void WriteComment(XHTMLElement element)
         {
-            XhtmlWriter.Write("<!-- " + element.GetContent() + "-->");
+            //Write comment open tag
+            XhtmlWriter.BeginRender();
+            XhtmlWriter.Write("<!--");
+
+            //Lets parse the text, because the XhtmlWriter handles layout chars incorrectly           
+            CharIterator charIterator = new CharIterator();
+            String content = charIterator.ParseText(element.GetContent());
+            XhtmlWriter.Write(content);
+
+            //Close comment tag
+            XhtmlWriter.Write("-->");
             XhtmlWriter.WriteLine();
+            XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
 
@@ -139,6 +172,7 @@ namespace Interpreter
         /// <param name="type">DocType of XHTML document</param>
         private void WriteDocType(DocType type)
         {
+            XhtmlWriter.BeginRender();
             switch (type)
             {
                 case DocType.STRICT:
@@ -152,6 +186,7 @@ namespace Interpreter
                     break;
             }
             XhtmlWriter.WriteLine();
+            XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
 
@@ -164,6 +199,19 @@ namespace Interpreter
         {
             String[] xhtmlEmptyTags = Enum.GetNames(typeof(EmptyXHTMLElement));
             foreach (String item in xhtmlEmptyTags)
+            {
+                if (item.Equals(tag.ToUpper()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsXHTMLTag(String tag)
+        {
+            String[] xhtmlTags = Enum.GetNames(typeof(XHTMLTags));
+            foreach (String item in xhtmlTags)
             {
                 if (item.Equals(tag.ToUpper()))
                 {

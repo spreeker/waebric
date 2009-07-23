@@ -17,6 +17,7 @@ namespace Interpreter
         private String Tag;
         private Dictionary<String, String> AttributeMap;
         private String Content;
+        private bool IsTag;
 
         #endregion
 
@@ -29,6 +30,7 @@ namespace Interpreter
             AttributeMap = new Dictionary<String,String>();
             Children = new List<XHTMLElement>();
             Content = "";
+            IsTag = true;
         }
 
         /// <summary>
@@ -93,6 +95,26 @@ namespace Interpreter
         public String GetContent()
         {
             return Content;
+        }
+
+        /// <summary>
+        /// Retrieve tag state of element
+        /// </summary>
+        /// <returns>State</returns>
+        public bool GetTagState()
+        {
+            return IsTag;
+        }
+
+        /// <summary>
+        /// Set tag state of element
+        /// True is tag
+        /// False is no tag
+        /// </summary>
+        /// <param name="state">State</param>
+        public void SetTagState(bool state)
+        {
+            IsTag = state;
         }
 
         /// <summary>
