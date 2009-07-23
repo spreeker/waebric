@@ -766,7 +766,9 @@ namespace Interpreter
         public override void Visit(FuncBindAssignment assignment)
         {   //Make a function of this binding and add it to SymbolTable
             FunctionDefinition functionDefinition = new FunctionDefinition();
+            
             functionDefinition.SetIdentifier(assignment.GetIdentifier());
+            functionDefinition.AddStatement(assignment.GetStatement());
 
             //Convert identifiers to formals
             foreach (String id in assignment.GetIdentifiers())
@@ -775,6 +777,8 @@ namespace Interpreter
                 frml.SetIdentifier(id);
                 functionDefinition.AddFormal(frml);
             }
+
+
 
             //Create new SymbolTable for function
             FunctionSymbolTable.Add(functionDefinition, (SymbolTable)SymbolTable.Clone());
