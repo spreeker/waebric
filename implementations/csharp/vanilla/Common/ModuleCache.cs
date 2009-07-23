@@ -51,7 +51,7 @@ namespace Common
         {
             if (ModuleTable.Contains(identifier.ToString()))
             {   //Module already loaded so return instance of module
-                return (Module) ModuleTable[identifier];
+                return (Module) ModuleTable[identifier.ToString()];
             }
 
             //Module not cached, so load it
@@ -80,14 +80,14 @@ namespace Common
         public void RequestDependencies(Module module, List<Module> list)
         {
             //Check if module is already in Table
-            if (!ModuleTable.Contains(module.GetModuleId().ToString()))
+            if (!ContainsModule(list,module.GetModuleId().ToString()))
             {
                 list.Add(module);
                 ISyntaxNode[] importArray = module.GetImports().ToArray();
 
                 foreach(Import import in importArray)
                 {
-                    if(!ModuleTable.Contains(import.GetModuleId().ToString()))
+                    if (!ContainsModule(list, import.GetModuleId().ToString()))
                     {
                         //Get module
                         Module requestedDependency = RequestModule(import.GetModuleId());
@@ -188,6 +188,24 @@ namespace Common
         private ModuleCache()
         {
             ModuleTable = new Hashtable();
+        }
+
+        /// <summary>
+        /// Method to check if list contains specific module
+        /// </summary>
+        /// <param name="moduleList">List of modules</param>
+        /// <param name="identifier">Identifier of module to search</param>
+        /// <returns>True if in list, otherwise false</returns>
+        private bool ContainsModule(List<Module> moduleList, String identifier)
+        {
+            foreach (Module module in moduleList)
+            {
+                if (module.GetModuleId().ToString() == identifier)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion
