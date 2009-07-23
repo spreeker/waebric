@@ -542,7 +542,7 @@ namespace Interpreter
                     {
                         //Get remaining markups
                         NodeList nonInterpretedMarkups = new NodeList();
-                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        for (int j = i + 1; j <= (MarkupArray.Length - 1); j++)
                         {
                             nonInterpretedMarkups.Add(MarkupArray[j]);
                         }
@@ -627,7 +627,7 @@ namespace Interpreter
                     {
                         //Get remaining markups
                         NodeList nonInterpretedMarkups = new NodeList();
-                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        for (int j = i + 1; j <= (MarkupArray.Length - 1); j++)
                         {
                             nonInterpretedMarkups.Add(MarkupArray[j]);
                         }
@@ -689,7 +689,7 @@ namespace Interpreter
                     {
                         //Get remaining markups
                         NodeList nonInterpretedMarkups = new NodeList();
-                        for (int j = i; j <= (MarkupArray.Length - 1); j++)
+                        for (int j = i+1; j <= (MarkupArray.Length - 1); j++)
                         {
                             nonInterpretedMarkups.Add(MarkupArray[j]);
                         }

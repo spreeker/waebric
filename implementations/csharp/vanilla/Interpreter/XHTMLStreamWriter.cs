@@ -208,6 +208,11 @@ namespace Interpreter
             return false;
         }
 
+        /// <summary>
+        /// Detect if this tag is an valid XHTML tag
+        /// </summary>
+        /// <param name="tag">Tag to check</param>
+        /// <returns>IsXHTMLTag</returns>
         private bool IsXHTMLTag(String tag)
         {
             String[] xhtmlTags = Enum.GetNames(typeof(XHTMLTags));
