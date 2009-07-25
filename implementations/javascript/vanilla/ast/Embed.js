@@ -15,6 +15,10 @@
 function ExpressionEmbedding(markups, expression){
 	this.markups = markups;
 	this.expression = expression;
+	
+	this.toString = function(){
+		return this.markups + ' ' + this.expression;
+	}
 }
 ExpressionEmbedding.prototype = new Node(); //Inheritance base class
 
@@ -27,5 +31,9 @@ ExpressionEmbedding.prototype = new Node(); //Inheritance base class
  */
 function MarkupEmbedding(markups){
 	this.markups = markups;
+	
+	this.toString = function(){
+		return this.markups;
+	}
 }
 MarkupEmbedding.prototype = new Node(); //Inheritance base class

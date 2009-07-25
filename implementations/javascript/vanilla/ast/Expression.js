@@ -19,7 +19,7 @@ function FieldExpression (expression, field){
 	this.field = field;
 	
 	//Methods
-	this.toString = new function(){
+	this.toString = function(){
 		return this.expression + "." + this.field;
 	}
 }
@@ -39,7 +39,7 @@ function CatExpression (expressionLeft, expressionRight){
 	this.expressionRight = expressionRight;
 	
 	//Methods
-	this.toString = new function(){
+	this.toString = function(){
 		 return this.expressionLeft + "+" + expressionRight;
 	}
 }
@@ -76,7 +76,10 @@ function VarExpression(variable){
 	
 	//Methods
 	this.toString = function(){
-		return this.variable;
+		if(this.variable.value != null){
+			return this.variable.value;
+		}
+		return this.variable		
 	}
 }
 VarExpression.prototype = new Node(); //Inheritance base class
@@ -112,7 +115,8 @@ function SymbolExpression(symbol){
 	
 	//Methods
 	this.toString = function(){
-		return this.symbol;
+		//Remove the single quote
+		return this.symbol.substr(1, this.symbol.length-1);
 	}
 }
 SymbolExpression.prototype = new Node(); //Inheritance base class
@@ -130,7 +134,7 @@ function ListExpression(list){
 	
 	//Methods
 	this.toString = function(){
-		return this.list;
+		return this.list.toString();
 	}
 }
 ListExpression.prototype = new Node(); //Inheritance base class
@@ -142,13 +146,23 @@ ListExpression.prototype = new Node(); //Inheritance base class
  * 
  * @param {Object} record
  */
-function RecordExpression(record){
+function RecordExpression(records){
 	//Fields
-	this.record = record;
+	this.records = records;
 	
-	//Methods
+	//Methods	
+	this.getValue = function(key){
+		for(var i = 0; i < records.length; i++){
+			var record = records[i];
+			if (key == record.key) {
+				return record.value;
+			}
+		}
+		return null;
+	}	
+	
 	this.toString = function(){
-		return this.record;
+		return this.records.toString();
 	}
 }
 RecordExpression.prototype = new Node(); //Inheritance base class

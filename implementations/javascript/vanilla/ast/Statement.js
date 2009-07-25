@@ -85,6 +85,10 @@ BlockStatement.prototype = new Node(); //Inheritance base class
  */
 function CommentStatement(comment){
 	this.comment = comment;
+	this.toString = function(){
+		//Make sure that new lines, tabs etc are processed properly
+		return eval(this.comment);
+	}
 }
 CommentStatement.prototype = new Node(); //Inheritance base class
 

@@ -17,5 +17,9 @@ function Embedding(head, embed, tail){
 	this.head = head;
 	this.embed = embed;
 	this.tail = tail;
+	
+	this.toString = function(){
+		return ['head: ' + this.head  + ', tail: ' + tail];
+	}
 }
 Embedding.prototype = new Node(); //Inheritance base class

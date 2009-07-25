@@ -13,11 +13,12 @@
  * @param {Array} Array of formals
  * @param {Array} Array of statements
  */
-function FunctionDefinition (functionName, formals, statements){
+function FunctionDefinition (functionName, formals, statements, isFunctionBinding){
 	//Fields
 	this.functionName = functionName;
 	this.formals = formals;
 	this.statements = statements;	
+	this.isFunctionBinding = isFunctionBinding;
 	
 	//Methods
 	this.toString = function(){

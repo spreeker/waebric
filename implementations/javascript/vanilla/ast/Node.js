@@ -6,8 +6,8 @@
 
 function Node(){
 	//Visitor pattern
-	this.accept = function(visitorObject, env){
-		visitorObject.visit(this, env);
+	this.accept = function(visitorObject){
+		visitorObject.visit(this);
 	}
 	
 	//ToString methods
@@ -19,5 +19,23 @@ function Node(){
 			}
 		}
 		return output.toString();
+	}
+	
+	//Add slashes (copied from http://javascript.about.com/library/bladdslash.htm)
+	this.addSlashes = function(str) {
+		str=str.replace(/\\/g,'\\\\');
+		str=str.replace(/\'/g,'\\\'');
+		str=str.replace(/\"/g,'\\"');
+		str=str.replace(/\0/g,'\\0');
+		return str;
+	}
+
+	//Strip slashes (copied from http://javascript.about.com/library/bladdslash.htm)
+	this.stripSlashes = function(str) {
+		str=str.replace(/\\'/g,'\'');		
+		str=str.replace(/\\"/g,'"');		
+		str=str.replace(/\\\\/g,'\\');		
+		str=str.replace(/\\0/g,'\0');		
+		return str;
 	}
 }
