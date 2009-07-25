@@ -1,0 +1,507 @@
+KEYWORD : module
+IDENTIFIER : home
+KEYWORD : import
+IDENTIFIER : utils
+KEYWORD : site
+KEYWORD : site
+SYMBOL : /
+IDENTIFIER : index
+SYMBOL : .
+IDENTIFIER : html
+SYMBOL : :
+IDENTIFIER : home
+SYMBOL : (
+SYMBOL : )
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : home
+IDENTIFIER : layout
+SYMBOL : {
+IDENTIFIER : div
+SYMBOL : .
+IDENTIFIER : span-7
+SYMBOL : .
+IDENTIFIER : colborder
+SYMBOL : {
+IDENTIFIER : uitreiking09
+SYMBOL : ;
+IDENTIFIER : geurts
+SYMBOL : ;
+COMMENT :  bp-2009; 
+IDENTIFIER : casteele
+SYMBOL : ;
+IDENTIFIER : lililite
+SYMBOL : ;
+SYMBOL : }
+IDENTIFIER : div
+SYMBOL : .
+IDENTIFIER : span-8
+SYMBOL : .
+IDENTIFIER : last
+SYMBOL : {
+IDENTIFIER : banners
+SYMBOL : ;
+IDENTIFIER : nieuws
+SYMBOL : ;
+IDENTIFIER : vpro
+SYMBOL : ;
+IDENTIFIER : cartoons
+SYMBOL : ;
+SYMBOL : }
+SYMBOL : }
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : uitreiking09
+IDENTIFIER : header
+SYMBOL : (
+TEXT : Jan Aelberts winnaar De Brandende Pen
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : p
+SYMBOL : {
+IDENTIFIER : img
+SYMBOL : (
+IDENTIFIER : src
+SYMBOL : =
+TEXT : images/jan.jpg
+SYMBOL : ,
+IDENTIFIER : width
+SYMBOL : =
+NATURAL : 180
+SYMBOL : )
+SYMBOL : ;
+KEYWORD : echo
+TEXT : Schrijver Jan Aelberts heeft De Brandende Pen 2009 gewonnen voor het beste korte verhaal.
+Het is de tweede keer op rij dat een Vlaming het beste Nederlandse korte verhaal schreef.&nbsp;
+SYMBOL : ;
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+TEXT : brandende%20pen.html
+SYMBOL : )
+TEXT : Meer lezen...
+SYMBOL : ;
+SYMBOL : }
+COMMENT : 
+  header("Uitreiking Brandende Pen 2009");
+  p {
+   echo "De  deadline voor de Brandende Pen 2009 is 15 oktober verstreken. Dit jaar stuurden 430 auteurs
+een kort verhaal in. De uitreiking is op zondag 18 januari om 16.00 uur in caf&eacute; Hofman (Janskerkhof 17a Utrecht).";
+  }
+
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : geurts
+IDENTIFIER : header
+SYMBOL : (
+TEXT : Elke Geurts prijswinnaar met publicatie in Lava
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : p
+SYMBOL : {
+KEYWORD : echo
+TEXT : De Nieuw Proza Prijs Venlo 2008 is toegekend aan 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Elke
+    	 Geurts
+SYMBOL : >
+TEXT : . Zij ontvangt 1250 euro voor het beste verhaal in 2007
+    	 in een Nederlandstalig literair tijdschrift gepubliceerd door
+    	 een auteur die eerder nog geen verhalend proza in boekvorm
+    	 had gepubliceerd. Het winnende verhaal, 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : 'De Nomadensnaar'
+SYMBOL : >
+TEXT : ,
+    	 verscheen in Lava in maart 2007.
+SYMBOL : ;
+SYMBOL : }
+IDENTIFIER : p
+SYMBOL : {
+KEYWORD : echo
+TEXT : 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Elke Geurts
+SYMBOL : >
+TEXT :  (Heijen, 1973) publiceerde in 2007 en
+    	 2008 ook verhalen in de tijdschriften 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : De Brakke Hond
+SYMBOL : >
+TEXT : ,
+    	 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Bunker Hill
+SYMBOL : >
+TEXT :  en 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Op Ruwe Planken
+SYMBOL : >
+TEXT : . Dit voorjaar verscheen
+    	 bij 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Uitgeverij Nieuw Amsterdam
+SYMBOL : >
+TEXT :  haar verhalenbundel 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Het
+    	 besluit van Dola Korstjens
+SYMBOL : >
+TEXT : . Zij werkt behalve aan nieuwe
+    	 verhalen, ook aan hoorspelen en toneelstukken. Zij volgde de
+    	 opleiding Dramaschrijven aan de Hogeschool voor de Kunsten in
+    	 Utrecht en woont in Amsterdam.
+SYMBOL : ;
+SYMBOL : }
+IDENTIFIER : p
+SYMBOL : {
+KEYWORD : echo
+TEXT : Voorgaande winnaars van de Nieuw Proza Prijs waren onder
+  meer 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Arnon Grunberg (1994)
+SYMBOL : >
+TEXT : , 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Manon Uphoff (1996)
+SYMBOL : >
+TEXT : , 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Karel Glastra van
+  Loon (1998)
+SYMBOL : >
+TEXT :  en 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Erwin Mortier (2000)
+SYMBOL : >
+TEXT : .
+SYMBOL : ;
+SYMBOL : }
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : casteele
+IDENTIFIER : header
+SYMBOL : (
+TEXT : Two-book deal voor Brusselse theatermaker Vandecasteele
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : p
+SYMBOL : {
+KEYWORD : echo
+TEXT : De Vlaamse golf zet door bij Amsterdamse uitgevers: nadat
+   Joost Vandecasteele (1979, schrijver, standup komiek en
+   theatermaker bij het gezelschap Abattoir Ferm&eacute;) de Brandende
+   Pen 2007 van 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Lava Literair
+SYMBOL : >
+TEXT :  had gewonnen, werd hij door de
+   Amsterdamse literair agent 
+SYMBOL : <
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+TEXT : http://www.sebes.nl
+SYMBOL : )
+TEXT : Paul
+   Sebes
+SYMBOL : >
+TEXT :  benaderd om eens te praten over zijn werk. Sebes: 'Wat hij
+   schrijft vond ik steengoed, keihard, hyperrealistisch en vaak erg
+   grappig.'  Vandecasteele bleek vergevorderd met de verhalenbundel
+   
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Brulletje
+SYMBOL : >
+TEXT : . De meerderheid van deze verhalen was reeds
+   gepubliceerd in literaire tijdschrijften als 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : De Revisor
+SYMBOL : >
+TEXT : , 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Lava Literair
+SYMBOL : >
+TEXT : , 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Deus ex Machina
+SYMBOL : >
+TEXT :  en 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : De Brakke
+   Hond
+SYMBOL : >
+TEXT : . Maar ook een roman, 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : De Slag om Neo-Sparta
+SYMBOL : >
+TEXT :  genaamd,
+   was reeds in de maak. Met dit materiaal is Sebes uitgeverijen gaan
+   benaderen. De vijf belangrijkste literaire huizen in Amsterdam
+   toonden interesse, maar Peter Nijssen van de Arbeiderspers wist
+   Vandecasteele en Sebes met zijn enthousiasme en een
+   contractvoorstel voor zowel de bundel als de roman te
+   overtuigen. Nijssen: 'Het talent spat van de pagina's. We gaan 
+SYMBOL : <
+IDENTIFIER : em
+TEXT : Brulletje
+SYMBOL : >
+TEXT :  meteen in 2009 brengen.' Vandecasteele, die met zijn
+   bundel en ambitieuze roman iets nieuws probeert te cre&euml;ren
+   binnen de Nederlandstalige literatuur, is zeer verheugd met de deal
+   en het vertrouwen van de 
+SYMBOL : <
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+TEXT : http://www.arbeiderspers.nl
+SYMBOL : )
+TEXT : Arbeiderspers
+SYMBOL : >
+TEXT : .
+SYMBOL : ;
+SYMBOL : }
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : vpro
+KEYWORD : let
+IDENTIFIER : link
+SYMBOL : =
+TEXT : http://www.vpro.nl/programma/deavonden/afleveringen/34639264/items/35915764/media/35915897/
+SYMBOL : ;
+IDENTIFIER : vpro
+SYMBOL : =
+TEXT : http://www.vpro.nl/programma/deavonden/afleveringen/34639264/items/35915764/
+SYMBOL : ;
+IDENTIFIER : in
+IDENTIFIER : header
+SYMBOL : (
+TEXT : Lava bij de VPRO
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : p
+SYMBOL : {
+IDENTIFIER : thumbnail
+SYMBOL : (
+TEXT : images/radio.jpg
+SYMBOL : )
+SYMBOL : ;
+KEYWORD : echo
+TEXT : Hoofdredacteur van Lava, Xavier van Leeuwe, was te gast bij
+radioprogramma De Avonden van VPRO-Radio. Klik 
+SYMBOL : <
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+IDENTIFIER : vpro
+SYMBOL : )
+IDENTIFIER : 'hier
+SYMBOL : >
+IDENTIFIER : om
+IDENTIFIER : de
+IDENTIFIER : VPRO-site
+IDENTIFIER : te
+IDENTIFIER : bezoeken
+SYMBOL : .
+IDENTIFIER : De
+IDENTIFIER : bijdrage
+IDENTIFIER : in
+IDENTIFIER : het
+IDENTIFIER : radioprogramma
+IDENTIFIER : 'live'
+IDENTIFIER : beluisteren
+SYMBOL : ?
+IDENTIFIER : Klik
+IDENTIFIER : dan
+SYMBOL : <
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+IDENTIFIER : link
+SYMBOL : )
+IDENTIFIER : 'hier
+SYMBOL : >
+SYMBOL : .
+TEXT : ;
+    }
+  end
+
+end
+
+
+
+def nieuws
+  header(
+IDENTIFIER : Literair
+IDENTIFIER : nieuws"
+SYMBOL : )
+SYMBOL : ;
+KEYWORD : let
+IDENTIFIER : link
+SYMBOL : =
+TEXT : http://feed2js.org///feed2js.php?src=http%3A%2F%2Fwww.nrcboeken.nl%2Frss.xml&amp;num=10&amp;targ=y&amp;utf=y
+SYMBOL : ;
+IDENTIFIER : in
+IDENTIFIER : script
+SYMBOL : (
+IDENTIFIER : language
+SYMBOL : =
+IDENTIFIER : 'JavaScript
+SYMBOL : ,
+IDENTIFIER : src
+SYMBOL : =
+IDENTIFIER : link
+SYMBOL : ,
+IDENTIFIER : type
+SYMBOL : =
+TEXT : text/javascript
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : noscript
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+IDENTIFIER : link
+SYMBOL : )
+TEXT : View RSS Feed
+SYMBOL : ;
+KEYWORD : end
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : banners
+COMMENT :  swfobject("banner
+IDENTIFIER : banner_deux
+SYMBOL : .
+IDENTIFIER : swf"
+SYMBOL : ,
+NATURAL : 300
+SYMBOL : ,
+NATURAL : 200
+SYMBOL : ,
+IDENTIFIER : 'deux
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : *
+SYMBOL : /
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+TEXT : http://www.woordheks.nl
+SYMBOL : )
+IDENTIFIER : swfobject
+SYMBOL : (
+TEXT : banners/banner468X60.swf
+SYMBOL : ,
+NATURAL : 300
+SYMBOL : ,
+NATURAL : 60
+SYMBOL : ,
+IDENTIFIER : 'woordheks
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : hr
+SYMBOL : .
+IDENTIFIER : space
+SYMBOL : ;
+IDENTIFIER : vprobanner
+SYMBOL : ;
+IDENTIFIER : hr
+SYMBOL : .
+IDENTIFIER : space
+SYMBOL : ;
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : lililite
+IDENTIFIER : a
+SYMBOL : (
+IDENTIFIER : href
+SYMBOL : =
+TEXT : http://www.lililite.com
+SYMBOL : )
+IDENTIFIER : img
+SYMBOL : (
+IDENTIFIER : src
+SYMBOL : =
+TEXT : images/lililite.jpg
+SYMBOL : ,
+IDENTIFIER : width
+SYMBOL : =
+NATURAL : 300
+SYMBOL : ,
+IDENTIFIER : height
+SYMBOL : =
+NATURAL : 200
+SYMBOL : )
+SYMBOL : ;
+KEYWORD : end
+KEYWORD : def
+IDENTIFIER : cartoons
+IDENTIFIER : table
+SYMBOL : {
+IDENTIFIER : tr
+IDENTIFIER : td
+IDENTIFIER : img
+SYMBOL : (
+IDENTIFIER : src
+SYMBOL : =
+TEXT : images/Boeken.jpg
+SYMBOL : ,
+IDENTIFIER : width
+SYMBOL : =
+NATURAL : 300
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : tr
+IDENTIFIER : td
+IDENTIFIER : img
+SYMBOL : (
+IDENTIFIER : src
+SYMBOL : =
+TEXT : images/Poezie.jpg
+SYMBOL : ,
+IDENTIFIER : width
+SYMBOL : =
+NATURAL : 300
+SYMBOL : )
+SYMBOL : ;
+IDENTIFIER : tr
+IDENTIFIER : td
+IDENTIFIER : img
+SYMBOL : (
+IDENTIFIER : src
+SYMBOL : =
+TEXT : images/099_oeuvre.jpg
+SYMBOL : ,
+IDENTIFIER : width
+SYMBOL : =
+NATURAL : 300
+SYMBOL : )
+SYMBOL : ;
+SYMBOL : }
+KEYWORD : end
