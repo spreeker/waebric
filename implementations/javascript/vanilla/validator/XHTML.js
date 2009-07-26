@@ -1,9 +1,11 @@
 /**
- * Utility class for determing wether the input string is part of the XHTML convention
+ * XHTML Class
+ * 
+ * Holds all valid XHTML tags (copied from www.w3c.com)
  */
 function XHTML(){
+	
 }
-
 
 XHTML.tags = [	
 	'a',
@@ -97,6 +99,11 @@ XHTML.tags = [
 
 ];
 
+/**
+ * Checks whether the input tag is a valid XHTML tag.
+ * 
+ * @param {String} input
+ */
 XHTML.isXHTMLTag = function(input){
 	for (var i = 0; i < XHTML.tags.length; i++) {
 		var str = "";

@@ -1,5 +1,5 @@
 /**
- * Helper class for DOM actions
+ * Wrapper class for DOM Document
  */
 
 function DOM(){

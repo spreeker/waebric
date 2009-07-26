@@ -1,16 +1,16 @@
 importPackage(java.io)
 
-load("../tokenizer/WaebricToken.js");
-load("../tokenizer/WaebricTokenIdentifier.js");
-load("../tokenizer/WaebricTokenComment.js");
-load("../tokenizer/WaebricTokenKeyword.js");
-load("../tokenizer/WaebricTokenNatural.js");
-load("../tokenizer/WaebricTokenSymbol.js");
-load("../tokenizer/WaebricTokenText.js");
-load("../tokenizer/WaebricTokenWhitespace.js");
-
-load("../tokenizer/WaebricCharacter.js");
 load("../tokenizer/WaebricTokenizer.js");
+load("../tokenizer/WaebricCharacter.js");
+
+load("../tokenizer/tokens/WaebricToken.js");
+load("../tokenizer/tokens/WaebricTokenIdentifier.js");
+load("../tokenizer/tokens/WaebricTokenComment.js");
+load("../tokenizer/tokens/WaebricTokenKeyword.js");
+load("../tokenizer/tokens/WaebricTokenNatural.js");
+load("../tokenizer/tokens/WaebricTokenSymbol.js");
+load("../tokenizer/tokens/WaebricTokenText.js");
+load("../tokenizer/tokens/WaebricTokenWhitespace.js");
 
 function loadProgram(){
     var fis = new FileInputStream('../programs/program.wae');
@@ -36,7 +36,6 @@ function action(){
 	for(tokenIndex in tokenizer.lexemes){
 		token = (tokenizer.lexemes[tokenIndex])	
 		text += (token.type + ' : ' + token.value + '\n');
-		//print(token.type + ' : ' + token.value);
 	}
 	
 	var fw = new FileWriter('output_scanner.txt');

@@ -1,3 +1,11 @@
+/**
+ * Waebric Keyword Token
+ * 
+ * A keyword is recognized by the characters allowed in the keyword 
+ * and is eventually matched against a set of keywords.
+ * 
+ * @param {String} The value of the token
+ */
 WaebricToken.KEYWORD = function(value){
 	this.value = value;
 	this.type = 'KEYWORD'
@@ -24,6 +32,12 @@ WaebricToken.KEYWORD.keywords = [
 	WaebricToken.KEYWORD.YIELD 				= 'YIELD'
 ]
 
+/**
+ * Returns whether the input matches one of the keywords
+ * 
+ * @param {String} input
+ * @return True if the input matches on of the keywords
+ */
 WaebricToken.KEYWORD.contains = function(input){	
 	for(keyword in WaebricToken.KEYWORD.keywords){
 		if(WaebricToken.KEYWORD.keywords[keyword] == input.toUpperCase() ){

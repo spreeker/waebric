@@ -1,5 +1,5 @@
 /** 
- * Performs a semantic validation on the module object
+ * Performs a semantic validation on the module object based on the Visitor pattern.
  *
  * The semantic validation includes:
  *
@@ -81,7 +81,6 @@ function WaebricSemanticValidatorVisitor(env){
 			//Visit only unprocessed dependencies
 			var dependencyName = module.moduleId.identifier;
 			var existingDependency = this.env.getDependency(dependencyName);
-			print(dependencyName)
 			//If dependency is not processed before, visit it
 			if (existingDependency == null) {
 				var new_env = this.env.addDependency('module');

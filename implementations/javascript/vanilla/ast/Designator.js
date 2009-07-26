@@ -15,17 +15,5 @@
 function DesignatorTag (idCon, attributes){
 	this.idCon = idCon;
 	this.attributes = attributes;
-	
-	this.containsClassAttribute = function(){
-		for(var i = 0; i < this.attributes.length; i++){
-			var attr = this.attributes[i];
-			if(attr instanceof ClassAttribute){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
 }
 DesignatorTag.prototype = new Node(); //Inheritance base class 

@@ -24,6 +24,12 @@ function WaebricSemanticValidator(){
 	
 }
 
+/**
+ * Validates a given module and returns the exception list
+ * 
+ * @param {Module} The module to be validated
+ * @return {Array} Exceptions
+ */
 WaebricSemanticValidator.validateAll = function(module){
 	//Setup environment for logging exceptions and storing functions, 
 	//variables and dependencies
@@ -34,5 +40,5 @@ WaebricSemanticValidator.validateAll = function(module){
 	module.accept(visitor.getModuleVisitor(env));
 	
 	//Return exception list
-	return env.getExceptions();
+	return new WaebricSemanticValidatorResult(env.getExceptions());
 }

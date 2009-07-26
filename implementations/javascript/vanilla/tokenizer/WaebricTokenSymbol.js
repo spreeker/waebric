@@ -1,3 +1,10 @@
+/**
+ * Waebric Symbol Token
+ * 
+ * A comment is recognized by matching it against a set of symbols
+ * 
+ * @param {String} The value of the token
+ */
 WaebricToken.SYMBOL = function(value){
 	this.value = value;
 	this.type = 'SYMBOL'
@@ -30,7 +37,12 @@ WaebricToken.SYMBOL.symbols = [
 	WaebricToken.SYMBOL.COMMA			= ','
 ]
 
-
+/**
+ * Returns whether the input matches one of the symbols
+ * 
+ * @param {String} input
+ * @return True if the input matches on of the symbols
+ */
 WaebricToken.SYMBOL.contains = function(input){	
 	for(symbol in WaebricToken.SYMBOL.symbols){
 		if(WaebricToken.SYMBOL.symbols[symbol] == input ){

@@ -1,3 +1,10 @@
+/**
+ * Waebric Text Token
+ * 
+ * Text is recognized by it's start and ending character (quotes).
+ * 
+ * @param {String} The value of the token
+ */
 WaebricToken.TEXT = function(value){
 	this.value = value;
 	this.type = 'TEXT'

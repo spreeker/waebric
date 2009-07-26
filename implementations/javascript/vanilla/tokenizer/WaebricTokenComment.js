@@ -1,3 +1,10 @@
+/**
+ * Waebric Comment Token
+ * 
+ * A comment is recognized by it's start and ending character.
+ * 
+ * @param {String} The value of the token
+ */
 WaebricToken.COMMENT = function(value){
 	this.value = value;
 	this.type = 'COMMENT'

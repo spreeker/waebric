@@ -1,7 +1,8 @@
-/** Semantic Exception class 
+/** 
+ * Semantic Exception class 
  * 
- * @param {String} The exception message
- * @return {Error} An error exception
+ * Represents exceptions found during semantic validation
+ * 
  */
 function WaebricSemanticException(){
 	this.message = "";
@@ -11,7 +12,8 @@ function WaebricSemanticException(){
 	}
 }
 
-/** Semantic Exception class for non existing modules
+/** 
+ * Semantic Exception class for non existing modules
  * 
  * @param {String} The path of the non existing module
  * @return {WaebricSemanticException} A Semantic Exception
@@ -22,7 +24,8 @@ function NonExistingModuleException(path){
 }
 NonExistingModuleException.prototype = new WaebricSemanticException();
 
-/** Semantic Exception class for undefined functions
+/** 
+ * Semantic Exception class for undefined functions
  * 
  * @param {Markup} The function call for which no function definition exists
  * @return {WaebricSemanticException} A Semantic Exception
@@ -32,7 +35,8 @@ function UndefinedFunctionException(functionCall, env){
 }
 UndefinedFunctionException.prototype = new WaebricSemanticException();
 
-/** Semantic Exception class for duplicate functions
+/** 
+ * Semantic Exception class for duplicate functions
  * 
  * @param {FunctionDefinition} The function definition 
  * @return {WaebricSemanticException} A Semantic Exception
@@ -42,7 +46,8 @@ function DuplicateDefinitionException(func, env){
 }
 DuplicateDefinitionException.prototype = new WaebricSemanticException();
 
-/** Semantic Exception class for functions calls with incorrect arguments 
+/** 
+ * Semantic Exception class for functions calls with incorrect arguments 
  * 
  * @param {Markup} The function call with the incorrect number of arguments
  * @return {WaebricSemanticException} A Semantic Exception
@@ -52,7 +57,8 @@ function IncorrectArgumentsException(functionCall, env){
 }
 IncorrectArgumentsException.prototype = new WaebricSemanticException();
 
-/** Semantic Exception class for undefined variables
+/** 
+ * Semantic Exception class for undefined variables
  * 
  * @param {Object} exception
  * @return {WaebricSemanticException} A Semantic Exception
