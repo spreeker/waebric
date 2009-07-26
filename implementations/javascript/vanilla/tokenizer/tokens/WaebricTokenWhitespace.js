@@ -13,4 +13,4 @@ WaebricToken.WHITESPACE = function(){
 WaebricToken.WHITESPACE.prototype = new WaebricToken();
 
 WaebricToken.WHITESPACE.ALLOWEDCHARS	= '[\n\t\r ]'
-WabericToken.WHITESPACE.SPACE 			= ' '
+WaebricToken.WHITESPACE.SPACE 			= " "

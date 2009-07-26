@@ -1,6 +1,9 @@
 importPackage(java.io)
 
+
 load("../tokenizer/WaebricTokenizer.js");
+load("../tokenizer/WaebricTokenizerResult.js");
+load("../tokenizer/WaebricTokenizerException.js");
 load("../tokenizer/WaebricCharacter.js");
 
 load("../tokenizer/tokens/WaebricToken.js");
@@ -27,14 +30,10 @@ function loadProgram(){
     return program;
 }
 
-
-function action(){
-	var tokenizer = new WaebricTokenizer();
-	tokenizer.tokenizeAll(loadProgram());
-
+function write(tokens){
 	var text = ""
-	for(tokenIndex in tokenizer.lexemes){
-		token = (tokenizer.lexemes[tokenIndex])	
+	for(tokenIndex in tokens){		
+		token = (tokens[tokenIndex])	
 		text += (token.type + ' : ' + token.value + '\n');
 	}
 	
@@ -42,6 +41,14 @@ function action(){
 	var bf = new BufferedWriter(fw);
 	bf.write(text);
 	bf.close();
+}
+function action(){	
+	try {
+		var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram());
+		write(tokenizerResult.tokens);
+	}catch(exception){
+		print(exception)
+	}
 }
 
 action();
