@@ -7,12 +7,19 @@
  */
 WaebricToken.TEXT = function(value){
 	this.value = value;
-	this.type = 'TEXT'
+	this.type = 'TEXT';
 }
 
 WaebricToken.TEXT.prototype = new WaebricToken();
 
-WaebricToken.TEXT.QUOTEDTEXT_STARTCHAR	= '"'
-WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR 	= '"'
-WaebricToken.TEXT.EMBED_STARTCHAR		= '<'
-WaebricToken.TEXT.EMBED_ENDCHAR			= '>'
+WaebricToken.TEXT.QUOTEDTEXT_STARTCHAR			= '"'
+WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR 			= '"'
+WaebricToken.TEXT.EMBED_STARTCHAR				= '<'
+WaebricToken.TEXT.EMBED_ENDCHAR					= '>'
+WaebricToken.TEXT.SINGLEQUOTEDTEXT_STARTCHAR	= "'"
+WaebricToken.TEXT.SINGLEQUOTEDTEXT_ALLOWEDCHARS = "[^ \t\n\r;,>]"	
+
+WaebricToken.TEXT.isSingleQuotedText = function(value){
+	var regExp = new RegExp(WaebricToken.TEXT.SINGLEQUOTEDTEXT_ALLOWEDCHARS);
+	return value.match(regExp);
+}

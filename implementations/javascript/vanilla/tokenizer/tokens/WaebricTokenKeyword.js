@@ -29,7 +29,8 @@ WaebricToken.KEYWORD.keywords = [
 	WaebricToken.KEYWORD.ECHO 				= 'ECHO',
 	WaebricToken.KEYWORD.CDATA 				= 'CDATA',
 	WaebricToken.KEYWORD.COMMENT 			= 'COMMENT',
-	WaebricToken.KEYWORD.YIELD 				= 'YIELD'
+	WaebricToken.KEYWORD.YIELD 				= 'YIELD',
+	WaebricToken.KEYWORD.IN 				= 'IN'
 ]
 
 /**
