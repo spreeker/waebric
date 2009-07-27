@@ -2,18 +2,15 @@ package org.cwi.waebric.checker;
 
 import java.util.List;
 
-import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.interpreter.Environment;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
-import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
@@ -37,42 +34,14 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * Construct checker
 	 * @param exceptions
 	 */
-	public DeclarationChecker(List<SemanticException> exceptions) {
+	public DeclarationChecker(List<SemanticException> exceptions, Environment environment) {
 		this.exceptions = exceptions;
-		environment = new Environment();
+		this.environment = environment;
 	}
 	
 	@Override
-	public void visit(Module module) {
-		// Retrieve all dependent modules and store their definitions
-		List<Module> dependancies = ModuleRegister.getInstance().loadDependencies(module);
-		
-		// Store function definitions
-		for(Module component: dependancies) {
-			for(FunctionDef function: component.getFunctionDefinitions()) {
-				if(environment.isDefinedFunction(function.getIdentifier().getName())) {
-					// Function is already defined, store exception
-					exceptions.add(new DuplicateFunctionDefinition(function));
-				} else {
-					// Store definition
-					environment.defineFunction(function);
-				}
-			}
-		}
-		
-		for(Module component: dependancies) {
-			// Check each function definition for invalid definitions
-			for(FunctionDef function: component.getFunctionDefinitions()) {
-				function.accept(this);
-			}
-			
-			// Check each site definition for invalid definitions
-			for(Site site: component.getSites()) {
-				for(Mapping mapping: site.getMappings()) {
-					mapping.getMarkup().accept(this);
-				}
-			}
-		}	
+	public void visit(Mapping mapping) {
+		mapping.getMarkup().accept(this); // Skip path
 	}
 	
 	@Override
@@ -203,7 +172,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public class ArityMismatchException extends SemanticException {
+	public static class ArityMismatchException extends SemanticException {
 
 		/**
 		 * Generated serial ID
@@ -224,7 +193,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public class DuplicateFunctionDefinition extends SemanticException {
+	public static class DuplicateFunctionDefinition extends SemanticException {
 
 		/**
 		 * Generated serial ID
@@ -249,7 +218,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public class UndefinedFunctionException extends SemanticException {
+	public static class UndefinedFunctionException extends SemanticException {
 
 		/**
 		 * Generated serial ID
@@ -272,7 +241,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public class UndefinedVariableException extends SemanticException {
+	public static class UndefinedVariableException extends SemanticException {
 
 		/**
 		 * Generated serial ID

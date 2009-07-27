@@ -8,7 +8,6 @@ import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
-import org.cwi.waebric.parser.ast.module.Modules;
 
 public class ModuleChecker extends DefaultNodeVisitor {
 
@@ -28,18 +27,9 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	@Override
 	public void visit(Module module) {
 		module.getIdentifier().accept(this);
-		
-		Modules dependancies = ModuleRegister.getInstance().loadDependencies(module);
-		for(Module dependancy: dependancies) {
-			for(Import imprt: dependancy.getImports()) {
-				imprt.accept(this);
-			}
+		for(Import imprt: module.getImports()) {
+			imprt.accept(this);
 		}
-	}
-	
-	@Override
-	public void visit(Import imprt) {
-		imprt.getIdentifier().accept(this);
 	}
 	
 	@Override
@@ -58,7 +48,7 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	 * @author Jeroen van Schagen
 	 * @date 09-06-2009
 	 */
-	public class NonExistingModuleException extends SemanticException {
+	public static class NonExistingModuleException extends SemanticException {
 
 		/**
 		 * Generated serial ID
