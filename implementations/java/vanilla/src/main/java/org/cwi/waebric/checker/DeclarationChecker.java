@@ -145,7 +145,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 			}
 		} else {
 			// When called function is not defined and is not a XHTML tag, report undefined function
-			if(! isXHTMLTag(call.getDesignator().getIdentifier())) {
+			if(! XHTMLTag.isXHTMLTag(call.getDesignator().getIdentifier().getName())) {
 				exceptions.add(new UndefinedFunctionException(call));
 			}
 		}
@@ -153,16 +153,6 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	
 	public Environment getEnvironment() {
 		return environment;
-	}
-	
-	public static boolean isXHTMLTag(IdCon identifier) {
-		if(identifier.getToken() == null || identifier.getToken().getLexeme() == null) { return false; }
-		String tag = identifier.getToken().getLexeme().toString();
-		try {
-			return XHTMLTag.valueOf(tag.toUpperCase()) != null;
-		} catch(IllegalArgumentException e) {
-			return false;
-		}
 	}
 	
 	/**

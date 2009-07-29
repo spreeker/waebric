@@ -68,7 +68,7 @@ public class IdCon extends AbstractSyntaxNode {
 	 * @return
 	 */
 	public String getName() {
-		return node.getToken().getLexeme().toString();
+		return this.getToken().getLexeme().toString();
 	}
 	
 	@Override
