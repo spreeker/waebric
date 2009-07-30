@@ -401,10 +401,11 @@ function WaebricInterpreterVisitor(){
 			//Assignments and statements in a let statement require a new environment under
 			//the current environment since the scope of the assignments (function/variable declaration)
 			// is limited to the statements inside the let statement
-			var new_env = this.env.addEnvironment('let-stmt');
+			var new_env = this.env;
 			
 			//Visit Assignments
 			for (var i = 0; i < letStmt.assignments.length; i++) {
+				new_env = new_env.addEnvironment('let-stmt');
 				var assignment = letStmt.assignments[i];
 				assignment.accept(new AssignmentVisitor(new_env, this.dom));
 			}
@@ -1018,7 +1019,7 @@ function WaebricInterpreterVisitor(){
 			var newFunctionFormals = funcbind.formals;
 			var newFunctionStatements = [funcbind.statement];
 			var newFunction = new FunctionDefinition(newFunctionName, newFunctionFormals, newFunctionStatements, true);
-			
+						
 			//Add function to current environment (let statement)
 			this.env.addFunction(newFunction);
 		}
@@ -1030,7 +1031,7 @@ function WaebricInterpreterVisitor(){
 	function MarkupVisitor(env, dom){
 		this.env = env;
 		this.dom = dom;
-		this.visit = function(markup){		
+		this.visit = function(markup){
 			if (markup instanceof MarkupCall){
 				//Call to function should exist, otherwise it's a tag
 				if (this.env.containsLocalFunction(markup.designator.idCon)) {
@@ -1051,7 +1052,7 @@ function WaebricInterpreterVisitor(){
 			}
 		}
 	}
-	
+
 	/**
 	 * Visitor Markup Calls
 	 */
@@ -1059,15 +1060,24 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(markup){			
-			var new_env = this.env.addEnvironment('markup-call')			
+			var new_env;
+			var functionDefinition;
+			
 			//Check if function already exists in current environment (incl dependecies)
-			var functionDefinition = this.env.getLocalFunction(markup.designator.idCon);
+			if (this.env.type == 'func-bind') {				
+				functionDefinition = this.env.parent.parent.parent.getLocalFunction(markup.designator.idCon);
+				new_env = this.env.parent.parent;
+			} else {
+				functionDefinition = this.env.getLocalFunction(markup.designator.idCon);
+				new_env = this.env.addEnvironment('markup-call');	
+			}
 						
 			//Store variables
 			for(var i = 0; i < markup.arguments.length; i++){
 				var variableValue = getExpressionValue(markup.arguments[i], this.env);	
 				new_env.addVariable('arg' + i, variableValue);
-			}				
+			}	
+
 			//Visit function definition
 			functionDefinition.accept(new FunctionDefinitionVisitor(new_env, this.dom));	
 		}

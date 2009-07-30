@@ -93,7 +93,7 @@ function WaebricEnvironment(){
 	 */
 	this.getFunction = function(funcName){
 		var root = this.getRootModule();		
-		return root.getLocalFunction(funcName)
+		return root.getLocalFunction(funcName);
 	}
 	
 	/**
@@ -104,13 +104,6 @@ function WaebricEnvironment(){
 	 * @return The requested function. Null if not found.
 	 */
 	this.getLocalFunction = function(funcName){	
-	
-		//Work arround for preventing endless loop in function bindings
-		if(this.parent != null && this.parent.type == 'func-bind'){
-			var parentModule = this.getParentModule();
-			return parentModule.getLocalFunction(funcName);
-		}
-		
 		//Search function local environment
 		for(var i = 0; i < this.functions.length; i++){
 			var func = this.functions[i];
@@ -119,7 +112,7 @@ function WaebricEnvironment(){
 			}
 		}
 		
-		//Search in the dependencies of the root module
+		//Search in the dependencies of the module
 		for (var i = 0; i < this.dependencies.length; i++) {
 			var dependency = this.dependencies[i];		
 			var func = dependency.getLocalFunction(funcName);
@@ -213,7 +206,6 @@ function WaebricEnvironment(){
 		}
 		return null;
 	}
-		
 	
 	/**
 	 * Returns a variable from the variablelist in the current environment or in it's
@@ -290,9 +282,5 @@ function WaebricEnvironment(){
 			exceptionList = exceptionList.concat(dependency.getExceptions());
 		}
 		return exceptionList;
-	}
-	
-	this.getVariableValue = function(){
-		
 	}
 }
