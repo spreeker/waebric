@@ -583,7 +583,10 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups/statements are
 				//intended for the YIELD statement 												
 				if(isValidMarkupCall(markup, this.env)){	
-					this.dom.addYield(constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1)), this.env);
+					var newMarkupStmt = constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1));
+					if (newMarkupStmt) {
+						this.dom.addYield(newMarkupStmt, this.env);
+					}
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					break;
 				}else{
@@ -607,7 +610,10 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 												
 				if(isValidMarkupCall(markup, this.env)){	
-					this.dom.addYield(constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding), this.env);
+					var newMarkupStmt = constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding);
+					if (newMarkupStmt) {
+						this.dom.addYield(newMarkupStmt, this.env);
+					}
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					return;
 				}else{
@@ -633,8 +639,11 @@ function WaebricInterpreterVisitor(){
 				var markup = markupStmtStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 												
-				if(isValidMarkupCall(markup, this.env)){		
-					this.dom.addYield(constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement), this.env);
+				if(isValidMarkupCall(markup, this.env)){	
+					var newMarkupStmt = constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement);
+					if(newMarkupStmt){
+						this.dom.addYield(newMarkupStmt, this.env);
+					}
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					return;
 				}else{
@@ -659,8 +668,11 @@ function WaebricInterpreterVisitor(){
 				var markup = markupExprStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 					
-				if(isValidMarkupCall(markup, this.env)){			
-					this.dom.addYield(constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression), this.env);
+				if(isValidMarkupCall(markup, this.env)){	
+				    var newMarkupStmt = constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression);
+					if(newMarkupStmt){
+						this.dom.addYield(newMarkupStmt, this.env);
+					}					
 					markup.accept(new MarkupVisitor(this.env, this.dom));	
 					return;
 				}else{
@@ -1018,10 +1030,10 @@ function WaebricInterpreterVisitor(){
 	function MarkupVisitor(env, dom){
 		this.env = env;
 		this.dom = dom;
-		this.visit = function(markup){			
+		this.visit = function(markup){		
 			if (markup instanceof MarkupCall){
 				//Call to function should exist, otherwise it's a tag
-				if (this.env.containsFunction(markup.designator.idCon)) {
+				if (this.env.containsLocalFunction(markup.designator.idCon)) {
 					markup.accept(new MarkupCallVisitor(this.env, this.dom))
 				}else{
 					markup.accept(new MarkupXHTMLTagVisitor(this.env, this.dom))
@@ -1029,7 +1041,7 @@ function WaebricInterpreterVisitor(){
 			}else{
 				//Tag should not be a reference to a function, 
 				//otherwise, it is processed as a MarkupCall
-				if(!this.env.containsFunction(markup.idCon)){
+				if(!this.env.containsLocalFunction(markup.idCon)){
 					markup.accept(new MarkupTagVisitor(this.env, this.dom))
 				}else{
 					//Convert to Markup Call
