@@ -483,8 +483,9 @@ function WaebricInterpreterVisitor(){
 		this.dom = dom;
 		this.visit = function(yieldStmt){
 			//Visit yield markup
-			if (this.dom.yieldValue != null) {
-				this.dom.yieldValue.accept(new StatementVisitor(this.dom.yieldEnv, this.dom));
+			var lastYield = this.dom.getLastYield();
+			if (lastYield != null) {
+				lastYield.value.accept(new StatementVisitor(lastYield.env, this.dom));
 			}
 		}
 	}
@@ -532,7 +533,9 @@ function WaebricInterpreterVisitor(){
 	 * @param {Object} tail
 	 */
 	function constructNewMarkupStatement(markups, tail){
-		if(tail == null){
+		if(tail == null && markups.length == 1){
+			return new MarkupStatement(markups[0]);
+		}else if(tail == null && markups.length > 1){
 			return new MarkupMarkupStatement(markups);
 		}else if(tail instanceof Embedding){
 			return new MarkupEmbeddingStatement(markups, tail);
@@ -580,8 +583,7 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups/statements are
 				//intended for the YIELD statement 												
 				if(isValidMarkupCall(markup, this.env)){	
-					this.dom.yieldValue = constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1));
-					this.dom.yieldEnv = this.env;	
+					this.dom.addYield(constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1)), this.env);
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					break;
 				}else{
@@ -605,8 +607,7 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 												
 				if(isValidMarkupCall(markup, this.env)){	
-					this.dom.yieldValue = constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding);
-					this.dom.yieldEnv = this.env;	
+					this.dom.addYield(constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding), this.env);
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					return;
 				}else{
@@ -633,8 +634,7 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 												
 				if(isValidMarkupCall(markup, this.env)){		
-					this.dom.yieldValue = constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement);
-					this.dom.yieldEnv = this.env;	
+					this.dom.addYield(constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement), this.env);
 					markup.accept(new MarkupVisitor(this.env, this.dom));				
 					return;
 				}else{
@@ -660,8 +660,7 @@ function WaebricInterpreterVisitor(){
 				//If a MarkupCall is found, then the remaining markups are
 				//intended for the YIELD statement 					
 				if(isValidMarkupCall(markup, this.env)){			
-					this.dom.yieldValue = constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression);
-					this.dom.yieldEnv = this.env;	
+					this.dom.addYield(constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression), this.env);
 					markup.accept(new MarkupVisitor(this.env, this.dom));	
 					return;
 				}else{

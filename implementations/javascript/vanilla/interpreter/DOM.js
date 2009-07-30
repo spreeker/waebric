@@ -5,10 +5,9 @@
 function DOM(){
 	this.document;
 	this.lastElement;
-	this.lastValue;
-	
-	this.yieldValue;
-	this.yieldEnv;
+	this.lastValue;	
+		
+	this.yieldList = new Array();
 	
 	/**
 	 * Creates the body of a strict XHTML document
@@ -42,4 +41,19 @@ function DOM(){
 	this.toString = function(){
 		return '\n\n\n' + this.document.xml + '\n\n\n';
 	}
+	
+	this.addYield = function(value, env){
+		print('add yield: ' + value + ' -  ' + env);
+		this.yieldList.push(new Yield(value, env));
+	}
+	
+	this.getLastYield = function(){
+		
+		return this.yieldList.pop();
+	}
+}
+
+function Yield(value, env){	
+	this.value = value;
+	this.env = env;
 }
