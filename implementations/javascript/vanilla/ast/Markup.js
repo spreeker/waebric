@@ -19,7 +19,7 @@ function MarkupCall (designator, arguments){
 	
 	//Methods
 	this.toString = function(){
-		return this.designator.idCon + "(" + this.arguments + ")";
+		return this.designator + "(" + this.arguments + ")";
 	}
 	
 	this.arguments.toString = function(){

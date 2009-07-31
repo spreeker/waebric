@@ -15,5 +15,9 @@
 function DesignatorTag (idCon, attributes){
 	this.idCon = idCon;
 	this.attributes = attributes;
+	
+	this.toString = function(){
+		return this.idCon + this.attributes;
+	}
 }
 DesignatorTag.prototype = new Node(); //Inheritance base class 

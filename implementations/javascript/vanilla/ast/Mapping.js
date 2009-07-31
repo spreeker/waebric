@@ -13,5 +13,9 @@
 function Mapping (path, markup){
 	this.path = path;
 	this.markup = markup;
+	
+	this.toString = function(){
+		return this.path + ' : ' + this.markup;
+	}
 }
 Mapping.prototype = new Node(); //Inheritance base class

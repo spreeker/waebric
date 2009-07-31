@@ -29,8 +29,7 @@ function WaebricTokenizer(){
      * @param {String} The input
      */
     this.tokenizeAll = function(input){
-		try {
-			
+		try {			
 			var currentChar = new WaebricCharacter(input, 0);
 			do {
 				currentChar = this.tokenize(currentChar);

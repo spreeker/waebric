@@ -13,6 +13,10 @@
  */
 function IdAttribute(id){
 	this.id = id;
+	
+	this.toString = function(){
+		return '#' + this.id;
+	}
 }
 IdAttribute.prototype = new Node(); //Inheritance base class
 
@@ -25,6 +29,10 @@ IdAttribute.prototype = new Node(); //Inheritance base class
  */
 function ClassAttribute(className){
 	this.className = className;
+	
+	this.toString = function(){
+		return '.' + this.className;
+	}
 }
 ClassAttribute.prototype = new Node(); //Inheritance base class
 
@@ -37,6 +45,10 @@ ClassAttribute.prototype = new Node(); //Inheritance base class
  */
 function NameAttribute(name){
 	this.name = name;
+	
+	this.toString = function(){
+		return '$' + this.name;
+	}
 }
 NameAttribute.prototype = new Node(); //Inheritance base class
 
@@ -49,6 +61,10 @@ NameAttribute.prototype = new Node(); //Inheritance base class
  */
 function TypeAttribute(type){
 	this.type = type;
+	
+	this.toString = function(){
+		return ':' + this.type;
+	}
 }
 TypeAttribute.prototype = new Node(); //Inheritance base class
 
@@ -63,6 +79,10 @@ TypeAttribute.prototype = new Node(); //Inheritance base class
 function WidthHeightAttribute(width, height){
 	this.width = width;
 	this.height = height;
+	
+	this.toString = function(){
+		return '@' + this.width + '%' + this.height;
+	}
 }
 WidthHeightAttribute.prototype = new Node(); //Inheritance base class
 
@@ -75,5 +95,9 @@ WidthHeightAttribute.prototype = new Node(); //Inheritance base class
  */
 function WidthAttribute(width){
 	this.width = width;
+	
+	this.toString = function(){
+		return '@' + this.width;
+	}
 }
 WidthAttribute.prototype = new Node(); //Inheritance base class

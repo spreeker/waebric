@@ -68,5 +68,5 @@ WaebricCharacter = function(input, position){
 }
 
 String.prototype.equals = function(input){
-	return this.toUpperCase() == input.toUpperCase();
+	return this.toString().toUpperCase() == input.toString().toUpperCase();
 }

@@ -32,7 +32,7 @@ function Module(moduleId, moduleElements){
 	}
 	
 	this.toString = function(){
-		return moduleId;
+		return moduleId.identifier;
 	}
 }
 Module.prototype = new Node(); //Inheritance base class

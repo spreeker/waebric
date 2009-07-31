@@ -7,7 +7,7 @@
 /**
  * ModuleId Class
  * 
- * (IdCon ",")* -> ModuleId ("module-id")
+ * (IdCon ".")* -> ModuleId ("module-id")
  * 
  * @param {Object} identifier
  */
