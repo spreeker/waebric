@@ -13,8 +13,9 @@
 function Argument (variable, expression){
 	this.variable = variable;
 	this.expression = expression;	
+	
 	this.toString = function(){
-		return this.variable + ':' + this.expression;
+		return this.variable + '=' + this.expression;
 	}
 }
 Argument.prototype = new Node();
