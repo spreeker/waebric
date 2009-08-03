@@ -68,18 +68,6 @@ public abstract class Token {
 	public void setCharacter(int charno) {
 		this.charno = charno;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(obj instanceof Token) {
-			Token token = (Token) obj; // Cast object
-			if(token.getLine() != this.getLine()) { return false; }
-			else if(token.getCharacter() != this.getCharacter()) { return false; }
-			else return token.getLexeme().equals(this.getLexeme());
-		}
-		
-		return false;
-	}
 	
 	@Override
 	public String toString() {
