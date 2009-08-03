@@ -15,7 +15,7 @@ function Argument (variable, expression){
 	this.expression = expression;	
 	
 	this.toString = function(){
-		return this.variable + '=' + this.expression;
+		return this.variable + '=' + this.expression.toString();
 	}
 }
 Argument.prototype = new Node();

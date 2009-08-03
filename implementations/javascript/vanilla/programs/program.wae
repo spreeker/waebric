@@ -1,8 +1,6 @@
 
 module homepage.cwi.nl
 
-import copyrights
-
 site
-	index.html : div#body.HeaderClass$New_Header:button@100%200(href="Nickolas")
+	index.html: div(width=xml.document.,value)
 end

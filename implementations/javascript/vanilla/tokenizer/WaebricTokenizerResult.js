@@ -31,4 +31,10 @@ function WaebricTokenizerResult(tokens){
 		}
 		return new WaebricToken.COMMENT('');
 	}
+	
+	this.toString = function(){
+		for(var tokenIndex in this.tokens){
+			print(tokens[tokenIndex].type + ' : ' + tokens[tokenIndex].value);
+		}
+	}
 }

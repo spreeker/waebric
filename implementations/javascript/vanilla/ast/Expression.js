@@ -20,7 +20,7 @@ function FieldExpression (expression, field){
 	
 	//Methods
 	this.toString = function(){
-		return this.expression + "." + this.field;
+		return "[" + this.expression.toString() + "." + this.field.toString() + "]";
 	}
 }
 FieldExpression.prototype = new Node(); //Inheritance base class
@@ -58,7 +58,7 @@ function TextExpression(text){
 	
 	//Methods
 	this.toString = function(){
-		return this.text;
+		return this.text.toString();
 	}
 }
 TextExpression.prototype = new Node(); //Inheritance base class
@@ -134,7 +134,7 @@ function ListExpression(list){
 	
 	//Methods
 	this.toString = function(){
-		return this.list.toString();
+		return "[" + this.list.toString() + "]";
 	}
 }
 ListExpression.prototype = new Node(); //Inheritance base class
@@ -162,7 +162,7 @@ function RecordExpression(records){
 	}	
 	
 	this.toString = function(){
-		return this.records.toString();
+		return "{" + this.records.toString() + "}";
 	}
 }
 RecordExpression.prototype = new Node(); //Inheritance base class
