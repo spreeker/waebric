@@ -2,5 +2,9 @@
 module homepage.cwi.nl
 
 site
-	index.html: div(width=xml.document.,value)
+	index.html: div(width={names: {name: ["Nickolas", {address: "Lamstraat"}]}}.names.address+"jpg")
+end
+
+def test[inputFile, outputFile)
+
 end

@@ -40,7 +40,7 @@ function CatExpression (expressionLeft, expressionRight){
 	
 	//Methods
 	this.toString = function(){
-		 return this.expressionLeft + "+" + expressionRight;
+		 return this.expressionLeft + expressionRight;
 	}
 }
 CatExpression.prototype = new Node(); //Inheritance base class

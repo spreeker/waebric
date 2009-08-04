@@ -109,7 +109,8 @@ function WaebricParser(){
 				var def = this.parseFunctionDefinition(this.currentToken.nextToken());
 				moduleElements.push(def);
 			} else {
-				print('Error parsing module elements. Expected IMPORT/SITE/DEF but current token is ' + this.currentToken);
+				print('Error parsing module elements. Expected IMPORT/SITE/DEF but current token is ' + this.currentToken.value);
+				this.currentToken = this.currentToken.nextToken();
 			}
 		}
 		return moduleElements;			
@@ -188,6 +189,74 @@ function WaebricParser(){
 		}
 		
 		return new Mapping(path, markup);
+	}
+	
+	
+	this.parseFunctionDefinition = function(token){
+		this.currentToken = token;
+		
+		var identifier;
+		var formals = new Array();
+		var statements = new Array();
+		
+		//First token should be an identifier
+		if(this.isIdentifier(this.currentToken.value)){
+			identifier = this.parseIdentifier(this.currentToken);
+		}else{
+			print('Error parsing function definition. Expected a FUNCTION NAME (IDENTIFIER) but found ' + this.currentToken.value);
+		}
+		
+		//Next token can be the start of formals
+		if(this.isStartFormals(this.currentToken.nextToken().value)){
+			formals = this.parseFormals(this.currentToken.nextToken().nextToken());
+		}
+
+		//Remaining tokens are part of statements
+		if (this.isStartStatement(this.currentToken.nextToken().value)) {
+			statements = this.parseStatements(this.currentToken.nextToken());
+		}else{
+			print('Error parsing function definition. Expected a STATEMENT but found ' + this.currentToken.value);
+		}
+		
+		return new FunctionDefinition(identifier, formals, statements)	
+	}
+	
+	
+	
+	this.isStartFormals = function(value){
+		return value == WaebricToken.SYMBOL.LEFTRBRACKET;
+	}
+	
+	this.parseFormals = function(token){
+		this.currentToken = token;
+		
+		var formals = new Array();		
+		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTRBRACKET){
+			//Skip COMMA seperator
+			if(formals.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA){
+				this.currentToken = this.currentToken.nextToken();
+			}else if(formals.length > 0){
+				print('Error parsing Formals. Expected COMMA after previous formal but found ' + this.currentToken.value);
+			}			
+			
+			if (this.isIdentifier(this.currentToken.value)) {
+				formals.push(this.currentToken.value);
+				this.currentToken = this.currentToken.nextToken();
+			}else{
+				print('Error parsing Formals. Expected formal but found ' + this.currentToken.value);				
+			}
+		}			
+		return formals;
+	}
+	
+	this.isStartStatement = function(value){
+		return true
+	}
+	
+	this.parseStatements = function(token){
+		this.currentToken = token;
+		this.currentToken = this.currentToken.nextToken();
+		return new Array();
 	}
 	
 	/**
@@ -305,11 +374,16 @@ function WaebricParser(){
 		|| this.isStartRecord(value) || this.isStartList(value) || this.isFieldExpression(value);
 	}
 	
-	this.parseExpression = function(token, ignoreFieldExpression){
+	this.parseExpression = function(token, ignoreFieldExpression, ignoreCatExpression){
 		this.currentToken = token;	
-			
-		if(this.isFieldExpression(this.currentToken) && !ignoreFieldExpression){
+		//print('start parsing expression')
+		
+		if(this.isCatExpression(this.currentToken) && !ignoreCatExpression){
+			return this.parseCatExpression(this.currentToken);
+		}else if(this.isFieldExpression(this.currentToken) && !ignoreFieldExpression){
 			return this.parseFieldExpression(this.currentToken);
+		}else if(this.isCatExpression(this.currentToken) && !ignoreCatExpression){
+			return this.parseCatExpression(this.currentToken);
 		}else if(this.isText(this.currentToken.value)){
 			return this.parseText(this.currentToken);
 		}else if(this.isIdentifier(this.currentToken.value)){
@@ -323,126 +397,6 @@ function WaebricParser(){
 		}else{
 			return "NYI"	
 		}
-	}
-	
-	this.isFieldExpression = function(token){		
-		//First token should be an expression
-		if(!this.isExpression(token.value)){
-			return false;
-		}
-		
-		//Next token should be a colon
-		if(!token.nextToken().value == WaebricToken.SYMBOL.COLON){
-			return false;
-		}
-		
-		//2nd next token should be an Identifier
-		if(!this.isIdentifier(token.nextToken().nextToken().value)){
-			return false;
-		}
-		return true;
-	}
-	
-	this.parseFieldExpression = function(token){
-		this.currentToken = token;
-		
-		var expressionToken = this.currentToken;
-		var fieldToken = this.currentToken.nextToken().nextToken();				
-				
-		var expression = this.parseExpression(expressionToken, true);
-		var field = this.parseIdentifier(fieldToken);		
-		var fieldExpression = new FieldExpression(expression, field);
-		
-		while (fieldToken.nextToken().value == WaebricToken.SYMBOL.DOT) {	
-			if(this.isIdentifier(fieldToken.nextToken().nextToken().value)){
-				var field = this.parseIdentifier(fieldToken.nextToken().nextToken(), true);			
-				fieldExpression = new FieldExpression(fieldExpression, field);
-				fieldToken = this.currentToken;	
-			}else{
-				print('Error parsing FieldExpression. Expected IDENTIFIER as FIELD but found ' + fieldToken.nextToken().nextToken().value);
-				return;
-			}		
-		}
-		
-		return fieldExpression;
-	}
-	
-	this.isStartList = function(value){
-		return value == WaebricToken.SYMBOL.LEFTBBRACKET;
-	}
-	
-	this.parseList = function(token){
-		this.currentToken = token;
-
-		var list = new Array();
-		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTBBRACKET){
-			//Detect the list-item seperator
-			if(list.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA){
-				this.currentToken = this.currentToken.nextToken(); //Skip comma	
-			}else if(list.length > 0){
-				print('Error parsing List. Expected COMMA after previous list item but found ' + this.currentToken.value);
-				return;
-			}			
-			var expression = this.parseExpression(this.currentToken);
-			list.push(expression);
-			this.currentToken = this.currentToken.nextToken()
-		}
-		return new ListExpression(list);
-	}
-	
-	this.isStartRecord = function(value){
-		return value == WaebricToken.SYMBOL.LEFTCBRACKET;
-	}
-	
-	this.parseRecord = function(token){
-		this.currentToken = token;
-
-		var list = new Array();
-		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTCBRACE){
-			//Detect the list-item seperator
-			if(list.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA){
-				this.currentToken = this.currentToken.nextToken(); //Skip comma	
-			}else if(list.length > 0){
-				print('Error parsing Record. Expected COMMA after previous record item but found ' + this.currentToken.value);
-				return;
-			}			
-			
-			//Parse KeyValuePair
-			var expression = this.parseKeyValuePair(this.currentToken);
-			list.push(expression);
-			this.currentToken = this.currentToken.nextToken()
-		}
-		return new RecordExpression(list);
-	}
-	
-	this.parseKeyValuePair = function(token){
-		this.currentToken = token;
-		
-		var key;
-		var value;
-		
-		//Parse Identifier
-		if (this.isIdentifier(this.currentToken.value)) {
-			key = this.parseIdentifier(this.currentToken)
-		}else{
-			print('Error parsing KeyValuePair. Expected IDENTIFIER as KEY but found ' + this.currentToken.value);
-		}
-		
-		//Parse Colon
-		if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.COLON) {
-			this.currentToken = this.currentToken.nextToken().nextToken(); //Skip colon
-		}else{
-			print('Error parsing KeyValuePair. Expected COLON after IDENTIFIER but found ' + this.currentToken.value);
-		}
-		
-		//Parse Expression
-		if (this.isExpression(this.currentToken.value)) {
-			value = this.parseIdentifier(this.currentToken)
-		}else{
-			print('Error parsing KeyValuePair. Expected EXPRESSION as VALUE but found ' + this.currentToken.value);
-		}
-		
-		return new KeyValuePair(key, value);
 	}
 	
 	this.isText = function(value){
@@ -473,6 +427,187 @@ function WaebricParser(){
 	this.parseNatural = function(token){
 		this.currentToken = token;
 		return new NatExpression(this.currentToken.value);
+	}
+	
+	this.isStartRecord = function(value){
+		return value == WaebricToken.SYMBOL.LEFTCBRACKET;
+	}
+	
+	this.parseRecord = function(token){
+		this.currentToken = token;
+
+		var list = new Array();
+		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTCBRACKET){
+			//Detect the list-item seperator
+			if(list.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA){
+				this.currentToken = this.currentToken.nextToken(); //Skip comma	
+			}else if(list.length > 0){
+				print('Error parsing Record. Expected COMMA after previous record item but found ' + this.currentToken.value);
+				return;
+			}			
+			
+			//Parse KeyValuePair
+			var expression = this.parseKeyValuePair(this.currentToken);
+			list.push(expression);
+			this.currentToken = this.currentToken.nextToken()
+		}
+		return new RecordExpression(list);
+	}
+			
+	this.parseKeyValuePair = function(token){
+		this.currentToken = token;
+		
+		var key;
+		var value;
+		
+		//Parse Identifier
+		if (this.isIdentifier(this.currentToken.value)) {
+			key = this.parseIdentifier(this.currentToken)
+		}else{
+			print('Error parsing KeyValuePair. Expected IDENTIFIER as KEY but found ' + this.currentToken.value);
+		}
+		
+		//Parse Colon
+		if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.COLON) {
+			this.currentToken = this.currentToken.nextToken().nextToken(); //Skip colon
+		}else{
+			print('Error parsing KeyValuePair. Expected COLON after IDENTIFIER but found ' + this.currentToken.value);
+		}
+		
+		//Parse Expression
+		if (this.isExpression(this.currentToken.value)) {
+			value = this.parseExpression(this.currentToken)
+		}else{
+			print('Error parsing KeyValuePair. Expected EXPRESSION as VALUE but found ' + this.currentToken.value);
+		}
+
+		return new KeyValuePair(key, value);
+	}
+
+	this.isStartList = function(value){
+		return value == WaebricToken.SYMBOL.LEFTBBRACKET;
+	}
+	
+	this.parseList = function(token){
+		this.currentToken = token;
+
+		var list = new Array();
+		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTBBRACKET){
+			//Detect the list-item seperator
+			if(list.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA){
+				this.currentToken = this.currentToken.nextToken(); //Skip comma	
+			}else if(list.length > 0){
+				print('Error parsing List. Expected COMMA after previous list item but found ' + this.currentToken.value);
+				return;
+			}			
+			var expression = this.parseExpression(this.currentToken);
+			list.push(expression);
+			this.currentToken = this.currentToken.nextToken()
+		}
+		return new ListExpression(list);
+	}
+	
+	this.isFieldExpression = function(token){	
+		//First token should be an expression
+		if(!this.isExpression(token.value)){
+			return false;
+		}
+		//Next token should be a DOT
+		var tokenAfterNextExpression = this.getTokenAfterExpression(token)
+		if(!(tokenAfterNextExpression.value == WaebricToken.SYMBOL.DOT)){
+			return false;
+		}
+		
+		//2nd next token should be an Identifier
+		if(!this.isIdentifier(tokenAfterNextExpression.nextToken().value)){
+			return false;
+		}
+		
+		return true;
+	}
+
+	this.parseFieldExpression = function(token){
+		this.currentToken = token;
+		var expressionToken = this.currentToken;
+		var fieldToken = this.getTokenAfterExpression(this.currentToken).nextToken();
+		
+		var expression = this.parseExpression(expressionToken, true);
+		var field = this.parseIdentifier(fieldToken);
+		var fieldExpression = new FieldExpression(expression, field);
+		
+		while (fieldToken.nextToken().value == WaebricToken.SYMBOL.DOT) {
+			if (this.isIdentifier(fieldToken.nextToken().nextToken().value)) {
+				var field = this.parseIdentifier(fieldToken.nextToken().nextToken(), true);
+				fieldExpression = new FieldExpression(fieldExpression, field);
+				fieldToken = this.currentToken;
+			} else {
+				print('Error parsing FieldExpression. Expected IDENTIFIER as FIELD but found ' + fieldToken.nextToken().nextToken().value);
+				return;
+			}
+		}
+		
+		//If the fieldExpression is followed by a "PLUS" sign, than it is part of a catExpression.
+		//Cannot be forseen before since the fieldexpression has a higher priority
+		if (this.currentToken.nextToken().value == '+') {			
+			var expressionLeft = fieldExpression;
+			var expressionRight = this.parseExpression(this.currentToken.nextToken().nextToken());
+			var catExpression = new CatExpression(expressionLeft,expressionRight);	
+			return catExpression;
+		} else {
+			return fieldExpression;
+		}
+	}
+	
+	this.isCatExpression = function(token){			
+		//First token should be an expression
+		if(!this.isExpression(token.value)){
+			return false;
+		}
+		//Next token should be a colon
+		var tokenAfterNextExpression = this.getTokenAfterExpression(token)
+		if(!(tokenAfterNextExpression.value == WaebricToken.SYMBOL.PLUS)){
+			return false;
+		}
+		//2nd next token should be an Identifier
+		if(!this.isExpression(tokenAfterNextExpression.nextToken().value)){	
+			return false;
+		}
+		
+		return true;
+	}
+	
+	this.parseCatExpression = function(token){
+		this.currentToken = token;
+		
+		var expressionLeft = this.parseExpression(this.currentToken, false, true);
+		var expressionRight = this.parseExpression(this.currentToken.nextToken().nextToken());
+		var catExpression = new CatExpression(expressionLeft,expressionRight);		
+		
+		return catExpression;
+	}
+	
+	this.getTokenAfterExpression = function(token){
+		if(token.value == WaebricToken.SYMBOL.LEFTCBRACKET){
+			return this.getTokenAfterBracketEnding(token, WaebricToken.SYMBOL.LEFTCBRACKET, WaebricToken.SYMBOL.RIGHTCBRACKET)
+		}else if(token.value == WaebricToken.SYMBOL.LEFTBBRACKET){
+			return this.getTokenAfterBracketEnding(token, WaebricToken.SYMBOL.LEFTBBRACKET, WaebricToken.SYMBOL.RIGHTBBRACKET)
+		}else{
+			return token.nextToken();
+		}
+	}
+	
+	this.getTokenAfterBracketEnding = function(token, symbolLeft, symbolRight){
+		var leftBracketsFound = 0;
+		var rightBracketsFound = 0;
+		do{
+			if (token.value == symbolLeft){
+				leftBracketsFound++;
+			}else if(token.value == symbolRight){
+				rightBracketsFound++;
+			}
+			token = token.nextToken();
+		}while(leftBracketsFound != rightBracketsFound)
+		return token;
 	}
 	
 	this.parseAttributes = function(token){

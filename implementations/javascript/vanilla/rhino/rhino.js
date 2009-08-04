@@ -77,6 +77,7 @@ function action(){
 		print(parserResult.moduleId.identifier);
 		print(parserResult.imports);
 		print(parserResult.site.mappings);
+		print(parserResult.functionDefinitions.toString());
 		print('\n');
 	//}catch(exception){
 	//	print(exception)
