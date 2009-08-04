@@ -241,7 +241,9 @@ public class WaebricScanner {
 		while(curr != '"' || previous == '\\') {
 			if(curr == EOF) {
 				// Unclosed text token, store exception
-				exceptions.add(new LexicalException.UnclosedText(buffer, tpos));
+				exceptions.add(new LexicalException("\"" + buffer + 
+						"\" at position " + tpos.lineno + ", " + tpos.charno +
+						"is not closed, attached a double quote."));
 				return;
 			} else if(curr == '<' && ! inStringContext()) {
 				// Embedding character detected, scan as embed and quit text
@@ -258,11 +260,19 @@ public class WaebricScanner {
 		if(inStringContext()) {
 			if(isString(buffer)) { 
 				tokens.add(new Token.StringToken(buffer, tpos.lineno, tpos.charno)); 
-			} else { exceptions.add(new LexicalException.InvalidString(buffer, tpos)); }
+			} else { 
+				exceptions.add(new LexicalException("\"" + buffer + 
+					"\" at position " + tpos.lineno + ", " + tpos.charno +
+					"is an invalid string construction.")); 
+			}
 		} else {
 			if(isText(buffer)) {
 				tokens.add(new Token.TextToken(buffer, tpos.lineno, tpos.charno));
-			} else { exceptions.add(new LexicalException.InvalidText(buffer, tpos)); }
+			} else { 
+				exceptions.add(new LexicalException("\"" + buffer + 
+					"\" at position " + tpos.lineno + ", " + tpos.charno +
+					"is an invalid text construction.")); 
+			}
 		}
 
 		read(); // Skip closure " symbol
@@ -292,7 +302,9 @@ public class WaebricScanner {
 		do {
 			if(curr == EOF) {
 				// Unclosed embedding token, store exception
-				exceptions.add(new LexicalException.UnclosedEmbedding(buffer, cpos));
+				exceptions.add(new LexicalException("\"" + buffer + 
+					"\" at position " + tpos.lineno + ", " + tpos.charno +
+					"is an unclosed embedding, attach >\"."));
 				return;
 			}
 			

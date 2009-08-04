@@ -42,7 +42,7 @@ public class TestWaebricScanner {
 		StringReader reader = new StringReader("\"text");
 		WaebricScanner scanner = new WaebricScanner(reader);
 		List<LexicalException> e = scanner.tokenizeStream();
-		assertEquals(LexicalException.UnclosedText.class, e.get(0).getClass());
+		assertEquals(LexicalException.class, e.get(0).getClass());
 	}
 	
 	@Test
@@ -106,7 +106,7 @@ public class TestWaebricScanner {
 		StringReader reader = new StringReader("\"pre<post");
 		WaebricScanner scanner = new WaebricScanner(reader);
 		List<LexicalException> e = scanner.tokenizeStream();
-		assertEquals(LexicalException.UnclosedEmbedding.class, e.get(0).getClass());
+		assertEquals(LexicalException.class, e.get(0).getClass());
 	}
 	
 	@Test
