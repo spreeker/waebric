@@ -22,7 +22,7 @@ function FunctionDefinition (functionName, formals, statements, isFunctionBindin
 	
 	//Methods
 	this.toString = function(){
-		return '\n' + this.functionName + "(" + this.formals.toString() + "){\n" + this.statements.toString() + '}';
+		return '\n' + this.functionName + "(" + this.formals.toString() + "){\n\n" + this.statements.join('\n') + '\n}';
 	}
 }
 FunctionDefinition.prototype = new Node(); //Inheritance base class

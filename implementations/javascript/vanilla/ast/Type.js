@@ -9,8 +9,10 @@
  * 
  * "list" -> Type ("list-type")
  */
-function ListType(){
-	this.type = ListExpression;
+function ListType(){	
+	this.toString = function(){
+		return 'list'
+	}
 }
 ListType.prototype = new Node(); //Inheritance base class
 
@@ -20,7 +22,9 @@ ListType.prototype = new Node(); //Inheritance base class
  * "record" -> Type ("record-type")
  */
 function RecordType(){
-	this.type = RecordExpression;
+	this.toString = function(){
+		return 'record'
+	}
 }
 RecordType.prototype = new Node(); //Inheritance base class
 
@@ -30,6 +34,8 @@ RecordType.prototype = new Node(); //Inheritance base class
  * "string" -> Type ("string-type")
  */
 function StringType(){
-	this.type = TextExpression;
+	this.toString = function(){
+		return 'string'
+	}
 }
 StringType.prototype = new Node(); //Inheritance base class
