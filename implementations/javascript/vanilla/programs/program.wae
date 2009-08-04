@@ -5,6 +5,11 @@ site
 	index.html: div(width={names: {name: ["Nickolas", {address: "Lamstraat"}]}}.names.address+"jpg")
 end
 
-def test[inputFile, outputFile)
+def test(inputFile, outputFile)
+	if(!output.list?)
+		div("Nickolas");
+	else
+		div("Jeroen");
 
+	div("Nickolas");
 end

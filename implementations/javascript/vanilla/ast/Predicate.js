@@ -13,6 +13,10 @@
  */
 function NotPredicate (predicate){
 	this.predicate = predicate;
+	
+	this.toString = function(){
+		return '!' + this.predicate.toString();
+	}
 }
 NotPredicate.prototype = new Node(); //Inheritance base class
 
@@ -27,6 +31,10 @@ NotPredicate.prototype = new Node(); //Inheritance base class
 function AndPredicate (predicateLeft, predicateRight){
 	this.predicateLeft = predicateLeft;
 	this.predicateRight = predicateRight;
+	
+	this.toString = function(){
+		return '[ ' + this.predicateLeft.toString() + ' && ' + this.predicateRight.toString() +' ]';
+	}
 }
 AndPredicate.prototype = new Node(); //Inheritance base class
 
@@ -41,6 +49,10 @@ AndPredicate.prototype = new Node(); //Inheritance base class
 function OrPredicate (predicateLeft, predicateRight){
 	this.predicateLeft = predicateLeft;
 	this.predicateRight = predicateRight;
+	
+	this.toString = function(){
+		return '[ ' + this.predicateLeft.toString() + ' || ' + this.predicateRight.toString() + ' ]';
+	}
 }
 OrPredicate.prototype = new Node(); //Inheritance base class
 

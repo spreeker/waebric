@@ -26,15 +26,18 @@ WaebricToken.SYMBOL.symbols = [
 	WaebricToken.SYMBOL.EQ 				= '=',
 	WaebricToken.SYMBOL.LESSTHAN 		= '<',
 	WaebricToken.SYMBOL.GREATERTHAN		= '>',
-	WaebricToken.SYMBOL.AND		 		= '&&',
-	WaebricToken.SYMBOL.OR	 			= '||',
+	WaebricToken.SYMBOL.AND		 		= '&',
+	WaebricToken.SYMBOL.DOUBLEAND		= '&&',
+	WaebricToken.SYMBOL.OR		 		= '|',
+	WaebricToken.SYMBOL.DOUBLEOR		= '||',
 	WaebricToken.SYMBOL.QUESTION		= '?',
 	WaebricToken.SYMBOL.CROSSHATCH		= '#',
 	WaebricToken.SYMBOL.DOLLAR			= '$',
 	WaebricToken.SYMBOL.AT	 			= '@',
 	WaebricToken.SYMBOL.PERCENT			= '%',
 	WaebricToken.SYMBOL.PLUS			= '+',
-	WaebricToken.SYMBOL.COMMA			= ','
+	WaebricToken.SYMBOL.COMMA			= ',',
+	WaebricToken.SYMBOL.EXCLAMATION		= '!' 
 ]
 
 /**

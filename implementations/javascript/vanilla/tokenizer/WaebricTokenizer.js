@@ -29,7 +29,7 @@ function WaebricTokenizer(){
      * @param {String} The input
      */
     this.tokenizeAll = function(input){
-		try {			
+		//try {			
 			var currentChar = new WaebricCharacter(input, 0);
 			do {
 				currentChar = this.tokenize(currentChar);
@@ -37,12 +37,12 @@ function WaebricTokenizer(){
 			
 			return this.tokenList;	
 			
-		}catch(exception if (exception instanceof WaebricTokenizerException)){
-			throw exception;
-		}catch(exception){
-			print(exception)
-			throw new WaebricTokenizerException("Tokenization failed.")
-		}
+		//}catch(exception if (exception instanceof WaebricTokenizerException)){
+		//	throw exception;
+		//}catch(exception){
+		//	print(exception)
+		//	throw new WaebricTokenizerException("Tokenization failed.")
+		//}
     }
     
     /**

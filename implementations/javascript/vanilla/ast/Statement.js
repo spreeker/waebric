@@ -15,6 +15,10 @@
 function IfStatement(predicate, ifStatement){
 	this.predicate = predicate;
 	this.ifStatement = ifStatement;
+	
+	this.toString = function(){
+		return 'if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}\n' 
+	}
 }
 IfStatement.prototype = new Node(); //Inheritance base class
 
@@ -31,6 +35,10 @@ function IfElseStatement(predicate, ifStatement, elseStatement){
 	this.predicate = predicate;
 	this.ifStatement = ifStatement;
 	this.elseStatement = elseStatement;
+	
+	this.toString = function(){
+		return 'if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}else{\n' + this.elseStatement.toString() + '\n}\n' 
+	}
 }
 IfElseStatement.prototype = new Node(); //Inheritance base class
 
