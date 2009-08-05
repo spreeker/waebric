@@ -1,16 +1,12 @@
 
-module homepage.cwi.nl
+module homepage
 
-site
-	index.html: div(width={names: {name: ["Nickolas", {address: "Lamstraat"}]}}.names.address+"jpg");
-	index.html: div(width={names: {name: ["Nickolas", {address: "Lamstraat"}]}}.names.address+"jpg")
-end
-
-def test(inputFile, outputFile)
-	if(!{name: "Nickolas"}.name.item+"jpg")
-		div("Nickolas");
-	else
-		div("Jeroen");
-
-	div("Nickolas");
+def test(input, output)
+	let
+		makeimage(path) = img(src=path, border=0);
+		makeimage(path) = img(src=path, border=0);
+		caption = "MCT goes USA! - San Francisco 2008";
+	in
+		dodit("image01.jpg");
+	end
 end
