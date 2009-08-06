@@ -35,7 +35,7 @@ function MidTextTail(mid, embed, tail){
 	this.tail = tail;
 	
 	this.toString = function(){
-		return ['mid: ' + this.mid + ', embed: ' + this.embed + ', this.tail: ' + tail]
+		return '[mid: ' + this.mid.toString() + ', embed: ' + this.embed.toString() + ', tail: ' + this.tail.toString() + "]"
 	}
 }
 MidTextTail.prototype = new Node(); //Inheritance base class

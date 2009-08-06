@@ -20,7 +20,7 @@ function FieldExpression (expression, field){
 	
 	//Methods
 	this.toString = function(){
-		return "[" + this.expression.toString() + "." + this.field.toString() + "]";
+		return "[fieldexpr: " + this.expression.toString() + "." + this.field.toString() + "]";
 	}
 }
 FieldExpression.prototype = new Node(); //Inheritance base class

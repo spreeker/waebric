@@ -2,11 +2,5 @@
 module homepage
 
 def test(input, output)
-	let
-		makeimage(path) = img(src=path, border=0);
-		makeimage(path) = img(src=path, border=0);
-		caption = "MCT goes USA! - San Francisco 2008";
-	in
-		dodit("image01.jpg");
-	end
+	echo "Gibbs <em is> cool but Abi is <em cooler";
 end

@@ -71,7 +71,7 @@ function write(tokens){
 function action(){	
 	//try {
 		var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram());
-		//print(tokenizerResult)
+		write(tokenizerResult.tokens)
 		var parserResult = WaebricParser.parseAll(tokenizerResult);
 		print('\n');
 		print(parserResult.moduleId.identifier);

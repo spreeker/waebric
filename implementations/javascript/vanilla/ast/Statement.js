@@ -93,9 +93,9 @@ BlockStatement.prototype = new Node(); //Inheritance base class
  */
 function CommentStatement(comment){
 	this.comment = comment;
+	
 	this.toString = function(){
-		//Make sure that new lines, tabs etc are processed properly
-		return eval(this.comment);
+		return "comment: " + this.comment;
 	}
 }
 CommentStatement.prototype = new Node(); //Inheritance base class
@@ -109,6 +109,10 @@ CommentStatement.prototype = new Node(); //Inheritance base class
  */
 function EchoStatement(expression){
 	this.expression = expression;
+	
+	this.toString = function(){
+		return "echo: " + this.expression.toString(); 
+	}
 }
 EchoStatement.prototype = new Node(); //Inheritance base class
 
@@ -121,6 +125,10 @@ EchoStatement.prototype = new Node(); //Inheritance base class
  */
 function EchoEmbeddingStatement(embedding){
 	this.embedding = embedding;
+	
+	this.toString = function(){
+		return "echoembedding: " + this.embedding.toString(); 
+	}
 }
 EchoEmbeddingStatement.prototype = new Node(); //Inheritance base class
 

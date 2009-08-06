@@ -305,6 +305,7 @@ function WaebricParser(){
 		//Validate opening formal
         var isValidOpening = (tempToken.value == WaebricToken.SYMBOL.LEFTRBRACKET);		
 		if(!isValidOpening){
+			
 			return false;
 		}
 		
@@ -382,18 +383,80 @@ function WaebricParser(){
         
         if (this.isStartIfStatement(this.currentToken)) {
             return this.parseIfElseStatement(this.currentToken);
-        } else if (this.isStartEachStatement(this.currentToken)) {
-            return this.parseEachStatement(this.currentToken)
-        } else if(this.isStartLetStatement(this.currentToken)){
+        } 		
+		else if (this.isStartEachStatement(this.currentToken)) {
+            return this.parseEachStatement(this.currentToken);
+        }		
+		else if(this.isStartLetStatement(this.currentToken)){
 			return this.parseLetStatement(this.currentToken);
-		} else if (this.isMarkup(this.currentToken)) {
-            return this.parseMarkup(this.currentToken)
-        } else {
-            print('Error parsing statement. Expected start of a statement but found ' + this.currentToken.value);
-            this.currentToken = this.currentToken.nextToken(); //TODO: REMOVE THIS IF ALL STATEMENTS ARE IMPLEMENTED
-        }
+		} 
+		else if(this.isStartBlockStatement(this.currentToken)){
+			return this.parseBlockStatement(this.currentToken);
+		} 
+		else if(this.isStartCommentStatement(this.currentToken)){
+			return this.parseCommentStatement(this.currentToken);
+		} 
+		else if (this.isEchoEmbeddingStatement(this.currentToken)) {
+			return this.parseEchoEmbeddingStatement(this.currentToken);
+		} 
+		else if (this.isEchoStatement(this.currentToken)) {
+			return this.parseEchoStatement(this.currentToken);
+		} 
+		else if (this.isMarkupStatement(this.currentToken)) {
+			return this.parseMarkupStatement(this.currentToken)
+		} 
+		else if (this.isMarkupMarkupStatement(this.currentToken)) {
+			return this.parseMarkupMarkupStatement(this.currentToken)
+		} 
+		else if (this.isMarkupExpressionStatement(this.currentToken)) {
+			return this.parseMarkupExpressionStatement(this.currentToken)
+		}
+		else {
+			print('Error parsing statement. Expected start of a statement but found ' + this.currentToken.value);
+			this.currentToken = this.currentToken.nextToken(); //TODO: REMOVE THIS IF ALL STATEMENTS ARE IMPLEMENTED
+		}
         return new Array();
     }
+		
+	this.isStartBlockStatement = function(token){
+		return token.value == WaebricToken.SYMBOL.LEFTCBRACKET;
+	}
+	
+	this.parseBlockStatement = function(token){
+		this.currentToken = token.nextToken(); //Skip "{" opening
+		
+		var statements = new Array();
+		while(this.currentToken.value != WaebricToken.SYMBOL.RIGHTCBRACKET){
+			var statement = this.parseStatement(this.currentToken);
+			statements.push(statement);
+			this.currentToken = this.currentToken.nextToken();
+		}		
+		return statements;
+	}
+	
+	this.isStartCommentStatement = function(token){
+		return WaebricToken.KEYWORD.COMMENT.equals(token.value);
+	}
+	
+	this.parseCommentStatement = function(token){
+		this.currentToken = token.nextToken();
+		
+		var comment;
+		if (this.isStrCon(this.currentToken)) {
+			comment = this.parseStrCon(this.currentToken);
+		}else{
+			print('Error parsing comment. Expected StrCon after keyword COMMENT but found ' + this.currentToken.value)
+		}
+		
+		var isValidClosing = (this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON);
+		if(isValidClosing){
+			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		}else{
+			print('Error parsing comment. Expected semicolon after comment but found ' + this.currentToken.nextToken().value)
+		}
+		
+		return new CommentStatement(comment);
+	}
 	
 	this.isStartLetStatement = function(token){
 		return WaebricToken.KEYWORD.LET.equals(token.value);
@@ -670,16 +733,17 @@ function WaebricParser(){
         
         return currentPredicate;
     }
-    
-    /**
-     * Checks whether the input value is valid markup
-     *
-     * @param {WaebricParserToken}
-     * @param {Boolean}
-     */
-    this.isMarkup = function(token){
-        return token.value instanceof WaebricToken.IDENTIFIER;
-    }
+
+	this.isMarkupStatement = function(token){	
+		var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+		if(!hasValidMarkup){return false;}
+		
+		var tokenAfterMarkup = this.getTokenAfterMarkup(token);
+		var hasValidClosing = !this.isMarkup(tokenAfterMarkup) && !this.isExpression(tokenAfterMarkup) 
+			&& !this.isStartEmbedding(tokenAfterMarkup); 
+		
+		return hasValidClosing;
+	}
     
     /**
      * Parses Markup
@@ -690,36 +754,132 @@ function WaebricParser(){
      * @param {WaebricParserToken} token
      * @return {Markup}
      */
-    this.parseMarkup = function(token){
+    this.parseMarkupStatement = function(token){	
         this.currentToken = token;
-        
-        if (this.currentToken.value instanceof WaebricToken.IDENTIFIER) {
+		
+		var markup = this.parseMarkup(this.currentToken);
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if (!hasValidClosing) {
+			print('Error parsing MarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+		}
+		
+		this.currentToken = this.currentToken.nextToken();	//Skip ";" ending
+		return new MarkupStatement(markup);			
+    }
+	
+	this.isMarkupMarkupStatement = function(token){	
+		var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+		if(!hasValidMarkup){return false;}
+		
+		var tokenAfterMarkup = this.getTokenAfterMarkup(token);
+		var isMarkupStatement = tokenAfterMarkup.value == WaebricToken.SYMBOL.SEMICOLON; 
+		if(isMarkupStatement){return false;}
+				
+		var tokenAfterMarkups = this.getTokenAfterMarkups(tokenAfterMarkup);
+		var hasMarkupClosing = !this.isExpression(tokenAfterMarkups) && !this.isStartEmbedding(tokenAfterMarkups);
+		return hasMarkupClosing;
+	}
+	
+	this.isMarkupExpressionStatement = function(token){
+		var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+		if(!hasValidMarkup){return false};
+		
+		var tokenAfterMarkups = this.getTokenAfterMarkups(token);
+		var hasNoClosingAfterMarkups = (tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON);
+		var hasMarkupAfterMarkup = hasNoClosingAfterMarkups && this.isExpression(tokenAfterMarkups);
+		return hasMarkupAfterMarkup;
+	}
+	
+	this.parseMarkupExpressionStatement = function(token){
+		this.currentToken = token;
+		
+		var markups = this.parseMarkups(this.currentToken);
+		var expression = this.parseExpression(this.currentToken.nextToken());
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if (!hasValidClosing) {
+			print('Error parsing MarkupExpressionStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+		}
+		
+		this.currentToken = this.currentToken.nextToken();	//Skip ";" ending
+		return new MarkupExpressionStatement(markups, expression)	
+	}
+	
+	this.getTokenAfterMarkups = function(token){			
+		var tempToken = token;
+		while(this.isMarkup(tempToken)){
+			tempToken = this.getTokenAfterMarkup(tempToken);
+		}
+		return tempToken;
+	}
+	
+	this.getTokenAfterMarkup = function(token){			
+		var tempToken = token.nextToken(); //Skip identifier
+		
+		//Skip attributes
+		while (this.isAttribute(tempToken)) {
+			tempToken = tempToken.nextToken();
+		}
+		
+		//Skip formals
+		var isStartFormal = tempToken.value == WaebricToken.SYMBOL.LEFTRBRACKET;
+		if (isStartFormal) {
+			while (tempToken.value != WaebricToken.SYMBOL.RIGHTRBRACKET) {
+				tempToken = tempToken.nextToken();
+			}
+			tempToken = tempToken.nextToken();//Skip right bracket
+		}
+		return tempToken; 
+	}
+	
+	this.parseMarkupMarkupStatement = function(token){
+        this.currentToken = token;
+		var markups = this.parseMarkups(this.currentToken);
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if (hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();	
+			return new MarkupMarkupStatement(markups);			
+		}else{
+			print('Error parsing MarkupMarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+			throw new Error();
+		}
+    }
+	
+	this.parseMarkups = function(token){
+		var markups = new Array();
+		while(this.isMarkup(this.currentToken)){
+			var markup = this.parseMarkup(this.currentToken);
+			markups.push(markup);
+			this.currentToken = this.currentToken.nextToken();
+		}
+		this.currentToken = this.currentToken.previousToken();
+		return markups;
+	}
+	
+	/**
+     * Checks whether the input value is valid markup
+     *
+     * @param {WaebricParserToken}
+     * @param {Boolean}
+     */
+    this.isMarkup = function(token){
+        return token.value instanceof WaebricToken.IDENTIFIER;
+    }
+	
+	this.parseMarkup = function(token){
+		 if (this.currentToken.value instanceof WaebricToken.IDENTIFIER) {
             var designator = this.parseDesignator(this.currentToken);
+			
             //If arguments found, parse as markup call
             if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
                 var arguments = this.parseArguments(this.currentToken.nextToken());
-				var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-				if (isValidClosing) {
-					this.currentToken = this.currentToken.nextToken();
-					return new MarkupCall(designator, arguments);
-				}else{
-					print('Error parsing Markup. Expected ";" but found ' + this.currentToken.nextToken().value);
-					throw new Error();
-				}
+				return new MarkupCall(designator, arguments);				
             }
-            //If no arguments found, parse as Markup
-			var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-			if (isValidClosing) {
-				this.currentToken = this.currentToken.nextToken();
-				return designator;
-			}else{
-				print('Error parsing Markup. Expected ";" but found ' + this.currentToken.nextToken().value);
-				throw new Error();
-			}
+			return designator;
         }
-        
-        print('Error parsing Markup. Expected IDENTIFIER MARKUP but found ' + this.currentToken.value);
-    }
+		print('Error parsing Markup. Expected IDENTIFIER MARKUP but found ' + this.currentToken.value);
+	}
     
     /**
      * Parses a designator
@@ -851,15 +1011,14 @@ function WaebricParser(){
      * @return {Boolean}
      */
     this.isExpression = function(token){
-		if (token.value == WaebricToken.SYMBOL.SEMICOLON) {
+		if (token.value == null || token.value == WaebricToken.SYMBOL.SEMICOLON || WaebricToken.KEYWORD.END.equals(token.value)) {
 			return false;
 		} else {		
 			return (this.isText(token) ||
 			this.isIdentifier(token) ||
 			this.isNatural(token) ||
 			this.isStartRecord(token) ||
-			this.isStartList(token) ||
-			this.isFieldExpression(token.value));
+			this.isStartList(token));
 		}
     }
     
@@ -899,7 +1058,7 @@ function WaebricParser(){
      * @param {WaebricParserToken} token
      * @return {Boolean}
      */
-    this.isText = function(token){
+    this.isText = function(token){		
         var regExp = new RegExp('^([^\x00-\x1F\&\<\"\x80-\xFF]*[\n\r\t]*(\\\\&)*(\\\\")*(&#[0-9]+;)*(&#x[0-9a-fA-F]+;)*(&[a-zA-Z_:][a-zA-Z0-9.-_:]*;)*)*$');
         return (token.value instanceof WaebricToken.TEXT) && (token.value.match(regExp) != null);
     }
@@ -914,6 +1073,103 @@ function WaebricParser(){
         this.currentToken = token;
         return new TextExpression(this.currentToken.value);
     }
+	
+	this.isStartEmbedding = function(token){	
+		var isValidOpening = this.isText(token);		
+		var isValidSeperator = token.nextToken().value == WaebricToken.SYMBOL.LESSTHAN;
+		return isValidOpening && isValidSeperator;
+	}
+	
+	this.parseEmbedding = function(token){
+		this.currentToken = token;
+		
+		var head = this.parseText(this.currentToken);
+		var embed = this.parseEmbed(this.currentToken.nextToken().nextToken());		
+		var tail = this.parseTail(this.currentToken.nextToken());
+		return new Embedding(head, embed, tail);
+	}
+	
+	this.parseTail = function(token){
+		this.currentToken = token;
+		var text = "";	
+		
+		//Validate seperator
+		var hasValidSeperator = this.currentToken.value == WaebricToken.SYMBOL.GREATERTHAN;
+		if(!hasValidSeperator){
+			print('Error parsing TextTail. Expected > but found ' + this.currentToken.value)
+		}		
+		
+		//Get next symbol to determine PostTextTail or MidTextTail		
+		if(this.isText(this.currentToken.nextToken())){
+			text = this.parseText(this.currentToken.nextToken());
+			if(this.currentToken.nextToken().value != WaebricToken.SYMBOL.SEMICOLON){
+				this.currentToken = this.currentToken.nextToken();	
+			}
+		}
+		
+		//If > follows, than the remaining tokens are processed as TEXT 
+		//since they are part an embedding
+		if(this.currentToken.value == WaebricToken.SYMBOL.LESSTHAN){
+			var embed = this.parseEmbed(this.currentToken.nextToken());
+			var tail = this.parseTail(this.currentToken.nextToken());
+			return new MidTextTail(text, embed, tail)
+		}else{
+			return new PostTextTail(text);
+		}
+	}
+	
+	this.parseEmbed = function(token){
+		this.currentToken = token;
+		
+		var markups = this.parseMarkups(this.currentToken)
+		if(this.isExpression(this.currentToken.nextToken())){
+			var expression = this.parseExpression(this.currentToken.nextToken());
+			return new ExpressionEmbedding(markups, expression);
+		}
+		return new MarkupEmbedding(markups);
+	}
+	
+	this.isStrCon = function(token){
+		var regExp = new RegExp('^([^\x00-\x1F\"\\\\]*(\\\\n)*(\\\\t)*(\\\\")*(\\\\[0-9]{3})*)*$');
+        return token.value instanceof WaebricToken.TEXT && token.value.match(regExp) != null;		
+	}
+	
+	this.parseStrCon = function(token){
+		this.currentToken = token;
+		return this.currentToken.value;
+	}
+	
+	this.isEchoStatement = function(token){
+		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
+		var isValidExpression = isValidOpening && this.isExpression(token.nextToken());
+		return isValidExpression;
+	}
+	
+	this.parseEchoStatement = function(token){
+		this.currentToken = token; 
+		
+		var expression = this.parseExpression(this.currentToken.nextToken());
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		return new EchoStatement(expression);
+	}
+	
+	this.isEchoEmbeddingStatement = function(token){
+		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
+		var isValidEmbedding = isValidOpening && this.isStartEmbedding(token.nextToken());
+		return isValidEmbedding;
+	}
+	
+	this.parseEchoEmbeddingStatement = function(token){
+		this.currentToken = token; 
+		var embedding = this.parseEmbedding(this.currentToken.nextToken());
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if(!hasValidClosing){
+			print('Error parsing EchoEmbeddingStatement. Expected ";" but found ' + this.currentToken.nextToken().value);			
+		}		
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		return new EchoEmbeddingStatement(embedding);
+	}
     
     /**
      * Checks whether the input value equals IDENTIFIER
