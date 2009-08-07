@@ -217,5 +217,9 @@ MarkupStatementStatement.prototype = new Node(); //Inheritance base class
 function MarkupEmbeddingStatement (markups, embedding){
 	this.markups = markups;
 	this.embedding = embedding;
+	
+	this.toString = function(){
+		return "[MarkupEmbeddingStmt: " + this.markups + "," + this.embedding + "]";
+	}
 }
 MarkupEmbeddingStatement.prototype = new Node(); //Inheritance base class

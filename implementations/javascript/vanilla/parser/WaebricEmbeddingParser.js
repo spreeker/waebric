@@ -1,0 +1,96 @@
+
+function WaebricEmbeddingParser(){
+	
+	this.currentToken;	
+	
+	this.expressionParser = new WaebricExpressionParser();
+	this.markupParser = new WaebricMarkupParser();
+	
+	this.parse = function(parentParser){
+		var embedding = this.parseEmbedding(parentParser.currentToken);
+		parentParser.currentToken = this.currentToken;
+		return embedding;
+	}
+	
+	/**
+	 * Checks whether the input value is the start of an {Embedding}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Boolean}
+	 */
+	this.isStartEmbedding = function(token){	
+		var isValidOpening = this.expressionParser.isText(token);		
+		var isValidSeperator = token.nextToken().value == WaebricToken.SYMBOL.LESSTHAN;
+		return isValidOpening && isValidSeperator;
+	}
+	
+	/**
+	 * Parses the input to an {Embedding}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Embedding}
+	 */
+	this.parseEmbedding = function(token){
+		this.currentToken = token;
+		
+		var head = this.expressionParser.parseText(this.currentToken);
+		var embed = this.parseEmbed(this.currentToken.nextToken().nextToken());		
+		var tail = this.parseTail(this.currentToken.nextToken());
+		return new Embedding(head, embed, tail);
+	}
+	
+	/**
+	 * Parses the input to a {PostTextTail} or a {MidTextTail}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {PostTextTail} or {MidTextTail}
+	 */
+	this.parseTail = function(token){
+		this.currentToken = token;
+		var text = "";	
+		
+		//Validate seperator
+		var hasValidSeperator = this.currentToken.value == WaebricToken.SYMBOL.GREATERTHAN;
+		if(!hasValidSeperator){
+			print('Error parsing TextTail. Expected > but found ' + this.currentToken.value)
+		}		
+		
+		//Get next symbol to determine PostTextTail or MidTextTail		
+		if(this.expressionParser.isText(this.currentToken.nextToken())){
+			this.currentToken = this.currentToken.nextToken();
+			text = this.expressionParser.parseText(this.currentToken);
+			if(this.currentToken.nextToken().value != WaebricToken.SYMBOL.SEMICOLON){
+				this.currentToken = this.currentToken.nextToken();	
+			}
+		}
+		
+		//If > follows, than the remaining tokens are processed as TEXT 
+		//since they are part an embedding
+		if(this.currentToken.value == WaebricToken.SYMBOL.LESSTHAN){
+			var embed = this.parseEmbed(this.currentToken.nextToken());
+			var tail = this.parseTail(this.currentToken.nextToken());
+			return new MidTextTail(text, embed, tail)
+		}else{
+			return new PostTextTail(text);
+		}
+	}
+	
+	/**
+	 * Parses the input to an {Embed}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Embed}
+	 */
+	this.parseEmbed = function(token){
+		this.currentToken = token;
+		
+		var markups = this.markupParser.parseMultiple(this)
+		if(this.expressionParser.isExpression(this.currentToken.nextToken())){
+			this.currentToken = this.currentToken.nextToken();
+			var expression = this.expressionParser.parse(this);
+			return new ExpressionEmbedding(markups, expression);
+		}
+		return new MarkupEmbedding(markups);
+	}	
+
+}

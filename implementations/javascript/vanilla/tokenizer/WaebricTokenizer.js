@@ -118,7 +118,7 @@ function WaebricTokenizer(){
             currentChar = currentChar.nextChar();
         }
         
-        this.tokenList.addToken(token);
+        //this.tokenList.addToken(token);
         return currentChar;
     }
     
@@ -280,12 +280,11 @@ function WaebricTokenizer(){
 			
         //Process double quoted text until ending quote is found (or an embedding).
         while (!this.isEndQuoteText(currentChar) && !this.isStartEmbedding(currentChar) 
-		&& !this.isEndEmbedding(currentChar) && !this.isSymbol(currentChar)) {			
+		&& !this.isEndEmbedding(currentChar)) {			
             token.addChar(currentChar);
             currentChar = currentChar.nextChar();	
         }		
         currentChar = currentChar.nextChar(); //Skip the ending quote
-		
         return this.tokenizeText(token, currentChar);
     }
 	

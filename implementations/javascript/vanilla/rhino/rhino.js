@@ -40,6 +40,15 @@ load("../tokenizer/tokens/WaebricTokenWhitespace.js");
 
 load("../parser/WaebricParser.js");
 load("../parser/WaebricParserToken.js");
+load("../parser/WaebricModuleParser.js");
+load("../parser/WaebricSiteParser.js");
+load("../parser/WaebricMarkupParser.js");
+load("../parser/WaebricExpressionParser.js");
+load("../parser/WaebricImportParser.js");
+load("../parser/WaebricFunctionDefinitionParser.js");
+load("../parser/WaebricStatementParser.js");
+load("../parser/WaebricPredicateParser.js");
+load("../parser/WaebricEmbeddingParser.js");
 
 function loadProgram(){
     var fis = new FileInputStream('../programs/program.wae');
@@ -72,7 +81,7 @@ function action(){
 	//try {
 		var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram());
 		write(tokenizerResult.tokens)
-		var parserResult = WaebricParser.parseAll(tokenizerResult);
+		var parserResult = WaebricParser.parse(tokenizerResult);
 		print('\n');
 		print(parserResult.moduleId.identifier);
 		print(parserResult.imports);
