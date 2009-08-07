@@ -42,12 +42,20 @@ function WaebricStatementParser(){
             return this.parseEchoEmbeddingStatement(this.currentToken);
         } else if (this.isEchoStatement(this.currentToken)) {
             return this.parseEchoStatement(this.currentToken);
-        } else if (this.isMarkupStatement(this.currentToken)) {
+        } else if (this.isCDataStatement(this.currentToken)) {
+            return this.parseCDataStatement(this.currentToken);
+        } else if (this.isYieldStatement(this.currentToken)) {
+            return this.parseYieldStatement(this.currentToken);
+        }else if (this.isMarkupStatement(this.currentToken)) {
             return this.parseMarkupStatement(this.currentToken)
         } else if (this.isMarkupMarkupStatement(this.currentToken)) {
             return this.parseMarkupMarkupStatement(this.currentToken)
+        } else if (this.isMarkupEmbeddingStatement(this.currentToken)) {
+            return this.parseMarkupEmbeddingStatement(this.currentToken)
         } else if (this.isMarkupExpressionStatement(this.currentToken)) {
             return this.parseMarkupExpressionStatement(this.currentToken)
+        } else if (this.isMarkupStatementStatement(this.currentToken)) {
+            return this.parseMarkupStatementStatement(this.currentToken)
         } else {
             print('Error parsing statement. Expected start of a statement but found ' + this.currentToken.value);
             this.currentToken = this.currentToken.nextToken(); //TODO: REMOVE THIS IF ALL STATEMENTS ARE IMPLEMENTED
@@ -275,12 +283,11 @@ function WaebricStatementParser(){
         
         var isValidClosing = (this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON);
         if (isValidClosing) {
-            this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+            this.currentToken = this.currentToken.nextToken(); //Skip ";" end
+            return new CommentStatement(comment);
         } else {
             print('Error parsing comment. Expected semicolon after comment but found ' + this.currentToken.nextToken().value)
         }
-        
-        return new CommentStatement(comment);
     }
 	
 	/**
@@ -294,6 +301,98 @@ function WaebricStatementParser(){
         return token.value instanceof WaebricToken.TEXT && token.value.match(regExp) != null;		
 	}
     
+	/**
+	 * Checks whether the input value is an {EchoStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Boolean}
+	 */
+	this.isEchoStatement = function(token){
+		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
+		var isValidExpression = isValidOpening && this.expressionParser.isExpression(token.nextToken());
+		return isValidExpression;
+	}
+	
+	/**
+	 * Parses the input to an {EchoStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {EchoStatement}
+	 */
+	this.parseEchoStatement = function(token){
+		this.currentToken = token.nextToken(); 
+		
+		var expression = this.expressionParser.parse(this);
+		
+		var isValidClosing = (this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON);
+		if (isValidClosing) {
+			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+			return new EchoStatement(expression);
+		}else{
+			print('Error parsing EchoStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
+		}	
+	}
+	
+	/**
+	 * Checks whether the input value is a {CDataStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Boolean}
+	 */
+	this.isCDataStatement = function(token){
+		var isValidOpening = WaebricToken.KEYWORD.CDATA.equals(token.value);
+		var isValidExpression = isValidOpening && this.expressionParser.isExpression(token.nextToken());
+		return isValidExpression;
+	}
+	
+	/**
+	 * Parses the input to a {CDataStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {CDataStatement}
+	 */
+	this.parseCDataStatement = function(token){
+		this.currentToken = token.nextToken(); 
+		
+		var expression = this.expressionParser.parse(this);
+		
+		var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if (isValidClosing) {
+			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+			return new CDataExpression(expression);
+		}else{
+			print('Error parsing CDataStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
+		}
+	}
+	
+	/**
+	 * Checks whether the input value is a {YieldStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {Boolean}
+	 */
+	this.isYieldStatement = function(token){
+		return WaebricToken.KEYWORD.YIELD.equals(token.value);
+	}
+	
+	/**
+	 * Parses the input to a {YieldStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {YieldStatement}
+	 */
+	this.parseYieldStatement = function(token){
+		this.currentToken = token;
+		
+		var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		if (isValidClosing) {
+			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+			return new YieldStatement();
+		}else{
+			print('Error parsing YieldStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
+		}
+	}
+
 	/**
 	 * Checks whether the input value is an {EchoEmbeddingStatement}
 	 * 
@@ -324,33 +423,7 @@ function WaebricStatementParser(){
 		return new EchoEmbeddingStatement(embedding);
 	}
 	
-	/**
-	 * Checks whether the input value is an {EchoStatement}
-	 * 
-	 * @param {WaebricParserToken} token
-	 * @return {Boolean}
-	 */
-	this.isEchoStatement = function(token){
-		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
-		var isValidExpression = isValidOpening && this.expressionParser.isExpression(token.nextToken());
-		return isValidExpression;
-	}
-	
-	/**
-	 * Parses the input to an {EchoStatement}
-	 * 
-	 * @param {WaebricParserToken} token
-	 * @return {EchoStatement}
-	 */
-	this.parseEchoStatement = function(token){
-		this.currentToken = token.nextToken(); 
-		
-		var expression = this.expressionParser.parse(this);
-		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-		return new EchoStatement(expression);
-	}
-	
-	/**
+		/**
 	 * Checks whether the input value is a {MarkupStatement}
 	 * 
 	 * @param {WaebricParserToken} token
@@ -364,7 +437,8 @@ function WaebricStatementParser(){
         var tokenAfterMarkup = this.markupParser.getTokenAfterMarkup(token);
         var hasValidClosing = !this.markupParser.isMarkup(tokenAfterMarkup) 
 			&& !this.expressionParser.isExpression(tokenAfterMarkup) 
-			&& !this.embeddingParser.isStartEmbedding(tokenAfterMarkup);
+			&& !this.embeddingParser.isStartEmbedding(tokenAfterMarkup)
+			&& !this.isStartStatement(tokenAfterMarkup);			
         return hasValidClosing;
     }
 	
@@ -408,10 +482,64 @@ function WaebricStatementParser(){
         
         var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(tokenAfterMarkup);
         var hasMarkupClosing = !this.expressionParser.isExpression(tokenAfterMarkups) 
-			&& !this.embeddingParser.isStartEmbedding(tokenAfterMarkups);
+			&& !this.embeddingParser.isStartEmbedding(tokenAfterMarkups)
+			&& !this.isStartStatement(tokenAfterMarkups);
         return hasMarkupClosing;
     }
 	
+	/**
+	 * Parses the input to a {MarkupEmbeddingStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {MarkupEmbeddingStatement}
+	 */
+    this.parseMarkupMarkupStatement = function(token){
+        this.currentToken = token;
+        var markups = this.markupParser.parseMultiple(this);
+        var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (hasValidClosing) {
+            this.currentToken = this.currentToken.nextToken();
+            return new MarkupMarkupStatement(markups);
+        } else {
+            print('Error parsing MarkupMarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+            throw new Error();
+        }
+    }
+ 	
+	this.isMarkupEmbeddingStatement = function(token){		
+		var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+        if (!hasValidMarkup) {
+            return false
+        };
+        
+        var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(token);
+        var hasNoClosingAfterMarkups = (tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON);
+        var hasMarkupAfterMarkup = hasNoClosingAfterMarkups && this.embeddingParser.isStartEmbedding(tokenAfterMarkups);
+        return hasMarkupAfterMarkup;
+	}
+	
+	/**
+	 * Parses the input to a {MarkupEmbeddingStatement}
+	 * 
+	 * @param {WaebricParserToken} token
+	 * @return {MarkupEmbeddingStatement}
+	 */
+	this.parseMarkupEmbeddingStatement = function(token){
+        this.currentToken = token;
+        
+        var markups = this.markupParser.parseMultiple(this);
+		this.currentToken = this.currentToken.nextToken();
+        var embedding = this.embeddingParser.parse(this);
+        
+        var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+            print('Error parsing MarkupEmbeddingStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+        }
+        
+        this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+        return new MarkupEmbeddingStatement(markups, embedding)
+    }
+ 	
 	/**
 	 * Parses the input to a {MarkupMarkupStatement}
 	 * 
@@ -452,25 +580,39 @@ function WaebricStatementParser(){
         return hasMarkupAfterMarkup;
     }
     
+		
 	/**
-	 * Parses the input to a {MarkupExpressionStatement}
+	 * Parses the input to a {MarkupMarkupStatement}
 	 * 
 	 * @param {WaebricParserToken} token
-	 * @return {MarkupExpressionStatement}
+	 * @return {MarkupMarkupStatement}
 	 */
-    this.parseMarkupMarkupStatement = function(token){
+	this.parseMarkupStatementStatement = function(token){
         this.currentToken = token;
+        
         var markups = this.markupParser.parseMultiple(this);
-        var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-        if (hasValidClosing) {
-            this.currentToken = this.currentToken.nextToken();
-            return new MarkupMarkupStatement(markups);
-        } else {
-            print('Error parsing MarkupMarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
-            throw new Error();
-        }
+        var statement = this.parseStatement(this.currentToken.nextToken())
+        return new MarkupStatementStatement(markups, statement)
     }
-   
+    
+    /**
+     * Checks whether the input value is a {MarkupExpressionStatement}
+     * 
+     * @param {WaebricParserToken} token
+     * @return {MarkupExpressionStatement}
+     */
+    this.isMarkupStatementStatement = function(token){
+        var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+        if (!hasValidMarkup) {
+            return false
+        };
+        
+        var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(token);
+        var hasNoClosingAfterMarkups = (tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON);
+        return hasNoClosingAfterMarkups;
+    }
+     
+	
    	/**
 	 * Parses the input to a {FunctionBinding} or {VariableBinding}
 	 * 
@@ -638,6 +780,21 @@ function WaebricStatementParser(){
         return formals;
     }
 
-
+	/***
+	 * Checks whether the input value is a statement.
+	 * Only the beginning of the statement if evaluated.
+	 * 
+	 * The statements that start with Markup are ignored.
+	 * This means that if the statement start with a Markup,
+	 * then the result is false, even if it is in fact the 
+	 * beginning of a statement. 
+	 */
+	this.isStartStatement = function(token){
+		return (WaebricToken.KEYWORD.IF.equals(token.value) || WaebricToken.KEYWORD.EACH.equals(token.value)
+			|| WaebricToken.KEYWORD.LET.equals(token.value) || WaebricToken.KEYWORD.COMMENT.equals(token.value)
+			|| WaebricToken.KEYWORD.ECHO.equals(token.value) || WaebricToken.KEYWORD.CDATA.equals(token.value)
+			|| WaebricToken.KEYWORD.YIELD.equals(token.value) ||token.value == WaebricToken.SYMBOL.LEFTCBRACKET)
+			
+	}
 
 }

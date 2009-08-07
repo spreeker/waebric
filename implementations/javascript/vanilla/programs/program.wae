@@ -43,14 +43,18 @@ def testBlockStatement(abc)
 	}
 end
 
-def testOtherStatement()
+def testOtherStatement(input)
 	comment "This is comment of the 2nd generation";
 	echo "Product " + {products: {music: "COLDPLAY"}.products.music};
 	echo "Some <em embeddings> from the 3th generation!";
 	table;
 	table td;
 	table tr td "content";
-	//table tr td "Michael Jackson <em 'was> a great artist...";
+	table tr td "Michael Jackson <em 'was> a great artist...";
+	h1 if(input) echo input; else echo "Not specified";
+	cdata "test";
+	yield;
+	cdata 'Howoa;
 end
 
 def testMarkup()

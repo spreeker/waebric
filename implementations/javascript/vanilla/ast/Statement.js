@@ -141,6 +141,10 @@ EchoEmbeddingStatement.prototype = new Node(); //Inheritance base class
  */
 function CDataExpression(expression){
 	this.expression = expression;
+	
+	this.toString = function(){
+		return '[CData: ' + this.expression + ']'
+	}
 }
 CDataExpression.prototype = new Node(); //Inheritance base class
 
@@ -150,7 +154,9 @@ CDataExpression.prototype = new Node(); //Inheritance base class
  * "yield" ";" -> Statement ("yield") 
  */
 function YieldStatement(){
-
+	this.toString = function(){
+		return "[yield]"
+	}
 }
 YieldStatement.prototype = new Node(); //Inheritance base class
 
@@ -177,6 +183,10 @@ MarkupStatement.prototype = new Node(); //Inheritance base class
 function MarkupExpressionStatement (markups, expression){
 	this.markups = markups;
 	this.expression = expression;
+	
+	this.toString = function(){
+		return "[MarkupExprStmt: " + this.markups + ', ' + this.expression + "]";
+	}
 }
 MarkupExpressionStatement.prototype = new Node(); //Inheritance base class
 
@@ -203,6 +213,10 @@ MarkupMarkupStatement.prototype = new Node(); //Inheritance base class
 function MarkupStatementStatement (markups, statement){
 	this.markups = markups;
 	this.statement = statement;
+	
+	this.toString = function(){
+		return "[MarkupStmtStmt: " + this.markups + ', ' + this.statement  + "]"
+	}
 }
 MarkupStatementStatement.prototype = new Node(); //Inheritance base class
 
