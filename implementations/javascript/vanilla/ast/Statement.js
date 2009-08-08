@@ -17,7 +17,7 @@ function IfStatement(predicate, ifStatement){
 	this.ifStatement = ifStatement;
 	
 	this.toString = function(){
-		return 'if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}\n' 
+		return '[if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}\n]' 
 	}
 }
 IfStatement.prototype = new Node(); //Inheritance base class
@@ -37,7 +37,7 @@ function IfElseStatement(predicate, ifStatement, elseStatement){
 	this.elseStatement = elseStatement;
 	
 	this.toString = function(){
-		return 'if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}else{\n' + this.elseStatement.toString() + '\n}\n' 
+		return '[if(' + this.predicate.toString() + '){\n' + this.ifStatement.toString() + '\n}else{\n' + this.elseStatement.toString() + '\n}\n]' 
 	}
 }
 IfElseStatement.prototype = new Node(); //Inheritance base class
@@ -81,6 +81,10 @@ LetStatement.prototype = new Node(); //Inheritance base class
  */
 function BlockStatement(statements){
 	this.statements = statements;
+	
+	this.toString = function(){
+		return '[blockstmt: ' + this.statements + ']';
+	}
 }
 BlockStatement.prototype = new Node(); //Inheritance base class
 
@@ -169,6 +173,10 @@ YieldStatement.prototype = new Node(); //Inheritance base class
  */
 function MarkupStatement (markup){
 	this.markup = markup;
+	
+	this.toString = function(){
+		return '[MarkupStmt: ' + this.markup + ']'
+	}
 }
 MarkupStatement.prototype = new Node(); //Inheritance base class
 
@@ -199,6 +207,10 @@ MarkupExpressionStatement.prototype = new Node(); //Inheritance base class
  */
 function MarkupMarkupStatement (markups){
 	this.markups = markups;
+	
+	this.toString = function(){
+		return '[MarkupMarkupStmt: ' + this.markups + ']'
+	}
 }
 MarkupMarkupStatement.prototype = new Node(); //Inheritance base class
 

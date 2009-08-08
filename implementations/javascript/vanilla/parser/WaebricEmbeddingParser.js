@@ -84,13 +84,30 @@ function WaebricEmbeddingParser(){
 	this.parseEmbed = function(token){
 		this.currentToken = token;
 		
-		var markups = this.markupParser.parseMultiple(this)
-		if(this.expressionParser.isExpression(this.currentToken.nextToken())){
+		var startTokenLastMarkup = this.markupParser.getLastMarkup(token);
+		var startToken = this.currentToken;
+		
+        var markups = this.markupParser.parseMultiple(this);	
+
+		//Make sure that Markup is processed correctly
+		// echo "<p>"; --> Variable
+		// echo "<p()>"; --> Markup
+		// echo "<p p>"; --> Markup, Variable
+		// echo "<p p()>"; --> Markup, Markup
+		var expression;
+		if(this.expressionParser.isExpression(this.currentToken.nextToken)){			
 			this.currentToken = this.currentToken.nextToken();
-			var expression = this.expressionParser.parse(this);
+			expression = this.expressionParser.parse(this); 
 			return new ExpressionEmbedding(markups, expression);
+		}else if(markups.length > 1 && !this.markupParser.isMarkupCall(startTokenLastMarkup)){	
+			markups = markups.slice(0, markups.length-1);	
+			expression = new VarExpression(startTokenLastMarkup.value);		
+			return new ExpressionEmbedding(markups, expression);	
+		}else if(markups.length == 1 && !this.markupParser.isMarkupCall(startToken)){
+			expression = new VarExpression(startToken.value);		
+			return new ExpressionEmbedding(new Array(), expression);	
 		}
-		return new MarkupEmbedding(markups);
+		return new MarkupEmbedding(markups);		
 	}	
 
 }

@@ -46,14 +46,14 @@ function WaebricStatementParser(){
             return this.parseCDataStatement(this.currentToken);
         } else if (this.isYieldStatement(this.currentToken)) {
             return this.parseYieldStatement(this.currentToken);
-        }else if (this.isMarkupStatement(this.currentToken)) {
+        } else if (this.isMarkupStatement(this.currentToken)) {
             return this.parseMarkupStatement(this.currentToken)
+        } else if (this.isMarkupExpressionStatement(this.currentToken)) {
+            return this.parseMarkupExpressionStatement(this.currentToken)
         } else if (this.isMarkupMarkupStatement(this.currentToken)) {
             return this.parseMarkupMarkupStatement(this.currentToken)
         } else if (this.isMarkupEmbeddingStatement(this.currentToken)) {
             return this.parseMarkupEmbeddingStatement(this.currentToken)
-        } else if (this.isMarkupExpressionStatement(this.currentToken)) {
-            return this.parseMarkupExpressionStatement(this.currentToken)
         } else if (this.isMarkupStatementStatement(this.currentToken)) {
             return this.parseMarkupStatementStatement(this.currentToken)
         } else {
@@ -252,7 +252,7 @@ function WaebricStatementParser(){
             statements.push(statement);
             this.currentToken = this.currentToken.nextToken();
         }
-        return statements;
+        return new BlockStatement(statements);
     }
     
 	/**
@@ -481,9 +481,10 @@ function WaebricStatementParser(){
         }
         
         var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(tokenAfterMarkup);
+		var lastMarkup = this.markupParser.getLastMarkup(token);
         var hasMarkupClosing = !this.expressionParser.isExpression(tokenAfterMarkups) 
 			&& !this.embeddingParser.isStartEmbedding(tokenAfterMarkups)
-			&& !this.isStartStatement(tokenAfterMarkups);
+			&& !this.isStartStatement(tokenAfterMarkups) && this.markupParser.isMarkupCall(lastMarkup);		
         return hasMarkupClosing;
     }
 	
@@ -549,10 +550,24 @@ function WaebricStatementParser(){
 	this.parseMarkupExpressionStatement = function(token){
         this.currentToken = token;
         
-        var markups = this.markupParser.parseMultiple(this);
-		this.currentToken = this.currentToken.nextToken();
-        var expression = this.expressionParser.parse(this);
-        
+		var startTokenLastMarkup = this.markupParser.getLastMarkup(token);
+        var markups = this.markupParser.parseMultiple(this);		
+
+		//Make sure that Markup is processed correctly
+		// p; --> Markup
+		// p p; --> Markup, Variable
+		// p p(); --> Markup, Markup
+		var expression;
+		if(this.expressionParser.isExpression(this.currentToken.nextToken)){
+			this.currentToken = this.currentToken.nextToken();
+			expression = this.expressionParser.parse(this); 
+		}else if(!this.markupParser.isMarkupCall(startTokenLastMarkup)){	
+			markups = markups.slice(0, markups.length-1);	
+			expression = new VarExpression(startTokenLastMarkup.value);			
+		}else{
+			print('Error parsing MarkupExpressionStatement. Expected Expression or DesignatorTag but found ' + this.currentToken.nextToken().value);
+		}
+		
         var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
         if (!hasValidClosing) {
             print('Error parsing MarkupExpressionStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
@@ -576,10 +591,13 @@ function WaebricStatementParser(){
         
         var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(token);
         var hasNoClosingAfterMarkups = (tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON);
-        var hasMarkupAfterMarkup = hasNoClosingAfterMarkups && this.expressionParser.isExpression(tokenAfterMarkups);
-        return hasMarkupAfterMarkup;
+		var lastMarkup = this.markupParser.getLastMarkup(token);
+        var hasExpressionAfterMarkup = hasNoClosingAfterMarkups && this.expressionParser.isExpression(tokenAfterMarkups);
+		var hasIdentifierAfterMarkup = !this.markupParser.isMarkupCall(lastMarkup)
+        return hasExpressionAfterMarkup || hasIdentifierAfterMarkup;
     }
     
+	
 		
 	/**
 	 * Parses the input to a {MarkupMarkupStatement}

@@ -43,7 +43,6 @@ function DOM(){
 	}
 	
 	this.addYield = function(value, env){
-		print('add yield: ' + value + ' -  ' + env);
 		this.yieldList.push(new Yield(value, env));
 	}
 	

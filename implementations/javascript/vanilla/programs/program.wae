@@ -1,67 +1,8 @@
 
 module homepage
 
-site
-	index.html: div#myId@100%20(href="Nickolas")
+
+def main()
+	echo "<table tr td boe>";
 end
 
-def testIfStatement
-	if(true)
-		div(href="www.java.be");
-end
-
-def testIfElseStatement
-	if(true)
-		div(href="www");
-	else
-		h5 "N.A.";
-end
-
-def testEachStatement
-	each(item : list)
-		echo item;
-end
-
-def testLetStatement(key)
-	let
-		td(path) = td img(src=path);
-		td(path) = table tr td(path);
-		key = "0110";
-	in
-		td("image01.jpg");
-		td("image02.jpg");
-		td("image03.jpg");
-		echo key;
-	end
-end
-
-def testBlockStatement(abc)
-	{
-		td("image01.jpg");
-		td("image02.jpg");
-		td("image03.jpg");
-	}
-end
-
-def testOtherStatement(input)
-	comment "This is comment of the 2nd generation";
-	echo "Product " + {products: {music: "COLDPLAY"}.products.music};
-	echo "Some <em embeddings> from the 3th generation!";
-	table;
-	table td;
-	table tr td "content";
-	table tr td "Michael Jackson <em 'was> a great artist...";
-	h1 if(input) echo input; else echo "Not specified";
-	cdata "test";
-	yield;
-	cdata 'Howoa;
-end
-
-def testMarkup()
-	p;
-	p p;
-	echo "<p>";
-	echo "<p()>";
-	echo "<p p>";
-	echo "<p p()>";
-end

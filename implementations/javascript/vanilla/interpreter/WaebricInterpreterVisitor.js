@@ -29,7 +29,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(module){			
-			//Get main function and output its statements
+			//Get main function and output its statements			
 			var mainFunction = this.env.getLocalFunction('main');
 			if (mainFunction != null) {
 				//Set path for output location
@@ -38,6 +38,8 @@ function WaebricInterpreterVisitor(){
 				//Output main function
 				this.dom.createXHTMLRoot();
 				mainFunction.accept(new FunctionDefinitionVisitor(this.env, this.dom));
+			}else{
+				print('No main function found!')
 			}
 		}
 	}
@@ -502,7 +504,7 @@ function WaebricInterpreterVisitor(){
 			cdataExpr.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
 			//Create CDATA element
-			var cdata = this.dom.document.createCDATASection(this.dom.lastValue);
+			var cdata = this.dom.document.createCDATASection(this.dom.lastValue.toString());
 			this.dom.lastElement.appendChild(cdata);
 		}
 	}
@@ -1092,7 +1094,7 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(markup){	
 			//Add tag/element to document (ignore html tags)
 			if (markup.designator.idCon != 'html') {
-				var element = this.dom.document.createElement(markup.designator.idCon);
+				var element = this.dom.document.createElement(markup.designator.idCon.toString());
 				this.dom.lastElement.appendChild(element);
 				this.dom.lastElement = element;
 			}			
@@ -1120,7 +1122,7 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(markup){
 			//Add tag/element to document (ignore html tags)
 			if (markup.idCon != 'html') {
-				var element = this.dom.document.createElement(markup.idCon);
+				var element = this.dom.document.createElement(markup.idCon.toString());
 				this.dom.lastElement.appendChild(element);
 				this.dom.lastElement = element;
 			}	
@@ -1163,7 +1165,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('id', attribute.id);
+			this.dom.lastElement.setAttribute('id', attribute.id.toString());
 		}
 	}
 	
@@ -1174,7 +1176,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('class', attribute.className);
+			this.dom.lastElement.setAttribute('class', attribute.className.toString());
 		}
 	}
 	
@@ -1185,7 +1187,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('name', attribute.name);
+			this.dom.lastElement.setAttribute('name', attribute.name.toString());
 		}
 	}
 	
@@ -1196,7 +1198,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('type', attribute.type);
+			this.dom.lastElement.setAttribute('type', attribute.type.toString());
 		}
 	}
 	
@@ -1207,8 +1209,8 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('width', attribute.width + 'px');
-			this.dom.lastElement.setAttribute('height', attribute.height + 'px');
+			this.dom.lastElement.setAttribute('width', attribute.width.toString() + 'px');
+			this.dom.lastElement.setAttribute('height', attribute.height.toString() + 'px');
 		}
 	}
 	
@@ -1219,7 +1221,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('width', attribute.width + 'px');
+			this.dom.lastElement.setAttribute('width', attribute.width.toString() + 'px');
 		}
 	}
 	
@@ -1250,7 +1252,7 @@ function WaebricInterpreterVisitor(){
 			argument.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
 			//Add attribute to last element
-			this.dom.lastElement.setAttribute(argument.variable, this.dom.lastValue);
+			this.dom.lastElement.setAttribute(argument.variable.toString(), this.dom.lastValue.toString());
 		}
 	}
 	

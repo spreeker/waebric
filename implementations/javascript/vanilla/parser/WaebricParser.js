@@ -37,5 +37,6 @@ function WaebricParser(){
  */
 WaebricParser.parse = function(tokenizerResult){
     var parser = new WaebricParser();
-    return parser.parse(tokenizerResult);
+    var module = parser.parse(tokenizerResult);
+	return new WaebricParserResult(module, new Array());
 }

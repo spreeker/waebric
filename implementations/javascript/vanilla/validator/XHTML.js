@@ -106,9 +106,7 @@ XHTML.tags = [
  */
 XHTML.isXHTMLTag = function(input){
 	for (var i = 0; i < XHTML.tags.length; i++) {
-		var str = "";
-		str.toLowerCase()
-		if (input.toLowerCase() == XHTML.tags[i]) {
+		if (input.toString().toLowerCase() == XHTML.tags[i]) {
 			return true;
 		}
 	}

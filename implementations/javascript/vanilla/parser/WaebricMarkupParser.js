@@ -26,16 +26,14 @@ function WaebricMarkupParser(){
 	this.parseMarkup = function(token){
 		this.currentToken = token;
 		
-		if (this.currentToken.value instanceof WaebricToken.IDENTIFIER) {
-            var designator = this.parseDesignator(this.currentToken);
-            //If arguments found, parse as markup call
-            if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
-                var arguments = this.parseArguments(this.currentToken.nextToken());
-				return new MarkupCall(designator, arguments);				
-            }
-			return designator;
-        }
-		print('Error parsing Markup. Expected IDENTIFIER MARKUP but found ' + this.currentToken.value);
+		if(this.isMarkupCall(this.currentToken)){
+			var designator = this.parseDesignator(this.currentToken);
+			var arguments = this.parseArguments(this.currentToken.nextToken());
+			return new MarkupCall(designator, arguments);		
+		}else{
+			var designator = this.parseDesignator(this.currentToken);
+			return designator
+		}
 	}
     
 	/**
@@ -67,6 +65,14 @@ function WaebricMarkupParser(){
 	    return token != null && token.value instanceof WaebricToken.IDENTIFIER;
 	}
 
+	this.isMarkupCall = function(token){
+		if (token.value instanceof WaebricToken.IDENTIFIER) {
+            if (token.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
+                return true;			
+            }
+        }
+		return false;
+	}
     /**
      * Parses a designator
      *
@@ -364,5 +370,14 @@ function WaebricMarkupParser(){
 			tempToken = tempToken.nextToken();//Skip right bracket
 		}
 		return tempToken; 
+	}
+
+	this.getLastMarkup = function(token){
+		var arrTokens = new Array();		
+		while(this.isMarkup(token)){
+			var token = this.getTokenAfterMarkup(token);
+			arrTokens.push(token);
+		}
+		return arrTokens[arrTokens.length-2];
 	}
 }
