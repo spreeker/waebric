@@ -219,7 +219,7 @@ function WaebricEnvironment(){
 		//Search function local environment
 		for(var i = 0; i < this.variables.length; i++){
 			var _var = this.variables[i];
-			if(name == _var.name){
+			if(name == _var.name){			
 				return _var;
 			}
 		}
@@ -239,10 +239,10 @@ function WaebricEnvironment(){
 	 * @param {String} variable
 	 * @return The requested variable. Null if not found
 	 */
-	this.getLocalVariable = function(name){
+	this.getLocalVariable = function(name){				
 		//Search function local environment
 		for(var i = 0; i < this.variables.length; i++){
-			var _var = this.variables[i];
+			var _var = this.variables[i];			
 			if(name == _var.name){
 				return _var;
 			}

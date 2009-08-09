@@ -445,7 +445,7 @@ function WaebricInterpreterVisitor(){
 		this.dom = dom;
 		this.visit = function(commentStmt){
 			//Create comment
-			var comment = this.dom.document.createComment(commentStmt.toString());
+			var comment = this.dom.document.createComment(commentStmt.comment.toString());
 			this.dom.lastElement.appendChild(comment);
 		}
 	}
@@ -584,9 +584,10 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupMarkupStmt.markups.length; i++) {
 				var markup = markupMarkupStmt.markups[i];					
 				//If a MarkupCall is found, then the remaining markups/statements are
-				//intended for the YIELD statement 												
-				if(isValidMarkupCall(markup, this.env)){	
-					var newMarkupStmt = constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1));
+				//intended for the YIELD statement 			
+				isLastMarkup = (i == markupMarkupStmt.markups.length-1)
+				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){
+					var newMarkupStmt = constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1));					
 					if (newMarkupStmt) {
 						this.dom.addYield(newMarkupStmt, this.env);
 					}
@@ -611,8 +612,9 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupEmbeddingStmt.markups.length; i++) {
 				markup = markupEmbeddingStmt.markups[i];								
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 												
-				if(isValidMarkupCall(markup, this.env)){	
+				//intended for the YIELD statement 		
+				isLastMarkup = (i == markupEmbeddingStmt.markups.length-1)										
+				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){	
 					var newMarkupStmt = constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding);
 					if (newMarkupStmt) {
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -641,8 +643,9 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupStmtStmt.markups.length; i++) {
 				var markup = markupStmtStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 												
-				if(isValidMarkupCall(markup, this.env)){	
+				//intended for the YIELD statement 	
+				isLastMarkup = (i == markupStmtStmt.markups.length-1)								
+				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){					
 					var newMarkupStmt = constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement);
 					if(newMarkupStmt){
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -670,8 +673,9 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupExprStmt.markups.length; i++) {
 				var markup = markupExprStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 					
-				if(isValidMarkupCall(markup, this.env)){	
+				//intended for the YIELD statement 	
+				isLastMarkup = (i == markupExprStmt.markups.length-1)				
+				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){					
 				    var newMarkupStmt = constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression);
 					if(newMarkupStmt){
 						this.dom.addYield(newMarkupStmt, this.env);

@@ -46,7 +46,6 @@ load("../parser/WaebricModuleParser.js");
 load("../parser/WaebricSiteParser.js");
 load("../parser/WaebricMarkupParser.js");
 load("../parser/WaebricExpressionParser.js");
-load("../parser/WaebricImportParser.js");
 load("../parser/WaebricFunctionDefinitionParser.js");
 load("../parser/WaebricStatementParser.js");
 load("../parser/WaebricPredicateParser.js");
@@ -63,8 +62,8 @@ load('../interpreter/WaebricInterpreter.js')
 load("../interpreter/WaebricInterpreterVisitor.js")
 load('../interpreter/DOM.js')
 
-function loadProgram(){
-    var fis = new FileInputStream('../programs/program.wae');
+function loadProgram(path){
+    var fis = new FileInputStream(path);
     var bis = new BufferedInputStream(fis);
     var dis = new DataInputStream(bis);
     
@@ -123,25 +122,25 @@ function writeHTML(waebricEnvironments){
 }
 
 
-function action(){	
+function convertToHTML(path){	
 	//Tokenizing
-	var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram());
+	var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram(path));
+	//writeTokenizerResult(tokenizerResult.tokens)
 	
 	//Parsing
 	var parserResult = WaebricParser.parse(tokenizerResult);
-	print(parserResult.module.functionDefinitions)
+	//print(parserResult.module.functionDefinitions)
 	
 	//Validating		
-	var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
+	//var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
 		
 	//Interpreting
 	var interpreterResult = WaebricInterpreter.interpreteAll(parserResult.module);		
 		
 	//Output results
 	//print(validationResult.exceptions)
-	print(interpreterResult.environments[0].document)
+	//print(interpreterResult.environments[0].document)
 	writeHTML(interpreterResult.environments);
-
 }
 
-action();
+convertToHTML('../../../../demos/lava/lava.wae');

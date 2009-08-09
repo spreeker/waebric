@@ -3,7 +3,7 @@
  *  
  * @author Nickolas Heirbaut
  */
-function WaebricParser(){
+function WaebricRootParser(){
 
     this.currentToken;
 	this.moduleParser = new WaebricModuleParser();
@@ -27,16 +27,4 @@ function WaebricParser(){
             this.currentToken.value);
         }
     }
-}
-
-/**
- * Parses the WaebricTokenizerResult to an Abstract Syntax Tree {Module}.
- * 
- * @param {WaebricTokenizerResult} tokenizerResult
- * @return {Module}
- */
-WaebricParser.parse = function(tokenizerResult){
-    var parser = new WaebricParser();
-    var module = parser.parse(tokenizerResult);
-	return new WaebricParserResult(module, new Array());
 }

@@ -67,12 +67,18 @@ function WaebricMarkupParser(){
 
 	this.isMarkupCall = function(token){
 		if (token.value instanceof WaebricToken.IDENTIFIER) {
+			//Skip attributes
+			while(this.isAttribute(token.nextToken())){
+				token = token.nextToken();
+			}
+			
             if (token.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
                 return true;			
             }
         }
 		return false;
 	}
+	
     /**
      * Parses a designator
      *
@@ -87,7 +93,7 @@ function WaebricMarkupParser(){
         
         //Parse identifier
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-            idCon = this.currentToken.value;
+            idCon = this.currentToken.value.toString();
         } else {
             print('Error parsing Designator. Expected IDENTIFIER but found ' + this.currentToken.value);
         }
@@ -174,7 +180,7 @@ function WaebricMarkupParser(){
         
         //Parse IdCon
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-            idCon = this.currentToken.value;
+            idCon = this.currentToken.value.toString();
         } else {
             print('Attribute should start with an identifier but found ' + this.currentToken.value)
         }
@@ -244,7 +250,7 @@ function WaebricMarkupParser(){
     this.parseIDAttribute = function(token){
         this.currentToken = token;
 		if (this.expressionParser.isIdentifier(this.currentToken)) {
-			var idValue = this.currentToken.value;
+			var idValue = this.currentToken.value.toString();
 		}else{
 			print('Error parsing ID Attribute. Expected identifier value but found ' + this.currentToken.value)
 		}
@@ -260,7 +266,7 @@ function WaebricMarkupParser(){
     this.parseClassAttribute = function(token){
         this.currentToken = token;
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-			var classValue = this.currentToken.value;
+			var classValue = this.currentToken.value.toString();
 		}else{
 			print('Error parsing Class Attribute. Expected identifier value but found ' + this.currentToken.value)
 		}
@@ -276,7 +282,7 @@ function WaebricMarkupParser(){
     this.parseNameAttribute = function(token){
         this.currentToken = token;
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-			var nameValue = this.currentToken.value;
+			var nameValue = this.currentToken.value.toString();
 		}else{
 			print('Error parsing Name Attribute. Expected identifier value but found ' + this.currentToken.value)
 		}
@@ -292,7 +298,7 @@ function WaebricMarkupParser(){
     this.parseTypeAttribute = function(token){
         this.currentToken = token;
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-			var typeValue = this.currentToken.value;
+			var typeValue = this.currentToken.value.toString();
 		}else{
 			print('Error parsing Type Attribute. Expected identifier value but found ' + this.currentToken.value)
 		}
@@ -312,7 +318,7 @@ function WaebricMarkupParser(){
 		var heightValue;
 		
 		if (this.expressionParser.isNatural(this.currentToken)) {
-			 widthValue = this.currentToken.value;
+			 widthValue = this.currentToken.value.toString();
 		}else{
 			print('Error parsing Width Attribute. Expected natural value but found ' + this.currentToken.value)
 		}
@@ -323,7 +329,7 @@ function WaebricMarkupParser(){
 		if (heightAttributeFollows) {
 			this.currentToken = this.currentToken.nextToken().nextToken()
 			if (heightAttributeIsNatural) {
-				heightValue = this.currentToken.value;
+				heightValue = this.currentToken.value.toString();
 				return new WidthHeightAttribute(widthValue, heightValue);
 			}else{
 				print('Error parsing WidthHeight Attribute. Expected natural value but found ' + this.currentToken.value)

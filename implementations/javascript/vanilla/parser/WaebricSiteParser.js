@@ -137,7 +137,7 @@ function WaebricSiteParser(){
             //Path should be valid
             path = directoryFileName + "." + fileExtension;
             if (this.isPath(path)) {
-                return path;
+                return path.toString();
             } else {
                 print('Error parsing path. Path has invalid characters. ' + path);
             }

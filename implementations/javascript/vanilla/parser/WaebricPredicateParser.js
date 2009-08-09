@@ -39,7 +39,7 @@ function WaebricPredicateParser(){
         
         //Parse SINGLE predicates
         if (this.isNotPredicate(this.currentToken.value)) {
-            predicate = new NotPredicate(this.parsePredicate(this.currentToken.nextToken(), true, true));
+            predicate = this.parseNotPredicate(this.currentToken.nextToken());
         } else if (this.expressionParser.isExpression(this.currentToken)) {
             predicate = this.expressionParser.parse(this)
             
@@ -78,7 +78,8 @@ function WaebricPredicateParser(){
      */
     this.parseNotPredicate = function(token){
         this.currentToken = token;
-        return new NotPredicate(this.currentToken.value);
+		var predicate = this.parsePredicate(this.currentToken, true, true);
+        return new NotPredicate(predicate);
     }
     
     /**

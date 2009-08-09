@@ -19,9 +19,9 @@ function WaebricEmbeddingParser(){
 	 * @return {Boolean}
 	 */
 	this.isStartEmbedding = function(token){	
-		var isValidOpening = this.expressionParser.isText(token);		
-		var isValidSeperator = token.nextToken().value == WaebricToken.SYMBOL.LESSTHAN;
-		return isValidOpening && isValidSeperator;
+		var isValidOpening = this.expressionParser.isText(token) && token.nextToken().value == WaebricToken.SYMBOL.LESSTHAN		
+			 || token.value == WaebricToken.SYMBOL.LESSTHAN;
+		return isValidOpening;
 	}
 	
 	/**
@@ -33,9 +33,22 @@ function WaebricEmbeddingParser(){
 	this.parseEmbedding = function(token){
 		this.currentToken = token;
 		
-		var head = this.expressionParser.parseText(this.currentToken);
-		var embed = this.parseEmbed(this.currentToken.nextToken().nextToken());		
-		var tail = this.parseTail(this.currentToken.nextToken());
+		var head = "";
+		var embed;
+		var tail;	
+		
+		if (this.expressionParser.isText(this.currentToken)) {
+			head = this.currentToken.value.toString();
+			this.currentToken = this.currentToken.nextToken();		
+		}
+		
+		if(this.currentToken.value == WaebricToken.SYMBOL.LESSTHAN){			
+			embed = this.parseEmbed(this.currentToken.nextToken());			
+		}else{
+			print('Error parsing Embedding. Expected "<" but found ' + this.currentToken.nextToken().value)
+		}	
+		
+		tail = this.parseTail(this.currentToken.nextToken());
 		return new Embedding(head, embed, tail);
 	}
 	
@@ -58,7 +71,7 @@ function WaebricEmbeddingParser(){
 		//Get next symbol to determine PostTextTail or MidTextTail		
 		if(this.expressionParser.isText(this.currentToken.nextToken())){
 			this.currentToken = this.currentToken.nextToken();
-			text = this.expressionParser.parseText(this.currentToken);
+			text = this.currentToken.value.toString();
 			if(this.currentToken.nextToken().value != WaebricToken.SYMBOL.SEMICOLON){
 				this.currentToken = this.currentToken.nextToken();	
 			}
@@ -95,16 +108,16 @@ function WaebricEmbeddingParser(){
 		// echo "<p p>"; --> Markup, Variable
 		// echo "<p p()>"; --> Markup, Markup
 		var expression;
-		if(this.expressionParser.isExpression(this.currentToken.nextToken)){			
+		if(this.expressionParser.isExpression(this.currentToken.nextToken())){
 			this.currentToken = this.currentToken.nextToken();
 			expression = this.expressionParser.parse(this); 
 			return new ExpressionEmbedding(markups, expression);
 		}else if(markups.length > 1 && !this.markupParser.isMarkupCall(startTokenLastMarkup)){	
 			markups = markups.slice(0, markups.length-1);	
-			expression = new VarExpression(startTokenLastMarkup.value);		
+			expression = new VarExpression(startTokenLastMarkup.value.toString());		
 			return new ExpressionEmbedding(markups, expression);	
-		}else if(markups.length == 1 && !this.markupParser.isMarkupCall(startToken)){
-			expression = new VarExpression(startToken.value);		
+		}else if(markups.length == 1 && !this.markupParser.isMarkupCall(startToken)){			
+			expression = new VarExpression(startToken.value.toString());		
 			return new ExpressionEmbedding(new Array(), expression);	
 		}
 		return new MarkupEmbedding(markups);		

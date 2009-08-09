@@ -17,7 +17,7 @@ WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR 			= '"'
 WaebricToken.TEXT.EMBED_STARTCHAR				= '<'
 WaebricToken.TEXT.EMBED_ENDCHAR					= '>'
 WaebricToken.TEXT.SINGLEQUOTEDTEXT_STARTCHAR	= "'"
-WaebricToken.TEXT.SINGLEQUOTEDTEXT_ALLOWEDCHARS = "^[^\x00-\x1F\ \t\n\r;,>]*$"	
+WaebricToken.TEXT.SINGLEQUOTEDTEXT_ALLOWEDCHARS = "^[^\x00-\x1F\ \t\n\r;,>\)]*$"	
 
 WaebricToken.TEXT.isSingleQuotedText = function(value){
 	var regExp = new RegExp(WaebricToken.TEXT.SINGLEQUOTEDTEXT_ALLOWEDCHARS);

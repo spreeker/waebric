@@ -37,7 +37,7 @@ function WaebricFunctionDefinitionParser(){
         
         //First token should be an identifier
         if (this.expressionParser.isIdentifier(this.currentToken)) {
-            identifier = this.expressionParser.parseIdentifier(this.currentToken);
+            identifier = this.currentToken.value.toString();
         } else {
             print('Error parsing function definition. Expected a FUNCTION NAME (IDENTIFIER) but found ' + this.currentToken.value);
         }

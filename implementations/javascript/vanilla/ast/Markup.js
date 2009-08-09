@@ -25,7 +25,7 @@ function MarkupCall (designator, arguments){
 	this.arguments.toString = function(){
 		var argumentsString = '';
 		for(var i = 0; i < this.length; i++){
-			argumentsString += this[i] + ',';	
+			argumentsString += this[i].toString() + ',';	
 		}
 		argumentsString = argumentsString.substr(0, argumentsString.length-1);
 		return argumentsString;

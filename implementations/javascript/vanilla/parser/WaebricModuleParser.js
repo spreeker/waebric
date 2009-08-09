@@ -9,7 +9,6 @@ function WaebricModuleParser(){
 		
 	this.siteParser = new WaebricSiteParser();
     this.expressionParser = new WaebricExpressionParser();
-	this.importParser = new WaebricImportParser();
 	this.functionParser = new WaebricFunctionDefinitionParser();
 	
 	/**
@@ -83,15 +82,15 @@ function WaebricModuleParser(){
      */
     this.parseModuleId = function(token){
         this.currentToken = token;
-        
+		
         //Parse first part ModuleId -> IdCon		
-        var value = this.currentToken.value;
+        var value = this.currentToken.value.toString();
         
         //Parse remaining parts ModuleID -> listOf("." IdCon)
         while (this.currentToken.nextToken().value == WaebricToken.SYMBOL.DOT &&
         this.isModuleIdElement(this.currentToken.nextToken().nextToken())) {
-            value += this.currentToken.nextToken().value;
-            value += this.currentToken.nextToken().nextToken().value;
+            value += this.currentToken.nextToken().value.toString();
+            value += this.currentToken.nextToken().nextToken().value.toString();
             this.currentToken = this.currentToken.nextToken().nextToken();
         }
         
@@ -124,9 +123,8 @@ function WaebricModuleParser(){
         this.currentToken = token;
         var moduleElements = new Array();
         while (this.currentToken.hasNextToken()) {
-            if (this.importParser.isStartImport(this.currentToken)) {
-				this.currentToken = this.currentToken.nextToken();
-                var imprt = this.importParser.parse(this);
+            if (this.isStartImport(this.currentToken)) {
+                var imprt = this.parseImport(this.currentToken.nextToken());
                 moduleElements.push(imprt);
             } else if (this.siteParser.isStartSite(this.currentToken)) {
 				this.currentToken = this.currentToken.nextToken();
@@ -140,11 +138,33 @@ function WaebricModuleParser(){
                 print('Error parsing module elements. Expected IMPORT/SITE/DEF but current token is ' + this.currentToken.value);
                 this.currentToken = this.currentToken.nextToken();
             }
+
 			this.currentToken = this.currentToken.nextToken();
         }
         return moduleElements;
     }
 	
+		/**
+     * Parses an Import
+     * 
+     * @param {WaebricParserToken} token
+     * @return {Import}
+     */
+	this.parseImport = function(token){
+		this.currentToken = token;		
+		var moduleId = this.parseModuleId(this.currentToken)
+        return new Import(moduleId);
+	}
 	
+	/**
+     * Checks whether the input value equals the start of an IMPORT
+     *
+     * @param {WaebricParserToken} token
+     * @return {Boolean}
+     */
+    this.isStartImport = function(token){
+        return WaebricToken.KEYWORD.IMPORT.equals(token.value);
+    }
+
 
 }

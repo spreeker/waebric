@@ -25,15 +25,15 @@ function WaebricExpressionParser(){
         } else if (this.isFieldExpression(this.currentToken) && !ignoreFieldExpression) {
             return this.parseFieldExpression(this.currentToken);
         } else if (this.isText(this.currentToken)) {			
-            return this.parseText(this.currentToken);
+            return this.parseTextExpression(this.currentToken);
         } else if (this.isIdentifier(this.currentToken)) {
-            return this.parseIdentifier(this.currentToken);
+            return this.parseVarExpression(this.currentToken);
         } else if (this.isNatural(this.currentToken)) {
-            return this.parseNatural(this.currentToken)
+            return this.parseNaturalExpression(this.currentToken)
         } else if (this.isStartList(this.currentToken)) {
-            return this.parseList(this.currentToken.nextToken())
+            return this.parseListExpression(this.currentToken.nextToken())
         } else if (this.isStartRecord(this.currentToken)) {
-            return this.parseRecord(this.currentToken.nextToken())
+            return this.parseRecordExpression(this.currentToken.nextToken())
         } else {
             return "NYI"
         }
@@ -99,12 +99,12 @@ function WaebricExpressionParser(){
         var fieldToken = this.getTokenAfterExpression(this.currentToken).nextToken();
         
         var expression = this.parseExpression(expressionToken, true);
-        var field = this.parseIdentifier(fieldToken);
+        var field = fieldToken.value.toString();
         var fieldExpression = new FieldExpression(expression, field);
         
         while (fieldToken.nextToken().value == WaebricToken.SYMBOL.DOT) {
             if (this.isIdentifier(fieldToken.nextToken().nextToken())) {
-                var field = this.parseIdentifier(fieldToken.nextToken().nextToken(), true);
+                var field = fieldToken.nextToken().nextToken().value.toString();
                 fieldExpression = new FieldExpression(fieldExpression, field);
                 fieldToken = this.currentToken;
             } else {
@@ -147,9 +147,9 @@ function WaebricExpressionParser(){
      * @param {WaebricParserToken} token
      * @return {TextExpression}
      */
-    this.parseText = function(token){
+    this.parseTextExpression = function(token){
         this.currentToken = token;
-        return new TextExpression(this.currentToken.value);
+        return new TextExpression(this.currentToken.value.toString());
     }  
 	
 	/**
@@ -164,14 +164,14 @@ function WaebricExpressionParser(){
 	} 
 	
 	/**
-     * Parses an IDENTIFIER
+     * Parses a VarExpression
      *
      * @param {WaebricParserToken} token
      * @return {VarExpression}
      */
-    this.parseIdentifier = function(token){
+    this.parseVarExpression = function(token){
         this.currentToken = token;
-        return new VarExpression(this.currentToken.value);
+        return new VarExpression(this.currentToken.value.toString());
     } 
 	
 	/**
@@ -191,9 +191,9 @@ function WaebricExpressionParser(){
      * @param {WaebricParserToken} token
      * @return {NatExpression}
      */
-    this.parseNatural = function(token){
+    this.parseNaturalExpression = function(token){
         this.currentToken = token;
-        return new NatExpression(this.currentToken.value);
+        return new NatExpression(this.currentToken.value.toString());
     }
 	
 	/**
@@ -213,7 +213,7 @@ function WaebricExpressionParser(){
      * @param {WaebricParserToken} token
      * @return {RecordExpression}
      */
-    this.parseRecord = function(token){
+    this.parseRecordExpression = function(token){
         this.currentToken = token;
         
         var list = new Array();
@@ -243,7 +243,9 @@ function WaebricExpressionParser(){
 	 * @return {Boolean}
 	 */
 	this.isStartRecord = function(token){
-	    return (token.value == WaebricToken.SYMBOL.LEFTCBRACKET);
+	    return (token.value == WaebricToken.SYMBOL.LEFTCBRACKET)
+			&& this.isIdentifier(token.nextToken()) 
+			&& token.nextToken().nextToken().value == WaebricToken.SYMBOL.COLON;
 	}
 	
 	/**
@@ -258,24 +260,11 @@ function WaebricExpressionParser(){
         var key;
         var value;
         
-        //Parse Identifier
-        if (this.isIdentifier(this.currentToken)) {
-            key = this.parseIdentifier(this.currentToken)
-        } else {
-            print('Error parsing KeyValuePair. Expected IDENTIFIER as KEY but found ' + this.currentToken.value);
-        }
+        key = this.currentToken.value.toString()
+        this.currentToken = this.currentToken.nextToken().nextToken(); //Skip colon
         
-        //Parse Colon
-        var hasValidSeperator = this.currentToken.nextToken().value == WaebricToken.SYMBOL.COLON;
-        if (hasValidSeperator) {
-            this.currentToken = this.currentToken.nextToken().nextToken(); //Skip colon
-        } else {
-            print('Error parsing KeyValuePair. Expected COLON after IDENTIFIER but found ' + this.currentToken.value);
-        }
-        
-        //Parse Expression
         if (this.isExpression(this.currentToken)) {
-            value = this.parseExpression(this.currentToken)
+           value = this.parseExpression(this.currentToken)
         } else {
             print('Error parsing KeyValuePair. Expected EXPRESSION as VALUE but found ' + this.currentToken.value);
         }
@@ -300,7 +289,7 @@ function WaebricExpressionParser(){
      * @param {WaebricParserToken} token
      * @return {ListExpression}
      */
-    this.parseList = function(token){
+    this.parseListExpression = function(token){
         this.currentToken = token;
         
         var list = new Array();

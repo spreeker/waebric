@@ -15,7 +15,7 @@ function PostTextTail(text){
 	this.text = text;
 	
 	this.toString = function(){
-		return this.text;
+		return "[PostText: " + this.text + "]";
 	}
 }
 PostTextTail.prototype = new Node(); //Inheritance base class
@@ -35,7 +35,7 @@ function MidTextTail(mid, embed, tail){
 	this.tail = tail;
 	
 	this.toString = function(){
-		return '[mid: ' + this.mid.toString() + ', embed: ' + this.embed.toString() + ', tail: ' + this.tail.toString() + "]"
+		return '[MidTextTail: ' + this.mid.toString() + ', ' + this.embed.toString() + ', ' + this.tail.toString() + "]"
 	}
 }
 MidTextTail.prototype = new Node(); //Inheritance base class

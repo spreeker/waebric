@@ -277,7 +277,7 @@ function WaebricTokenizer(){
     this.tokenizeDoubleQuotedText = function(character){
         var token = new WaebricToken.TEXT(EMPTY_TOKEN_VALUE);        
         var currentChar = character.nextChar(); //Skip the opening quote
-			
+
         //Process double quoted text until ending quote is found (or an embedding).
         while (!this.isEndQuoteText(currentChar) && !this.isStartEmbedding(currentChar) 
 		&& !this.isEndEmbedding(currentChar)) {			
@@ -285,6 +285,7 @@ function WaebricTokenizer(){
             currentChar = currentChar.nextChar();	
         }		
         currentChar = currentChar.nextChar(); //Skip the ending quote
+        
         return this.tokenizeText(token, currentChar);
     }
 	
@@ -316,7 +317,9 @@ function WaebricTokenizer(){
 	 */
 	this.tokenizeText = function(token, currentChar){
 		//Save processed token
-        this.tokenList.addToken(token);  
+		if (token.value != '') {
+			this.tokenList.addToken(token);
+		}
 
         if (WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.previousChar().value)) {
 			this.tokenizeSymbol(currentChar.previousChar());
