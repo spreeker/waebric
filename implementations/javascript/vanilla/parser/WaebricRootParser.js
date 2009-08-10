@@ -1,5 +1,5 @@
 /**
- * Waebric Parser
+ * Waebric Root Parser
  *  
  * @author Nickolas Heirbaut
  */
@@ -17,7 +17,7 @@ function WaebricRootParser(){
 	this.parse = function(tokenizerResult){
         //Store first token globally
         this.currentToken = new WaebricParserToken(tokenizerResult.tokens, 0)
-        
+		
         //Start parsing the module
         if (this.moduleParser.isStartModule(this.currentToken.value)) {
 			this.currentToken = this.currentToken.nextToken();
@@ -28,3 +28,10 @@ function WaebricRootParser(){
         }
     }
 }
+
+WaebricRootParser.parse = function(tokenizerResult){
+	var parser = new WaebricRootParser();
+	return parser.parse(tokenizerResult);
+}
+	
+	

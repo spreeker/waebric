@@ -18,7 +18,7 @@ function WaebricEmbeddingParser(){
 	 * @param {WaebricParserToken} token
 	 * @return {Boolean}
 	 */
-	this.isStartEmbedding = function(token){	
+	this.isStartEmbedding = function(token){
 		var isValidOpening = this.expressionParser.isText(token) && token.nextToken().value == WaebricToken.SYMBOL.LESSTHAN		
 			 || token.value == WaebricToken.SYMBOL.LESSTHAN;
 		return isValidOpening;

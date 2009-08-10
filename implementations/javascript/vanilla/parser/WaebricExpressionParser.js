@@ -94,6 +94,7 @@ function WaebricExpressionParser(){
      * @return {FieldExpression}
      */
     this.parseFieldExpression = function(token){
+		
         this.currentToken = token;
         var expressionToken = this.currentToken;
         var fieldToken = this.getTokenAfterExpression(this.currentToken).nextToken();
@@ -101,7 +102,6 @@ function WaebricExpressionParser(){
         var expression = this.parseExpression(expressionToken, true);
         var field = fieldToken.value.toString();
         var fieldExpression = new FieldExpression(expression, field);
-        
         while (fieldToken.nextToken().value == WaebricToken.SYMBOL.DOT) {
             if (this.isIdentifier(fieldToken.nextToken().nextToken())) {
                 var field = fieldToken.nextToken().nextToken().value.toString();
@@ -112,7 +112,6 @@ function WaebricExpressionParser(){
                 return;
             }
         }
-        
         //If the fieldExpression is followed by a "PLUS" sign, than it is part of a catExpression.
         //Cannot be forseen before since the fieldexpression has a higher priority
         var catExpressionFollows = this.currentToken.nextToken().value == WaebricToken.SYMBOL.PLUS;
@@ -122,6 +121,7 @@ function WaebricExpressionParser(){
             var catExpression = new CatExpression(expressionLeft, expressionRight);
             return catExpression;
         } else {
+			this.currentToken = fieldToken;
             return fieldExpression;
         }
     }
@@ -133,9 +133,9 @@ function WaebricExpressionParser(){
 	 * @return {Boolean}
 	 */
 	this.isFieldExpression = function(token){
-	    var isValidExpression = this.isExpression(token);
+	    var isValidExpression = this.isExpression(token);		
 	    var tokenAfterNextExpression = this.getTokenAfterExpression(token)
-	    var hasValidSeperator = tokenAfterNextExpression.value == WaebricToken.SYMBOL.DOT
+	    var hasValidSeperator = tokenAfterNextExpression.value == WaebricToken.SYMBOL.DOT		
 	    var hasValidField = this.isIdentifier(tokenAfterNextExpression.nextToken());
 	    
 	    return (isValidExpression && hasValidSeperator && hasValidField);
@@ -159,7 +159,7 @@ function WaebricExpressionParser(){
 	 * @return {Boolean}
 	 */
 	this.isText = function(token){		
-	    var regExp = new RegExp('^([^\x00-\x1F\&\<\"\x80-\xFF]*[\n\r\t]*(\\\\&)*(\\\\")*(&#[0-9]+;)*(&#x[0-9a-fA-F]+;)*(&[a-zA-Z_:][a-zA-Z0-9.-_:]*;)*)*$');
+	    var regExp = new RegExp('^([^\x00-\x1F\&\<\"\x80-\xFF]*[\n\r\t]*(\\\\&)*(\\\\")*(&#[0-9]+;)*(&#x[0-9a-fA-F]+;)*(&[a-zA-Z_:][a-zA-Z0-9.-_:]*;)*)*$');		
 	    return (token.value instanceof WaebricToken.TEXT) && (token.value.match(regExp) != null);
 	} 
 	

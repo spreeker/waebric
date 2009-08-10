@@ -25,8 +25,7 @@ function WaebricMarkupParser(){
 	 */
 	this.parseMarkup = function(token){
 		this.currentToken = token;
-		
-		if(this.isMarkupCall(this.currentToken)){
+		if(this.isMarkupCall(this.currentToken)){			
 			var designator = this.parseDesignator(this.currentToken);
 			var arguments = this.parseArguments(this.currentToken.nextToken());
 			return new MarkupCall(designator, arguments);		
@@ -69,7 +68,7 @@ function WaebricMarkupParser(){
 		if (token.value instanceof WaebricToken.IDENTIFIER) {
 			//Skip attributes
 			while(this.isAttribute(token.nextToken())){
-				token = token.nextToken();
+				token = token.nextToken().nextToken();
 			}
 			
             if (token.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
@@ -111,6 +110,17 @@ function WaebricMarkupParser(){
      * @return {Boolean}
      */
     this.isAttribute = function(token){
+        var regExp = new RegExp("^[#.$:@%]$");
+        return token.value.match(regExp);
+    }
+	
+	/**
+     * Checks whether the input token is the start of an attribute
+     *
+     * @param {WaebricParserToken} token
+     * @return {Boolean}
+     */
+    this.isStartAttribute = function(token){
         var regExp = new RegExp("^[#.$:@]$");
         return token.value.match(regExp);
     }
@@ -211,7 +221,7 @@ function WaebricMarkupParser(){
     this.parseAttributes = function(token){
         this.currentToken = token;
         var attributes = new Array();
-        while (this.isAttribute(this.currentToken.nextToken())) {
+        while (this.isStartAttribute(this.currentToken.nextToken())) {
             var attribute = this.parseAttribute(this.currentToken.nextToken());
             attributes.push(attribute);
         }
@@ -325,7 +335,7 @@ function WaebricMarkupParser(){
 		
 		var heightAttributeFollows = this.currentToken.nextToken().value == WaebricToken.SYMBOL.PERCENT
 		var heightAttributeIsNatural = this.expressionParser.isNatural(this.currentToken.nextToken().nextToken());
-		
+
 		if (heightAttributeFollows) {
 			this.currentToken = this.currentToken.nextToken().nextToken()
 			if (heightAttributeIsNatural) {
@@ -361,10 +371,10 @@ function WaebricMarkupParser(){
 	 */
 	this.getTokenAfterMarkup = function(token){			
 		var tempToken = token.nextToken(); //Skip identifier
-		
+
 		//Skip attributes
-		while (this.isAttribute(tempToken)) {
-			tempToken = tempToken.nextToken();
+		while (this.isAttribute(tempToken)) {			
+			tempToken = tempToken.nextToken().nextToken();		
 		}
 		
 		//Skip formals

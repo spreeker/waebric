@@ -249,7 +249,7 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
-	function getFieldExpressionValue(expression, env){
+	function getFieldExpressionValue(expression, env){		
 		//Store fields in array
 		var fields = new Array();
 		var expr = expression;
@@ -276,7 +276,6 @@ function WaebricInterpreterVisitor(){
 			//Get incapsulated data
 			data = getExpressionValue(fieldValue, env);
 		}
-		
 		return data;
 	}
 	
@@ -487,7 +486,8 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(yieldStmt){
 			//Visit yield markup
 			var lastYield = this.dom.getLastYield();
-			if (lastYield != null) {
+
+			if (lastYield != null) {				
 				lastYield.value.accept(new StatementVisitor(lastYield.env, this.dom));
 			}
 		}
@@ -585,7 +585,7 @@ function WaebricInterpreterVisitor(){
 				var markup = markupMarkupStmt.markups[i];					
 				//If a MarkupCall is found, then the remaining markups/statements are
 				//intended for the YIELD statement 			
-				isLastMarkup = (i == markupMarkupStmt.markups.length-1)
+				isLastMarkup = (i == markupMarkupStmt.markups.length-1); //Last markup has no remaining yield value
 				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){
 					var newMarkupStmt = constructNewMarkupStatement(markupMarkupStmt.markups.slice(i+1));					
 					if (newMarkupStmt) {
@@ -612,9 +612,8 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupEmbeddingStmt.markups.length; i++) {
 				markup = markupEmbeddingStmt.markups[i];								
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 		
-				isLastMarkup = (i == markupEmbeddingStmt.markups.length-1)										
-				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){	
+				//intended for the YIELD statement 											
+				if(isValidMarkupCall(markup, this.env)){	
 					var newMarkupStmt = constructNewMarkupStatement(markupEmbeddingStmt.markups.slice(i+1), markupEmbeddingStmt.embedding);
 					if (newMarkupStmt) {
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -643,9 +642,8 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupStmtStmt.markups.length; i++) {
 				var markup = markupStmtStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 	
-				isLastMarkup = (i == markupStmtStmt.markups.length-1)								
-				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){					
+				//intended for the YIELD statement 								
+				if(isValidMarkupCall(markup, this.env)){					
 					var newMarkupStmt = constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement);
 					if(newMarkupStmt){
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -673,9 +671,8 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupExprStmt.markups.length; i++) {
 				var markup = markupExprStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 	
-				isLastMarkup = (i == markupExprStmt.markups.length-1)				
-				if(isValidMarkupCall(markup, this.env) && !isLastMarkup){					
+				//intended for the YIELD statement 			
+				if(isValidMarkupCall(markup, this.env)){					
 				    var newMarkupStmt = constructNewMarkupStatement(markupExprStmt.markups.slice(i+1), markupExprStmt.expression);
 					if(newMarkupStmt){
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -691,7 +688,7 @@ function WaebricInterpreterVisitor(){
 			markupExprStmt.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
 			//Print out HTML from expression
-			var text = this.dom.document.createTextNode(normalize(this.dom.lastValue));
+			var text = this.dom.document.createTextNode(normalize(this.dom.lastValue));	
 			this.dom.lastElement.appendChild(text);
 		}
 	}
@@ -904,8 +901,8 @@ function WaebricInterpreterVisitor(){
 		this.dom = dom;
 		this.visit = function(midTextTail){				
 			//Add mid text as normal text to document
-			if((normalize(midTextTail.mid)) != ""){
-				var text = this.dom.document.createTextNode((normalize(midTextTail.mid)));				
+			if ((normalize(midTextTail.mid)) != "") {
+				var text = this.dom.document.createTextNode((normalize(midTextTail.mid)));
 				this.dom.lastElement.appendChild(text);
 			}
 			

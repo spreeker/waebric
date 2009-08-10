@@ -40,7 +40,9 @@ load("../tokenizer/tokens/WaebricTokenText.js");
 load("../tokenizer/tokens/WaebricTokenWhitespace.js");
 
 load("../parser/WaebricParser.js");
+load("../parser/WaebricRootParser.js");
 load("../parser/WaebricParserResult.js");
+load("../parser/WaebricParserException.js");
 load("../parser/WaebricParserToken.js");
 load("../parser/WaebricModuleParser.js");
 load("../parser/WaebricSiteParser.js");
@@ -78,23 +80,6 @@ function loadProgram(path){
 }
 
 /**
- * Outputs the result of the tokenizer
- * @param {Object} tokens
- */
-function writeTokenizerResult(tokens){
-	var text = ""
-	for(tokenIndex in tokens){		
-		token = (tokens[tokenIndex])	
-		text += (token.type + ' : ' + token.value + '\n');
-	}
-	
-	var fw = new FileWriter('output_scanner.txt');
-	var bf = new BufferedWriter(fw);
-	bf.write(text);
-	bf.close();
-}
-
-/**
  * Outputs the HTML code to a set of files
  * 
  * @param {Array} An array of XML documents
@@ -123,13 +108,9 @@ function writeHTML(waebricEnvironments){
 
 
 function convertToHTML(path){	
-	//Tokenizing
-	var tokenizerResult = WaebricTokenizer.tokenizeAll(loadProgram(path));
-	//writeTokenizerResult(tokenizerResult.tokens)
-	
 	//Parsing
-	var parserResult = WaebricParser.parse(tokenizerResult);
-	//print(parserResult.module.functionDefinitions)
+	var parserResult = WaebricParser.parseAll(path);
+	print(parserResult.module.functionDefinitions)
 	
 	//Validating		
 	//var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
@@ -138,9 +119,8 @@ function convertToHTML(path){
 	var interpreterResult = WaebricInterpreter.interpreteAll(parserResult.module);		
 		
 	//Output results
-	//print(validationResult.exceptions)
-	//print(interpreterResult.environments[0].document)
+	print(interpreterResult.environments[0].document)
 	writeHTML(interpreterResult.environments);
 }
 
-convertToHTML('../../../../demos/lava/lava.wae');
+convertToHTML('../../../../demos/misc/menus.wae');

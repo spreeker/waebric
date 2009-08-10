@@ -33,8 +33,8 @@ function WaebricTokenizer(){
 			var currentChar = new WaebricCharacter(input, 0);
 			do {
 				currentChar = this.tokenize(currentChar);
-			} while (currentChar.hasNextChar())		
-			
+			} while (currentChar != null && currentChar.hasNextChar())	
+				
 			return this.tokenList;	
 			
 		//}catch(exception if (exception instanceof WaebricTokenizerException)){
@@ -50,7 +50,7 @@ function WaebricTokenizer(){
      *
      * @param {Object} token
      */
-    this.tokenize = function(character){
+    this.tokenize = function(character){		
         if (this.isWhitespace(character)) {
             return this.tokenizeWhitespaces(character);
         } else if (this.isStartSinglelineComment(character)) {
@@ -89,7 +89,7 @@ function WaebricTokenizer(){
      * @param {String} The input character
      * @return {String} The next character to be tokenized
      */
-    this.tokenizeWhitespaces = function(character){
+    this.tokenizeWhitespaces = function(character){		
         return character.nextChar();
     }    
   
@@ -150,7 +150,7 @@ function WaebricTokenizer(){
             currentChar = currentChar.nextChar();
         }	
         
-        this.tokenList.addToken(token);
+        //this.tokenList.addToken(token);
         return currentChar.nextChar().nextChar(); //Ignore comment ending
     }
     
@@ -280,12 +280,11 @@ function WaebricTokenizer(){
 
         //Process double quoted text until ending quote is found (or an embedding).
         while (!this.isEndQuoteText(currentChar) && !this.isStartEmbedding(currentChar) 
-		&& !this.isEndEmbedding(currentChar)) {			
+		&& !this.isEndEmbedding(currentChar)) {	
             token.addChar(currentChar);
             currentChar = currentChar.nextChar();	
         }		
         currentChar = currentChar.nextChar(); //Skip the ending quote
-        
         return this.tokenizeText(token, currentChar);
     }
 	
@@ -299,15 +298,18 @@ function WaebricTokenizer(){
 	this.isStartEmbedding = function(character){
 		var currentChar = character;
 		var previousChar = character.previousChar();
-		
-		return WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value);
+		var lastToken = this.tokenList.tokens[this.tokenList.tokens.length-1]
+		var isPartOfComment = WaebricToken.KEYWORD.COMMENT.equals(lastToken.value);
+		return WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value) && !isPartOfComment;
 	}
 	
 	this.isEndEmbedding = function(character){
 		var currentChar = character;
 		var previousChar = character.previousChar();
 		
-		return WaebricToken.TEXT.EMBED_ENDCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value);
+		return WaebricToken.TEXT.EMBED_ENDCHAR.equals(currentChar.value) 
+			&& WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR.equals(currentChar.value)
+			&& !"\\".equals(previousChar.value) ;
 	}
 	
 	/**
@@ -317,14 +319,11 @@ function WaebricTokenizer(){
 	 */
 	this.tokenizeText = function(token, currentChar){
 		//Save processed token
-		if (token.value != '') {
-			this.tokenList.addToken(token);
-		}
-
+		this.tokenList.addToken(token);
+		
         if (WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.previousChar().value)) {
 			this.tokenizeSymbol(currentChar.previousChar());
         }
-		
 		return currentChar;
 	}
     
@@ -348,12 +347,10 @@ function WaebricTokenizer(){
     this.tokenizeIdentifier = function(character){
         var value = "";
         var currentChar = character;
-        
         while (this.isStartIdentifier(currentChar)) {
             value += currentChar.value;
             currentChar = currentChar.nextChar();
         }
-		
         //Check if the value is a waebric reserved keyword or not
 		if (WaebricToken.KEYWORD.contains(value) && !this.isPathElement(value)) {
 			this.tokenList.addToken(new WaebricToken.KEYWORD(value));
@@ -431,7 +428,7 @@ function WaebricTokenizer(){
 	}
 }
 
-WaebricTokenizer.tokenizeAll = function(input){
+WaebricTokenizer.tokenize = function(input){
 	var tokenizer = new WaebricTokenizer();
 	return tokenizer.tokenizeAll(input);
 }
