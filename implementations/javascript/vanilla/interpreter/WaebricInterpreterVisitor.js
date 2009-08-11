@@ -487,8 +487,10 @@ function WaebricInterpreterVisitor(){
 			//Visit yield markup
 			var lastYield = this.dom.getLastYield();
 
-			if (lastYield != null) {				
+			if (lastYield != null) {	
 				lastYield.value.accept(new StatementVisitor(lastYield.env, this.dom));
+			}else{
+				throw new Error('Yield field is empty!');
 			}
 		}
 	}
@@ -570,7 +572,15 @@ function WaebricInterpreterVisitor(){
 	 * @param {Object} env
 	 */
 	function isValidMarkupCall(markup, env){
-		return ((markup instanceof MarkupCall) && (env.containsFunction(markup.designator.idCon)));
+		if(env.type == 'func-bind'){
+			env = env.parent.parent.parent;	
+		}
+		
+		if (markup instanceof MarkupCall) {
+			return env.containsLocalFunction(markup.designator.idCon);
+		}else if(markup instanceof DesignatorTag){
+			return env.containsLocalFunction(markup.idCon);
+		}
 	}
 	
 	/**
@@ -642,8 +652,8 @@ function WaebricInterpreterVisitor(){
 			for (var i = 0; i < markupStmtStmt.markups.length; i++) {
 				var markup = markupStmtStmt.markups[i];
 				//If a MarkupCall is found, then the remaining markups are
-				//intended for the YIELD statement 								
-				if(isValidMarkupCall(markup, this.env)){					
+				//intended for the YIELD statement
+				if(isValidMarkupCall(markup, this.env)){
 					var newMarkupStmt = constructNewMarkupStatement(markupStmtStmt.markups.slice(i+1), markupStmtStmt.statement);
 					if(newMarkupStmt){
 						this.dom.addYield(newMarkupStmt, this.env);
@@ -1067,7 +1077,7 @@ function WaebricInterpreterVisitor(){
 			var functionDefinition;
 			
 			//Check if function already exists in current environment (incl dependecies)
-			if (this.env.type == 'func-bind') {				
+			if (this.env.type == 'func-bind') {	
 				functionDefinition = this.env.parent.parent.parent.getLocalFunction(markup.designator.idCon);
 				new_env = this.env.parent.parent;
 			} else {
@@ -1082,7 +1092,11 @@ function WaebricInterpreterVisitor(){
 			}	
 
 			//Visit function definition
-			functionDefinition.accept(new FunctionDefinitionVisitor(new_env, this.dom));	
+			if (functionDefinition != null) {
+				functionDefinition.accept(new FunctionDefinitionVisitor(new_env, this.dom));
+			}else{
+				markup.accept(new MarkupXHTMLTagVisitor(this.env, this.dom))
+			}	
 		}
 	}
 	
@@ -1109,7 +1123,7 @@ function WaebricInterpreterVisitor(){
 			//Visit arguments/formals
 			for (var i = 0; i < markup.arguments.length; i++) {
 				var argument = markup.arguments[i];
-				argument.accept(new ArgumentVisitor(this.env, this.dom));
+				argument.accept(new ArgumentExpressionVisitor(this.env, this.dom));
 			}
 		}
 	}
@@ -1166,7 +1180,12 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('id', attribute.id.toString());
+			this.previousValue = this.dom.lastElement.getAttribute('id');			
+			if(this.previousValue != null){
+				this.dom.lastElement.setAttribute('id', this.previousValue + ' ' + attribute.id.toString());
+			}else{
+				this.dom.lastElement.setAttribute('id', attribute.id.toString());
+			}
 		}
 	}
 	
@@ -1177,7 +1196,12 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('class', attribute.className.toString());
+			this.previousValue = this.dom.lastElement.getAttribute('class');			
+			if(this.previousValue != null){
+				this.dom.lastElement.setAttribute('class', this.previousValue + ' ' + attribute.className.toString());
+			}else{
+				this.dom.lastElement.setAttribute('class', attribute.className.toString());
+			}
 		}
 	}
 	
@@ -1188,7 +1212,12 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('name', attribute.name.toString());
+			this.previousValue = this.dom.lastElement.getAttribute('name');			
+			if(this.previousValue != null){
+				this.dom.lastElement.setAttribute('name', this.previousValue + ' ' + attribute.name.toString());
+			}else{
+				this.dom.lastElement.setAttribute('name', attribute.name.toString());
+			}
 		}
 	}
 	
@@ -1199,7 +1228,12 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('type', attribute.type.toString());
+			this.previousValue = this.dom.lastElement.getAttribute('type');			
+			if(this.previousValue != null){
+				this.dom.lastElement.setAttribute('type', this.previousValue + ' ' + attribute.type.toString());
+			}else{
+				this.dom.lastElement.setAttribute('type', attribute.type.toString());
+			}
 		}
 	}
 	
@@ -1210,8 +1244,20 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('width', attribute.width.toString() + 'px');
-			this.dom.lastElement.setAttribute('height', attribute.height.toString() + 'px');
+			this.previousWidthValue = this.dom.lastElement.getAttribute('width');	
+			this.previousHeightValue = this.dom.lastElement.getAttribute('height');			
+					
+			if(this.previousWidthValue != null){
+				this.dom.lastElement.setAttribute('width', this.previousWidthValue + ' ' + attribute.width.toString());
+			}else{
+				this.dom.lastElement.setAttribute('width', attribute.width.toString());
+			}
+			
+			if(this.previousHeightValue != null){
+				this.dom.lastElement.setAttribute('height', this.previousHeightValue + ' ' + attribute.height.toString());
+			}else{
+				this.dom.lastElement.setAttribute('height', attribute.height.toString());
+			}
 		}
 	}
 	
@@ -1222,7 +1268,12 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(attribute){
-			this.dom.lastElement.setAttribute('width', attribute.width.toString() + 'px');
+			this.previousValue = this.dom.lastElement.getAttribute('width');			
+			if(this.previousValue != null){
+				this.dom.lastElement.setAttribute('width', this.previousValue + ' ' + attribute.width.toString());
+			}else{
+				this.dom.lastElement.setAttribute('width', attribute.width.toString());
+			}
 		}
 	}
 	
@@ -1249,11 +1300,21 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(argument){
-			//Visit Expression
-			argument.expression.accept(new ExpressionVisitor(this.env, this.dom));
-			
-			//Add attribute to last element
-			this.dom.lastElement.setAttribute(argument.variable.toString(), this.dom.lastValue.toString());
+			//If argument is Expression, than this is an argument of an XHTML Tag.
+			//The arguments should then be processed as key/value where key is always "value"
+			if (argument instanceof Argument) {			
+				//Visit Expression
+				argument.expression.accept(new ExpressionVisitor(this.env, this.dom));
+				
+				//Add attribute to last element
+				this.dom.lastElement.setAttribute(argument.variable.toString(), this.dom.lastValue.toString());
+			}else{
+				//Visit Expression
+				argument.accept(new ExpressionVisitor(this.env, this.dom));
+				
+				//Add attribute to last element
+				this.dom.lastElement.setAttribute("value", this.dom.lastValue.toString());
+			}
 		}
 	}
 	

@@ -64,63 +64,97 @@ load('../interpreter/WaebricInterpreter.js')
 load("../interpreter/WaebricInterpreterVisitor.js")
 load('../interpreter/DOM.js')
 
-function loadProgram(path){
-    var fis = new FileInputStream(path);
-    var bis = new BufferedInputStream(fis);
-    var dis = new DataInputStream(bis);
-    
-    var program = '';
-    while (dis.available() != 0) {
-        program += dis.readLine() + '\n';
-    }
-    fis.close();
-    bis.close();
-    dis.close();
-    return program;
-}
-
 /**
  * Outputs the HTML code to a set of files
  * 
  * @param {Array} An array of XML documents
  */
-function writeHTML(waebricEnvironments){
+function createHTML(waebricEnvironments, siteName){
 	for(var i = 0; i < waebricEnvironments.length; i++){	
 		var waebricEnvironment = waebricEnvironments[i];
-		var path = waebricEnvironment.path.toString();		
-		
-		//Create directory
-		var pathElements = path.split('/');
-		var directory = pathElements.slice(0, pathElements.length - 1).join('');
-		
-		var fDir = new File(directory);
-		if (!fDir.exists()) {
-			fDir.mkdir();
-		}
+		var rootPath = '../../demos/vanilla/';
+		var sitePath = siteName + '/' + waebricEnvironment.path.toString();
+		createDirectories(rootPath, sitePath)
 		
 		//Write file
-		var fw = new FileWriter(waebricEnvironment.path);
+		var fw = new FileWriter(rootPath + sitePath);
 		var bf = new BufferedWriter(fw);
 		bf.write(waebricEnvironment.document);
 		bf.close();
-	}
+	}	
 }
 
+/**
+ * Creates the directory structure for the HTML output
+ * 
+ * @param {String} rootPath
+ * @param {String} sitePath
+ */
+function createDirectories(rootPath, sitePath){		
+	var fDir = new File(rootPath);
+	if (!fDir.exists()) {
+		fDir.mkdir();
+	}
+	
+	var lastDirectory = rootPath;
+	var pathElements = sitePath.split('/')
+	for(var itemIndex = 0; itemIndex < pathElements.length - 1; itemIndex++){
+		var pathElement = pathElements[itemIndex];
+		var fDir = new File(lastDirectory+pathElement);
+		if (!fDir.exists()) {
+			fDir.mkdir();
+		}
+		lastDirectory += pathElement + '/';
+	}
+	
+}
 
-function convertToHTML(path){	
+/**
+ * Creates a text file that serves as the input for Tidy,
+ * a pretty printer for HTML
+ * 
+ * @param {Array} An array of XML documents
+ */
+function createTidyOutput(waebricEnvironments, siteName){
+	var output = '';
+	for(var i = 0; i < waebricEnvironments.length; i++){	
+		var waebricEnvironment = waebricEnvironments[i];
+		output += '../../demos/vanilla/' + siteName + '/' + waebricEnvironment.path.toString() + ' ';	
+	}
+	//Write file
+	var fw = new FileWriter('../../demos/vanilla/tidy.txt');
+	var bf = new BufferedWriter(fw);
+	bf.write(output);
+	bf.close();
+}
+
+/**
+ * Converts a Waebric Program to HTML
+ * 
+ * @param {String} path
+ * @param {String} siteName
+ */
+function convertToHTML(path, siteName){	
 	//Parsing
 	var parserResult = WaebricParser.parseAll(path);
-	print(parserResult.module.functionDefinitions)
+
 	
 	//Validating		
-	//var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
-		
+	var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
+	print('---------------EXCEPTIONS--------------------')
+	print(validationResult.exceptions)
+	print('---------------------------------------------')
+	
 	//Interpreting
 	var interpreterResult = WaebricInterpreter.interpreteAll(parserResult.module);		
 		
 	//Output results
+	createHTML(interpreterResult.environments, siteName);
+	
+	//Create text file for pretty printer
+	createTidyOutput(interpreterResult.environments, siteName);
+	
 	print(interpreterResult.environments[0].document)
-	writeHTML(interpreterResult.environments);
 }
 
-convertToHTML('../../../../demos/misc/menus.wae');
+convertToHTML('../../../../demos/lava/lava.wae', 'lava');
