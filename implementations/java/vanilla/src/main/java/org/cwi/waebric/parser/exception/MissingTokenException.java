@@ -23,7 +23,7 @@ public class MissingTokenException extends SyntaxException {
 	 */
 	public MissingTokenException(Token previous, String name, String formula) {
 		super("Missing '" + name + "' token after: " + previous.toString() + ", " +
-				"attach the expected: (" + formula + ").");
+				"follow the specified syntax: (" + formula + ").");
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class MissingTokenException extends SyntaxException {
 	 * @param formula
 	 */
 	public MissingTokenException(String name, String formula) {
-		super("Missing '" + name + "' token, attach the expected: (" + formula + ").");
+		super("Missing '" + name + "' token, follow the specified syntax: (" + formula + ").");
 	}
 	
 }

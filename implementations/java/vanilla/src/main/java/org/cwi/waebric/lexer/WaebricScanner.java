@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.lexer.exception.LexicalException;
 import org.cwi.waebric.lexer.token.Position;
 import org.cwi.waebric.lexer.token.Token;
 import org.cwi.waebric.lexer.token.TokenIterator;

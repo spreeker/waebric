@@ -8,8 +8,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
-import org.cwi.waebric.lexer.LexicalException;
 import org.cwi.waebric.lexer.WaebricScanner;
+import org.cwi.waebric.lexer.exception.LexicalException;
 import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;

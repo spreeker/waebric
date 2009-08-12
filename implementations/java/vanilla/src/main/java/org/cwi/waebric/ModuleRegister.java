@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.cwi.waebric.lexer.LexicalException;
 import org.cwi.waebric.lexer.WaebricScanner;
+import org.cwi.waebric.lexer.exception.LexicalException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
