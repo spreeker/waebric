@@ -33,8 +33,8 @@ public class WaebricChecker {
 			}
 		}
 		
-		ModuleChecker moduleChecker = new ModuleChecker(exceptions);
-		DeclarationChecker declarationChecker = new DeclarationChecker(exceptions, environment);
+		ModuleVisitor moduleChecker = new ModuleVisitor(exceptions);
+		DeclarationVisitor declarationChecker = new DeclarationVisitor(exceptions, environment);
 		
 		// Check module and dependencies
 		for(Module component: dependancies) {

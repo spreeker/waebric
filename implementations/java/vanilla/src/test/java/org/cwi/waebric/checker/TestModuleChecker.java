@@ -17,11 +17,11 @@ import org.junit.Test;
 public class TestModuleChecker {
 	
 	private List<SemanticException> exceptions;
-	private ModuleChecker checker;
+	private ModuleVisitor checker;
 	
 	public TestModuleChecker() {
 		exceptions = new ArrayList<SemanticException>();
-		checker = new ModuleChecker(exceptions);
+		checker = new ModuleVisitor(exceptions);
 	}
 	
 	@After

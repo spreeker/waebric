@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.util.ModuleRegister;
 
-public class ModuleChecker extends DefaultNodeVisitor {
+public class ModuleVisitor extends DefaultNodeVisitor {
 
 	/**
 	 * Exceptions
@@ -22,7 +22,7 @@ public class ModuleChecker extends DefaultNodeVisitor {
 	 * Construct checker
 	 * @param exceptions
 	 */
-	public ModuleChecker(List<SemanticException> exceptions) {
+	public ModuleVisitor(List<SemanticException> exceptions) {
 		this.exceptions = exceptions;
 	}
 	

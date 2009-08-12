@@ -22,7 +22,7 @@ import org.cwi.waebric.parser.ast.statement.Statement.Each;
 import org.cwi.waebric.parser.ast.statement.Statement.Let;
 import org.cwi.waebric.util.Environment;
 
-public class DeclarationChecker extends DefaultNodeVisitor {
+public class DeclarationVisitor extends DefaultNodeVisitor {
 
 	/**
 	 * Current environment
@@ -38,7 +38,7 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	 * Construct checker
 	 * @param exceptions
 	 */
-	public DeclarationChecker(List<SemanticException> exceptions, Environment environment) {
+	public DeclarationVisitor(List<SemanticException> exceptions, Environment environment) {
 		this.exceptions = exceptions;
 		this.environment = environment;
 	}
