@@ -7,7 +7,6 @@ import org.cwi.waebric.checker.exception.ArityMismatchException;
 import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.checker.exception.UndefinedFunctionException;
 import org.cwi.waebric.checker.exception.UndefinedVariableException;
-import org.cwi.waebric.interpreter.Environment;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
@@ -21,6 +20,7 @@ import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
 import org.cwi.waebric.parser.ast.statement.Assignment.VarBind;
 import org.cwi.waebric.parser.ast.statement.Statement.Each;
 import org.cwi.waebric.parser.ast.statement.Statement.Let;
+import org.cwi.waebric.util.Environment;
 
 public class DeclarationChecker extends DefaultNodeVisitor {
 

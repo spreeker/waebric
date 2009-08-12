@@ -41,6 +41,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
+import org.cwi.waebric.util.Environment;
 
 import org.jdom.CDATA;
 import org.jdom.Comment;

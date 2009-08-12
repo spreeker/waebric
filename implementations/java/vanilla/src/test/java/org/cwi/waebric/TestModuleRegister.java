@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.util.ModuleRegister;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
+import org.cwi.waebric.util.Environment;
 import org.junit.Before;
 import org.junit.Test;
 

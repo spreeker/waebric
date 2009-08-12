@@ -10,13 +10,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.util.Environment;
+import org.cwi.waebric.util.ModuleRegister;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.output.Format;

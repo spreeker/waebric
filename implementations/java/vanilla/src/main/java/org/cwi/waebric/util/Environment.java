@@ -1,4 +1,4 @@
-package org.cwi.waebric.interpreter;
+package org.cwi.waebric.util;
 
 import java.util.Collection;
 import java.util.HashMap;

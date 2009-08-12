@@ -3,13 +3,13 @@ package org.cwi.waebric.checker;
 import java.io.File;
 import java.util.List;
 
-import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.checker.exception.NonExistingModuleException;
 import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.util.ModuleRegister;
 
 public class ModuleChecker extends DefaultNodeVisitor {
 

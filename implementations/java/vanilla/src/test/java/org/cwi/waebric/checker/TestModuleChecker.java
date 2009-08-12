@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cwi.waebric.ModuleRegister;
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.checker.exception.NonExistingModuleException;
 import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
+import org.cwi.waebric.util.ModuleRegister;
 import org.junit.After;
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package org.cwi.waebric;
+package org.cwi.waebric.util;
 
 import java.io.FileReader;
 import java.io.IOException;
