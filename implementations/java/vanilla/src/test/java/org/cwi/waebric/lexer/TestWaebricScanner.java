@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner;
+package org.cwi.waebric.lexer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,10 +11,12 @@ import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
-import org.cwi.waebric.scanner.token.Token.EmbeddingToken;
+import org.cwi.waebric.lexer.LexicalException;
+import org.cwi.waebric.lexer.WaebricScanner;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
+import org.cwi.waebric.lexer.token.Token.EmbeddingToken;
 import org.junit.Test;
 
 public class TestWaebricScanner {

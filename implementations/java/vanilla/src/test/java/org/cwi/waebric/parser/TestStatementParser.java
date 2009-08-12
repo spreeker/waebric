@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
 import org.cwi.waebric.parser.ast.module.function.Formals;
@@ -30,7 +31,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

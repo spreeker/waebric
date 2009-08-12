@@ -3,15 +3,15 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.basic.SymbolCon;
 import org.cwi.waebric.parser.ast.basic.Text;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * module languages/waebric/syntax/Expressions

@@ -3,9 +3,9 @@ package org.cwi.waebric.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Module;
-import org.cwi.waebric.scanner.token.TokenIterator;
 
 /**
  * Parser attempts to reconstruct the derivation of a Waebric program,

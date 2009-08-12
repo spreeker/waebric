@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * module languages/waebric/syntax/Site

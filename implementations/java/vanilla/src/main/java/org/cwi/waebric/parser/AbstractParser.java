@@ -2,9 +2,9 @@ package org.cwi.waebric.parser;
 
 import java.util.List;
 
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 
 /**
  * Abstract parser stores token stream and exceptions. Based on these fields

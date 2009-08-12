@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

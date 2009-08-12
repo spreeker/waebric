@@ -1,9 +1,9 @@
 package org.cwi.waebric.parser.ast.basic;
 
+import org.cwi.waebric.lexer.token.Token;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.TokenNode;
-import org.cwi.waebric.scanner.token.Token;
 
 /**
  * head:[A-Za-Z] tail:[A-Za-Z\-0-9]* -> IdCon {cons("default")}

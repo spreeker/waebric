@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner.token;
+package org.cwi.waebric.lexer.token;
 
 /**
  * Sorts of available tokens

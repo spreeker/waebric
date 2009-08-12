@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser;
 
-import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.lexer.token.Token;
 
 /**
  * Missing token exceptions are thrown when the token stream ends prematurely.

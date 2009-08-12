@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
@@ -15,9 +18,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * module languages/waebric/syntax/Statements

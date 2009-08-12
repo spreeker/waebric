@@ -1,8 +1,10 @@
-package org.cwi.waebric.scanner.token;
+package org.cwi.waebric.lexer.token;
 
 import static org.junit.Assert.*;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.junit.Test;
 
 public class TestToken {

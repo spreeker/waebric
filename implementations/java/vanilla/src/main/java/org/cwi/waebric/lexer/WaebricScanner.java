@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner;
+package org.cwi.waebric.lexer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.WaebricKeyword;
-import org.cwi.waebric.scanner.token.Position;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
+import org.cwi.waebric.lexer.token.Position;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
 
 public class WaebricScanner {
 	

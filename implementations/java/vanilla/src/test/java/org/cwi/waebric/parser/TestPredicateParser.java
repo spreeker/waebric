@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
@@ -15,7 +16,6 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Is;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Not;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Or;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

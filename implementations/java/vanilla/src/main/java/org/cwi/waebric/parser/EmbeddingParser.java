@@ -3,6 +3,9 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
@@ -11,9 +14,6 @@ import org.cwi.waebric.parser.ast.statement.embedding.MidText;
 import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * Embedding

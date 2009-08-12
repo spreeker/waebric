@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Arguments;
@@ -17,7 +18,6 @@ import org.cwi.waebric.parser.ast.markup.Argument.Attr;
 import org.cwi.waebric.parser.ast.markup.Argument.RegularArgument;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.TestUtilities;
-import org.cwi.waebric.scanner.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package org.cwi.waebric.scanner.token;
+package org.cwi.waebric.lexer.token;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.cwi.waebric.WaebricKeyword;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

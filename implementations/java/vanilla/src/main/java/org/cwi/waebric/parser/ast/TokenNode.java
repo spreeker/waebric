@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast;
 
-import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.lexer.token.Token;
 
 public class TokenNode extends AbstractSyntaxNode {
 

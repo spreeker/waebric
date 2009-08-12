@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser;
 
-import org.cwi.waebric.scanner.token.Token;
+import org.cwi.waebric.lexer.token.Token;
 
 /**
  * Unexpected token exceptions are thrown when a coming

@@ -3,6 +3,9 @@ package org.cwi.waebric.parser;
 import java.util.List;
 
 import org.cwi.waebric.WaebricSymbol;
+import org.cwi.waebric.lexer.token.Token;
+import org.cwi.waebric.lexer.token.TokenIterator;
+import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
 import org.cwi.waebric.parser.ast.markup.Argument;
@@ -11,9 +14,6 @@ import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.scanner.token.Token;
-import org.cwi.waebric.scanner.token.TokenIterator;
-import org.cwi.waebric.scanner.token.WaebricTokenSort;
 
 /**
  * module languages/waebric/syntax/Markup
