@@ -1,9 +1,12 @@
 /**
  * Holds the result of the Tokenization validation
  * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ * 
  * @param {Array} An array of tokens
  */
 function WaebricTokenizerResult(tokens){
+	
 	this.tokens = tokens;
 	
 	/**
@@ -19,7 +22,7 @@ function WaebricTokenizerResult(tokens){
 	/**
 	 * Returns the last used keyword
 	 * 
-	 * @return Last used keyword in the tokenlist.
+	 * @return {WaebricToken}
 	 */
 	this.getLastKeyword = function(){
 		for(var i = this.tokens.length - 1; i >= 0; i--){

@@ -1,16 +1,34 @@
-
+/**
+ * Waebric Markup Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricMarkupParser(){
 	
 	this.currentToken;
 	
 	this.expressionParser = new WaebricExpressionParser();
 
+	/**
+	 * Parses the input to {MarkupCall, DesignatorTag}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {MarkupCall, DesignatorTag}
+	 */
 	this.parseSingle = function(parentParser){
 		var markup = this.parseMarkup(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
 		return markup;
 	}
 	
+	/**
+	 * Parses the input to a collection of {MarkupCall, DesignatorTag}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {Array} Collection of {MarkupCall, DesignatorTag}
+	 */
 	this.parseMultiple = function(parentParser){
 		var markups = this.parseMarkups(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
@@ -18,10 +36,10 @@ function WaebricMarkupParser(){
 	}
 	
 	/**
-	 * Parses the input to {MarkupCall} or {DesignatorTag}
+	 * Parses the input to {MarkupCall, DesignatorTag}
 	 * 
-	 * @param {WaebricParserToken} token
-	 * @return {MarkupCall} or {DesignatorTag}
+	 * @param {WaebricParserToken} token The token to parse
+	 * @return {MarkupCall, DesignatorTag}
 	 */
 	this.parseMarkup = function(token){
 		this.currentToken = token;
@@ -36,10 +54,10 @@ function WaebricMarkupParser(){
 	}
     
 	/**
-	 * Parses the input to a collection of {MarkupCall} and {DesignatorTag}
+	 * Parses the input to a collection of {MarkupCall, DesignatorTag}
 	 * 
-	 * @param {WaebricParserToken} token
-	 * @return {Array} Collection of {MarkupCall} and {DesignatorTag}
+	 * @param {WaebricParserToken} token The token to parse
+	 * @return {Array} Collection of {MarkupCall, DesignatorTag}
 	 */
 	this.parseMarkups = function(token){
 		this.currentToken = token;
@@ -57,13 +75,19 @@ function WaebricMarkupParser(){
 	/**
 	 * Checks whether the input value is valid markup
 	 *
-	 * @param {WaebricParserToken}
-	 * @param {Boolean}
+	 * @param {WaebricParserToken} token The token to evaluate
+	 * @return {Boolean}
 	 */
 	this.isMarkup = function(token){
 	    return token != null && token.value instanceof WaebricToken.IDENTIFIER;
 	}
 
+	/**
+	 * Checks whether the input value is a valid MarkupCall
+	 * 
+	 * @param {WaebricParserToken} token The token to evaluate
+	 * @return {Boolean}
+	 */
 	this.isMarkupCall = function(token){
 		if (token.value instanceof WaebricToken.IDENTIFIER) {
 			//Skip attributes
@@ -81,7 +105,7 @@ function WaebricMarkupParser(){
     /**
      * Parses a designator
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Designator}
      */
     this.parseDesignator = function(token){
@@ -106,7 +130,7 @@ function WaebricMarkupParser(){
     /**
      * Checks whether the input token is an attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isAttribute = function(token){
@@ -117,7 +141,7 @@ function WaebricMarkupParser(){
 	/**
      * Checks whether the input token is the start of an attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartAttribute = function(token){
@@ -128,7 +152,7 @@ function WaebricMarkupParser(){
     /**
      * Parse arguments
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Array} An array of arguments
      */
     this.parseArguments = function(token){
@@ -154,7 +178,7 @@ function WaebricMarkupParser(){
     /**
      * Parse single argument
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Object} Argument or Expression
      */
     this.parseArgument = function(token){
@@ -169,7 +193,7 @@ function WaebricMarkupParser(){
     /**
      * Parses regular argument
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @param {Object} An expression
      */
     this.parseRegularArgument = function(token){
@@ -180,7 +204,7 @@ function WaebricMarkupParser(){
     /**
      * Parses an attribute argument
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @param {Argument}
      */
     this.parseAttributeArgument = function(token){
@@ -215,7 +239,7 @@ function WaebricMarkupParser(){
 	 /**
      * Parses attributes
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Array} An array with attributes
      */
     this.parseAttributes = function(token){
@@ -231,8 +255,9 @@ function WaebricMarkupParser(){
     /**
      * Parses single attribute
      *
-     * @param {WaebricParserToken} token
-     * @return {Object} Attribute
+     * @param {WaebricParserToken} token The token to parse
+     * @return {IDAttribute, ClassAttribute, NameAttribute, TypeAttribute, 
+     * 			WidthHeightAttribute, WidthAttribute} 
      */
     this.parseAttribute = function(token){
         this.currentToken = token
@@ -254,7 +279,7 @@ function WaebricMarkupParser(){
     /**
      * Parses an ID Attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {IdAttribute}
      */
     this.parseIDAttribute = function(token){
@@ -270,7 +295,7 @@ function WaebricMarkupParser(){
     /**
      * Parses a Class Attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {ClassAttribute}
      */
     this.parseClassAttribute = function(token){
@@ -286,7 +311,7 @@ function WaebricMarkupParser(){
     /**
      * Parses a Name Attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {NameAttribute}
      */
     this.parseNameAttribute = function(token){
@@ -302,7 +327,7 @@ function WaebricMarkupParser(){
     /**
      * Parses an Type Attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {TypeAttribute}
      */
     this.parseTypeAttribute = function(token){
@@ -318,7 +343,7 @@ function WaebricMarkupParser(){
     /**
      * Parses an Width/Height Attribute
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {WidthAttribute}
      */
     this.parseWidthHeightAttribute = function(token){
@@ -352,8 +377,8 @@ function WaebricMarkupParser(){
 	/**
 	 * Returns the token that follows a sequence of Markup objects.
 	 * 
-	 * @param {Object} token The token of the first Markup object in the sequence
-	 * @return {WaebricParserToken} The token that follows the sequence of Markup objects
+	 * @param {WaebricParserToken} token The token of the first Markup object in the sequence
+	 * @return {WaebricParserToken}
 	 */
 	this.getTokenAfterMarkups = function(token){			
 		var tempToken = token;
@@ -388,6 +413,12 @@ function WaebricMarkupParser(){
 		return tempToken; 
 	}
 
+	/**
+	 * Returns the last markup in a sequence of markup tokens
+	 * 
+	 * @param {WaebricParserToken} token The token of the first markup in the sequence of markup tokens
+	 * @return {WaebricParserToken}
+	 */
 	this.getLastMarkup = function(token){
 		var arrTokens = new Array();		
 		while(this.isMarkup(token)){

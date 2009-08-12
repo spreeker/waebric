@@ -1,8 +1,6 @@
 /**
- * An environment used during Semantic Validation which
- * hold all data (functions, variables and exceptions) of 
- * a certain environment such as a module, functionmodule,
- * a let statement or an each statement
+ * The WaebricEnvironment holds all functions, variables, exceptions, 
+ * dependencies and children. 
  */
 
 function WaebricEnvironment(){	
@@ -21,7 +19,8 @@ function WaebricEnvironment(){
 	
 	/**
 	 * Adds a function to the functionlist
-	 * @param {FunctionDefinition} func
+	 * 
+	 * @param {FunctionDefinition} func The function definition
 	 */
 	this.addFunction = function(func){
 		this.functions.push(func);
@@ -29,7 +28,9 @@ function WaebricEnvironment(){
 	
 	/**
 	 * Adds a variable to the variable list
-	 * @param {VariableName} variable
+	 * 
+	 * @param {String} variable The name of the variable
+	 * @param {Object} value The value of the variable
 	 */
 	this.addVariable = function(name, value){
 		var foundVariable = this.getLocalVariable(name);
@@ -42,7 +43,8 @@ function WaebricEnvironment(){
 	
 	/**
 	 * Adds an exception to the exceptionlist
-	 * @param {WaebricSemanticException} exception
+	 * 
+	 * @param {WaebricSemanticException} exception The exception
 	 */
 	this.addException = function(exception){
 		this.exceptions.push(exception);
@@ -51,7 +53,9 @@ function WaebricEnvironment(){
 	/**
 	 * Adds an environment to the current environment
 	 * The new environment becomes child of the current environment
-	 * @return The new environment
+	 * 
+	 * @param {String} The type of the environment
+	 * @return {WaebricEnvironment}The new environment
 	 */
 	this.addEnvironment = function(type){
 		var env = new WaebricEnvironment();
@@ -64,7 +68,8 @@ function WaebricEnvironment(){
 	/**
 	 * Adds new dependency to the current environment
 	 * The new environment becomes child of the current environment
-	 * @return The new environment
+	 * 
+	 * @return {WaebricEnvironment} The new environment
 	 */
 	this.addDependency = function(type){
 		var env = new WaebricEnvironment();
@@ -77,7 +82,8 @@ function WaebricEnvironment(){
 	/**
 	 * Adds new dependency to the current environment
 	 * The new environment becomes child of the current environment
-	 * @return The new environment
+	 * 
+	 * @return {WaebricEnvironment} The new environment
 	 */
 	this.addExistingDependency = function(existingDependency){
 		this.dependencies.push(existingDependency);		
@@ -89,7 +95,7 @@ function WaebricEnvironment(){
 	 * -> Root module environment + dependencies environment
 	 * 
 	 * @param {String} funcName
-	 * @return The requested function. Null if not found.
+	 * @return {FunctionDefinition} The requested function. Null if not found.
 	 */
 	this.getFunction = function(funcName){
 		var root = this.getRootModule();		
@@ -101,7 +107,7 @@ function WaebricEnvironment(){
 	 * -> Module environment + dependencies environment
 	 * 
 	 * @param {String} funcName
-	 * @return The requested function. Null if not found.
+	 * @return {FunctionDefinition} The requested function. Null if not found.
 	 */
 	this.getLocalFunction = function(funcName){	
 		//Search function local environment
@@ -159,7 +165,7 @@ function WaebricEnvironment(){
 	/**
 	 * Returns the parent environment
 	 * 
-	 * @return {Environment} The root environment
+	 * @return {WaebricEnvironment} The root environment
 	 */
 	this.getParentModule = function(){
 		if (this.type != 'module') {			
@@ -172,7 +178,7 @@ function WaebricEnvironment(){
 	/**
 	 * Returns the root environment with no parents.
 	 * 
-	 * @return {Environment} The root environment
+	 * @return {WaebricEnvironment} The root environment
 	 */
 	this.getRootModule = function(){
 		if (this.parent != null) {			
@@ -185,13 +191,20 @@ function WaebricEnvironment(){
 	/**
 	 * Returns a dependency found in the root environment or its transitive dependencies
 	 * 
-	 * @param {Object} dependencyName
+	 * @param {String} dependencyName The name of the dependency
+	 * @return {Module} The requested Module. Null if not found
 	 */
 	this.getDependency = function(dependencyName){		
 		var root = this.getRootModule();
 		return root.getLocalDependency(dependencyName)
 	}
 	
+	/**
+	 * Returns a dependency found in the transitive dependencies of the current environment
+	 * 
+	 * @param {String} dependencyName The name of the dependency
+	 * @return {Module} The requested dependency. Null if not found.
+	 */
 	this.getLocalDependency = function(dependencyName){
 		for(var i = 0; i < this.dependencies.length; i++){		
 			var dependency = this.dependencies[i];		
@@ -212,8 +225,8 @@ function WaebricEnvironment(){
 	 * parent environment. If no variable is found in the current environment,
 	 * nor in the parent environment, then null is returned.
 	 * 
-	 * @param {String} variable
-	 * @return The requested variable. Null if not found
+	 * @param {String} variable The name of the variable
+	 * @return {Object} The requested variable. Null if not found.
 	 */
 	this.getVariable = function(name){
 		//Search function local environment
@@ -236,8 +249,8 @@ function WaebricEnvironment(){
 	 * Returns a variable from the variablelist in the current environment.
 	 * If no variable is found in the current environment, then null is returned.
 	 * 
-	 * @param {String} variable
-	 * @return The requested variable. Null if not found
+	 * @param {String} variable The name of the variable
+	 * @return {Object} The requested variable. Null if not found.
 	 */
 	this.getLocalVariable = function(name){				
 		//Search function local environment
@@ -250,6 +263,13 @@ function WaebricEnvironment(){
 		return null;
 	}
 	
+	/**
+	 * Checks whether the variable exists in the current environment or in it's
+	 * parent environment. 
+	 * 
+	 * @param {String} name The name of the variable
+	 * @param {Boolean}
+	 */
 	this.containsVariable = function(name){
 		if(this.getVariable(name) != null){
 			return true
@@ -257,6 +277,12 @@ function WaebricEnvironment(){
 		return false;
 	}
 	
+	/**
+	 * Checks whether the variable exists in the current environment.
+	 * 
+	 * @param {String} name The name of the variable
+	 * @return {Boolean}
+	 */
 	this.containsLocalVariable = function(name){
 		if(this.getLocalVariable(name) != null){
 			return true
@@ -268,7 +294,7 @@ function WaebricEnvironment(){
 	 * Returns all exceptions found in the current environment or in it's children's
 	 * environment. 
 	 * 
-	 * @return Array of exceptions
+	 * @return {Array} Collection of exceptions
 	 */
 	this.getExceptions = function(){
 		var exceptionList = new Array();
@@ -282,5 +308,16 @@ function WaebricEnvironment(){
 			exceptionList = exceptionList.concat(dependency.getExceptions());
 		}
 		return exceptionList;
+	}
+}
+
+/** 
+ * Specifies a variable object used in the WaebricEnvironment
+ */
+function Variable (name, value){
+	this.name = name;
+	this.value = value;	
+	this.toString = function(){
+		this.name;
 	}
 }

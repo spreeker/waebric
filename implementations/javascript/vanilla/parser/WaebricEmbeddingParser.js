@@ -1,4 +1,8 @@
-
+/**
+ * Waebric Embedding Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricEmbeddingParser(){
 	
 	this.currentToken;	
@@ -6,6 +10,13 @@ function WaebricEmbeddingParser(){
 	this.expressionParser = new WaebricExpressionParser();
 	this.markupParser = new WaebricMarkupParser();
 	
+	/**
+	 * Parses the input to {Embedding}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {Embedding}
+	 */
 	this.parse = function(parentParser){
 		var embedding = this.parseEmbedding(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
@@ -15,7 +26,7 @@ function WaebricEmbeddingParser(){
 	/**
 	 * Checks whether the input value is the start of an {Embedding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to be parsed
 	 * @return {Boolean}
 	 */
 	this.isStartEmbedding = function(token){
@@ -25,9 +36,9 @@ function WaebricEmbeddingParser(){
 	}
 	
 	/**
-	 * Parses the input to an {Embedding}
+	 * Parses the input to {Embedding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to be parsed
 	 * @return {Embedding}
 	 */
 	this.parseEmbedding = function(token){
@@ -45,7 +56,7 @@ function WaebricEmbeddingParser(){
 		if(this.currentToken.value == WaebricToken.SYMBOL.LESSTHAN){			
 			embed = this.parseEmbed(this.currentToken.nextToken());			
 		}else{
-			print('Error parsing Embedding. Expected "<" but found ' + this.currentToken.nextToken().value)
+			throw ('Error parsing Embedding. Expected "<" but found ' + this.currentToken.nextToken().value);
 		}	
 		
 		tail = this.parseTail(this.currentToken.nextToken());
@@ -53,9 +64,9 @@ function WaebricEmbeddingParser(){
 	}
 	
 	/**
-	 * Parses the input to a {PostTextTail} or a {MidTextTail}
+	 * Parses the input to {PostTextTail} or {MidTextTail}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to be parsed
 	 * @return {PostTextTail} or {MidTextTail}
 	 */
 	this.parseTail = function(token){
@@ -65,7 +76,7 @@ function WaebricEmbeddingParser(){
 		//Validate seperator
 		var hasValidSeperator = this.currentToken.value == WaebricToken.SYMBOL.GREATERTHAN;
 		if(!hasValidSeperator){
-			print('Error parsing TextTail. Expected > but found ' + this.currentToken.value)
+			throw ('Error parsing TextTail. Expected > but found ' + this.currentToken.value)
 		}		
 		
 		//Get next symbol to determine PostTextTail or MidTextTail		
@@ -89,9 +100,9 @@ function WaebricEmbeddingParser(){
 	}
 	
 	/**
-	 * Parses the input to an {Embed}
+	 * Parses the input to {Embed}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to be parsed
 	 * @return {Embed}
 	 */
 	this.parseEmbed = function(token){

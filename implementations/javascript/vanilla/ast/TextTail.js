@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a TextTail used in Embedding
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

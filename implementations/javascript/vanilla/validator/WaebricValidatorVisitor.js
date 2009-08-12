@@ -18,11 +18,18 @@
  *
  * - Arity mismathces: If a function is called with an incorrect numer of arguments
  *   (as follows from its definition), this is an error.
+ *   
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ *   
+ * @param {WaebricEnvironment} env The parent environment
  */
-function WaebricSemanticValidatorVisitor(env){
+function WaebricValidatorVisitor(env){
 	
 	/**
 	 * Returns a module visitor
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @reutrn {Object} A visitor for the {Module} object
 	 */
 	this.getModuleVisitor = function(env){
 		return new ModuleVisitor(env);
@@ -31,6 +38,7 @@ function WaebricSemanticValidatorVisitor(env){
 	/**
 	 * Visitor for Module
 	 *
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ModuleVisitor(env){
 		this.env = env
@@ -70,10 +78,11 @@ function WaebricSemanticValidatorVisitor(env){
 			}
 		}
 	}
-	
-	
+		
 	/**
 	 * Visitor for dependencies (imports)
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function DependencyVisitor(env){
 		this.env = env
@@ -97,6 +106,7 @@ function WaebricSemanticValidatorVisitor(env){
 	/**
 	 * Visitor for FunctionDefinition
 	 *
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function FunctionDefinitionVisitor(env){
 		this.env = env
@@ -118,6 +128,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor for Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function StatementVisitor(env){
 		this.env = env
@@ -161,6 +173,8 @@ function WaebricSemanticValidatorVisitor(env){
 			
 	/**
 	 * Visitor IfStatement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function IfStatementVisitor(env){
 		this.env = env
@@ -175,6 +189,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor IfElseStatement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function IfElseStatementVisitor(env){
 		this.env = env
@@ -192,6 +208,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Each Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function EachStatementVisitor(env){
 		this.env = env
@@ -213,6 +231,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Let Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function LetStatementVisitor(env){
 		this.env = env
@@ -238,6 +258,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor Block Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function BlockStatementVisitor(env){
 		this.env = env
@@ -252,6 +274,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor Echo Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function EchoStatementVisitor(env){
 		this.env = env
@@ -263,6 +287,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor for Echo Embedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function EchoEmbeddingVisitor(env){
 		this.env = env
@@ -274,6 +300,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor for CData
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function CDataExpressionVisitor(env){
 		this.env = env
@@ -285,6 +313,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Markup Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupStatementVisitor(env){
 		this.env = env
@@ -296,6 +326,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor MarkupMarkup Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupMarkupStatementVisitor(env){
 		this.env = env
@@ -310,6 +342,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor MarkupEmbedding Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupEmbeddingStatementVisitor(env){
 		this.env = env
@@ -327,6 +361,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor MarkupStatement Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupStatementStatementVisitor(env){
 		this.env = env
@@ -344,6 +380,8 @@ function WaebricSemanticValidatorVisitor(env){
 		
 	/**
 	 * Visitor MarkupExpression Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupExpressionStatementVisitor(env){
 		this.env = env
@@ -361,6 +399,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ExpressionVisitor(env){
 		this.env = env
@@ -389,6 +429,8 @@ function WaebricSemanticValidatorVisitor(env){
 		
 	/**
 	 * Visitor Variable Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function VarExpressionVisitor(env){
 		this.env = env
@@ -402,6 +444,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Field Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function FieldExpressionVisitor(env){
 		this.env = env
@@ -412,6 +456,8 @@ function WaebricSemanticValidatorVisitor(env){
 		
 	/**
 	 * Visitor Category Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function CatExpressionVisitor(env){
 		this.env = env
@@ -426,6 +472,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor List Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ListExpressionVisitor(env){
 		this.env = env
@@ -440,6 +488,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Record Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function RecordExpressionVisitor(env){
 		this.env = env
@@ -454,6 +504,8 @@ function WaebricSemanticValidatorVisitor(env){
 		
 	/**
 	 * Visitor Predicate
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function PredicateVisitor(env){
 		this.env = env
@@ -476,6 +528,8 @@ function WaebricSemanticValidatorVisitor(env){
 		
 	/**
 	 * Visitor for Embedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function EmbeddingVisitor(env){
 		this.env = env
@@ -490,6 +544,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Embed
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function EmbedVisitor(env){
 		this.env = env
@@ -506,6 +562,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor for TextTail
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function TextTailVisitor(env){
 		this.env = env
@@ -522,6 +580,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor for Mid Text Tail
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MidTextTailVisitor(env){
 		this.env = env
@@ -536,6 +596,8 @@ function WaebricSemanticValidatorVisitor(env){
 			
 	/**
 	 * Visitor ExpressionEmbedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ExpressionEmbeddingVisitor(env){
 		this.env = env
@@ -553,6 +615,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor MarkupEmbedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupEmbeddingVisitor(env){
 		this.env = env
@@ -567,6 +631,8 @@ function WaebricSemanticValidatorVisitor(env){
 			
 	/**
 	 * Visitor Assignment
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function AssignmentVisitor(env){
 		this.env = env
@@ -583,6 +649,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor Variablebinding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function VariableBindingVisitor(env){
 		this.env = env
@@ -597,6 +665,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Functionbinding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function FunctionBindingVisitor(env){
 		this.env = env
@@ -623,6 +693,8 @@ function WaebricSemanticValidatorVisitor(env){
 
 	/**
 	 * Visitor Markup
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function MarkupVisitor(env){
 		this.env = env
@@ -660,6 +732,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Argument
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ArgumentVisitor(env){
 		this.env = env
@@ -674,6 +748,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor Argument Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function ArgumentExpressionVisitor(env){
 		this.env = env
@@ -685,6 +761,8 @@ function WaebricSemanticValidatorVisitor(env){
 	
 	/**
 	 * Visitor KeyValue
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function KeyValueVisitor(env){
 		this.env = env

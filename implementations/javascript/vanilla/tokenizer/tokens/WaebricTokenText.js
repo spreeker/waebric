@@ -1,13 +1,14 @@
 /**
  * Waebric Text Token
  * 
- * Text is recognized by it's start and ending character (quotes).
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} The value of the token
  */
-WaebricToken.TEXT = function(value){
+WaebricToken.TEXT = function(value, position){
 	this.value = value;
 	this.type = 'TEXT';
+	this.position = position;
 }
 
 WaebricToken.TEXT.prototype = new WaebricToken();

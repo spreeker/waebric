@@ -1,5 +1,7 @@
 /**
- * Waebric Tokenacter
+ * Waebric Parser Token
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} input
  * @param {Number} position

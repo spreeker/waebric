@@ -1,7 +1,16 @@
+/**
+ * Visit each element in the {Module} and produces HTML output
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricInterpreterVisitor(){	
 	
 	/**
 	 * Returns a module visitor
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return A visitor for the {Module} object
 	 */
 	this.getModuleVisitor = function(env, dom){		
 		return new ModuleVisitor(env, dom);
@@ -9,6 +18,10 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Returns a main visitor
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return A visitor for the Main function in a {Module}
 	 */
 	this.getMainVisitor = function(env, dom){		
 		return new MainVisitor(env, dom);
@@ -16,6 +29,10 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Returns a mapping visitor
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return A visitor for the Mappings in a {Module}
 	 */
 	this.getMappingVisitor = function(env, dom){		
 		return new MappingVisitor(env, dom);
@@ -24,6 +41,8 @@ function WaebricInterpreterVisitor(){
 	/**
 	 * Visitor for main function
 	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MainVisitor(env, dom){
 		this.env = env;
@@ -47,6 +66,8 @@ function WaebricInterpreterVisitor(){
 	/**
 	 * Visitor for mappings
 	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MappingVisitor(env, dom){
 		this.env = env;
@@ -62,9 +83,10 @@ function WaebricInterpreterVisitor(){
 	}
 	
 	/**
-	 * Visitor for Module
+	 * Visitor for Module (preprocessing)
 	 * 
-	 * Preprocessor
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ModuleVisitor(env, dom){	
 		this.env = env;
@@ -93,6 +115,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for dependencies (imports)
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function DependencyVisitor(env, dom){
 		this.env = env;
@@ -117,7 +142,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for FunctionDefinition
-	 *
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function FunctionDefinitionVisitor(env, dom){
 		this.env = env;
@@ -160,6 +187,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function StatementVisitor(env, dom){
 		this.env = env;
@@ -207,6 +237,13 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	/**
+	 * Checks whether the input value is a valid expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Boolean}
+	 */
 	function isValidExpression(expression, env){
 		if(expression instanceof FieldExpression){
 			return isValidFieldExpression(expression, env);
@@ -225,16 +262,37 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	/**
+	 * Checks whether the input value is a valid {FieldExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Boolean}
+	 */
 	function isValidFieldExpression(expression, env){
 		return getFieldExpressionValue(expression, env) != null;
 	}
 	
+	/**
+	 * Checks whether the input value is a valid {CatExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Boolean}
+	 */
 	function isValidCatExpression(expression, env){
 		var isValidLeftExpression = isValidExpression(expression.expressionLeft, env);
 		var isValidRightExpression = isValidExpression(expression.expressionRight, env);
 		return isValidLeftExpression && isValidRightExpression;
 	}
 	
+	/**
+	 * Returns the value of an Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Object}
+	 */
 	function getExpressionValue(expression, env){
 		if (expression instanceof FieldExpression) {
 			return getFieldExpressionValue(expression, env);
@@ -249,6 +307,13 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	/**
+	 * Returns the value of a {FieldExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Object}
+	 */
 	function getFieldExpressionValue(expression, env){		
 		//Store fields in array
 		var fields = new Array();
@@ -279,6 +344,13 @@ function WaebricInterpreterVisitor(){
 		return data;
 	}
 	
+	/**
+	 * Returns the value of the first expression in a {FieldExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Object}
+	 */
 	function getFieldExpressionRootValue(expression, env){
 		var root = expression;
 		while (root instanceof FieldExpression) {
@@ -295,6 +367,13 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	/**
+	 * Returns the value of a {RecordExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Object}
+	 */
 	function getRecordExpressionValue(recordExpr, env){
 		for (var i = 0; i < recordExpr.records.length; i++) {
 			var keyValuePair = recordExpr.records[i];
@@ -303,6 +382,13 @@ function WaebricInterpreterVisitor(){
 		return recordExpr;
 	}
 	
+	/**
+	 * Returns the value of a {ListExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {Object}
+	 */
 	function getListExpressionValue(listExpr, env){
 		for (var i = 0; i < listExpr.list.length; i++) {
 			var item = listExpr.list[i];
@@ -311,7 +397,14 @@ function WaebricInterpreterVisitor(){
 		
 		return listExpr;
 	}
-		
+	
+	/**
+	 * Returns a String representation of a {RecordExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {String}
+	 */	
 	function getRecordExpressionStringValue(recordExpr, env){
 		var records = '{'
 		for (var i = 0; i < recordExpr.records.length; i++) {
@@ -320,7 +413,14 @@ function WaebricInterpreterVisitor(){
 		}
 		return records.substr(0, records.length - 1).concat('}')
 	}
-		
+	
+	/**
+	 * Returns a String representation of a {ListExpression}
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
+	 * @return {String}
+	 */
 	function getListExpressionStringValue(listExpr, env){
 		var list = '[';
 		for (var i = 0; i < listExpr.list.length; i++) {
@@ -332,6 +432,9 @@ function WaebricInterpreterVisitor(){
 			
 	/**
 	 * Visitor IfStatement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function IfStatementVisitor(env, dom){
 		this.env = env;
@@ -345,6 +448,9 @@ function WaebricInterpreterVisitor(){
 		
 	/**
 	 * Visitor IfElseStatement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function IfElseStatementVisitor(env, dom){
 		this.env = env;
@@ -360,6 +466,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Each Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function EachStatementVisitor(env, dom){
 		this.env = env;
@@ -394,6 +503,9 @@ function WaebricInterpreterVisitor(){
 		
 	/**
 	 * Visitor Let Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function LetStatementVisitor(env, dom){
 		this.env = env;
@@ -423,6 +535,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor Block Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function BlockStatementVisitor(env, dom){
 		this.env = env;
@@ -438,6 +553,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Comment Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function CommentStatementVisitor(env, dom){
 		this.env = env;
@@ -451,6 +569,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor Echo Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function EchoStatementVisitor(env, dom){
 		this.env = env;
@@ -467,6 +588,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for Echo Embedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function EchoEmbeddingVisitor(env, dom){
 		this.env = env;
@@ -479,6 +603,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for Yield
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function YieldStatementVisitor(env, dom){
 		this.env = env;
@@ -497,6 +624,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor for CData
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function CDataExpressionVisitor(env, dom){
 		this.env = env;
@@ -513,6 +643,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Markup Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupStatementVisitor(env, dom){
 		this.env = env;
@@ -534,7 +667,7 @@ function WaebricInterpreterVisitor(){
 	 * reconstructs the statement based on the head (= markups) and the 
 	 * tail (= Empty, Embedding, Expression, statement). 
 	 * 
-	 * @param {Object} markups
+	 * @param {MarkupCall, DesignatorTag} markups 
 	 * @param {Object} tail
 	 */
 	function constructNewMarkupStatement(markups, tail){
@@ -568,8 +701,8 @@ function WaebricInterpreterVisitor(){
 	/**
 	 * Checks whether the requested markup is a function call to a valid function;
 	 * 
-	 * @param {Object} markup
-	 * @param {Object} env
+	 * @param {MarkupCall, DesignatorTag} markup The Markup to evaluate
+	 * @param {WaebricEnvironment} env The parent environment
 	 */
 	function isValidMarkupCall(markup, env){
 		if(env.type == 'func-bind'){
@@ -585,6 +718,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor MarkupMarkup Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupMarkupStatementVisitor(env, dom){
 		this.env = env;
@@ -612,6 +748,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor MarkupEmbedding Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupEmbeddingStatementVisitor(env, dom){
 		this.env = env;
@@ -643,6 +782,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor MarkupStatement Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupStatementStatementVisitor(env, dom){
 		this.env = env;
@@ -672,6 +814,9 @@ function WaebricInterpreterVisitor(){
 		
 	/**
 	 * Visitor MarkupExpression Statement
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupExpressionStatementVisitor(env, dom){
 		this.env = env;
@@ -705,6 +850,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ExpressionVisitor(env, dom){
 		this.env = env;
@@ -734,6 +882,9 @@ function WaebricInterpreterVisitor(){
 		
 	/**
 	 * Visitor Variable Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function VarExpressionVisitor(env, dom){
 		this.env = env;
@@ -750,6 +901,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Symbol Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function SymbolExpressionVisitor(env, dom){
 		this.env = env;
@@ -762,6 +916,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Variable Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function NatExpressionVisitor(env, dom){
 		this.env = env;
@@ -774,6 +931,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Text Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function TextExpressionVisitor(env, dom){
 		this.env = env;
@@ -786,6 +946,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Field Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function FieldExpressionVisitor(env, dom){
 		this.env = env;
@@ -797,6 +960,9 @@ function WaebricInterpreterVisitor(){
 			
 	/**
 	 * Visitor Category Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function CatExpressionVisitor(env, dom){
 		this.env = env;
@@ -819,7 +985,8 @@ function WaebricInterpreterVisitor(){
 	/**
 	 * Visitor List Expression
 	 * 
-	 * [value1, value2, value3, ...]
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ListExpressionVisitor(env, dom){
 		this.env = env;
@@ -832,7 +999,8 @@ function WaebricInterpreterVisitor(){
 	/**
 	 * Visitor Record Expression
 	 * 
-	 * {key1  value1, key2  value2};'
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function RecordExpressionVisitor(env, dom){
 		this.env = env;
@@ -844,6 +1012,9 @@ function WaebricInterpreterVisitor(){
 		
 	/**
 	 * Visitor for Embedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function EmbeddingVisitor(env, dom){
 		this.env = env;
@@ -871,6 +1042,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Embed
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function EmbedVisitor(env, dom){
 		this.env = env;
@@ -888,6 +1062,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor for TextTail
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function TextTailVisitor(env, dom){
 		this.env = env;
@@ -905,6 +1082,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for Mid Text Tail
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MidTextTailVisitor(env, dom){
 		this.env = env;
@@ -930,6 +1110,11 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	/**
+	 * Normalizes the input value so whitespaces are not outputed
+	 * 
+	 * @param {String} str The input string
+	 */
 	function normalize(str){
 		str = str.toString().replace(/\n/g,' ');
 		str = str.toString().replace(/[\r\t\\]/g,'');
@@ -938,6 +1123,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor for Post Text Tail
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function PostTextTailVisitor(env, dom){
 		this.env = env;
@@ -953,6 +1141,9 @@ function WaebricInterpreterVisitor(){
 			
 	/**
 	 * Visitor ExpressionEmbedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ExpressionEmbeddingVisitor(env, dom){
 		this.env = env;
@@ -975,6 +1166,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor MarkupEmbedding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupEmbeddingVisitor(env, dom){
 		this.env = env;
@@ -990,6 +1184,9 @@ function WaebricInterpreterVisitor(){
 			
 	/**
 	 * Visitor Assignment
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function AssignmentVisitor(env, dom){
 		this.env = env;
@@ -1007,6 +1204,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor Variablebinding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function VariableBindingVisitor(env, dom){
 		this.env = env;
@@ -1022,6 +1222,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Functionbinding
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function FunctionBindingVisitor(env, dom){
 		this.env = env;
@@ -1040,6 +1243,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor Markup
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupVisitor(env, dom){
 		this.env = env;
@@ -1068,6 +1274,9 @@ function WaebricInterpreterVisitor(){
 
 	/**
 	 * Visitor Markup Calls
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupCallVisitor(env, dom){
 		this.env = env;
@@ -1102,6 +1311,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Markup XHTML Tag
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupXHTMLTagVisitor(env, dom){
 		this.env = env;
@@ -1130,6 +1342,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Markup Tags
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function MarkupTagVisitor(env, dom){
 		this.env = env;
@@ -1152,6 +1367,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Attributes
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function AttributeVisitor(env, dom){
 		this.env = env;
@@ -1175,6 +1393,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor ID Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function IdAttributeVisitor(env, dom){
 		this.env = env;
@@ -1191,6 +1412,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Class Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ClassAttributeVisitor(env, dom){
 		this.env = env;
@@ -1207,6 +1431,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Name Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function NameAttributeVisitor(env, dom){
 		this.env = env;
@@ -1223,6 +1450,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Type Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function TypeAttributeVisitor(env, dom){
 		this.env = env;
@@ -1239,6 +1469,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Width Height Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function WidthHeightAttributeVisitor(env, dom){
 		this.env = env;
@@ -1263,6 +1496,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Width Attribute
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function WidthAttributeVisitor(env, dom){
 		this.env = env;
@@ -1280,6 +1516,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Argument
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ArgumentVisitor(env, dom){
 		this.env = env;
@@ -1295,6 +1534,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor Argument Expression
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function ArgumentExpressionVisitor(env, dom){
 		this.env = env;
@@ -1320,6 +1562,9 @@ function WaebricInterpreterVisitor(){
 	
 	/**
 	 * Visitor KeyValue
+	 * 
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @param {DOM} dom The Document Object Model
 	 */
 	function KeyValueVisitor(env, dom){
 		this.env = env;

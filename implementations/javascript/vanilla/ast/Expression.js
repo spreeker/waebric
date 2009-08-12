@@ -2,7 +2,7 @@
  * Specifies an Expression used in Statements, Assignments, Embeds, 
  * Predicates, Argument, KeyValuePair
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

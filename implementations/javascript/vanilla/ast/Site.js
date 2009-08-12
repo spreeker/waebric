@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a Site used in ModuleElement
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

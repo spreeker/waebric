@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a ModuleId used in Module and Import
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

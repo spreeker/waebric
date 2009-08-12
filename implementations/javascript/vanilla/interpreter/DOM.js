@@ -1,7 +1,8 @@
 /**
  * Wrapper class for DOM Document
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
-
 function DOM(){
 	this.document;
 	this.lastElement;
@@ -42,16 +43,32 @@ function DOM(){
 		return '\n\n\n' + this.document.xml + '\n\n\n';
 	}
 	
+	/**
+	 * Adds a yield value to the yieldList
+	 * 
+	 * @param {Object} value The value for the Yield
+	 * @param {WaebricEnvironment} env The environment of the yield value
+	 */
 	this.addYield = function(value, env){
 		this.yieldList.push(new Yield(value, env));
 	}
 	
-	this.getLastYield = function(){
-		
+	/**
+	 * Returns the last Yield value and removes it from the list
+	 * 
+	 * @return {Object} The value of the last Yield value
+	 */
+	this.getLastYield = function(){		
 		return this.yieldList.pop();
 	}
 }
 
+/**
+ * Yield class
+ * 
+ * @param {Object} value The value for the Yield
+ * @param {WaebricEnvironment} env The environment of the yield value
+ */
 function Yield(value, env){	
 	this.value = value;
 	this.env = env;

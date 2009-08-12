@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies Markup used in Statements
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /** 

@@ -1,434 +1,509 @@
 /**
  * Waebric Tokenizer
  *
- * Reads the input stream and classifies the tokenList based on regular
- * expressions or starting and ending characters.
+ * Reads the String representation of a Waebric program and classifies 
+ * the characters based on regular expressions or starting and ending characters.
  *
  * The tokenizer categorize the following tokens:
- * - COMMENTS
  * - SYMBOLS
  * - TEXT
  * - NATURALS
  * - IDENTIFIERS
- * - KEYWORDS (1)
- * 
- * (1) Reserved keywords that appear in the PATH of a site mapping are 
- * categorized as IDENTIFIERS.
- * 
- * Whitespaces are ignored and not tokenized 
- * 
+ * - KEYWORDS
+ *
+ * Reserved keywords that appear in the PATH of a site mapping are
+ * categorized as IDENTIFIERS. Whitespaces and comments are ignored 
+ * and not tokenized.
+ *
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricTokenizer(){
-	
-    this.tokenList = new WaebricTokenizerResult(new Array());
-    const EMPTY_TOKEN_VALUE = '';
+
+    var tokenList = new WaebricTokenizerResult(new Array());
+	var position = new WaebricCharacter.Position(1,1) ;
 	
     /**
-     * Tokenizes the input
-     *
-     * @param {String} The input
+     * Tokenizes the input String
+     * 
+     * @param {String} input String representation of a Waebric program
+     * @return {WaebricTokenizerResult}
      */
-    this.tokenizeAll = function(input){
-		//try {			
-			var currentChar = new WaebricCharacter(input, 0);
-			do {
-				currentChar = this.tokenize(currentChar);
-			} while (currentChar != null && currentChar.hasNextChar())	
-				
-			return this.tokenList;	
-			
-		//}catch(exception if (exception instanceof WaebricTokenizerException)){
-		//	throw exception;
-		//}catch(exception){
-		//	print(exception)
-		//	throw new WaebricTokenizerException("Tokenization failed.")
-		//}
+    this.tokenize = function(input){
+        var currentChar = new WaebricCharacter(input, 0);
+        do {			
+            currentChar = tokenizeCharacter(currentChar);
+        } while (currentChar != null && currentChar.hasNextChar())
+        return tokenList;
     }
     
     /**
-     * Tokenizes a token
+     * Tokenizes a sequence of characters to a token
      *
-     * @param {Object} token
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
      */
-    this.tokenize = function(character){		
-        if (this.isWhitespace(character)) {
-            return this.tokenizeWhitespaces(character);
-        } else if (this.isStartSinglelineComment(character)) {
-            return this.tokenizeSinglelineComment(character);
-        } else if (this.isStartMultilineComment(character)) {
-            return this.tokenizeMultilineComment(character);
-        } else if (this.isNatural(character)) {
-            return this.tokenizeNatural(character);
-        } else if (this.isSymbol(character)) {
-            return this.tokenizeSymbol(character);
-        } else if (this.isStartSingleQuotedText(character)) {
-            return this.tokenizeSingleQuotedText(character);
-        } else if (this.isStartDoubleQuotedText(character)) {
-            return this.tokenizeDoubleQuotedText(character);
-        } else if (this.isStartIdentifier(character)) {
-            return this.tokenizeIdentifier(character);
+    function tokenizeCharacter(character){
+        if (isWhitespace(character)) {
+            return tokenizeWhitespaces(character);
+        } else if (isStartSinglelineComment(character)) {
+            return tokenizeSinglelineComment(character);
+        } else if (isStartMultilineComment(character)) {
+            return tokenizeMultilineComment(character);
+        } else if (isStartNatural(character)) {
+            return tokenizeNatural(character);
+        } else if (isSymbol(character)) {
+            return tokenizeSymbol(character);
+        } else if (isStartSingleQuotedText(character)) {
+            return tokenizeSingleQuotedText(character);
+        } else if (isStartDoubleQuotedText(character)) {
+            return tokenizeDoubleQuotedText(character);
+        } else if (isStartIdentifier(character)) {
+            return tokenizeIdentifier(character);
         } else {
-            throw new WaebricTokenizerException("Unrecognized character in input stream.")
+            throw "Unrecognized character in input stream.";
         }
     }
     
     /**
      * Checks whether the input character is whitespace
      *
-     * @param {String} The input character
-     * @return {Boolean} True is the input character is the start of a whitespace
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
      */
-    this.isWhitespace = function(character){
+    function isWhitespace(character){
         var regularExpression = new RegExp(WaebricToken.WHITESPACE.ALLOWEDCHARS);
         return character.match(regularExpression);
     }
     
     /**
-     * Tokenizes the whitespace (whitespace is ignored)
+     * Tokenizes whitespace (ignored)
      *
-     * @param {String} The input character
-     * @return {String} The next character to be tokenized
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
      */
-    this.tokenizeWhitespaces = function(character){		
+    function tokenizeWhitespaces(character){
+		position.update(character);
         return character.nextChar();
-    }    
-  
+    }
+    
     /**
      * Checks whether the input character is the start of singleline comment
      *
-     * @param {String} The input character
-     * @return {Boolean} True if the input character is the start of singleline comment
+     * @param {WaebricCharacter} character The input character
+     * @return {Boolean}
      */
-    this.isStartSinglelineComment = function(character){
+    function isStartSinglelineComment(character){
         return character.equals(WaebricToken.COMMENT.SINGLELINE_STARTCHAR_1) &&
         character.nextChar().equals(WaebricToken.COMMENT.SINGLELINE_STARTCHAR_2);
     }
-	
-	/**
-	 * Tokenizes the Singleline comment
-	 * 
-	 * @param {String} The character
-	 * @return {String} The next character to be tokenized
-	 */
-    this.tokenizeSinglelineComment = function(character){
-        var token = new WaebricToken.COMMENT(EMPTY_TOKEN_VALUE);
+    
+    /**
+     * Tokenizes Singleline comment (ignored)
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeSinglelineComment(character){
         var currentChar = character.nextChar().nextChar(); //Ignore comment start
+        position.increaseColumn(2);
         while (currentChar != WaebricToken.COMMENT.SINGLELINE_ENDCHAR_1) {
-            token.addChar(currentChar);
+            position.update(currentChar)
             currentChar = currentChar.nextChar();
         }
-        
-        //this.tokenList.addToken(token);
         return currentChar;
     }
     
     /**
      * Checks whether the input character is the start of multiline comment
      *
-     * @param {String} The input character
-     * @return {Boolean} True if the input character is the start of multiline comment
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
      */
-    this.isStartMultilineComment = function(character){
+    function isStartMultilineComment(character){
         return character.equals(WaebricToken.COMMENT.MULTILINE_STARTCHAR_1) &&
         character.nextChar().equals(WaebricToken.COMMENT.MULTILINE_STARTCHAR_2);
-    }    
-	
-	/**
-	 * Tokenizes the Multiline comment
-	 * 
-	 * @param {String} The input character
-	 * @return {String} The next character to be tokenized
-	 */    
-    this.tokenizeMultilineComment = function(character){
-        var token = new WaebricToken.COMMENT(EMPTY_TOKEN_VALUE);
+    }
+    
+    /**
+     * Tokenizes Multiline comment (ignored)
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeMultilineComment(character){
         var currentChar = character.nextChar().nextChar(); //Ignore comment start
-	
-		//Process comment until ending of multiline comment is found
-        while ((currentChar.value + currentChar.nextChar().value) 
-				!= WaebricToken.COMMENT.MULTILINE_ENDCHARS) {
-            token.addChar(currentChar);
+        position.increaseColumn(2);
+        while ((currentChar.value + currentChar.nextChar().value) !=
+        WaebricToken.COMMENT.MULTILINE_ENDCHARS) {
+            position.update(currentChar)
             currentChar = currentChar.nextChar();
-        }	
-        
-        //this.tokenList.addToken(token);
+        }
         return currentChar.nextChar().nextChar(); //Ignore comment ending
     }
     
-	/**
-     * Checks whether the input character is a natural number
+    /**
+     * Checks whether the input character is the start of a number
      *
-     * @param {String} The input character
-     * @return {Boolean} True if the input character is a natural number
+     * @param {WaebricCharacter} character The input character
+     * @return {Boolean}
      */
-    this.isNatural = function(character){
+    function isStartNatural (character){
         var regularExpression = new RegExp(WaebricToken.NATURAL.ALLOWEDCHARS);
         return character.match(regularExpression);
     }
     
-	/**
-	 * Tokenizes the Natural number
-	 * 
-	 * @param {String} The input character
-	 * @return {String} The next character to be tokenized
-	 */
-    this.tokenizeNatural = function(character){
-        var token = new WaebricToken.NATURAL(EMPTY_TOKEN_VALUE);
+    /**
+     * Tokenizes a Number
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeNatural(character){
+        var token = new WaebricToken.NATURAL(WaebricToken.EMPTY_TOKEN_VALUE, position);
         var currentChar = character;
         
-        while (this.isNatural(currentChar)) {
+        while (isStartNatural(currentChar)) {
+			position.increaseColumn(1);		
             token.addChar(currentChar);
             currentChar = currentChar.nextChar();
         }
         
-        this.tokenList.addToken(token);
+        if (!isWhitespace(currentChar) && !isSymbol(currentChar)) {
+            throw "Illegal character found after natural: " + currentChar.value + '(' + position.line + ',' + position.column + ')'
+        }
+        
+        tokenList.addToken(token);
         return currentChar;
     }
     
-	/**
+    /**
      * Checks whether the input character is a sybmol
      *
-     * @param {String} The input character
+     * @param {WaebricCharacter} character The input character
      * @return {Boolean} True if the input character is a symbol
      */
-    this.isSymbol = function(character){
+    function isSymbol(character){
         return WaebricToken.SYMBOL.contains(character);
     }
     
-	/**
-	 * Tokenizes the Symbol
-	 * 
-	 * @param {String} character The input character
-	 * @return {String} The next character to be tokenized
-	 */ 
-    this.tokenizeSymbol = function(character){
-        var token = new WaebricToken.SYMBOL(character.value);		
+    /**
+     * Tokenizes a Symbol
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+	function tokenizeSymbol(character){		
+        var token = new WaebricToken.SYMBOL(character.value, position);
         var currentChar = character;
-		
+        
         //&& and || operator should be processed as one symbol
-        if (currentChar.equals('&')) {
+        if (currentChar.equals('&')) {			
             if (currentChar.nextChar().equals('&')) {
-                token.addChar(currentChar.nextChar());
+				position.increaseColumn(1);
                 currentChar = currentChar.nextChar();
-            } else {
-                return currentChar;
+                token.addChar(currentChar);				
             }
         } else if (currentChar.equals('|')) {
             if (currentChar.nextChar().equals('|')) {
-                token.addChar(currentChar.nextChar());
-                currentChar = currentChar.nextChar();
-            } else {
-                return currentChar;
+				position.increaseColumn(1);
+				currentChar = currentChar.nextChar();
+                token.addChar(currentChar);                
             }
+        }		
+        tokenList.addToken(token);
+        
+        //Detect the end of an embedding
+        if (currentChar == WaebricToken.SYMBOL.GREATERTHAN) {
+            if (currentChar.nextChar() == '"') {
+				position.increaseColumn(2);
+                return currentChar.nextChar().nextChar(); //Skip current character + ending quote
+            }
+            return tokenizeDoubleQuotedText(currentChar);
+        } else {
+			position.increaseColumn(1);
+            return currentChar.nextChar();
         }
-        this.tokenList.addToken(token);
-		
-		if (currentChar == WaebricToken.SYMBOL.GREATERTHAN) {
-			if(currentChar.nextChar() == '"'){
-				return currentChar.nextChar().nextChar(); //Skip current character + ending quote
-			}
-			return this.tokenizeDoubleQuotedText(currentChar);
-		} else {
-			return currentChar.nextChar();
-		}
-    }	
-	
-	this.isStartSingleQuotedText = function(character){
+    }
+    
+    /**
+     * Checks whether the input character is the start of single quoted text
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
+     */
+    function isStartSingleQuotedText(character){
         return WaebricToken.TEXT.SINGLEQUOTEDTEXT_STARTCHAR.equals(character.value);
     }
-
-	/**
-	 * Tokenizes the Quoted Text
-	 * 
-	 * Quoted text can contain one other kind of token: Embeddings (see Waebric)
-	 * 
-	 * @param {String} character The input character
-	 * @return {String} The next character to be tokenized
-	 */
-	this.tokenizeSingleQuotedText = function(character){
-        var token = new WaebricToken.TEXT(EMPTY_TOKEN_VALUE);        
+    
+    /**
+     * Tokenizes the Quoted Text
+     *
+     * Quoted text can contain one other kind of token: Embeddings (see Waebric)
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeSingleQuotedText(character){
+        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position);
         var currentChar = character.nextChar(); //Skip the opening quote
         
-		//Process single quoted text until an illegal character is found
-		while(WaebricToken.TEXT.isSingleQuotedText(currentChar.value)){				
-			token.addChar(currentChar);
-			currentChar = currentChar.nextChar();	
-		}	
-		return this.tokenizeText(token, currentChar);
+        //Process single quoted text until an illegal character is found
+        while (WaebricToken.TEXT.isSingleQuotedText(currentChar.value)) {
+			position.update(currentChar);
+            token.addChar(currentChar);
+            currentChar = currentChar.nextChar();
+        }
+        tokenList.addToken(token);
+        
+        //Detect start of embedding after the text
+        if (WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.previousChar().value)) {
+			position.decreaseColumn(1);
+            tokenizeSymbol(currentChar.previousChar());
+        }
+        return currentChar;
     }
     
-	/**
+    /**
      * Checks whether the input character is the start of quotes text
      *
-     * @param {String} The input character
-     * @return {Boolean} True if the input character is the start of a quoted text
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
      */
-    this.isStartDoubleQuotedText = function(character){
+    function isStartDoubleQuotedText(character){
         return WaebricToken.TEXT.QUOTEDTEXT_STARTCHAR.equals(character.value);
     }
-	
-	/**
-	 * Tokenizes the Quoted Text
-	 * 
-	 * Quoted text can contain one other kind of token: Embeddings (see Waebric)
-	 * 
-	 * @param {String} The input character
-	 * @return {String} The next character to be tokenized
-	 */
-    this.tokenizeDoubleQuotedText = function(character){
-        var token = new WaebricToken.TEXT(EMPTY_TOKEN_VALUE);        
-        var currentChar = character.nextChar(); //Skip the opening quote
-
-        //Process double quoted text until ending quote is found (or an embedding).
-        while (!this.isEndQuoteText(currentChar) && !this.isStartEmbedding(currentChar) 
-		&& !this.isEndEmbedding(currentChar)) {	
-            token.addChar(currentChar);
-            currentChar = currentChar.nextChar();	
-        }		
-        currentChar = currentChar.nextChar(); //Skip the ending quote
-        return this.tokenizeText(token, currentChar);
-    }
-	
-	this.isEndQuoteText = function(character){
-		var currentChar = character;
-		var previousChar = character.previousChar();
-
-		return WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value);
-	}
-	
-	this.isStartEmbedding = function(character){
-		var currentChar = character;
-		var previousChar = character.previousChar();
-		var lastToken = this.tokenList.tokens[this.tokenList.tokens.length-1]
-		var isPartOfComment = WaebricToken.KEYWORD.COMMENT.equals(lastToken.value);
-		return WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value) && !isPartOfComment;
-	}
-	
-	this.isEndEmbedding = function(character){
-		var currentChar = character;
-		var previousChar = character.previousChar();
-		
-		return WaebricToken.TEXT.EMBED_ENDCHAR.equals(currentChar.value) 
-			&& WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR.equals(currentChar.value)
-			&& !"\\".equals(previousChar.value) ;
-	}
-	
-	/**
-	 * 
-	 * @param {String} The input character
-	 * @return {String} The next character to be tokenized
-	 */
-	this.tokenizeText = function(token, currentChar){
-		//Save processed token
-		this.tokenList.addToken(token);
-		
-        if (WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.previousChar().value)) {
-			this.tokenizeSymbol(currentChar.previousChar());
-        }
-		return currentChar;
-	}
     
-	/**
+    /**
+     * Tokenizes the Quoted Text
+     *
+     * Quoted text can contain one other kind of token: Embeddings (see Waebric)
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeDoubleQuotedText(character){
+        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position);
+        var currentChar = character.nextChar(); //Skip the opening quote
+        position.increaseColumn(1)
+		
+        //Process double quoted text until ending quote is found (or an embedding).
+        while (!isEndQuoteText(currentChar) && !isStartEmbedding(currentChar) &&
+        !isEndEmbedding(currentChar)) {
+			position.update(currentChar)
+            token.addChar(currentChar);
+            currentChar = currentChar.nextChar();
+        }
+		position.increaseColumn(1);
+        currentChar = currentChar.nextChar(); //Skip the ending quote        
+        tokenList.addToken(token);
+        
+        //Detect start of embedding after the text
+        if (WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.previousChar().value)) {
+			position.decreaseColumn(1);
+            tokenizeSymbol(currentChar.previousChar());
+        }
+        return currentChar;
+    }
+    
+    /**
+     * Checks whether the input character is the end of a quoted text.
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
+     */
+    function isEndQuoteText(character){
+        var currentChar = character;
+        var previousChar = character.previousChar();
+        return WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value);
+    }
+    
+    /**
+     * Checks whether the input character is the start of an embedding tag.
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
+     */
+    function isStartEmbedding (character){
+        var currentChar = character;
+        var previousChar = character.previousChar();
+        var lastToken = tokenList.tokens[tokenList.tokens.length - 1]
+        if (lastToken != null) {
+			var isPartOfComment = WaebricToken.KEYWORD.COMMENT.equals(lastToken.value);
+			return WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value) && !isPartOfComment;
+		}else{
+			return WaebricToken.TEXT.EMBED_STARTCHAR.equals(currentChar.value) && !"\\".equals(previousChar.value)
+		}
+    }
+    
+    /**
+     * Checks whether the input character is the end of an embedding tag.
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
+     */
+    function isEndEmbedding(character){
+        var currentChar = character;
+        var previousChar = character.previousChar();
+        return WaebricToken.TEXT.EMBED_ENDCHAR.equals(currentChar.value) &&
+        WaebricToken.TEXT.QUOTEDTEXT_ENDCHAR.equals(currentChar.value) &&
+        !"\\".equals(previousChar.value);
+    }
+    
+    /**
      * Checks whether the input character is allowed in an identifier
      *
-     * @param {String} The input character
-     * @return {Boolean} True if the input character is allowed in an identifier
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {Boolean}
      */
-    this.isStartIdentifier = function(character){
-        var regExp = new RegExp(WaebricToken.IDENTIFIER.ALLOWEDCHARS);
+    function isStartIdentifier(character){
+        var regExp = new RegExp("[^\ \t\n\r./\\\\:.(){};=<>&|?#$@%+,\\]\[\!]");
         return character.match(regExp);
     }
     
-	/**
-	 * Tokenizes the Identifier
-	 * 
-	 * @param {String} The input character
-	 * @return {String} The next character to be tokenized
-	 */ 
-    this.tokenizeIdentifier = function(character){
+    /**
+     * Tokenizes the Identifier
+     *
+     * @param {WaebricCharacter} character The character that needs to be tokenized
+     * @return {WaebricCharacter} The next character to be tokenized
+     */
+    function tokenizeIdentifier(character){
         var value = "";
+		var startPosition = new WaebricCharacter.Position(position.line, position.column);
         var currentChar = character;
-        while (this.isStartIdentifier(currentChar)) {
+        while (isStartIdentifier(currentChar)) {
+			position.update(currentChar);
             value += currentChar.value;
             currentChar = currentChar.nextChar();
         }
-        //Check if the value is a waebric reserved keyword or not
-		if (WaebricToken.KEYWORD.contains(value) && !this.isPathElement(value)) {
-			this.tokenList.addToken(new WaebricToken.KEYWORD(value));
-			return currentChar;
-		} else {
-			this.tokenList.addToken(new WaebricToken.IDENTIFIER(value));
-			return currentChar;
-		}
+        //Check if the value is a waebric reserved keyword
+        //Path elements are never tokenized as keywords
+        //Path elements require a regular expression to be valid
+        var isPathElement = isValidPathElement(value);
+        if (WaebricToken.KEYWORD.contains(value) && !isPathElement) {
+            tokenList.addToken(new WaebricToken.KEYWORD(value, startPosition));
+            return currentChar;
+        } else if (!isPathElement) {
+            if (isValidIdentifier(value)) {
+                tokenList.addToken(new WaebricToken.IDENTIFIER(value, startPosition));
+                return currentChar;
+            } else {
+                throw "Illegal character in input stream while tokenizing Identifier: " + value + startPosition
+            }
+        } else if (isPathElement) {
+            if (isValidPath(value)) {
+                tokenList.addToken(new WaebricToken.IDENTIFIER(value, startPosition));
+                return currentChar;
+            } else {
+                throw "Illegal character in input stream while tokenizing Path Element: " + value + startPosition
+            }
+        }
     }
-	
-	/**
-	 * Determines whether the input token is a path element.
-	 * 
-	 * This function is required to prevent the tokenizer to categorize reserved keywords
-	 * as such in the case they are used in a path element.
-	 * 
-	 * If the input token is a path element, then the token should be processed as an IDENTIFIER.
-	 * 
-	 * @param {String} The value of the token
-	 * @return {Boolean} True if value is part of a Path element in a Site Mapping
-	 */
-	this.isPathElement = function(value){
-		if(WaebricToken.KEYWORD.END.equals(value)){			
-			return false; 
-		}else if(WaebricToken.KEYWORD.SITE.equals(this.tokenList.getLastKeyword().value)){
-			var dotFound = this.hasDotInSiteMapping();
-			var colonFound = this.hasColonInSiteMapping();
-			//If a DOT and a COLON is found inside a single SITE MAPPING, 
-			// then the input value is markup
-			if(dotFound && colonFound){
-				return false; //Markup
-			}		
-			return true; //Path element
-		}
-		return false; //Not in SITE definition
-	}
-	
-	/**
-	 * Returns whether a DOT appears in the current processed site mapping	  
-	 * 
-	 * @return {Boolean} True if a dot appears in the site mapping
-	 */
-	this.hasDotInSiteMapping = function(){
-		var currentTokenIndex = this.tokenList.tokens.length - 1.
-		var currentToken = this.tokenList.tokens[currentTokenIndex];
-		while(!WaebricToken.KEYWORD.SITE.equals(currentToken.value) 
-				&& !WaebricToken.KEYWORD.END.equals(currentToken.value)
-				&& currentToken.value != WaebricToken.SYMBOL.SEMICOLON 
-				){
-			if(currentToken.value == WaebricToken.SYMBOL.DOT){	
-				return true;
-			}
-			currentToken = this.tokenList.tokens[--currentTokenIndex];	
-		}
-		return false;
-	}
-	
-	/**
-	 * Returns whether a COLON appears in the current processed site mapping
-	 * 
-	 * @return {Boolean} True if a colon appears in the site mapping
-	 */
-	this.hasColonInSiteMapping = function(){
-		var currentTokenIndex = this.tokenList.tokens.length - 1.
-		var currentToken = this.tokenList.tokens[currentTokenIndex];
-		while(!WaebricToken.KEYWORD.SITE.equals(currentToken.value) 
-				&& !WaebricToken.KEYWORD.END.equals(currentToken.value)
-				&& currentToken.value != WaebricToken.SYMBOL.DOT){
-			if(currentToken.value == WaebricToken.SYMBOL.COLON){				
-				return true;
-			}
-			currentToken = this.tokenList.tokens[currentTokenIndex--];
-		}
-		return false;
-	}
+    
+    /**
+     * Checks whether the input value is a valid path
+     *
+     * @param {String} value
+     * @return {Boolean}
+     */
+    function isValidPath(value){
+        var regExp = new RegExp('^[^\ \t\n\r.\/\\\\]*$');
+        return value.match(regExp);
+    }
+    
+    /**
+     * Checks whether the input value is a valid identifier
+     *
+     * @param {String} value
+     * @return {Boolean}
+     */
+    function isValidIdentifier(value){
+        var regExp = new RegExp('^([A-Za-z][A-Za-z0-9\-]*)$');
+        return value.match(regExp);
+    }
+    
+    /**
+     * Determines whether the input token is a path element.
+     *
+     * This function is required to prevent the tokenizer to categorize reserved keywords
+     * as such in the case they are used in a path element.
+     *
+     * If the input value is a path element, then the value should be processed as an IDENTIFIER.
+     *
+     * @param {WaebricCharacter} value 
+     * @return {Boolean}
+     */
+    function isValidPathElement(value){
+        if (WaebricToken.KEYWORD.END.equals(value)) {
+            return false;
+        } else if (WaebricToken.KEYWORD.SITE.equals(tokenList.getLastKeyword().value)) {
+            var dotFound = hasDotInSiteMapping();
+            var colonFound = hasColonInSiteMapping();
+            //If a DOT and a COLON is found inside a single SITE MAPPING, 
+            // then the input value is markup
+            if (dotFound && colonFound) {
+                return false; //Markup
+            }
+            return true; //Path element
+        }
+        return false; //Not in SITE definition
+    }
+    
+    /**
+     * Returns whether a DOT appears in the current processed site mapping tokens
+     * Note: this function operates at token level, not character level
+	 *
+     * @return {Boolean}
+     */
+    function hasDotInSiteMapping(){
+        var currentTokenIndex = tokenList.tokens.length - 1.
+        var currentToken = tokenList.tokens[currentTokenIndex];
+        while (!WaebricToken.KEYWORD.SITE.equals(currentToken.value) &&
+        !WaebricToken.KEYWORD.END.equals(currentToken.value) &&
+        currentToken.value != WaebricToken.SYMBOL.SEMICOLON) {
+            if (currentToken.value == WaebricToken.SYMBOL.DOT) {
+                return true;
+            }
+            currentToken = tokenList.tokens[--currentTokenIndex];
+        }
+        return false;
+    }
+    
+    /**
+     * Returns whether a COLON appears in the current processed site mapping tokens
+     * Note: this function operates at token level, not character level *
+     *
+     * @return {Boolean}
+     */
+    function hasColonInSiteMapping(){
+        var currentTokenIndex = tokenList.tokens.length - 1.
+        var currentToken = tokenList.tokens[currentTokenIndex];
+        while (!WaebricToken.KEYWORD.SITE.equals(currentToken.value) &&
+        !WaebricToken.KEYWORD.END.equals(currentToken.value) &&
+        currentToken.value != WaebricToken.SYMBOL.DOT) {
+            if (currentToken.value == WaebricToken.SYMBOL.COLON) {
+                return true;
+            }
+            currentToken = tokenList.tokens[currentTokenIndex--];
+        }
+        return false;
+    }
 }
 
+/**
+ * Reads the input stream and classifies the tokenList based on regular
+ * expressions or starting and ending characters.
+ *
+ * @param {String} input String representation of a Waebric program
+ * @return {WaebricTokenizerResult}
+ * @exception {WaebricTokenizerException}
+ */
 WaebricTokenizer.tokenize = function(input){
-	var tokenizer = new WaebricTokenizer();
-	return tokenizer.tokenizeAll(input);
+    try {
+        var tokenizer = new WaebricTokenizer();
+        return tokenizer.tokenize(input);
+    } catch (exception) {
+		var err = new Error();
+        throw new WaebricTokenizerException(exception);
+    }
 }
+

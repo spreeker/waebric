@@ -4,8 +4,8 @@
  * Represents exceptions found during semantic validation
  * 
  */
-function WaebricSemanticException(){
-	this.message = "";
+function WaebricSemanticException(message){
+	this.message = message;
 	
 	this.toString = function(){
 		return this.message;
@@ -13,10 +13,9 @@ function WaebricSemanticException(){
 }
 
 /** 
- * Semantic Exception class for non existing modules
+ * Semantic Exception: non-existing modules
  * 
- * @param {String} The path of the non existing module
- * @return {WaebricSemanticException} A Semantic Exception
+ * @param {String} path The path of the non existing module
  */
 function NonExistingModuleException(path){
 	this.path = path;
@@ -25,10 +24,10 @@ function NonExistingModuleException(path){
 NonExistingModuleException.prototype = new WaebricSemanticException();
 
 /** 
- * Semantic Exception class for undefined functions
+ * Semantic Exception: undefined functions
  * 
- * @param {Markup} The function call for which no function definition exists
- * @return {WaebricSemanticException} A Semantic Exception
+ * @param {Markup} functionCall The function call for which no function definition exists
+ * @param {WaebricEnvironment} env The environment where the exception occured
  */
 function UndefinedFunctionException(functionCall, env){
 	this.message = "The function '" + functionCall + "' in module '" + env.getParentModule().name + "'was not found in any of the loaded modules, nor is the functionname part of XHTML";
@@ -36,10 +35,10 @@ function UndefinedFunctionException(functionCall, env){
 UndefinedFunctionException.prototype = new WaebricSemanticException();
 
 /** 
- * Semantic Exception class for duplicate functions
+ * Semantic Exception: duplicate functions
  * 
- * @param {FunctionDefinition} The function definition 
- * @return {WaebricSemanticException} A Semantic Exception
+ * @param {FunctionDefinition} func The function definition 
+ * @param {WaebricEnvironment} env The environment where the exception occured
  */
 function DuplicateDefinitionException(func, env){
 	this.message = "Duplicate function found: " + func + "' in module '" + env.getParentModule().name + "'";
@@ -47,10 +46,10 @@ function DuplicateDefinitionException(func, env){
 DuplicateDefinitionException.prototype = new WaebricSemanticException();
 
 /** 
- * Semantic Exception class for functions calls with incorrect arguments 
+ * Semantic Exception: functions calls with incorrect arguments 
  * 
- * @param {Markup} The function call with the incorrect number of arguments
- * @return {WaebricSemanticException} A Semantic Exception
+ * @param {Markup} functionCall The function call with the incorrect number of arguments
+ * @param {WaebricEnvironment} env The environment where the exception occured
  */
 function IncorrectArgumentsException(functionCall, env){
 	this.message = "The functioncall '" + functionCall + "' in module '" + env.getParentModule().name + "' has an incorrect number of arguments. ";
@@ -58,10 +57,10 @@ function IncorrectArgumentsException(functionCall, env){
 IncorrectArgumentsException.prototype = new WaebricSemanticException();
 
 /** 
- * Semantic Exception class for undefined variables
+ * Semantic Exception: undefined variables
  * 
- * @param {Object} exception
- * @return {WaebricSemanticException} A Semantic Exception
+ * @param {VarExpression} variable The reference to the variable
+ * @param {WaebricEnvironment} env The environment where the exception occured
  */
 function UndefinedVariableException(variable, env){
 	this.message = "The variable '" + variable + "' in module '" + env.getParentModule().name + "' is not declared.";

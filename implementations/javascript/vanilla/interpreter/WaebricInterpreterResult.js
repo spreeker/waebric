@@ -1,7 +1,9 @@
 /**
- * Holds the result of the interpreter
+ * Represents the result of the interpreter
  * 
- * @param {Array} An array of XHTML documents
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ *  
+ * @param {Array} environemnts A collection of {WaebricEnvironment}
  */
 function WaebricInterpreterResult(environments){
 	this.environments = environments;

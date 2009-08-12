@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies an designator used in markup
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /** 

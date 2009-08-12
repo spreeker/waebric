@@ -1,9 +1,20 @@
-
+/**
+ * Waebric Site Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricSiteParser(){
 	
 	this.currentToken;	
 	this.markupParser = new WaebricMarkupParser();
 	
+	/**
+	 * Parses the input to {Embedding}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {Site}
+	 */
 	this.parse = function(parentParser){
 		var site = this.parseSite(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
@@ -13,7 +24,7 @@ function WaebricSiteParser(){
 	/**
 	 * Parses the input to {Site}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {Site}
 	 */
 	this.parseSite = function(token){
@@ -25,7 +36,7 @@ function WaebricSiteParser(){
 	/**
      * Checks whether the input value is the start of {Site}
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartSite = function(token){
@@ -35,7 +46,7 @@ function WaebricSiteParser(){
 	/**
      * Parses the input to a collection of {Mapping}
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Array} Collection of {Mapping}
      */
     this.parseMappings = function(token){
@@ -74,7 +85,7 @@ function WaebricSiteParser(){
 	/**
      * Parses the input to {Mapping}
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Mapping}
      */
     this.parseMapping = function(token){
@@ -99,7 +110,7 @@ function WaebricSiteParser(){
 	/**
      * Parses the input to {String}
      * 
-     * @parem {WaebricParserToken} token
+     * @parem {WaebricParserToken} token The token to parse
      * @return {String}
      */
     this.parsePath = function(token){
@@ -148,7 +159,7 @@ function WaebricSiteParser(){
 	/**
      * Checks whether the input value is a valid directory
      * 
-     * @param {WaebricParserToken} value
+     * @param {WaebricParserToken} value The value to evaluate
      * @return {Boolean}
      */
     this.isDirectory = function(value){
@@ -159,7 +170,7 @@ function WaebricSiteParser(){
     /**
      * Checks whether the input value is a valid file extension
      * 
-     * @param {WaebricParserToken} value
+     * @param {WaebricParserToken} value The value to evaluate
      * @return {Boolean}
      */
     this.isFileExtension = function(value){
@@ -170,7 +181,7 @@ function WaebricSiteParser(){
     /**
      * Checks whether the input value is a valid path
      * 
-     * @param {WaebricParserToken} value
+     * @param {WaebricParserToken} value The value to evaluate
      * @return {Boolean}
      */
     this.isPath = function(value){

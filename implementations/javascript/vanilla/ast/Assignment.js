@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies an assignment in a let-function
  *  
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

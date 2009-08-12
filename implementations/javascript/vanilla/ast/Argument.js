@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies the arguments in a designator call
  *  
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /** 
@@ -9,7 +9,6 @@
  * 
  * IdCon "=" Expression -> Argument ("attr")
  */
-
 function Argument (variable, expression){
 	this.variable = variable;
 	this.expression = expression;	

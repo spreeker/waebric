@@ -1,7 +1,7 @@
 /**
- * XHTML Class
- * 
  * Holds all valid XHTML tags (copied from www.w3c.com)
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function XHTML(){
 	

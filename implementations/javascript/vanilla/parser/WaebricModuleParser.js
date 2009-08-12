@@ -1,7 +1,7 @@
 /**
  * Waebric Module Parser
  * 
- * @author Nickolas Heirbaut
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricModuleParser(){
 	
@@ -13,8 +13,9 @@ function WaebricModuleParser(){
 	
 	/**
 	 * Parses the input value to a {Module}
+	 * Updates currentToken of the parent parser
 	 * 
-	 * @param {Object} parentParser
+	 * @param {Object} parentParser The parent parser
 	 * @return {Module}
 	 */
 	this.parse = function(parentParser){
@@ -26,7 +27,7 @@ function WaebricModuleParser(){
 	/**
      * Checks whether the input token's value equals the start of a Module
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartModule = function(token){
@@ -35,9 +36,8 @@ function WaebricModuleParser(){
     
     /**
      * Parses the module root
-     * --> "Module" ModuleId ModuleElements*
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Module}
      */
     this.parseModule = function(token){
@@ -66,7 +66,7 @@ function WaebricModuleParser(){
     /**
      * Checks whether the input value is part of a ModuleId. No DOT is allowed in the input value.
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isModuleIdElement = function(token){
@@ -75,9 +75,8 @@ function WaebricModuleParser(){
     
     /**
      * Parses the ModuleID
-     * --> ModuleId = IdCon listOf("." IdCon)
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {ModuleId}
      */
     this.parseModuleId = function(token){
@@ -100,7 +99,7 @@ function WaebricModuleParser(){
     /**
      * Checks whether the input value equals the start of a ModuleElement
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartModuleElement = function(token){
@@ -112,11 +111,7 @@ function WaebricModuleParser(){
     /**
      * Parses a ModuleElement
      *
-     * ModuleElement = "import" ModuleId
-     * 				 | "site" (Mapping ";")* "end"
-     * 			 	 | "def" IdCon Formals Statement* "end"
-     *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Array} An array of moduleElements
      */
     this.parseModuleElement = function(token){
@@ -144,10 +139,10 @@ function WaebricModuleParser(){
         return moduleElements;
     }
 	
-		/**
+	/**
      * Parses an Import
      * 
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {Import}
      */
 	this.parseImport = function(token){
@@ -159,7 +154,7 @@ function WaebricModuleParser(){
 	/**
      * Checks whether the input value equals the start of an IMPORT
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartImport = function(token){

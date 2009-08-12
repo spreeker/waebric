@@ -1,18 +1,30 @@
-
+/**
+ * Waebric Predicate Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricPredicateParser(){
 	
 	this.currentToken;
 	this.expressionParser = new WaebricExpressionParser();
 	
+	/**
+	 * Parses the input to {Embedding}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {NotPredicate, AndPredicate, OrPredicate, PredicateType, Expression}
+	 */
 	this.parse = function(parentParser){
 		var predicate = this.parsePredicate(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
 		return predicate;
 	}
+	
 	/**
      * Checks whether the input value equals the start of a predicate
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartPredicate = function(token){
@@ -28,10 +40,10 @@ function WaebricPredicateParser(){
     /**
      * Parses a predicate
      *
-     * @param {WaebricParserToken} token
-     * @param {Boolean} ignoreDoubleAnd
-     * @param {Boolean} ignoreDoubleOr
-     * @return {Object} Predicate
+     * @param {WaebricParserToken} token The token to parse
+     * @param {Boolean} ignoreDoubleAnd Flag to ignore a && token
+     * @param {Boolean} ignoreDoubleOr Flag to ignore a || token
+     * @return {NotPredicate, AndPredicate, OrPredicate, PredicateType, Expression}
      */
     this.parsePredicate = function(token, ignoreDoubleAnd, ignoreDoubleOr){
         this.currentToken = token;
@@ -63,7 +75,7 @@ function WaebricPredicateParser(){
     /**
      * Checks whether the input value equals the start of a not-predicate
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluata
      * @return {Boolean}
      */
     this.isNotPredicate = function(token){
@@ -73,7 +85,7 @@ function WaebricPredicateParser(){
     /**
      * Parses a not-predicate
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to be parsed
      * @return {NotPredicate}
      */
     this.parseNotPredicate = function(token){
@@ -85,7 +97,7 @@ function WaebricPredicateParser(){
     /**
      * Checks whether the input value equals the start of a not-predicate
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isEndPredicateType = function(token){
@@ -95,7 +107,7 @@ function WaebricPredicateParser(){
     /**
      * Parses a TYPE predicate
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {PredicateType}
      */
     this.parsePredicateType = function(token){
@@ -119,8 +131,8 @@ function WaebricPredicateParser(){
     /**
      * Parses an AND predicate
      *
-     * @param {Object} token
-     * @param {Object} predicate
+     * @param {WaebricParserToken} token The token to parse
+     * @param {AndPredicate} 
      */
     this.parseAndPredicate = function(token, predicate){
         this.currentToken = token;
@@ -147,8 +159,8 @@ function WaebricPredicateParser(){
     /**
      * Parses an OR predicate
      *
-     * @param {Object} token
-     * @param {Object} predicate
+     * @param {WaebricParserToken} token The token to parse
+     * @param {OrPredicate} predicate
      */
     this.parseOrPredicate = function(token, predicate){
         this.currentToken = token;

@@ -1,14 +1,14 @@
 /**
  * Waebric Keyword Token
  * 
- * A keyword is recognized by the characters allowed in the keyword 
- * and is eventually matched against a set of keywords.
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} The value of the token
  */
-WaebricToken.KEYWORD = function(value){
+WaebricToken.KEYWORD = function(value, position){
 	this.value = value;
-	this.type = 'KEYWORD'
+	this.type = 'KEYWORD';	
+	this.position = position;
 }
 
 WaebricToken.KEYWORD.prototype = new WaebricToken();

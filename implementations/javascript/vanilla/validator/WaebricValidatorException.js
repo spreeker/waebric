@@ -1,11 +1,9 @@
 /** 
- * Waebric Tokenizer Exception class 
- * 
- * Represents exceptions found during tokenization
+ * Validator Exception class 
  * 
  * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
-function WaebricTokenizerException(message){
+function WaebricValidatorException(message){
 	this.message = message;
 	
 	this.toString = function(){

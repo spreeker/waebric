@@ -1,13 +1,14 @@
 /**
  * Waebric Symbol Token
  * 
- * A comment is recognized by matching it against a set of symbols
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} The value of the token
  */
-WaebricToken.SYMBOL = function(value){
+WaebricToken.SYMBOL = function(value, position){
 	this.value = value;
-	this.type = 'SYMBOL'
+	this.type = 'SYMBOL';
+	this.position = position;
 }
 
 WaebricToken.SYMBOL.prototype = new WaebricToken();

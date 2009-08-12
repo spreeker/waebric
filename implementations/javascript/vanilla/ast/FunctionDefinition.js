@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a Function Definition used in ModuleElement
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

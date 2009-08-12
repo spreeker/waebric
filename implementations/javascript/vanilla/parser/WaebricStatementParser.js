@@ -1,4 +1,8 @@
-
+/**
+ * Waebric Statement Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricStatementParser(){
 
     this.currentToken;
@@ -8,12 +12,30 @@ function WaebricStatementParser(){
 	this.embeddingParser = new WaebricEmbeddingParser();
 	this.markupParser = new WaebricMarkupParser();
 	
+	/**
+	 * Parses the input to a Statement
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {IfStatement, IfElseStatement, EachStatement, LetStatement, 
+	 * 			BlockStatement, CommentStatement, EchoExpressionStatement, 
+	 * 			EchoEmbeddingStatement, CDataStatement, YieldStatement, 
+	 * 			MarkupStatement, MarkupMarkupStatement, MarkupExpressionStatement, 
+	 * 			MarkupEmbeddingStatement, MarkupStatementStatement}
+	 */
     this.parseSingle = function(parentParser){
         var statement = this.parseStatement(parentParser.currentToken);
         parentParser.currentToken = this.currentToken;
         return statement;
     }
     
+	/**
+	 * Parses the input to a Statement
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @return {Array} An collection of statements
+	 */
     this.parseMultiple = function(parentParser){
         var statements = this.parseStatements(parentParser.currentToken);
         parentParser.currentToken = this.currentToken;
@@ -21,10 +43,14 @@ function WaebricStatementParser(){
     }
     
     /**
-     * Parses the input to a {Statement}
+     * Parses the input to a Statement
      *
-     * @param {WaebricParserToken} token
-     * @return {Statement}
+     * @param {WaebricParserToken} token The token to parse
+     * @return {IfStatement, IfElseStatement, EachStatement, LetStatement, 
+	 * 			BlockStatement, CommentStatement, EchoExpressionStatement, 
+	 * 			EchoEmbeddingStatement, CDataStatement, YieldStatement, 
+	 * 			MarkupStatement, MarkupMarkupStatement, MarkupExpressionStatement, 
+	 * 			MarkupEmbeddingStatement, MarkupStatementStatement}
      */
     this.parseStatement = function(token){
         this.currentToken = token;
@@ -64,10 +90,10 @@ function WaebricStatementParser(){
     }
     
 	/**
-     * Parses the input a collection of {Statement}
+     * Parses the input a collection of Statements
      *
-     * @param {WaebricParserToken} token
-     * @return {Array} Collection of {Statement}
+     * @param {WaebricParserToken} token The token to parse
+     * @return {Array} A collection of statements
      */
     this.parseStatements = function(token){
         this.currentToken = token;
@@ -84,7 +110,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is the start of an {IfStatement} or {IfElseStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isStartIfStatement = function(token){
@@ -94,7 +120,7 @@ function WaebricStatementParser(){
     /**
      * Parses the input to an {IfStatement} or {IfElseStatement}. If the else clause is not specified, it returns an If statement
      * 
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {IfElseStatement}
      * @return {IfStatement}
      */
@@ -135,7 +161,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is the start of an {EachStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isStartEachStatement = function(token){
@@ -145,7 +171,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to an {EachStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {EachStatement}
 	 */
     this.parseEachStatement = function(token){
@@ -200,7 +226,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is the start of a {LetStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
     this.isStartLetStatement = function(token){
@@ -210,7 +236,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {LetStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {LetStatement}
 	 */
     this.parseLetStatement = function(token){
@@ -231,7 +257,7 @@ function WaebricStatementParser(){
     /**
      * Checks whether the input value is the start of a {BlockStatement}
      * 
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartBlockStatement = function(token){
@@ -241,7 +267,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {BlockStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {BlockStatement}
 	 */
     this.parseBlockStatement = function(token){
@@ -258,7 +284,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is the start of a {CommentStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
     this.isStartCommentStatement = function(token){
@@ -268,7 +294,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {CommentStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {CommenStatement}
 	 */
     this.parseCommentStatement = function(token){
@@ -293,7 +319,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a valid input for the {CommentStatement} value
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isStrCon = function(token){
@@ -316,7 +342,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to an {EchoStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token  The token to parse
 	 * @return {EchoStatement}
 	 */
 	this.parseEchoStatement = function(token){
@@ -335,7 +361,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a {CDataStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isCDataStatement = function(token){
@@ -347,7 +373,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {CDataStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token  The token to parse
 	 * @return {CDataStatement}
 	 */
 	this.parseCDataStatement = function(token){
@@ -367,7 +393,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a {YieldStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isYieldStatement = function(token){
@@ -377,7 +403,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {YieldStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token  The token to parse
 	 * @return {YieldStatement}
 	 */
 	this.parseYieldStatement = function(token){
@@ -395,7 +421,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is an {EchoEmbeddingStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isEchoEmbeddingStatement = function(token){
@@ -407,7 +433,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to an {EchoEmbeddingStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token  The token to parse
 	 * @return {EchoEmbeddingStatement}
 	 */
 	this.parseEchoEmbeddingStatement = function(token){
@@ -425,7 +451,7 @@ function WaebricStatementParser(){
 		/**
 	 * Checks whether the input value is a {MarkupStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {MarkupStatement}
 	 */
 	this.isMarkupStatement = function(token){
@@ -441,7 +467,7 @@ function WaebricStatementParser(){
 	/**
      * Parses the input to a {MarkupStatement}
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token  The token to parse
      * @return {MarkupStatement}
      */
     this.parseMarkupStatement = function(token){
@@ -461,7 +487,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a {MarkupMarkupStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {MarkupMarkupStatement}
 	 */
 	this.isMarkupMarkupStatement = function(token){
@@ -488,7 +514,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {MarkupEmbeddingStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {MarkupEmbeddingStatement}
 	 */
     this.parseMarkupMarkupStatement = function(token){
@@ -504,6 +530,11 @@ function WaebricStatementParser(){
         }
     }
  	
+	/**
+	 * Checks whether the input value is a {MarkupEmbeddingStatement}
+	 * @param {WaebricParserToken} token The token to evaluate
+	 * @return {Boolean}
+	 */
 	this.isMarkupEmbeddingStatement = function(token){		
 		var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
         if (!hasValidMarkup) {
@@ -518,7 +549,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {MarkupEmbeddingStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {MarkupEmbeddingStatement}
 	 */
 	this.parseMarkupEmbeddingStatement = function(token){
@@ -540,7 +571,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {MarkupMarkupStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {MarkupMarkupStatement}
 	 */
 	this.parseMarkupExpressionStatement = function(token){
@@ -578,7 +609,7 @@ function WaebricStatementParser(){
     /**
      * Checks whether the input value is a {MarkupExpressionStatement}
      * 
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {MarkupExpressionStatement}
      */
     this.isMarkupExpressionStatement = function(token){		
@@ -598,13 +629,11 @@ function WaebricStatementParser(){
         var result = (hasExpressionAfterMarkup && hasValidClosingExpression) || (hasValidClosingIdentifier && hasIdentifierAfterMarkup);
 		return result
     }
-    
-	
-		
+    		
 	/**
 	 * Parses the input to a {MarkupMarkupStatement}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {MarkupMarkupStatement}
 	 */
 	this.parseMarkupStatementStatement = function(token){
@@ -618,7 +647,7 @@ function WaebricStatementParser(){
     /**
      * Checks whether the input value is a {MarkupExpressionStatement}
      * 
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {MarkupExpressionStatement}
      */
     this.isMarkupStatementStatement = function(token){		
@@ -632,12 +661,11 @@ function WaebricStatementParser(){
 		var hasValidClosing =  !this.expressionParser.isExpression(tokenAfterMarkups);
         return hasNoClosingAfterMarkups && hasValidClosing;
     }
-     
-	
+     	
    	/**
 	 * Parses the input to a {FunctionBinding} or {VariableBinding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {FunctionBinding} or {VariableBinding}
 	 */
 	this.parseAssignment = function(token){
@@ -656,8 +684,8 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a collection of {FunctionBinding} or {VariableBinding}
 	 * 
-	 * @param {WaebricParserToken} token
-	 * @return {Array} Collection of {FunctionBinding} or {VariableBinding}
+	 * @param {WaebricParserToken} token The token to parse
+	 * @return {Array} Collection of {FunctionBinding, VariableBinding}
 	 */
 	this.parseAssignments = function(token){
 		this.currentToken = token.nextToken();
@@ -674,7 +702,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a {VariableBinding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isVariableBinding = function(token){
@@ -687,7 +715,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {VariableBinding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {VariableBinding}
 	 */
 	this.parseVariableBinding = function(token){
@@ -709,7 +737,7 @@ function WaebricStatementParser(){
 	/**
 	 * Checks whether the input value is a {FunctionBinding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isFunctionBinding = function(token){
@@ -721,7 +749,7 @@ function WaebricStatementParser(){
 	/**
 	 * Parses the input to a {FunctionBinding}
 	 * 
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to parse
 	 * @return {FunctionBinding}
 	 */
 	this.parseFunctionBinding = function(token){
@@ -742,9 +770,9 @@ function WaebricStatementParser(){
 	    
     /**
      * Checks whether the input value equals the start of a formal
-     * TODO: should be stricter!
+	 *
      * @param {WaebricParserToken} token
-     * @return {Array} An array of formals
+     * @return {Array} A collection of {Formal}
      */
     this.isFormal = function(token){
 		var tempToken = token;
@@ -776,8 +804,8 @@ function WaebricStatementParser(){
     /**
      * Parses formals
      *
-     * @param {WaebricParserToken} token
-     * @return {Array} An array of formals
+     * @param {WaebricParserToken} token  The token to parse
+     * @return {Array} A collection of {Formal}
      */
     this.parseFormals = function(token){
         this.currentToken = token;
@@ -801,7 +829,7 @@ function WaebricStatementParser(){
         return formals;
     }
 
-	/***
+	/**
 	 * Checks whether the input value is a statement.
 	 * Only the beginning of the statement if evaluated.
 	 * 
@@ -809,6 +837,9 @@ function WaebricStatementParser(){
 	 * This means that if the statement start with a Markup,
 	 * then the result is false, even if it is in fact the 
 	 * beginning of a statement. 
+	 * 
+	 * @param {WaebricParserToken} token The token to evaluata
+	 * @return {Boolean}
 	 */
 	this.isStartStatement = function(token){
 		return (WaebricToken.KEYWORD.IF.equals(token.value) || WaebricToken.KEYWORD.EACH.equals(token.value)
@@ -817,5 +848,4 @@ function WaebricStatementParser(){
 			|| WaebricToken.KEYWORD.YIELD.equals(token.value) ||token.value == WaebricToken.SYMBOL.LEFTCBRACKET)
 			
 	}
-
 }

@@ -1,3 +1,9 @@
+/**************************************************************************** 
+ * Specifies a Path used in Mapping
+ *  
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ ****************************************************************************/
+
 /**
  * Path class
  *

@@ -1,16 +1,17 @@
 /**
  * Waebric Identifier Token
  * 
- * An identifier is recognized by the characters allowed in an identifier.
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} The value of the token
  */
-WaebricToken.IDENTIFIER = function(value){
+WaebricToken.IDENTIFIER = function(value, position){
 	this.value = value;
-	this.type = 'IDENTIFIER'
+	this.type = 'IDENTIFIER';	
+	this.position = position;
 }
 
 WaebricToken.IDENTIFIER.prototype = new WaebricToken();
 
-WaebricToken.IDENTIFIER.ALLOWEDCHARS = "[^\"\f\n\r\t\v\u00A0\u2028\u2029 :/.(){};=<>&|?#$@%+,\\]\[]"
+WaebricToken.IDENTIFIER.ALLOWEDCHARS = "[^\"\n\r\t\u00A0\u2028\u2029 :/.(){};=<>&|?#$@%+,\\]\[\!]"
 

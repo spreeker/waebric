@@ -5,42 +5,56 @@
  */
 function WaebricParser(){
 	
-	this.exceptions = new Array();
+	var exceptions = new Array();
 	
 	/**
-	 * Parses the program source to a Module
+	 * Parses the program source
 	 * 
-	 * @param {String} The source of the Waebric program
-	 * @return {Module} The parsed Module
-	 * @exception 
+	 * @param {String} path The path of the Waebric program
+	 * @return {WaebricParserResult}
+	 * @exception {NonExistingModuleException, Error}
 	 */
-	this.parseModule = function(path){
-		//try {
-			print('---- Parsing ' + path)			
-			//Get Waebric program
-			var programSource = this.getSourceWaebricProgram(path);	
-			//Tokenize the module
-			var tokenizerResult = WaebricTokenizer.tokenize(programSource);
-			writeTokenizerResult(tokenizerResult.tokens)
-			//Parse the tokenizerResult to a Module
-			var module = WaebricRootParser.parse(tokenizerResult)
-			//Parse the dependencies
-			module.dependencies = this.parseDependencies(path, module);
-			return module;
-		//}catch(exception if (exception instanceof NonExistingModuleException)){
-			//Dependency couldn't be found, save as WaebricSemanticException
-			//Evaluation will be continued for remaining dependencies
-		//	this.exceptions.push(exception);
-		//	print('! FAILED !')
-		//}catch(exception){
-			//Unexpected exception thrown. Evaluation terminated
-		//	throw exception;
-		//}		
+	this.parse = function(path){
+		try {
+			var module = parseModule(path);
+			return new WaebricParserResult(module, exceptions);		
+		}catch(exception if (exception instanceof NonExistingModuleException)){
+			exceptions.push(exception);
+		}catch(exception){
+			throw exception;
+		}	
+	}
+	
+	/**
+	 * Parses the program source
+	 * 
+	 * @param {String} path The path of the Waebric program
+	 * @return {Module}
+	 */
+	function parseModule(path){		
+		//Get Waebric program		
+		var programSource = getSourceWaebricProgram(path);	
+		
+		//Tokenize the module
+		print('\n---- Parsing ' + path)
+		var start=new Date().getTime();
+		var tokenizerResult = WaebricTokenizer.tokenize(programSource);
+		var end= new Date().getTime();
+		var diff = end-start
+		print('miliseconds:' + diff)
+		//writeTokenizerResult(tokenizerResult.tokens)
+		//Parse the tokenizerResult to a Module
+		//var module = WaebricRootParser.parse(tokenizerResult)
+
+		//Parse the dependencies
+		//module.dependencies = parseDependencies(path, module);
+		//return module;	
 	}
 	
 	/**
 	 * Outputs the result of the tokenizer
-	 * @param {Object} tokens
+	 * 
+	 * @param {Array} tokens An array of {WaebricToken}
 	 */
 	function writeTokenizerResult(tokens){
 		var text = ""
@@ -58,37 +72,35 @@ function WaebricParser(){
 	/**
 	 * Returns transitive dependencies for a given module
 	 *
-	 * @param {String} The path of the waebric program
-	 * @param {Module} The module for which the transitive dependencies will be returned
-	 * @return An array of {Module}
+	 * @param {String} parentPath The parent path of the waebric program
+	 * @param {Module} parentModule The module for which the transitive dependencies will be returned
+	 * @return {Array} An array of {Module} elements
 	 */
-	this.parseDependencies = function(parentPath, parentModule){
-		var dependencies = new Array();
-		
-		//Load all dependencies inside the module
-	    for (var i = 0; i < parentModule.imports.length; i++) {
-			var dependency = parentModule.imports[i];			
-	        //try {				
-				var dependencyPath = this.getDependencyPath(parentPath, dependency);
-	            var dependencyModule = this.parseModule(dependencyPath)
-	            dependencies.push(dependencyModule)
-			//}catch(exception){
-				//Unexpected exception thrown. Evaluation will be terminated				
-			//	throw exception;
-			//}
-	    }	
-	    return dependencies;
+	function parseDependencies(parentPath, parentModule){
+		try {
+			var dependencies = new Array();
+			for (var i = 0; i < parentModule.imports.length; i++) {
+				var dependency = parentModule.imports[i];
+				var dependencyPath = getDependencyPath(parentPath, dependency);
+				var dependencyModule = parseModule(dependencyPath)
+				dependencies.push(dependencyModule)
+			}
+			return dependencies;
+		}catch(exception){
+			//Unexpected exception thrown. Evaluation terminated
+			throw exception;
+		}
 	}
 	
 	/**
 	 * Returns the path of the dependency based on the parentpath
 	 * 
-	 * @param {String} Path of the parent module
-	 * @param {Module} The dependency for which the path should be generated
+	 * @param {String} parentPath Path of the parent module
+	 * @param {Module} dependency The dependency for which the path should be generated
 	 * @return {String} The path of the dependency
 	 */
-	this.getDependencyPath = function(parentPath, dependency){
-		//try {
+	function getDependencyPath(parentPath, dependency){
+		try {
 			//Determine relative path of parent module towards file system
 			var directoriesParent = parentPath.split('/');
 			var directoryParent = directoriesParent.slice(0, directoriesParent.length - 1).join('/').concat("/");
@@ -100,19 +112,19 @@ function WaebricParser(){
 			var path = directoryParent + directoryDependency + ".wae"
 			
 			return path;
-		//}catch(exception){
-		//	throw exception;
-		//}
+		}catch(exception){
+			throw "The path of the dependency couldn't be recognized."
+		}
 	}
 	
 	/**
 	 * Returns the source of a Waebric program
 	 *
-	 * @param {String} The path of the Waebric program
-	 * @return The source of the Waebric program
+	 * @param {String} path The path of the Waebric program
+	 * @return {String} The source of the Waebric program
 	 */
-	this.getSourceWaebricProgram = function(path){
-	    //try {
+	function getSourceWaebricProgram(path){
+	    try {
 	        var fis = new FileInputStream(path);
 	        var bis = new BufferedInputStream(fis);
 	        var dis = new DataInputStream(bis);
@@ -125,25 +137,31 @@ function WaebricParser(){
 	        bis.close();
 	        dis.close();
 	        return program;
-	    //} catch (exception) {
-	    //    throw new NonExistingModuleException(path);
-	    //}
+	    } catch (exception) {
+	        throw new NonExistingModuleException(path);
+	    }
 	}
 }
 
-WaebricParser.parseAll = function(path){
-	//try {
+/**
+ * Parses the program source
+ * 
+ * @param {String} The path of the Waebric program
+ * @return {WaebricParserResult}
+ * @exception {WaebricParserException}
+ */
+WaebricParser.parse = function(path){
+	try {
 		var fileExists = (new File(path)).exists();
 		if (fileExists) {
 			var parser = new WaebricParser();
-			var module = parser.parseModule(path);
-			return new WaebricParserResult(module, parser.exceptions);
+			return parser.parse(path);
 		}else{
-			throw "Waebric program doesn't exists";
+			throw new NonExistingModuleException(path);
 		}
-	//}catch(exception){
-	//	throw new WaebricParserException(exception);
-	//}
+	}catch(exception){
+		throw new WaebricParserException(exception.message);
+	}
 }
 	
 	

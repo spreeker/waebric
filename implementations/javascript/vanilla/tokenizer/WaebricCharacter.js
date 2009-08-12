@@ -1,21 +1,29 @@
 /**
  * Waebric Character
  * 
- * @param {String} input
- * @param {Number} position
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ *  
+ * @param {Array} input An array of characters
+ * @param {Number} position The position of the character in the array 
  */
 WaebricCharacter = function(input, position){	
-	this.value = input[position];
 
+	this.value = input[position];
+	this.position = new WaebricCharacter.Position(position)
+	
 	/**
-	 * @return {Boolean} True if a character follows the current character.
+	 * Checks whether a character follows the current character
+	 * 
+	 * @return {Boolean}
 	 */
 	this.hasNextChar = function(){
 		return position < input.length;
 	}
 	
 	/**
-	 * @return {String} The next character in the input stream
+	 * Returns the next character in the input stream
+	 * 
+	 * @return {WaebricCharacter} 
 	 */
 	this.nextChar = function(){
 		if (position < input.length){
@@ -24,9 +32,20 @@ WaebricCharacter = function(input, position){
 			return null
 		}
 	}
+
+	/**
+	 * Checks whether a previous character exists
+	 * 
+	 * @return {Boolean} 
+	 */
+	this.hasPreviousChar = function(){
+		return position > 0;
+	}	
 	
 	/**
-	 * @return {String} The previous character in the input stream
+	 * Returns the previous character in the input stream
+	 * 
+	 * @return {WaebricCharacter} 
 	 */
 	this.previousChar = function(){
 		if (position > 0){
@@ -37,16 +56,19 @@ WaebricCharacter = function(input, position){
 	}
 	
 	/**
-	 * @return {String} The value of the character
+	 * Returns the value of the character
+	 * 
+	 * @return {String} 
 	 */
 	this.toString = function(){
 		return this.value;
 	}
 	
 	/**
-	 * Determines if the input equals the character's value
+	 * Checks whether the input equals the character's value
 	 * 
-	 * @return {Boolean} True if character's value equals the input
+	 * @parem {String} input The input value to be compared 
+	 * @return {Boolean}
 	 */
 	this.equals = function(input){
 		return this.value == input;
@@ -55,7 +77,7 @@ WaebricCharacter = function(input, position){
 	/**
 	 * Matches the character's value against a regular expression
 	 * 
-	 * @param {Object} regExpr
+	 * @param {RegExp} regExpr
 	 * @return {String} The string that matches the regular expression
 	 */
 	this.match = function(regExpr){
@@ -64,6 +86,72 @@ WaebricCharacter = function(input, position){
 		}else{
 			return false;
 		}
+	}
+}
+
+WaebricCharacter.Position = function(line, column){
+	
+	this.line = line;
+	this.column = column;	
+	
+	/**
+	 * Calculates the new position (column, line) based on the input character
+	 * A new line results in a new line number and the column number is reset.
+	 * A new tab results in a multiple of the tabsize.
+	 * All other characters results in an increased column number.
+	 * 
+	 * @param {Object} character
+	 */
+	this.update = function(character){
+		if(character.value == '\n'){
+			this.line ++;
+			this.column = 1;
+		}else if(character.value == '\t'){
+			var tabsize = 4;
+			this.column = 1 + (tabsize * (Math.floor((this.column - 1)/tabsize) + 1))
+		}else {
+			this.column++;
+		}
+	}
+	
+	/**
+	 * Increases the current line position
+	 * 
+	 * @param {Number} count
+	 */
+	this.increaseLine = function(count){
+		this.line = (this.line + count);
+	}
+	
+	/**
+	 * Increases the current column position
+	 * 
+	 * @param {Number} count
+	 */
+	this.increaseColumn = function(count){
+		this.column = (this.column + count);
+	}
+	
+	/**
+	 * Decreases the current line position
+	 * 
+	 * @param {Number} count
+	 */
+	this.decreaseLine = function(count){
+		this.line = (this.line - count);
+	}
+	
+	/**
+	 * Decreases the current column position
+	 * 
+	 * @param {Number} count
+	 */
+	this.decreaseColumn = function(count){
+		this.column = (this.column - count);
+	}
+	
+	this.toString = function(){
+		return ' line: ' + this.line + ' column: ' + this.column
 	}
 }
 

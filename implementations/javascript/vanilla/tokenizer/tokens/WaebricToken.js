@@ -1,13 +1,14 @@
 /**
  * Waebric Token
  * 
- * The token's value is a sequence of characters
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {Object} value
  */
-WaebricToken = function(value){	
+WaebricToken = function(value, position){	
 	this.value = value;
 	this.type = "unrecognized"
+	this.position = position;
 	
 	/**
 	 * Adds a character/string to the token
@@ -40,3 +41,5 @@ WaebricToken = function(value){
 		}
 	}
 }
+
+WaebricToken.EMPTY_TOKEN_VALUE = '';

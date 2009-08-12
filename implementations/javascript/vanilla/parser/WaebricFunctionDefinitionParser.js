@@ -1,10 +1,20 @@
-
+/**
+ * Waebric FunctionDefinition Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricFunctionDefinitionParser(){
 	
 	this.currentToken;
 	this.expressionParser = new WaebricExpressionParser();
 	this.statementParser = new WaebricStatementParser();
 	
+	/**
+	 * Parses the input to a {FunctionDefinition}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 */
 	this.parse = function(parentParser){
 		var functionDef = this.parseFunctionDefinition(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
@@ -14,7 +24,7 @@ function WaebricFunctionDefinitionParser(){
 	/**
      * Checks whether the input value equals the start of a FUNCTIONDEFINITION
      *
-     * @param {WaebricParserToken}
+     * @param {WaebricParserToken} token The token to evaluate
      * @return {Boolean}
      */
     this.isStartFunctionDef = function(token){
@@ -25,7 +35,7 @@ function WaebricFunctionDefinitionParser(){
      * Parses a FunctionDefinition
      * "def" IdCon Formals Statement* "end"
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {FunctionDefinition}
      */
     this.parseFunctionDefinition = function(token){

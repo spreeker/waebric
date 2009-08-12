@@ -1,8 +1,20 @@
-
+/**
+ * Waebric Expression Parser
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ */
 function WaebricExpressionParser(){
 	
 	this.currentToken;
 	
+	/**
+	 * Parses the input to an {Expression}
+	 * Updates currentToken of the parent parser
+	 * 
+	 * @param {Object} parentParser The parent parser
+	 * @param {Boolean} ignoreFieldExpression Flag to ignore {FieldExpression} during parsing
+	 * @param {Boolean} ignoreCatExpression Flag to ignore {CatExpression} during parsing
+	 */
 	this.parse = function(parentParser, ignoreFieldExpression, ignoreCatExpression){
 		var expression = this.parseExpression(parentParser.currentToken);
 		parentParser.currentToken = this.currentToken;
@@ -12,10 +24,11 @@ function WaebricExpressionParser(){
     /**
      * Parses an expression
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @param {Boolean} ignoreFieldExpression If true, no FieldExpressions are parsed
      * @param {Boolean} ignoreCatExpression If true, no CatExpressions are parsed
-     * @return {Object} Expression
+     * @return {CatExpression, FieldExpression, TextExpression, VarExpression, 
+     * 			NatExpression, ListExpression, RecordExpression}
      */
     this.parseExpression = function(token, ignoreFieldExpression, ignoreCatExpression){
         this.currentToken = token;				
@@ -35,14 +48,14 @@ function WaebricExpressionParser(){
         } else if (this.isStartRecord(this.currentToken)) {
             return this.parseRecordExpression(this.currentToken.nextToken())
         } else {
-            return "NYI"
+           throw "Unrecognized expression found"
         }
     }
 	
 	/**
 	 * Checks whether the input value is an expression
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isExpression = function(token){
@@ -60,7 +73,7 @@ function WaebricExpressionParser(){
 	/**
      * Parses a CatExpression
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {CatExpression}
      */
     this.parseCatExpression = function(token){
@@ -76,7 +89,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value is a CatExpression
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isCatExpression = function(token){		
@@ -90,7 +103,7 @@ function WaebricExpressionParser(){
 	/**
      * Parses a FieldExpression
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {FieldExpression}
      */
     this.parseFieldExpression = function(token){
@@ -129,7 +142,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value is the start of a field expression
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isFieldExpression = function(token){
@@ -144,7 +157,7 @@ function WaebricExpressionParser(){
     /**
      * Parses TEXT
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {TextExpression}
      */
     this.parseTextExpression = function(token){
@@ -155,7 +168,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value equals TEXT
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isText = function(token){		
@@ -166,7 +179,7 @@ function WaebricExpressionParser(){
 	/**
      * Parses a VarExpression
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {VarExpression}
      */
     this.parseVarExpression = function(token){
@@ -177,7 +190,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value equals IDENTIFIER
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isIdentifier = function(token){
@@ -188,7 +201,7 @@ function WaebricExpressionParser(){
 	 /**
      * Parses a NATURAL
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {NatExpression}
      */
     this.parseNaturalExpression = function(token){
@@ -199,7 +212,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value equals a NATURAL
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isNatural = function(token){
@@ -239,7 +252,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input value equals the start of a RECORD
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isStartRecord = function(token){
@@ -251,7 +264,7 @@ function WaebricExpressionParser(){
 	/**
      * Parses a KeyValuePair
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {KeyValuePair}
      */
     this.parseKeyValuePair = function(token){
@@ -275,7 +288,7 @@ function WaebricExpressionParser(){
 	/**
 	 * Checks whether the input equals the start of a list
 	 *
-	 * @param {WaebricParserToken} token
+	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
 	this.isStartList = function(token){
@@ -286,7 +299,7 @@ function WaebricExpressionParser(){
 	/**
      * Parses an ExpressionList
      *
-     * @param {WaebricParserToken} token
+     * @param {WaebricParserToken} token The token to parse
      * @return {ListExpression}
      */
     this.parseListExpression = function(token){

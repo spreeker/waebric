@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a Mapping used in Site
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

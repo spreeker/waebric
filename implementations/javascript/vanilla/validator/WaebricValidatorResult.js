@@ -1,17 +1,18 @@
 /**
  * Holds the result of the semantic validation
  * 
- * @param {Object} module
- * @param {Object} exceptions
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ * 
+ * @param {Array} exceptions The list of Semantic exceptions
  */
-function WaebricSemanticValidatorResult(exceptions){
+function WaebricValidatorResult(exceptions){
 	
 	this.exceptions = exceptions;
 	
 	/**
 	 * Adds a token to the tokenlist
 	 * 
-	 * @param {WaebricSemanticValidatorException} exception
+	 * @param {WaebricSemanticException} exception The semantic exception
 	 * @return {Array} The new exceptionlist
 	 */
 	this.addException = function(exception){

@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a Predicate used in Statement
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

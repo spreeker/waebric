@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a Module, the root object of the data structure
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

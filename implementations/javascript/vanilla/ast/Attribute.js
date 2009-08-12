@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies an attributes used in a designator tag 
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /** 

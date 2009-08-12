@@ -1,13 +1,14 @@
 /**
  * Waebric Natural Token
  * 
- * A natural is recognized by the characters allowed in a natural
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  * 
  * @param {String} The value of the token
  */
-WaebricToken.NATURAL = function(value){
+WaebricToken.NATURAL = function(value, position){
 	this.value = value;
-	this.type = 'NATURAL'
+	this.type = 'NATURAL';
+	this.position = position;
 }
 
 WaebricToken.NATURAL.prototype = new WaebricToken();

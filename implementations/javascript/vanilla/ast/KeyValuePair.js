@@ -1,7 +1,7 @@
 /**************************************************************************** 
  * Specifies a KeyValuePair used in Expression
  * 
- * @author Nickolas Heirbaut 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  ****************************************************************************/
 
 /**

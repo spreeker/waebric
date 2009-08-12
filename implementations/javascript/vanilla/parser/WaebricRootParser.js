@@ -1,7 +1,7 @@
 /**
  * Waebric Root Parser
  *  
- * @author Nickolas Heirbaut
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricRootParser(){
 

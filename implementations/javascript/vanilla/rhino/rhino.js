@@ -2,7 +2,6 @@ importPackage(java.io)
 load('env.rhino.js')
 
 load("../ast/WaebricEnvironment.js")
-load("../ast/VisitorNode.js")
 load("../ast/Node.js")
 load("../ast/Path.js")
 load("../ast/Module.js")
@@ -23,7 +22,6 @@ load("../ast/KeyValuePair.js")
 load("../ast/Predicate.js")
 load("../ast/TextTail.js")
 load("../ast/Type.js")
-load("../ast/Variable.js")
 load("../ast/Assignment.js")
 
 load("../tokenizer/WaebricTokenizer.js");
@@ -53,10 +51,11 @@ load("../parser/WaebricStatementParser.js");
 load("../parser/WaebricPredicateParser.js");
 load("../parser/WaebricEmbeddingParser.js");
 
-load("../validator/WaebricSemanticValidator.js");
-load("../validator/WaebricSemanticValidatorException.js");
-load("../validator/WaebricSemanticValidatorResult.js");
-load("../validator/WaebricSemanticValidatorVisitor.js");
+load("../validator/WaebricValidator.js");
+load("../validator/WaebricSemanticException.js");
+load("../validator/WaebricValidatorException.js");
+load("../validator/WaebricValidatorResult.js");
+load("../validator/WaebricValidatorVisitor.js");
 load("../validator/XHTML.js")
 
 load('../interpreter/WaebricInterpreterResult.js')
@@ -135,26 +134,28 @@ function createTidyOutput(waebricEnvironments, siteName){
  * @param {String} siteName
  */
 function convertToHTML(path, siteName){	
-	//Parsing
-	var parserResult = WaebricParser.parseAll(path);
+	try {
+		//Parsing
+		var parserResult = WaebricParser.parse(path);
 
-	
-	//Validating		
-	var validationResult = WaebricSemanticValidator.validateAll(parserResult.module)	
-	print('---------------EXCEPTIONS--------------------')
-	print(validationResult.exceptions)
-	print('---------------------------------------------')
-	
-	//Interpreting
-	var interpreterResult = WaebricInterpreter.interpreteAll(parserResult.module);		
+		//Validating		
+		var validatorResult = WaebricValidator.validate(parserResult.module)
+		print('---------------VALIDATOR --------------------')
+		print(validatorResult.exceptions)
+		print('---------------------------------------------')
 		
-	//Output results
-	createHTML(interpreterResult.environments, siteName);
-	
-	//Create text file for pretty printer
-	createTidyOutput(interpreterResult.environments, siteName);
-	
-	print(interpreterResult.environments[0].document)
+		//Interpreting
+		var interpreterResult = WaebricInterpreter.interprete(parserResult.module);
+		
+		//Output results		
+		createHTML(interpreterResult.environments, siteName);
+		
+		//Create text file for pretty printer
+		createTidyOutput(interpreterResult.environments, siteName);
+	}catch(exception){
+		print(exception.toString());
+	}
 }
 
-convertToHTML('../../../../demos/lava/lava.wae', 'lava');
+//convertToHTML('../../../../demos/lava/lava.wae', 'lava');
+convertToHTML('../programs/program.wae', 'program');
