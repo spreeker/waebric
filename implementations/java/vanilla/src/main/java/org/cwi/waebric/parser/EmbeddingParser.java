@@ -14,6 +14,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.MidText;
 import org.cwi.waebric.parser.ast.statement.embedding.PostText;
 import org.cwi.waebric.parser.ast.statement.embedding.PreText;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
+import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * Embedding

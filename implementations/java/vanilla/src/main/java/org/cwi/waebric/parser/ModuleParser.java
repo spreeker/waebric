@@ -12,6 +12,7 @@ import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/waebric/syntax/Modules

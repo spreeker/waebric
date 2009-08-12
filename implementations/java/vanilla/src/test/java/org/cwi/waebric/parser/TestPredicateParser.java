@@ -15,6 +15,9 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate.RegularPredicate
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Is;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Not;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate.Or;
+import org.cwi.waebric.parser.exception.MissingTokenException;
+import org.cwi.waebric.parser.exception.SyntaxException;
+import org.cwi.waebric.parser.exception.UnexpectedTokenException;
 import org.cwi.waebric.TestUtilities;
 import org.junit.After;
 import org.junit.Before;

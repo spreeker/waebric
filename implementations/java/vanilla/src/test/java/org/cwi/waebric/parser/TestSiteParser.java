@@ -15,6 +15,7 @@ import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Mappings;
 import org.cwi.waebric.parser.ast.module.site.Path;
 import org.cwi.waebric.parser.ast.module.site.Site;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
 import org.junit.After;
 import org.junit.Before;

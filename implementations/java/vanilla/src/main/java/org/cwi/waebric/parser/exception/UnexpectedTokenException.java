@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser;
+package org.cwi.waebric.parser.exception;
 
 import org.cwi.waebric.lexer.token.Token;
 
@@ -9,7 +9,7 @@ import org.cwi.waebric.lexer.token.Token;
  * @author Jeroen van Schagen
  * @date 05-06-2009
  */
-class UnexpectedTokenException extends SyntaxException {
+public class UnexpectedTokenException extends SyntaxException {
 
 	/**
 	 * Serial ID

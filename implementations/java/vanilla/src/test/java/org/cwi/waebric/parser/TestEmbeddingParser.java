@@ -23,6 +23,7 @@ import org.cwi.waebric.parser.ast.statement.embedding.Embed.ExpressionEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed.MarkupEmbed;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.MidTail;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail.PostTail;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

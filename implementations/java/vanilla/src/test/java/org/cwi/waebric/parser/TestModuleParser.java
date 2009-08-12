@@ -10,6 +10,7 @@ import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
+import org.cwi.waebric.parser.exception.SyntaxException;
 import org.cwi.waebric.TestUtilities;
 import org.junit.After;
 import org.junit.Before;
