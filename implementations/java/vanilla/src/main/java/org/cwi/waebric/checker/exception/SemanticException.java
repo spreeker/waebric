@@ -1,4 +1,4 @@
-package org.cwi.waebric.checker;
+package org.cwi.waebric.checker.exception;
 
 /**
  * Apart from syntactic correctness, a WAEBRIC implementation also 

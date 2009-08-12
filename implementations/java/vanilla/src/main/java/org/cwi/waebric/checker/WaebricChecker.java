@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
-import org.cwi.waebric.checker.DeclarationChecker.DuplicateFunctionDefinition;
+import org.cwi.waebric.checker.exception.DuplicateFunctionDefinition;
+import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.interpreter.Environment;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.module.Module;

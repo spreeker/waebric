@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import org.cwi.waebric.ModuleRegister;
+import org.cwi.waebric.checker.exception.NonExistingModuleException;
+import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
@@ -39,28 +41,6 @@ public class ModuleChecker extends DefaultNodeVisitor {
 		if(! file.isFile()) {
 			exceptions.add(new NonExistingModuleException(identifier));
 		}
-	}
-	
-	/**
-	 * If for an import directive import m no corresponding file m.wae 
-	 * can be found, this a an error. [The import directive is skipped]
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 09-06-2009
-	 */
-	public static class NonExistingModuleException extends SemanticException {
-
-		/**
-		 * Generated serial ID
-		 */
-		private static final long serialVersionUID = -4503945323554024642L;
-
-		public NonExistingModuleException(ModuleId id) {
-			super("Module identifier \"" + id.toString() 
-					+ "\" at line " + id.get(0).getToken().getLine()
-					+ ", refers to a non-existing module.");
-		}
-		
 	}
 	
 }

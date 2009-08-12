@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import org.cwi.waebric.checker.SemanticException;
 import org.cwi.waebric.checker.WaebricChecker;
+import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.interpreter.WaebricInterpreter;
 import org.cwi.waebric.lexer.WaebricScanner;
 import org.cwi.waebric.lexer.exception.LexicalException;

@@ -3,6 +3,10 @@ package org.cwi.waebric.checker;
 import java.util.List;
 
 import org.cwi.waebric.XHTMLTag;
+import org.cwi.waebric.checker.exception.ArityMismatchException;
+import org.cwi.waebric.checker.exception.SemanticException;
+import org.cwi.waebric.checker.exception.UndefinedFunctionException;
+import org.cwi.waebric.checker.exception.UndefinedVariableException;
 import org.cwi.waebric.interpreter.Environment;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
@@ -153,97 +157,6 @@ public class DeclarationChecker extends DefaultNodeVisitor {
 	
 	public Environment getEnvironment() {
 		return environment;
-	}
-	
-	/**
-	 * If a function is called with an incorrect number of arguments 
-	 * (as follows from its definition), this is an error.
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 09-06-2009
-	 */
-	public static class ArityMismatchException extends SemanticException {
-
-		/**
-		 * Generated serial ID
-		 */
-		private static final long serialVersionUID = -954167103131401047L;
-
-		public ArityMismatchException(Markup.Call call) {
-			super("Call \"" + call.getDesignator().getIdentifier().getToken().getLexeme().toString()
-					+ "\" at line " + call.getDesignator().getIdentifier().getToken().getLine()
-					+ ", is an arity mismatch.");
-		}
-		
-	}
-	
-	/**
-	 * Multiple function definitions with the same name are disallowed.
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 09-06-2009
-	 */
-	public static class DuplicateFunctionDefinition extends SemanticException {
-
-		/**
-		 * Generated serial ID
-		 */
-		private static final long serialVersionUID = -8833578229100261366L;
-
-		public DuplicateFunctionDefinition(FunctionDef def) {
-			super("Function \"" + def.getIdentifier().getToken().getLexeme().toString()
-					+ "\" at line " + def.getIdentifier().getToken().getLine()
-					+ " has a duplicate definition.");
-		}
-		
-	}
-	
-	/**
-	 * If for a markup-call (f) no function definition can be found in 
-	 * the current module or one of its (transitive) imports, and, if 
-	 * f is not a tag defined in the XHTML 1.0 Transitional standard, 
-	 * then this is an error. [f will be interpreted as if it was part 
-	 * of XHTML 1.0 transitional.]
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 09-06-2009
-	 */
-	public static class UndefinedFunctionException extends SemanticException {
-
-		/**
-		 * Generated serial ID
-		 */
-		private static final long serialVersionUID = -4467095005921534334L;
-
-		public UndefinedFunctionException(Markup.Call call) {
-			super("Call \"" + call.getDesignator().getIdentifier().getToken().getLexeme().toString()
-					+ "\" at line " + call.getDesignator().getIdentifier().getToken().getLine()
-					+ ", is made to an undefined function.");
-		}
-		
-	}
-	
-	/**
-	 * If a variable reference x cannot be traced back to an enclosing 
-	 * let-definition or function parameter, this is an error. [The 
-	 * variable x will be undefined and evaluate to the string “undef”.]
-	 * 
-	 * @author Jeroen van Schagen
-	 * @date 09-06-2009
-	 */
-	public static class UndefinedVariableException extends SemanticException {
-
-		/**
-		 * Generated serial ID
-		 */
-		private static final long serialVersionUID = 3043727441105977011L;
-
-		public UndefinedVariableException(IdCon var) {
-			super("Variable \"" + var.getToken().getLexeme().toString()
-					+ "\" at line " + var.getToken().getLine()
-					+ " is not defined.");
-		}
-		
 	}
 	
 }

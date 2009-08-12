@@ -6,8 +6,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
+import org.cwi.waebric.checker.exception.ArityMismatchException;
+import org.cwi.waebric.checker.exception.DuplicateFunctionDefinition;
+import org.cwi.waebric.checker.exception.SemanticException;
+import org.cwi.waebric.checker.exception.UndefinedFunctionException;
+import org.cwi.waebric.checker.exception.UndefinedVariableException;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
-import org.junit.After;
 import org.junit.Test;
 
 public class TestDeclarationChecker {
@@ -24,8 +28,8 @@ public class TestDeclarationChecker {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/duplicate.wae");
 		exceptions = checker.checkAST(ast);
 		assertEquals(2, exceptions.size());
-		assertEquals(DeclarationChecker.DuplicateFunctionDefinition.class, exceptions.get(0).getClass());
-		assertEquals(DeclarationChecker.DuplicateFunctionDefinition.class, exceptions.get(1).getClass());
+		assertEquals(DuplicateFunctionDefinition.class, exceptions.get(0).getClass());
+		assertEquals(DuplicateFunctionDefinition.class, exceptions.get(1).getClass());
 	}
 	
 	@Test
@@ -33,8 +37,8 @@ public class TestDeclarationChecker {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/aritymm.wae");
 		exceptions = checker.checkAST(ast);
 		assertEquals(2, exceptions.size());
-		assertEquals(DeclarationChecker.ArityMismatchException.class, exceptions.get(0).getClass());
-		assertEquals(DeclarationChecker.ArityMismatchException.class, exceptions.get(1).getClass());
+		assertEquals(ArityMismatchException.class, exceptions.get(0).getClass());
+		assertEquals(ArityMismatchException.class, exceptions.get(1).getClass());
 	}
 	
 	@Test
@@ -42,9 +46,9 @@ public class TestDeclarationChecker {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/func/undeffunc.wae");
 		exceptions = checker.checkAST(ast);
 		assertEquals(3, exceptions.size());
-		assertEquals(DeclarationChecker.UndefinedFunctionException.class, exceptions.get(0).getClass());
-		assertEquals(DeclarationChecker.UndefinedFunctionException.class, exceptions.get(1).getClass());
-		assertEquals(DeclarationChecker.UndefinedFunctionException.class, exceptions.get(2).getClass());
+		assertEquals(UndefinedFunctionException.class, exceptions.get(0).getClass());
+		assertEquals(UndefinedFunctionException.class, exceptions.get(1).getClass());
+		assertEquals(UndefinedFunctionException.class, exceptions.get(2).getClass());
 	}
 	
 	@Test
@@ -59,8 +63,8 @@ public class TestDeclarationChecker {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/var/undefinedvar.wae");
 		exceptions = checker.checkAST(ast);
 		assertEquals(2, exceptions.size());
-		assertEquals(DeclarationChecker.UndefinedVariableException.class, exceptions.get(0).getClass());
-		assertEquals(DeclarationChecker.UndefinedVariableException.class, exceptions.get(1).getClass());
+		assertEquals(UndefinedVariableException.class, exceptions.get(0).getClass());
+		assertEquals(UndefinedVariableException.class, exceptions.get(1).getClass());
 	}
 	
 }
