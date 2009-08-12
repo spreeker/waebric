@@ -104,22 +104,19 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param content
 	 */
 	private void addContent(Content content) {
-		// Construct root element
-		if(current == null) {
+		if(current == null) { // Construct root element
 			if(content instanceof Element) {
-				Element rootElement = (Element) content;
-				document.setRootElement(rootElement);
-				current = rootElement;
-				return; // Content added, quit function
+				document.setRootElement((Element) content);
 			} else {
-				Element XHTML = createXHTMLTag();
-				document.setRootElement(XHTML);
-				current = XHTML;
-			}
+				document.setRootElement(createXHTMLTag());
+				document.addContent(content);
+			}	
+    			
+			current = document.getRootElement();
+		} else { // Add content to current element
+			current.addContent(content); // Attach content
+			if(content instanceof Element) { current = (Element) content; } // Update current
 		}
-		
-		current.addContent(content); // Attach content
-		if(content instanceof Element) { current = (Element) content; } // Update current
 	}
 	
 	/**
