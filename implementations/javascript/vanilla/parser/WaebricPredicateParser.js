@@ -16,8 +16,10 @@ function WaebricPredicateParser(){
 	 * @return {NotPredicate, AndPredicate, OrPredicate, PredicateType, Expression}
 	 */
 	this.parse = function(parentParser){
+		this.parserStack.setStack(parentParser.parserStack)
 		var predicate = this.parsePredicate(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return predicate;
 	}
 	
@@ -28,13 +30,12 @@ function WaebricPredicateParser(){
      * @return {Boolean}
      */
     this.isStartPredicate = function(token){
-        var hasValidOpening = token.value == WaebricToken.SYMBOL.LEFTRBRACKET;
-        var hasContent = token.nextToken().value != WaebricToken.SYMBOL.RIGHTRBRACKET;
-        var isNotPredicate = hasContent && (token.nextToken().value == WaebricToken.SYMBOL.EXCLAMATION);
-        var isExpression = !isNotPredicate && hasContent && this.expressionParser.isExpression(token.nextToken());
+        var hasContent = token.value != WaebricToken.SYMBOL.RIGHTRBRACKET;
+        var isNotPredicate = hasContent && (token.value == WaebricToken.SYMBOL.EXCLAMATION);
+        var isExpression = !isNotPredicate && hasContent && this.expressionParser.isExpression(token);
         var hasValidContent = isNotPredicate || isExpression
-        
-        return (hasValidOpening && hasValidContent);
+
+        return (hasValidContent);
     }
     
     /**
@@ -46,7 +47,9 @@ function WaebricPredicateParser(){
      * @return {NotPredicate, AndPredicate, OrPredicate, PredicateType, Expression}
      */
     this.parsePredicate = function(token, ignoreDoubleAnd, ignoreDoubleOr){
-        this.currentToken = token;
+        this.parserStack.addParser('Predicate');
+		this.setCurrentToken(token);  
+		
         var predicate;
         
         //Parse SINGLE predicates
@@ -69,6 +72,7 @@ function WaebricPredicateParser(){
             predicate = this.parseOrPredicate(this.currentToken.nextToken(), predicate)
         }
         
+		this.parserStack.removeParser();
         return predicate;
     }
     
@@ -89,8 +93,10 @@ function WaebricPredicateParser(){
      * @return {NotPredicate}
      */
     this.parseNotPredicate = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('NotPredicate');
+		this.setCurrentToken(token);  
 		var predicate = this.parsePredicate(this.currentToken, true, true);
+		this.parserStack.removeParser();
         return new NotPredicate(predicate);
     }
     
@@ -111,21 +117,25 @@ function WaebricPredicateParser(){
      * @return {PredicateType}
      */
     this.parsePredicateType = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('IsAPredicate');
+		this.setCurrentToken(token);  
         
+		var type;
         switch (this.currentToken.value.toString()) {
             case "list":
                 this.currentToken = token.nextToken();
-                return new ListType();
+                type = new ListType();
             case "record":
                 this.currentToken = token.nextToken();
-                return new RecordType();
+                type = new RecordType();
             case "string":
                 this.currentToken = token.nextToken();
-                return new StringType();
+                type = new StringType();
             default:
-                print('Error parsing is-a-predicate type. Expected LIST/RECORD/STRING but found ' + this.currentToken.value);
+				throw new WaebricSyntaxException(this, '"list", "record" or "string"', 'Predicate type to evaluate an expression');
         }
+		this.parserStack.removeParser();
+		return type;
     }
     
     /**
@@ -135,7 +145,9 @@ function WaebricPredicateParser(){
      * @param {AndPredicate} 
      */
     this.parseAndPredicate = function(token, predicate){
-        this.currentToken = token;
+        this.parserStack.addParser('AndPredicate');
+		this.setCurrentToken(token);  
+		
         var currentPredicate = predicate;
         
         //Parse all && predicates
@@ -153,6 +165,7 @@ function WaebricPredicateParser(){
             this.currentToken = this.currentToken.previousToken();
         }
         
+		this.parserStack.removeParser();
         return currentPredicate;
     }
     
@@ -163,7 +176,9 @@ function WaebricPredicateParser(){
      * @param {OrPredicate} predicate
      */
     this.parseOrPredicate = function(token, predicate){
-        this.currentToken = token;
+        this.parserStack.addParser('OrPredicate');
+		this.setCurrentToken(token);  
+		
         var currentPredicate = predicate;
         
         //Parse all || predicats
@@ -181,7 +196,8 @@ function WaebricPredicateParser(){
             this.currentToken = this.currentToken.previousToken();
         }
         
+		this.parserStack.removeParser();
         return currentPredicate;
     }
-
 }
+WaebricPredicateParser.prototype = new WaebricBaseParser();

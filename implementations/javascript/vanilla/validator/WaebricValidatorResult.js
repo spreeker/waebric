@@ -18,4 +18,13 @@ function WaebricValidatorResult(exceptions){
 	this.addException = function(exception){
 		return this.exceptions.push(exception);
 	}
+	
+	this.toString = function(){
+		var exceptionString = "";
+		for(var exceptionIndex in this.exceptions){
+			var exception = this.exceptions[exceptionIndex];			
+			exceptionString += 'Warning: ' + exception.toString() + '\n';
+		}
+		return exceptionString
+	}
 }

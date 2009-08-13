@@ -57,8 +57,6 @@ function WaebricInterpreterVisitor(){
 				//Output main function
 				this.dom.createXHTMLRoot();
 				mainFunction.accept(new FunctionDefinitionVisitor(this.env, this.dom));
-			}else{
-				print('No main function found!')
 			}
 		}
 	}

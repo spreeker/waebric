@@ -60,7 +60,7 @@ function WaebricTokenizer(){
         } else if (isStartIdentifier(character)) {
             return tokenizeIdentifier(character);
         } else {
-            throw "Unrecognized character in input stream.";
+            throw new WaebricLexicalException("Unrecognized character in input stream.", position);
         }
     }
     
@@ -159,7 +159,7 @@ function WaebricTokenizer(){
      * @return {WaebricCharacter} The next character to be tokenized
      */
     function tokenizeNatural(character){
-        var token = new WaebricToken.NATURAL(WaebricToken.EMPTY_TOKEN_VALUE, position);
+        var token = new WaebricToken.NATURAL(WaebricToken.EMPTY_TOKEN_VALUE, position.clone());
         var currentChar = character;
         
         while (isStartNatural(currentChar)) {
@@ -169,7 +169,7 @@ function WaebricTokenizer(){
         }
         
         if (!isWhitespace(currentChar) && !isSymbol(currentChar)) {
-            throw "Illegal character found after natural: " + currentChar.value + '(' + position.line + ',' + position.column + ')'
+            throw new WaebricLexicalException("Illegal character found after natural.", position);
         }
         
         tokenList.addToken(token);
@@ -193,8 +193,8 @@ function WaebricTokenizer(){
      * @return {WaebricCharacter} The next character to be tokenized
      */
 	function tokenizeSymbol(character){		
-        var token = new WaebricToken.SYMBOL(character.value, position);
-        var currentChar = character;
+        var token = new WaebricToken.SYMBOL(character.value, position.clone());
+        var currentChar = character;''
         
         //&& and || operator should be processed as one symbol
         if (currentChar.equals('&')) {			
@@ -222,7 +222,7 @@ function WaebricTokenizer(){
         } else {
 			position.increaseColumn(1);
             return currentChar.nextChar();
-        }
+        }		
     }
     
     /**
@@ -244,7 +244,7 @@ function WaebricTokenizer(){
      * @return {WaebricCharacter} The next character to be tokenized
      */
     function tokenizeSingleQuotedText(character){
-        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position);
+        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position.clone());
         var currentChar = character.nextChar(); //Skip the opening quote
         
         //Process single quoted text until an illegal character is found
@@ -282,7 +282,7 @@ function WaebricTokenizer(){
      * @return {WaebricCharacter} The next character to be tokenized
      */
     function tokenizeDoubleQuotedText(character){
-        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position);
+        var token = new WaebricToken.TEXT(WaebricToken.EMPTY_TOKEN_VALUE, position.clone());
         var currentChar = character.nextChar(); //Skip the opening quote
         position.increaseColumn(1)
 		
@@ -292,9 +292,12 @@ function WaebricTokenizer(){
 			position.update(currentChar)
             token.addChar(currentChar);
             currentChar = currentChar.nextChar();
+			if(currentChar.value == null){
+				throw new WaebricLexicalException('No ending quote of TEXT found.', position)
+			}
         }
 		position.increaseColumn(1);
-        currentChar = currentChar.nextChar(); //Skip the ending quote        
+        currentChar = currentChar.nextChar(); //Skip the ending quote      
         tokenList.addToken(token);
         
         //Detect start of embedding after the text
@@ -368,7 +371,7 @@ function WaebricTokenizer(){
      */
     function tokenizeIdentifier(character){
         var value = "";
-		var startPosition = new WaebricCharacter.Position(position.line, position.column);
+		var startPosition = position.clone()
         var currentChar = character;
         while (isStartIdentifier(currentChar)) {
 			position.update(currentChar);
@@ -379,7 +382,7 @@ function WaebricTokenizer(){
         //Path elements are never tokenized as keywords
         //Path elements require a regular expression to be valid
         var isPathElement = isValidPathElement(value);
-        if (WaebricToken.KEYWORD.contains(value) && !isPathElement) {
+        if (WaebricToken.KEYWORD.contains(value) && !isPathElement) {			
             tokenList.addToken(new WaebricToken.KEYWORD(value, startPosition));
             return currentChar;
         } else if (!isPathElement) {
@@ -387,14 +390,14 @@ function WaebricTokenizer(){
                 tokenList.addToken(new WaebricToken.IDENTIFIER(value, startPosition));
                 return currentChar;
             } else {
-                throw "Illegal character in input stream while tokenizing Identifier: " + value + startPosition
+                throw new WaebricLexicalException("Illegal character in identifier.", startPosition)
             }
         } else if (isPathElement) {
             if (isValidPath(value)) {
                 tokenList.addToken(new WaebricToken.IDENTIFIER(value, startPosition));
                 return currentChar;
             } else {
-                throw "Illegal character in input stream while tokenizing Path Element: " + value + startPosition
+                throw new WaebricLexicalException("Illegal character in path element.", startPosition)
             }
         }
     }
@@ -487,6 +490,15 @@ function WaebricTokenizer(){
         }
         return false;
     }
+	
+	/**
+	 * Returns the position of the current token being processed by the tokenizer
+	 * 
+	 * @return {WaebricCharacter.Position}
+	 */
+	this.getPosition = function(){
+		return position;
+	}
 }
 
 /**
@@ -497,13 +509,13 @@ function WaebricTokenizer(){
  * @return {WaebricTokenizerResult}
  * @exception {WaebricTokenizerException}
  */
-WaebricTokenizer.tokenize = function(input){
+WaebricTokenizer.tokenize = function(input, path){
     try {
         var tokenizer = new WaebricTokenizer();
         return tokenizer.tokenize(input);
+    } catch (exception if exception instanceof WaebricLexicalException) {
+        throw new WaebricTokenizerException(exception.message, exception.position, path, exception);
     } catch (exception) {
-		var err = new Error();
-        throw new WaebricTokenizerException(exception);
+        throw new WaebricTokenizerException(exception.message, tokenizer.getPosition(), path, exception);
     }
 }
-

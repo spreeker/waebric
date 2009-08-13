@@ -27,6 +27,7 @@ load("../ast/Assignment.js")
 load("../tokenizer/WaebricTokenizer.js");
 load("../tokenizer/WaebricTokenizerResult.js");
 load("../tokenizer/WaebricTokenizerException.js");
+load("../tokenizer/WaebricLexicalException.js");
 load("../tokenizer/WaebricCharacter.js");
 load("../tokenizer/tokens/WaebricToken.js");
 load("../tokenizer/tokens/WaebricTokenIdentifier.js");
@@ -38,9 +39,12 @@ load("../tokenizer/tokens/WaebricTokenText.js");
 load("../tokenizer/tokens/WaebricTokenWhitespace.js");
 
 load("../parser/WaebricParser.js");
+load("../parser/WaebricBaseParser.js");
+load("../parser/WaebricParserStack.js");
 load("../parser/WaebricRootParser.js");
 load("../parser/WaebricParserResult.js");
 load("../parser/WaebricParserException.js");
+load("../parser/WaebricSyntaxException.js");
 load("../parser/WaebricParserToken.js");
 load("../parser/WaebricModuleParser.js");
 load("../parser/WaebricSiteParser.js");
@@ -69,17 +73,21 @@ load('../interpreter/DOM.js')
  * @param {Array} An array of XML documents
  */
 function createHTML(waebricEnvironments, siteName){
-	for(var i = 0; i < waebricEnvironments.length; i++){	
+	for(var i = 0; i < waebricEnvironments.length; i++){			
 		var waebricEnvironment = waebricEnvironments[i];
-		var rootPath = '../../demos/vanilla/';
-		var sitePath = siteName + '/' + waebricEnvironment.path.toString();
-		createDirectories(rootPath, sitePath)
-		
-		//Write file
-		var fw = new FileWriter(rootPath + sitePath);
-		var bf = new BufferedWriter(fw);
-		bf.write(waebricEnvironment.document);
-		bf.close();
+		if (waebricEnvironment.path != '') {
+			var rootPath = '../../demos/vanilla/';
+			var sitePath = siteName + '/' + waebricEnvironment.path.toString();
+			createDirectories(rootPath, sitePath)
+			
+			//Write file
+			var fw = new FileWriter(rootPath + sitePath);
+			var bf = new BufferedWriter(fw);
+			bf.write(waebricEnvironment.document);
+			bf.close();
+		}else{
+			print('Unable to write XHTML document for file ' + waebricEnvironment.name + '.wae. DOM document is empty.')
+		}
 	}	
 }
 
@@ -140,9 +148,7 @@ function convertToHTML(path, siteName){
 
 		//Validating		
 		var validatorResult = WaebricValidator.validate(parserResult.module)
-		print('---------------VALIDATOR --------------------')
-		print(validatorResult.exceptions)
-		print('---------------------------------------------')
+		print(validatorResult)
 		
 		//Interpreting
 		var interpreterResult = WaebricInterpreter.interprete(parserResult.module);
@@ -153,9 +159,11 @@ function convertToHTML(path, siteName){
 		//Create text file for pretty printer
 		createTidyOutput(interpreterResult.environments, siteName);
 	}catch(exception){
+		print('\n******************************************************************************')
 		print(exception.toString());
+		print('******************************************************************************\n')
 	}
 }
 
-//convertToHTML('../../../../demos/lava/lava.wae', 'lava');
-convertToHTML('../programs/program.wae', 'program');
+convertToHTML('../../../../demos/lava/lava.wae', 'lava');
+//convertToHTML('../programs/program.wae', 'program');

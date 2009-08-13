@@ -4,8 +4,7 @@
  * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricFunctionDefinitionParser(){
-	
-	this.currentToken;
+
 	this.expressionParser = new WaebricExpressionParser();
 	this.statementParser = new WaebricStatementParser();
 	
@@ -16,8 +15,10 @@ function WaebricFunctionDefinitionParser(){
 	 * @param {Object} parentParser The parent parser
 	 */
 	this.parse = function(parentParser){
+		this.parserStack.setStack(parentParser.parserStack)
 		var functionDef = this.parseFunctionDefinition(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return functionDef;
 	}
 	
@@ -38,8 +39,9 @@ function WaebricFunctionDefinitionParser(){
      * @param {WaebricParserToken} token The token to parse
      * @return {FunctionDefinition}
      */
-    this.parseFunctionDefinition = function(token){
-        this.currentToken = token;
+    this.parseFunctionDefinition = function(token){		
+        this.parserStack.addParser('FunctionDefinition')
+		this.setCurrentToken(token);  
         
         var identifier;
         var formals = new Array();
@@ -49,7 +51,7 @@ function WaebricFunctionDefinitionParser(){
         if (this.expressionParser.isIdentifier(this.currentToken)) {
             identifier = this.currentToken.value.toString();
         } else {
-            print('Error parsing function definition. Expected a FUNCTION NAME (IDENTIFIER) but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Identifier', 'Functionname');
         }
 		
         //Next token can be the start of formals
@@ -61,11 +63,18 @@ function WaebricFunctionDefinitionParser(){
         //Remaining tokens are part of statements
 		this.currentToken = this.currentToken.nextToken();
         statements = this.statementParser.parseMultiple(this);
-        
-		if(WaebricToken.KEYWORD.END.equals(this.currentToken.value)){
-			return new FunctionDefinition(identifier, formals, statements)
-		}else{
-			print('Error parsing function definition. Expected END after statements but found ' + this.currentToken.nextToken().value);
+
+		if(!WaebricToken.KEYWORD.END.equals(this.currentToken.value)){		
+			if (this.currentToken.hasNextToken()) {
+				this.currentToken = this.currentToken.nextToken();
+				throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'FunctionDefinition closing');
+			}else{
+				this.currentToken.value = 'EOF (End of Line!)'
+				throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'FunctionDefinition closing');
+			}
 		}
+		this.parserStack.removeParser();
+		return new FunctionDefinition(identifier, formals, statements)
     }
 }
+WaebricFunctionDefinitionParser.prototype = new WaebricBaseParser();

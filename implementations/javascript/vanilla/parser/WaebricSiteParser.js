@@ -5,7 +5,6 @@
  */
 function WaebricSiteParser(){
 	
-	this.currentToken;	
 	this.markupParser = new WaebricMarkupParser();
 	
 	/**
@@ -16,8 +15,10 @@ function WaebricSiteParser(){
 	 * @return {Site}
 	 */
 	this.parse = function(parentParser){
+		this.parserStack.setStack(parentParser.parserStack)
 		var site = this.parseSite(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return site;
 	}
 	
@@ -28,8 +29,10 @@ function WaebricSiteParser(){
 	 * @return {Site}
 	 */
 	this.parseSite = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('Site');
+		this.setCurrentToken(token);  		
         var mappings = this.parseMappings(this.currentToken);
+		this.parserStack.removeParser();
         return new Site(mappings);
 	}	
 	
@@ -50,7 +53,8 @@ function WaebricSiteParser(){
      * @return {Array} Collection of {Mapping}
      */
     this.parseMappings = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('Mappings');
+		this.setCurrentToken(token);  
 
         var mappings = new Array();
         while (!WaebricToken.KEYWORD.END.equals(this.currentToken.value)) {
@@ -60,7 +64,7 @@ function WaebricSiteParser(){
             if (hasMultipleMappings && hasMappingSeperator) {
                 this.currentToken = this.currentToken.nextToken();
             } else if (hasMultipleMappings && hasMappingSeperator) {
-                print('Error parsing Mapping. Expected semicolon after mapping but found ' + this.currentToken.value);
+				throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'End of Site Mapping');
             }
             
             //Get current mapping
@@ -70,15 +74,27 @@ function WaebricSiteParser(){
             mappings.push(mapping);
             
             //Navigate to next token (skips the last token)
+			var previousToken = this.currentToken;
             this.currentToken = this.currentToken.nextToken();
 
             //Check mapping ending
-            var hasSemicolonEnding = WaebricToken.SYMBOL.SEMICOLON.equals(this.currentToken.value);			
-            var hasMappingEnding = hasSemicolonEnding && WaebricToken.KEYWORD.END.equals(this.currentToken.nextToken().value)
-            if (hasMappingEnding) {
-                print('Error parsing Mapping. The last SITE MAPPING should be followed by "END" but found ' + this.currentToken.value);
-            }
+            var hasSemicolonEnding = this.currentToken != null && WaebricToken.SYMBOL.SEMICOLON.equals(this.currentToken.value);				
+            if (hasSemicolonEnding) {
+				print('2')
+				var hasEndEnding = !this.currentToken.hasNextToken() || WaebricToken.KEYWORD.END.equals(this.currentToken.nextToken().value)
+				if (hasEndEnding) {
+					throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'Closing of last Site Mapping should be end');
+				}							
+            }else if(!hasSemicolonEnding){
+				var hasEndEnding = this.currentToken != null && WaebricToken.KEYWORD.END.equals(this.currentToken.value)
+				if (!hasEndEnding) {
+					this.currentToken = previousToken;
+					throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 
+						'Closing of Site Mapping');	
+				}			
+			}
         }
+		this.parserStack.removeParser();
         return mappings;
     }
 	
@@ -89,7 +105,9 @@ function WaebricSiteParser(){
      * @return {Mapping}
      */
     this.parseMapping = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('Mapping');
+		this.setCurrentToken(token);  
+		
         var path = this.parsePath(this.currentToken);
         var markup;
         
@@ -100,10 +118,12 @@ function WaebricSiteParser(){
 			this.currentToken = this.currentToken.nextToken();
             markup = this.markupParser.parseSingle(this);
         } else if (!hasPathMarkupSeperator) {
-            print('Error parsing Mapping. Expected colon after path but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COLON, 'Path/Markup seperator');
         } else if (!isMarkup) {
-            print('Error parsing Mapping. Expected Markup after path but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, 'Identifier', 'Start of Markup');
         }
+		this.parserStack.removeParser();
         return new Mapping(path, markup);
     }
 	
@@ -114,46 +134,44 @@ function WaebricSiteParser(){
      * @return {String}
      */
     this.parsePath = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('Site Path');
+		this.setCurrentToken(token);  
+		
         var path;
         if (this.currentToken.value instanceof WaebricToken.IDENTIFIER) {
             //Build directory + filename
             var directoryFileName = "";
             while (this.isDirectory(this.currentToken.value)) {
                 directoryFileName += this.currentToken.value;
-                this.currentToken = this.currentToken.nextToken();
+                
+				if(this.currentToken.hasNextToken()){
+					this.currentToken = this.currentToken.nextToken();					
+				}else{
+					throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.DOT, 'Filename/extension seperator');
+				}
             }
-            
-            //Skip DOT file extension
-            var hasDotSeperator = this.currentToken.value == WaebricToken.SYMBOL.DOT
-            if (hasDotSeperator) {
-                this.currentToken = this.currentToken.nextToken();
-            } else {
-                print('Error parsing path. Expected DOT between filename and extension but found ' +
-                this.currentToken.nextToken().value);
-            }
+
+           	//Skip DOT file extension
+           	this.currentToken = this.currentToken.nextToken();
             
             //Build file extension
             var fileExtension = "";
             while (this.isFileExtension(this.currentToken.value)) {
                 fileExtension += this.currentToken.value;
-                if (this.currentToken.value instanceof WaebricToken.IDENTIFIER &&
-                this.currentToken.nextToken().value instanceof WaebricToken.IDENTIFIER) {
-                    print('Error parsing path. Found whitespace in file extension.');
-                    return;
-                }
                 this.currentToken = this.currentToken.nextToken();
             }
             
             //Path should be valid
             path = directoryFileName + "." + fileExtension;
-            if (this.isPath(path)) {
-                return path.toString();
-            } else {
-                print('Error parsing path. Path has invalid characters. ' + path);
+            if (!this.isPath(path)) {
+				throw new WaebricSyntaxException(this, 'Path', 'Invalid characters found in Path');
             }
+			
+			this.parserStack.removeParser();
+			return path.toString();
         }
-        print('Error parsing path. Path should start with an identifier ' + this.currentToken.value);
+		
+		throw new WaebricSyntaxException(this, 'Identifier', 'Start of path');
     }
 	
 	/**
@@ -189,3 +207,4 @@ function WaebricSiteParser(){
         return value.match(regExp);
     }
 }
+WaebricSiteParser.prototype = new WaebricBaseParser();

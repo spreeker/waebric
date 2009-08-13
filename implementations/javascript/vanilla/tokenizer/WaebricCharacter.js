@@ -150,8 +150,15 @@ WaebricCharacter.Position = function(line, column){
 		this.column = (this.column - count);
 	}
 	
+	/**
+	 * Returns a clone of the current object
+	 */
+	this.clone = function(){
+		return new WaebricCharacter.Position(this.line, this.column)
+	}
+	
 	this.toString = function(){
-		return ' line: ' + this.line + ' column: ' + this.column
+		return 'line: ' + this.line + ' column: ' + this.column
 	}
 }
 

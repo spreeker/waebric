@@ -5,7 +5,6 @@
  */
 function WaebricRootParser(){
 
-    this.currentToken;
 	this.moduleParser = new WaebricModuleParser();
 	
 	/**
@@ -17,21 +16,30 @@ function WaebricRootParser(){
 	this.parse = function(tokenizerResult){
         //Store first token globally
         this.currentToken = new WaebricParserToken(tokenizerResult.tokens, 0)
-		
+
         //Start parsing the module
         if (this.moduleParser.isStartModule(this.currentToken.value)) {
-			this.currentToken = this.currentToken.nextToken();
-            return this.moduleParser.parse(this); //Skip keyword "Module"
+			this.setCurrentToken(this.currentToken.nextToken());
+            var module = this.moduleParser.parse(this); //Skip keyword "Module"
+            this.parserStack = module.parserStack;
+			this.setCurrentToken(module.currentToken);
+			return module;
         } else {
-            print('Error parsing module. Expected keyword Module as first token but found ' +
-            this.currentToken.value);
+			throw new WaebricSyntaxException(this, "Module", "Start Waebric file");
         }
     }
 }
 
-WaebricRootParser.parse = function(tokenizerResult){
-	var parser = new WaebricRootParser();
-	return parser.parse(tokenizerResult);
+WaebricRootParser.parse = function(tokenizerResult, path){
+	try {	
+		var parser = new WaebricRootParser();
+		return parser.parse(tokenizerResult);
+	}catch (exception){
+		if (this.currentToken != null) {
+			throw new WaebricParserException(exception.message, this.currentToken.value.position, path, exception)
+		}else{
+			throw new WaebricParserException(exception.message, exception.message, path, exception)
+		}
+	}
 }
-	
-	
+WaebricRootParser.prototype = new WaebricBaseParser();

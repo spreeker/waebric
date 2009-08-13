@@ -4,8 +4,6 @@
  * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricStatementParser(){
-
-    this.currentToken;
 	
     this.predicateParser = new WaebricPredicateParser();
 	this.expressionParser = new WaebricExpressionParser();
@@ -24,9 +22,11 @@ function WaebricStatementParser(){
 	 * 			MarkupEmbeddingStatement, MarkupStatementStatement}
 	 */
     this.parseSingle = function(parentParser){
-        var statement = this.parseStatement(parentParser.currentToken);
-        parentParser.currentToken = this.currentToken;
-        return statement;
+		this.parserStack.setStack(parentParser.parserStack)
+		var statement = this.parseStatement(parentParser.currentToken);
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
+		return statement;
     }
     
 	/**
@@ -37,9 +37,11 @@ function WaebricStatementParser(){
 	 * @return {Array} An collection of statements
 	 */
     this.parseMultiple = function(parentParser){
-        var statements = this.parseStatements(parentParser.currentToken);
-        parentParser.currentToken = this.currentToken;
-        return statements;
+		this.parserStack.setStack(parentParser.parserStack)
+		var statements = this.parseStatements(parentParser.currentToken);
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
+		return statements;		
     }
     
     /**
@@ -53,40 +55,44 @@ function WaebricStatementParser(){
 	 * 			MarkupEmbeddingStatement, MarkupStatementStatement}
      */
     this.parseStatement = function(token){
-        this.currentToken = token;
+		this.parserStack.addParser('Statement')
+		this.setCurrentToken(token);
+
+		var statement;
         if (this.isStartIfStatement(this.currentToken)) {
-            return this.parseIfElseStatement(this.currentToken);
+            statement = this.parseIfElseStatement(this.currentToken);
         } else if (this.isStartEachStatement(this.currentToken)) {
-            return this.parseEachStatement(this.currentToken);
+            statement = this.parseEachStatement(this.currentToken);
         } else if (this.isStartLetStatement(this.currentToken)) {
-            return this.parseLetStatement(this.currentToken);
+            statement = this.parseLetStatement(this.currentToken);
         } else if (this.isStartBlockStatement(this.currentToken)) {
-            return this.parseBlockStatement(this.currentToken);
+            statement = this.parseBlockStatement(this.currentToken);
         } else if (this.isStartCommentStatement(this.currentToken)) {
-            return this.parseCommentStatement(this.currentToken);
+            statement = this.parseCommentStatement(this.currentToken);
         } else if (this.isEchoEmbeddingStatement(this.currentToken)) {
-            return this.parseEchoEmbeddingStatement(this.currentToken);
+            statement = this.parseEchoEmbeddingStatement(this.currentToken);
         } else if (this.isEchoStatement(this.currentToken)) {
-            return this.parseEchoStatement(this.currentToken);
+            statement = this.parseEchoStatement(this.currentToken);
         } else if (this.isCDataStatement(this.currentToken)) {
-            return this.parseCDataStatement(this.currentToken);
+            statement = this.parseCDataStatement(this.currentToken);
         } else if (this.isYieldStatement(this.currentToken)) {
-            return this.parseYieldStatement(this.currentToken);
-        } else if (this.isMarkupStatement(this.currentToken)) {
-            return this.parseMarkupStatement(this.currentToken)
+            statement = this.parseYieldStatement(this.currentToken);
+        } else if (this.isMarkupStatement(this.currentToken)) {			
+            statement = this.parseMarkupStatement(this.currentToken)
         } else if (this.isMarkupEmbeddingStatement(this.currentToken)) {
-            return this.parseMarkupEmbeddingStatement(this.currentToken)
+            statement = this.parseMarkupEmbeddingStatement(this.currentToken)
         } else if (this.isMarkupExpressionStatement(this.currentToken)) {
-            return this.parseMarkupExpressionStatement(this.currentToken)
+            statement = this.parseMarkupExpressionStatement(this.currentToken)
         } else if (this.isMarkupMarkupStatement(this.currentToken)) {
-            return this.parseMarkupMarkupStatement(this.currentToken)
+            statement = this.parseMarkupMarkupStatement(this.currentToken)
         } else if (this.isMarkupStatementStatement(this.currentToken)) {
-            return this.parseMarkupStatementStatement(this.currentToken)
+            statement = this.parseMarkupStatementStatement(this.currentToken)
         } else {
-            print('Error parsing statement. Expected start of a statement but found ' + this.currentToken.nextToken().nextToken().value);
-            throw new Error('Error parsing statement. Expected start of a statement')
+			throw new WaebricSyntaxException(this, '"IF", "EACH", "LET", "{", "COMMENT", "ECHO", "CDATA", "YIELD" or Identifier', 'Start of statement');
         }
-        return new Array();
+
+		this.parserStack.removeParser();
+		return statement;
     }
     
 	/**
@@ -96,14 +102,23 @@ function WaebricStatementParser(){
      * @return {Array} A collection of statements
      */
     this.parseStatements = function(token){
-        this.currentToken = token;
-        
+        this.parserStack.addParser('Statements');
+		this.setCurrentToken(token);  
+		
         var statements = new Array();
-        while (!WaebricToken.KEYWORD.END.equals(this.currentToken.value)) {
+        while (!WaebricToken.KEYWORD.END.equals(this.currentToken.value) 
+				&& !WaebricToken.KEYWORD.DEF.equals(this.currentToken.value)) {
             statement = this.parseStatement(this.currentToken);
             statements.push(statement);
-            this.currentToken = this.currentToken.nextToken();
+			if (this.currentToken.hasNextToken()) {
+				this.currentToken = this.currentToken.nextToken();
+			}else{
+				print(this.currentToken.value.position)
+				this.currentToken.value.value = 'EOF (End of File)'
+				throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'Closing function definition');
+			}
         }
+		this.parserStack.removeParser();
         return statements;
     }
 	
@@ -125,17 +140,28 @@ function WaebricStatementParser(){
      * @return {IfStatement}
      */
     this.parseIfElseStatement = function(token){
-        this.currentToken = token.nextToken(); //Skip IF keyword
+        this.parserStack.addParser('IfElseStatement');
+		this.setCurrentToken(token.nextToken());   //Skip IF keyword
+		
         var predicate;
         var ifStatement;
         var elseStatement;
         
+		//Parse opening
+		var hasValidOpening = this.currentToken.value == WaebricToken.SYMBOL.LEFTRBRACKET;
+        if (hasValidOpening) {
+            this.currentToken = this.currentToken.nextToken();
+        } else {
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.LEFTRBRACKET,'Opening predicate');
+        }
+		
         //Parse predicate
         if (this.predicateParser.isStartPredicate(this.currentToken)) {
-			this.currentToken = this.currentToken.nextToken();
             predicate = this.predicateParser.parse(this);
         } else {
-            print('Error parsing IF/ELSE statement. Expected predicate but found ' + this.currentToken.nextToken().value);
+			throw new WaebricSyntaxException(this, 'Expression or "!" ', 
+					'Predicate', 'IfElseStatement');
         }
         
         //Predicate should be ended correctly
@@ -143,7 +169,8 @@ function WaebricStatementParser(){
         if (hasValidEnding) {
             this.currentToken = this.currentToken.nextToken();
         } else {
-            print('Error parsing IF/ELSE statement. Expected ending of predicate ")" but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.RIGHTRBRACKET, 'Closing predicate');
         }
         
         //Parse IF statement
@@ -153,8 +180,10 @@ function WaebricStatementParser(){
         var hasElseClause = WaebricToken.KEYWORD.ELSE.equals(this.currentToken.nextToken().value);
         if (hasElseClause) {
             elseStatement = this.parseStatement(this.currentToken.nextToken().nextToken());
+			this.parserStack.removeParser();
             return new IfElseStatement(predicate, ifStatement, elseStatement);
         }
+		this.parserStack.removeParser();
         return new IfStatement(predicate, ifStatement);
     }
 	
@@ -175,7 +204,8 @@ function WaebricStatementParser(){
 	 * @return {EachStatement}
 	 */
     this.parseEachStatement = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('EachStatement');
+		this.setCurrentToken(token);  
         
         var identifier;
         var expression;
@@ -185,7 +215,7 @@ function WaebricStatementParser(){
         if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.LEFTRBRACKET) {
             this.currentToken = this.currentToken.nextToken(); //Skip
         } else {
-            print('Error parsing Each statement. Expected LEFT ROUND BRACKET but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.LEFTRBRACKET, 'Opening evaluation');
         }
         
         //Parse IDENTIFIER
@@ -193,14 +223,15 @@ function WaebricStatementParser(){
 			this.currentToken = this.currentToken.nextToken()
             identifier = this.currentToken.value.toString();
         } else {
-            print('Error parsing Each statement. Expected IDENTIFIER but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Identifier', 'Variable of EachStatement');
         }
         
         //Parse COLON
         if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.COLON) {
             this.currentToken = this.currentToken.nextToken(); //Skip
         } else {
-            print('Error parsing Each statement. Expected COLON after identifier but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COLON, 'Identifier/Expression seperator');
         }
         
         //Parse EXPRESSION
@@ -208,18 +239,20 @@ function WaebricStatementParser(){
 			this.currentToken = this.currentToken.nextToken();
             expression = this.expressionParser.parse(this);
         } else {
-            print('Error parsing Each statement. Expected EXPRESSION but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Expression', 'Expression of EachStatement');
         }
         
         //Parse RIGHT ROUND BRACKET
         if (this.currentToken.nextToken().value == WaebricToken.SYMBOL.RIGHTRBRACKET) {
             this.currentToken = this.currentToken.nextToken(); //Skip
         } else {
-            print('Error parsing Each statement. Expected LEFT ROUND BRACKET but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.RIGHTRBRACKET, 'Closing evaluation');
         }
         
         //Parse STATEMENT
         statement = this.parseStatement(this.currentToken.nextToken());
+		
+		this.parserStack.removeParser();
         return new EachStatement(identifier, expression, statement);
     }
 
@@ -240,18 +273,17 @@ function WaebricStatementParser(){
 	 * @return {LetStatement}
 	 */
     this.parseLetStatement = function(token){
-        this.currentToken = token;
-        
-        var assignments = this.parseAssignments(this.currentToken);
-        var statements = this.parseStatements(this.currentToken.nextToken());
-        
-        var hasValidEnding = WaebricToken.KEYWORD.END.equals(this.currentToken.value);
-        if (!hasValidEnding) {
-            print('Error parsing LET statement. Expected end of let statement (END) but found ' + this.currentToken.value);
-            throw new Error();
-        } else {
-            return new LetStatement(assignments, statements);
-        }
+        this.parserStack.addParser('LetStatement');
+		this.setCurrentToken(token);  
+        var assignments = this.parseAssignments(this.currentToken);		
+        var statements = this.parseStatements(this.currentToken.nextToken());  
+		
+        var hasValidClosing = WaebricToken.KEYWORD.END.equals(this.currentToken.value);
+        if (!hasValidClosing) {
+			throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'Closing LetStatement');
+        }      
+		this.parserStack.removeParser();
+		return new LetStatement(assignments, statements);
     }
     
     /**
@@ -271,13 +303,17 @@ function WaebricStatementParser(){
 	 * @return {BlockStatement}
 	 */
     this.parseBlockStatement = function(token){
-        this.currentToken = token.nextToken(); //Skip "{" opening
+        this.parserStack.addParser('BlockStatement');
+		this.setCurrentToken(token.nextToken());   //Skip "{" opening
+		
         var statements = new Array();
         while (this.currentToken.value != WaebricToken.SYMBOL.RIGHTCBRACKET) {
             var statement = this.parseStatement(this.currentToken);
             statements.push(statement);
             this.currentToken = this.currentToken.nextToken();
         }
+		
+		this.parserStack.removeParser();
         return new BlockStatement(statements);
     }
     
@@ -298,22 +334,25 @@ function WaebricStatementParser(){
 	 * @return {CommenStatement}
 	 */
     this.parseCommentStatement = function(token){
-        this.currentToken = token.nextToken();
+        this.parserStack.addParser('CommentStatement');
+		this.setCurrentToken(token.nextToken());  //Skip comment keyword
         
         var comment;
         if (this.isStrCon(this.currentToken)) {
             comment = this.currentToken.value.toString();
         } else {
-            print('Error parsing comment. Expected StrCon after keyword COMMENT but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'StrCon', 'content of comment');
         }
-        
-        var isValidClosing = (this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON);
-        if (isValidClosing) {
-            this.currentToken = this.currentToken.nextToken(); //Skip ";" end
-            return new CommentStatement(comment);
-        } else {
-            print('Error parsing comment. Expected semicolon after comment but found ' + this.currentToken.nextToken().value)
-        }
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
+        }	
+			
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" end
+		this.parserStack.removeParser();
+        return new CommentStatement(comment);
     }
 	
 	/**
@@ -326,7 +365,41 @@ function WaebricStatementParser(){
 		var regExp = new RegExp('^([^\x00-\x1F\"\\\\]*(\\\\n)*(\\\\t)*(\\\\")*(\\\\[0-9]{3})*)*$');
         return token.value instanceof WaebricToken.TEXT && token.value.match(regExp) != null;		
 	}
-    
+    	
+	/**
+	 * Checks whether the input value is an {EchoEmbeddingStatement}
+	 * 
+	 * @param {WaebricParserToken} token The token to evaluate
+	 * @return {Boolean}
+	 */
+	this.isEchoEmbeddingStatement = function(token){
+		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
+		var isValidEmbedding = isValidOpening && this.embeddingParser.isStartEmbedding(token.nextToken());
+		return isValidEmbedding;
+	}
+	
+	/**
+	 * Parses the input to an {EchoEmbeddingStatement}
+	 * 
+	 * @param {WaebricParserToken} token  The token to parse
+	 * @return {EchoEmbeddingStatement}
+	 */
+	this.parseEchoEmbeddingStatement = function(token){
+		this.parserStack.addParser('EchoEmbeddingStatement');
+		this.setCurrentToken(token.nextToken()); //Skip echo keyword
+		
+		var embedding = this.embeddingParser.parse(this);
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
+        }
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new EchoEmbeddingStatement(embedding);		
+	}
+	
 	/**
 	 * Checks whether the input value is an {EchoStatement}
 	 * 
@@ -334,9 +407,7 @@ function WaebricStatementParser(){
 	 * @return {Boolean}
 	 */
 	this.isEchoStatement = function(token){
-		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
-		var isValidExpression = isValidOpening && this.expressionParser.isExpression(token.nextToken());
-		return isValidExpression;
+		return WaebricToken.KEYWORD.ECHO.equals(token.value);
 	}
 	
 	/**
@@ -346,16 +417,18 @@ function WaebricStatementParser(){
 	 * @return {EchoStatement}
 	 */
 	this.parseEchoStatement = function(token){
-		this.currentToken = token.nextToken(); 
-		
+		this.parserStack.addParser('EchoStatement')
+		this.setCurrentToken(token.nextToken()); //Skip echo keyword
 		var expression = this.expressionParser.parse(this);
-		var isValidClosing = (this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON);
-		if (isValidClosing) {
-			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-			return new EchoStatement(expression);
-		}else{
-			print('Error parsing EchoStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
-		}	
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
+        }
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new EchoStatement(expression);		
 	}
 	
 	/**
@@ -377,17 +450,19 @@ function WaebricStatementParser(){
 	 * @return {CDataStatement}
 	 */
 	this.parseCDataStatement = function(token){
-		this.currentToken = token.nextToken(); 
+		this.parserStack.addParser('CDataStatement');
+		this.setCurrentToken(token.nextToken()); //Skip CData keyword
 		
 		var expression = this.expressionParser.parse(this);
 		
-		var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-		if (isValidClosing) {
-			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-			return new CDataExpression(expression);
-		}else{
-			print('Error parsing CDataStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
-		}
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
+        }
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new CDataExpression(expression);		
 	}
 	
 	/**
@@ -407,48 +482,20 @@ function WaebricStatementParser(){
 	 * @return {YieldStatement}
 	 */
 	this.parseYieldStatement = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('YieldStatement');
+		this.setCurrentToken(token);
 		
-		var isValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-		if (isValidClosing) {
-			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-			return new YieldStatement();
-		}else{
-			print('Error parsing YieldStatement. Expected ";" but found ' + this.currentToken.nextToken().value)
-		}
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
+        }
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new YieldStatement();		
 	}
 
 	/**
-	 * Checks whether the input value is an {EchoEmbeddingStatement}
-	 * 
-	 * @param {WaebricParserToken} token The token to evaluate
-	 * @return {Boolean}
-	 */
-	this.isEchoEmbeddingStatement = function(token){
-		var isValidOpening = WaebricToken.KEYWORD.ECHO.equals(token.value);
-		var isValidEmbedding = isValidOpening && this.embeddingParser.isStartEmbedding(token.nextToken());
-		return isValidEmbedding;
-	}
-	
-	/**
-	 * Parses the input to an {EchoEmbeddingStatement}
-	 * 
-	 * @param {WaebricParserToken} token  The token to parse
-	 * @return {EchoEmbeddingStatement}
-	 */
-	this.parseEchoEmbeddingStatement = function(token){
-		this.currentToken = token.nextToken()
-		var embedding = this.embeddingParser.parse(this);
-		
-		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-		if(!hasValidClosing){
-			print('Error parsing EchoEmbeddingStatement. Expected ";" but found ' + this.currentToken.nextToken().value);			
-		}		
-		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-		return new EchoEmbeddingStatement(embedding);
-	}
-	
-		/**
 	 * Checks whether the input value is a {MarkupStatement}
 	 * 
 	 * @param {WaebricParserToken} token The token to evaluate
@@ -471,17 +518,19 @@ function WaebricStatementParser(){
      * @return {MarkupStatement}
      */
     this.parseMarkupStatement = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('MarkupStatement');
+		this.setCurrentToken(token);
         
         var markup = this.markupParser.parseSingle(this);
         
-        var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
         if (!hasValidClosing) {
-            print('Error parsing MarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
         }
-        
-        this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-        return new MarkupStatement(markup);
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new MarkupStatement(markup);		
     }
 	
 	/**
@@ -518,16 +567,20 @@ function WaebricStatementParser(){
 	 * @return {MarkupEmbeddingStatement}
 	 */
     this.parseMarkupMarkupStatement = function(token){
-        this.currentToken = token;
+       	this.parserStack.addParser('MarkupMarkupStatement');
+		this.setCurrentToken(token);
+		
         var markups = this.markupParser.parseMultiple(this);
-        var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
-        if (hasValidClosing) {
-            this.currentToken = this.currentToken.nextToken();
-            return new MarkupMarkupStatement(markups);
-        } else {
-            print('Error parsing MarkupMarkupStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
-            throw new Error();
+		
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
+        if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
         }
+		
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new MarkupMarkupStatement(markups);		
     }
  	
 	/**
@@ -553,7 +606,8 @@ function WaebricStatementParser(){
 	 * @return {MarkupEmbeddingStatement}
 	 */
 	this.parseMarkupEmbeddingStatement = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('MarkupEmbeddingStatement');
+		this.setCurrentToken(token);
         
         var markups = this.markupParser.parseMultiple(this);
 		this.currentToken = this.currentToken.nextToken();
@@ -561,10 +615,12 @@ function WaebricStatementParser(){
         
         var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
         if (!hasValidClosing) {
-            print('Error parsing MarkupEmbeddingStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing of statement');
         }
         
         this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+        this.parserStack.removeParser();
         return new MarkupEmbeddingStatement(markups, embedding)
     }
  	
@@ -575,7 +631,8 @@ function WaebricStatementParser(){
 	 * @return {MarkupMarkupStatement}
 	 */
 	this.parseMarkupExpressionStatement = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('MarkupExpressionStatement');
+		this.setCurrentToken(token);
         
 		var startTokenLastMarkup = this.markupParser.getLastMarkup(token);
         var markups = this.markupParser.parseMultiple(this);		
@@ -587,22 +644,25 @@ function WaebricStatementParser(){
 		var expression;
 		if(this.expressionParser.isExpression(this.currentToken.nextToken())){
 			this.currentToken = this.currentToken.nextToken();
-			expression = this.expressionParser.parse(this); 
+			expression = this.expressionParser.parse(this); 			
 		}else if(startTokenLastMarkup != null && !this.markupParser.isMarkupCall(startTokenLastMarkup)){	
 			markups = markups.slice(0, markups.length-1);	
 			this.currentToken = startTokenLastMarkup;
-			expression = this.expressionParser.parse(this);//new VarExpression(startTokenLastMarkup.value);			
+			expression = this.expressionParser.parse(this);
 		}else{
-			print('Error parsing MarkupExpressionStatement. Expected Expression or DesignatorTag but found ' + this.currentToken.nextToken().value);
-						throw new Error();
-		}
-		
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, 'DesignatorTag', 'MarkupExpressionStatement should end with an Expression');
+		}		
+				
         var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
         if (!hasValidClosing) {
-            print('Error parsing MarkupExpressionStatement. Expected ";" but found ' + this.currentToken.nextToken().value);
+			this.currentToken = this.currentToken.nextToken();
+            throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 
+					'Closing of statement');
         }
         
         this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+        this.parserStack.removeParser();
         return new MarkupExpressionStatement(markups, expression)
     }
     
@@ -624,9 +684,12 @@ function WaebricStatementParser(){
         var hasExpressionAfterMarkup = hasNoClosingAfterMarkups && tokenAfterMarkups != null && this.expressionParser.isExpression(tokenAfterMarkups);
 		var hasIdentifierAfterMarkup = lastMarkup != null && !this.markupParser.isMarkupCall(lastMarkup);
 		
-		var hasValidClosingExpression = hasExpressionAfterMarkup && this.expressionParser.getTokenAfterExpression(tokenAfterMarkups).value == ";"
-		var hasValidClosingIdentifier = hasIdentifierAfterMarkup && tokenAfterMarkups.value == ";"
+		var tokenAfterExpression = this.expressionParser.getTokenAfterExpression(tokenAfterMarkups);
+		var hasValidClosingExpression = hasExpressionAfterMarkup 
+			&& (tokenAfterExpression.value == WaebricToken.SYMBOL.SEMICOLON || tokenAfterExpression.value == WaebricToken.SYMBOL.DOT)
+		var hasValidClosingIdentifier = hasIdentifierAfterMarkup && tokenAfterMarkups.value == WaebricToken.SYMBOL.SEMICOLON
         var result = (hasExpressionAfterMarkup && hasValidClosingExpression) || (hasValidClosingIdentifier && hasIdentifierAfterMarkup);
+		
 		return result
     }
     		
@@ -637,10 +700,12 @@ function WaebricStatementParser(){
 	 * @return {MarkupMarkupStatement}
 	 */
 	this.parseMarkupStatementStatement = function(token){
-        this.currentToken = token;
-        
+        this.parserStack.addParser('MarkupStatementStatement');
+		this.setCurrentToken(token);        
+		
         var markups = this.markupParser.parseMultiple(this);
         var statement = this.parseStatement(this.currentToken.nextToken())
+		this.parserStack.removeParser();
         return new MarkupStatementStatement(markups, statement)
     }
     
@@ -669,16 +734,20 @@ function WaebricStatementParser(){
 	 * @return {FunctionBinding} or {VariableBinding}
 	 */
 	this.parseAssignment = function(token){
-		this.currentToken = token;
-
+		this.parserStack.addParser('Assignment');
+		this.setCurrentToken(token);
+		
+		var assignment;
 		if(this.isVariableBinding(this.currentToken)){
-			return this.parseVariableBinding(this.currentToken);
+			assignment = this.parseVariableBinding(this.currentToken);
 		}else if(this.isFunctionBinding(this.currentToken)){
-			return this.parseFunctionBinding(this.currentToken);
-		}else{
-			print('Error parsing assignment. Expected FunctionAssignment or VariableAssignment but found ' + this.currentToken.value)
-			throw new Error();
+			assignment = this.parseFunctionBinding(this.currentToken);
+		}else{			
+			throw new WaebricSyntaxException(this, "FunctionAssignment or VariableAssignment", '?');
 		}
+		
+		this.parserStack.removeParser();
+		return assignment;
 	}
 	
 	/**
@@ -688,7 +757,8 @@ function WaebricStatementParser(){
 	 * @return {Array} Collection of {FunctionBinding, VariableBinding}
 	 */
 	this.parseAssignments = function(token){
-		this.currentToken = token.nextToken();
+		this.parserStack.addParser('Assignments');
+		this.setCurrentToken(token.nextToken());
 
 		var assignments = new Array();
 		while(!WaebricToken.KEYWORD.IN.equals(this.currentToken.value)){
@@ -696,6 +766,7 @@ function WaebricStatementParser(){
 			assignments.push(assignment);
 			this.currentToken = this.currentToken.nextToken();	
 		}
+		this.parserStack.removeParser();
 		return assignments;
 	}
     
@@ -708,8 +779,7 @@ function WaebricStatementParser(){
 	this.isVariableBinding = function(token){
 		var validIdentifier = this.expressionParser.isIdentifier(token);
 		var validSeperator = token.nextToken().value == WaebricToken.SYMBOL.EQ;
-		var validExpression = validSeperator && this.expressionParser.isExpression(token.nextToken().nextToken());
-		return validIdentifier && validSeperator && validExpression;
+		return validIdentifier && validSeperator;
 	}
 	
 	/**
@@ -719,19 +789,21 @@ function WaebricStatementParser(){
 	 * @return {VariableBinding}
 	 */
 	this.parseVariableBinding = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('VariableBinding');
+		this.setCurrentToken(token);
 				
 		var identifier = this.currentToken.value.toString();
 		this.currentToken = this.currentToken.nextToken().nextToken();
 		var expression = this.expressionParser.parse(this);
-		var isValidEnding = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;
 		
-		if (isValidEnding) {
-			this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
-			return new VariableBinding(identifier, expression);
-		} else {
-			print('Error parsing Variable Assignment. Expected end of statement ";" but found ' +  this.currentToken.nextToken().value)
+		var hasValidClosing = this.currentToken.nextToken().value == WaebricToken.SYMBOL.SEMICOLON;		
+		if (!hasValidClosing) {
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.SEMICOLON, 'Closing statement');			
 		}
+		this.currentToken = this.currentToken.nextToken(); //Skip ";" ending
+		this.parserStack.removeParser();
+		return new VariableBinding(identifier, expression);
 	}
 	
 	/**
@@ -753,18 +825,25 @@ function WaebricStatementParser(){
 	 * @return {FunctionBinding}
 	 */
 	this.parseFunctionBinding = function(token){
-		this.currentToken = token;
-				
+		this.parserStack.addParser('FunctionBinding');
+		this.setCurrentToken(token);
+			
+		//Parse Identifier	
 		var identifier = this.currentToken.value.toString();	
 		var formals = this.parseFormals(this.currentToken.nextToken().nextToken());
 		
+		//Parse seperator
 		var hasValidSeperator = this.currentToken.nextToken().value == WaebricToken.SYMBOL.EQ;		
-		if(hasValidSeperator){
-			var statement = this.parseStatement(this.currentToken.nextToken().nextToken());
-			return new FunctionBinding(identifier, formals, statement);
-		}else{
-			print('Error parsing Function Assignment. Expected FunctionAssignment but found ' + this.currentToken.nextToken().value)
+		if(!hasValidSeperator){
+			this.currentToken = this.currentToken.nextToken();
+			throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.EQ, 'Designator/Statement seperator');	
 		}
+		
+		//Parse Statement
+		var statement = this.parseStatement(this.currentToken.nextToken().nextToken());
+		
+		this.parserStack.removeParser();
+		return new FunctionBinding(identifier, formals, statement);
 	}
 	
 	    
@@ -775,30 +854,7 @@ function WaebricStatementParser(){
      * @return {Array} A collection of {Formal}
      */
     this.isFormal = function(token){
-		var tempToken = token;
-		
-		//Validate opening formal
-        var isValidOpening = (tempToken.value == WaebricToken.SYMBOL.LEFTRBRACKET);		
-		if(!isValidOpening){
-			
-			return false;
-		}
-		
-		//Validate content and ending formal	
-		tempToken = tempToken.nextToken();
-		while (tempToken.value != WaebricToken.SYMBOL.RIGHTRBRACKET) {	
-			if(!this.expressionParser.isIdentifier(tempToken)){	
-				return false;
-			}else if(tempToken.nextToken().value != ',' && tempToken.nextToken().value != ')'){
-				return false;
-			}else if( tempToken.nextToken().value == ')'){
-				tempToken = tempToken.nextToken();
-			}else{
-				tempToken = tempToken.nextToken().nextToken()
-			}
-        }		
-		
-		return true;
+        return (token.value == WaebricToken.SYMBOL.LEFTRBRACKET);
     }
     
     /**
@@ -808,24 +864,28 @@ function WaebricStatementParser(){
      * @return {Array} A collection of {Formal}
      */
     this.parseFormals = function(token){
-        this.currentToken = token;
-        
+        this.parserStack.addParser('Formals');
+		this.setCurrentToken(token);
+
         var formals = new Array();
         while (this.currentToken.value != WaebricToken.SYMBOL.RIGHTRBRACKET) {
-            var isCommaSeperator = (formals.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA)
-            if (isCommaSeperator) {
+			this.parserStack.addParser('Formal');
+            var hasCommaSeperator = (formals.length > 0 && this.currentToken.value == WaebricToken.SYMBOL.COMMA)
+            if (hasCommaSeperator) {
                 this.currentToken = this.currentToken.nextToken();
             } else if (formals.length > 0) {
-                print('Error parsing Formals. Expected COMMA after previous formal but found ' + this.currentToken.value);
+				throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COMMA, 'Formal seperator');	
             }
-            
+			
             if (this.expressionParser.isIdentifier(this.currentToken)) {
                 formals.push(this.currentToken.value.toString());
                 this.currentToken = this.currentToken.nextToken();
             } else {
-                print('Error parsing Formals. Expected formal but found ' + this.currentToken.value);
+				throw new WaebricSyntaxException(this, 'Identifier', 'Formal');	
             }
-        }
+			this.parserStack.removeParser();
+        }		
+		this.parserStack.removeParser();
         return formals;
     }
 
@@ -849,3 +909,4 @@ function WaebricStatementParser(){
 			
 	}
 }
+WaebricStatementParser.prototype = new WaebricBaseParser();

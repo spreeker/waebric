@@ -20,7 +20,7 @@ WaebricParserToken = function(input, position){
 	 * @return {String} The next token in the input stream
 	 */
 	this.nextToken = function(){
-		if (position < input.length){
+		if (position < input.length-1){
 			return new WaebricParserToken(input, position + 1);
 		}else{
 			return null

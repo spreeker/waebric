@@ -5,8 +5,6 @@
  */
 function WaebricMarkupParser(){
 	
-	this.currentToken;
-	
 	this.expressionParser = new WaebricExpressionParser();
 
 	/**
@@ -16,9 +14,11 @@ function WaebricMarkupParser(){
 	 * @param {Object} parentParser The parent parser
 	 * @return {MarkupCall, DesignatorTag}
 	 */
-	this.parseSingle = function(parentParser){
+	this.parseSingle = function(parentParser){		
+		this.parserStack.setStack(parentParser.parserStack)
 		var markup = this.parseMarkup(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return markup;
 	}
 	
@@ -30,8 +30,10 @@ function WaebricMarkupParser(){
 	 * @return {Array} Collection of {MarkupCall, DesignatorTag}
 	 */
 	this.parseMultiple = function(parentParser){
+		this.parserStack.setStack(parentParser.parserStack)
 		var markups = this.parseMarkups(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return markups;
 	}
 	
@@ -42,15 +44,20 @@ function WaebricMarkupParser(){
 	 * @return {MarkupCall, DesignatorTag}
 	 */
 	this.parseMarkup = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('Markup');
+		this.setCurrentToken(token);  
+		
+		var markup;
 		if(this.isMarkupCall(this.currentToken)){			
 			var designator = this.parseDesignator(this.currentToken);
 			var arguments = this.parseArguments(this.currentToken.nextToken());
-			return new MarkupCall(designator, arguments);		
+			markup = new MarkupCall(designator, arguments);		
 		}else{
-			var designator = this.parseDesignator(this.currentToken);
-			return designator
+			markup = this.parseDesignator(this.currentToken);
 		}
+		
+		this.parserStack.removeParser();
+		return markup;
 	}
     
 	/**
@@ -60,7 +67,8 @@ function WaebricMarkupParser(){
 	 * @return {Array} Collection of {MarkupCall, DesignatorTag}
 	 */
 	this.parseMarkups = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('Markups');
+		this.setCurrentToken(token);  
 		
 		var markups = new Array();
 		while(this.isMarkup(this.currentToken)){
@@ -69,6 +77,7 @@ function WaebricMarkupParser(){
 			this.currentToken = this.currentToken.nextToken();
 		}
 		this.currentToken = this.currentToken.previousToken();
+		this.parserStack.removeParser();
 		return markups;
 	}
 		
@@ -109,7 +118,8 @@ function WaebricMarkupParser(){
      * @return {Designator}
      */
     this.parseDesignator = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('DesignatorTag');
+		this.setCurrentToken(token);  
         
         var idCon;
         var attributes;
@@ -118,12 +128,13 @@ function WaebricMarkupParser(){
         if (this.expressionParser.isIdentifier(this.currentToken)) {
             idCon = this.currentToken.value.toString();
         } else {
-            print('Error parsing Designator. Expected IDENTIFIER but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Identifier', 'Tag name');
         }
         
         //Parse formals
         attributes = this.parseAttributes(this.currentToken);
         
+		this.parserStack.removeParser();
         return new DesignatorTag(idCon, attributes);
     }
     
@@ -156,7 +167,8 @@ function WaebricMarkupParser(){
      * @return {Array} An array of arguments
      */
     this.parseArguments = function(token){
-        this.currentToken = token.nextToken();
+        this.parserStack.addParser('Arguments');
+		this.setCurrentToken(token.nextToken());  
         
         var arguments = new Array();
         while (this.currentToken.value != WaebricToken.SYMBOL.RIGHTRBRACKET) {
@@ -166,12 +178,14 @@ function WaebricMarkupParser(){
             if (hasMultipleArguments && hasValidSeperator) {
                 this.currentToken = this.currentToken.nextToken();
             } else if (hasMultipleArguments) {
-                print('Error parsing Arguments. Expected COMMA after previous argument but found ' + this.currentToken.value);
+				throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COMMA, 'Argument seperator');
             }
             var argument = this.parseArgument(this.currentToken);
             arguments.push(argument);
             this.currentToken = this.currentToken.nextToken();
-        }        
+        }     
+		
+		this.parserStack.removeParser();   
         return arguments;
     }
     
@@ -182,12 +196,19 @@ function WaebricMarkupParser(){
      * @return {Object} Argument or Expression
      */
     this.parseArgument = function(token){
-        this.currentToken = token;
-        if (this.currentToken.value instanceof WaebricToken.IDENTIFIER && this.currentToken.nextToken().value == WaebricToken.SYMBOL.EQ) {
-            return this.parseAttributeArgument(this.currentToken);
+        this.parserStack.addParser('Argument');
+		this.setCurrentToken(token);  
+		
+		var argument;
+        if (this.currentToken.value instanceof WaebricToken.IDENTIFIER 
+			&& this.currentToken.nextToken().value == WaebricToken.SYMBOL.EQ) {
+            argument = this.parseAttributeArgument(this.currentToken);
         } else {
-            return this.parseRegularArgument(this.currentToken);
+            argument = this.parseRegularArgument(this.currentToken);
         }
+		
+		this.parserStack.removeParser();
+		return argument;
     }
     
     /**
@@ -197,8 +218,11 @@ function WaebricMarkupParser(){
      * @param {Object} An expression
      */
     this.parseRegularArgument = function(token){
-        this.currentToken = token;
-        return this.expressionParser.parse(this);
+        this.parserStack.addParser('RegularArgument');
+		this.setCurrentToken(token);  
+        var expression = this.expressionParser.parse(this);
+		this.parserStack.removeParser();
+		return expression;
     }
     
     /**
@@ -208,31 +232,22 @@ function WaebricMarkupParser(){
      * @param {Argument}
      */
     this.parseAttributeArgument = function(token){
-        this.currentToken = token;
-        var idCon;
-        var expression;
-        
-        //Parse IdCon
-        if (this.expressionParser.isIdentifier(this.currentToken)) {
-            idCon = this.currentToken.value.toString();
-        } else {
-            print('Attribute should start with an identifier but found ' + this.currentToken.value)
+        this.parserStack.addParser('AttributeArgument');
+		this.setCurrentToken(token);  
+		
+		//Parsing KEY
+        var idCon = this.currentToken.value.toString();
+		
+		//Parsing EQUAL SIGN
+		this.currentToken = this.currentToken.nextToken().nextToken();
+		
+        //Parsing Expression
+        if (!this.expressionParser.isExpression(this.currentToken)) {
+			throw new WaebricSyntaxException(this, 'Expression', 'Value of attribute');
         }
-        
-        //Skip equality sign
-        var hasValidSeperator = this.currentToken.hasNextToken() && this.currentToken.nextToken().hasNextToken()
-        if (hasValidSeperator) {
-            this.currentToken = this.currentToken.nextToken().nextToken();
-        } else {
-            print('Expected equality sign but found ' + this.currentToken.value);
-        }
-        
-        //Parse arguments/attributes
-        if (this.expressionParser.isExpression(this.currentToken)) {
-            expression = this.expressionParser.parse(this);
-        } else {
-            print('Attribute is not correctly closed. Expected expression but found ' + this.currentToken.value)
-        }
+		var expression = this.expressionParser.parse(this);
+		
+		this.parserStack.removeParser();
         return new Argument(idCon, expression);
     }	
 	
@@ -243,12 +258,17 @@ function WaebricMarkupParser(){
      * @return {Array} An array with attributes
      */
     this.parseAttributes = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('Attributes');
+		this.setCurrentToken(token);  
+		
         var attributes = new Array();
         while (this.isStartAttribute(this.currentToken.nextToken())) {
             var attribute = this.parseAttribute(this.currentToken.nextToken());
             attributes.push(attribute);
+			this.parserStack.removeParser();
         }
+		
+		this.parserStack.removeParser();
         return attributes;
     }
     
@@ -260,20 +280,26 @@ function WaebricMarkupParser(){
      * 			WidthHeightAttribute, WidthAttribute} 
      */
     this.parseAttribute = function(token){
-        this.currentToken = token
+        this.parserStack.addParser('Attribute');
+		this.setCurrentToken(token);  
+		
+		var attribute;
         if (this.currentToken.value == WaebricToken.SYMBOL.CROSSHATCH) {
-            return this.parseIDAttribute(this.currentToken.nextToken());
+            attribute = this.parseIDAttribute(this.currentToken.nextToken());
         } else if (this.currentToken.value == WaebricToken.SYMBOL.DOT) {
-            return this.parseClassAttribute(this.currentToken.nextToken());
+            attribute = this.parseClassAttribute(this.currentToken.nextToken());
         } else if (this.currentToken.value == WaebricToken.SYMBOL.DOLLAR) {
-            return this.parseNameAttribute(this.currentToken.nextToken());
+            attribute = this.parseNameAttribute(this.currentToken.nextToken());
         } else if (this.currentToken.value == WaebricToken.SYMBOL.COLON) {
-            return this.parseTypeAttribute(this.currentToken.nextToken());
+            attribute = this.parseTypeAttribute(this.currentToken.nextToken());
         } else if (this.currentToken.value == WaebricToken.SYMBOL.AT) {
-            return this.parseWidthHeightAttribute(this.currentToken.nextToken());
-        }
-		throw new Error()
-        print('Error parsing attribute.')
+            attribute = this.parseWidthHeightAttribute(this.currentToken.nextToken());
+        }else{
+			throw new WaebricSyntaxException(this, '"#" or "." or "$" or ":" or "@"', 'Shorthand attribute');
+		}
+		
+		this.parserStack.removeParser();
+		return attribute;
     }
     
     /**
@@ -283,12 +309,15 @@ function WaebricMarkupParser(){
      * @return {IdAttribute}
      */
     this.parseIDAttribute = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('IDAttribute');
+		this.setCurrentToken(token);  
+		
 		if (this.expressionParser.isIdentifier(this.currentToken)) {
 			var idValue = this.currentToken.value.toString();
 		}else{
-			print('Error parsing ID Attribute. Expected identifier value but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'Identifier', 'Value of the shorthand attribute id');
 		}
+		this.parserStack.removeParser();
         return new IdAttribute(idValue);
     }
     
@@ -299,12 +328,15 @@ function WaebricMarkupParser(){
      * @return {ClassAttribute}
      */
     this.parseClassAttribute = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('ClassAttribute');
+		this.setCurrentToken(token);  
+		
         if (this.expressionParser.isIdentifier(this.currentToken)) {
 			var classValue = this.currentToken.value.toString();
 		}else{
-			print('Error parsing Class Attribute. Expected identifier value but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'Identifier', 'Value of the shorthand attribute class');
 		}
+		this.parserStack.removeParser();
         return new ClassAttribute(classValue);
     }
     
@@ -315,12 +347,15 @@ function WaebricMarkupParser(){
      * @return {NameAttribute}
      */
     this.parseNameAttribute = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('NameAttribute');
+		this.setCurrentToken(token);  
+		
         if (this.expressionParser.isIdentifier(this.currentToken)) {
 			var nameValue = this.currentToken.value.toString();
 		}else{
-			print('Error parsing Name Attribute. Expected identifier value but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'Identifier', 'Value of the shorthand attribute name');
 		}
+		this.parserStack.removeParser();
         return new NameAttribute(nameValue);
     }
     
@@ -331,12 +366,15 @@ function WaebricMarkupParser(){
      * @return {TypeAttribute}
      */
     this.parseTypeAttribute = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('TypeAttribute');
+		this.setCurrentToken(token);  
+		
         if (this.expressionParser.isIdentifier(this.currentToken)) {
 			var typeValue = this.currentToken.value.toString();
 		}else{
-			print('Error parsing Type Attribute. Expected identifier value but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'Identifier', 'Value of the shorthand attribute type');
 		}
+		this.parserStack.removeParser();
         return new TypeAttribute(typeValue);
     }
     
@@ -347,7 +385,8 @@ function WaebricMarkupParser(){
      * @return {WidthAttribute}
      */
     this.parseWidthHeightAttribute = function(token){
-		this.currentToken = token;
+		this.parserStack.addParser('WidthHeightAttribute');
+		this.setCurrentToken(token);  
 		
 		var widthValue;
 		var heightValue;
@@ -355,7 +394,7 @@ function WaebricMarkupParser(){
 		if (this.expressionParser.isNatural(this.currentToken)) {
 			 widthValue = this.currentToken.value.toString();
 		}else{
-			print('Error parsing Width Attribute. Expected natural value but found ' + this.currentToken.value)
+			throw new WaebricSyntaxException(this, 'Number', 'Value of the shorthand attribute width');
 		}
 		
 		var heightAttributeFollows = this.currentToken.nextToken().value == WaebricToken.SYMBOL.PERCENT
@@ -365,13 +404,14 @@ function WaebricMarkupParser(){
 			this.currentToken = this.currentToken.nextToken().nextToken()
 			if (heightAttributeIsNatural) {
 				heightValue = this.currentToken.value.toString();
+				this.parserStack.removeParser();
 				return new WidthHeightAttribute(widthValue, heightValue);
 			}else{
-				print('Error parsing WidthHeight Attribute. Expected natural value but found ' + this.currentToken.value)
+				throw new WaebricSyntaxException(this, 'Number', 'Value of the shorthand attribute height');
 			}
-        } else {
-            return new WidthAttribute(widthValue);
         }
+		this.parserStack.removeParser();
+        return new WidthAttribute(widthValue);
     }
 
 	/**
@@ -428,3 +468,4 @@ function WaebricMarkupParser(){
 		return arrTokens[arrTokens.length-2];
 	}
 }
+WaebricMarkupParser.prototype = new WaebricBaseParser();

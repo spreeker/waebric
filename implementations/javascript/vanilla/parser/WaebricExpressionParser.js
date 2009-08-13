@@ -5,8 +5,6 @@
  */
 function WaebricExpressionParser(){
 	
-	this.currentToken;
-	
 	/**
 	 * Parses the input to an {Expression}
 	 * Updates currentToken of the parent parser
@@ -16,8 +14,10 @@ function WaebricExpressionParser(){
 	 * @param {Boolean} ignoreCatExpression Flag to ignore {CatExpression} during parsing
 	 */
 	this.parse = function(parentParser, ignoreFieldExpression, ignoreCatExpression){
+		this.parserStack.setStack(parentParser.parserStack)
 		var expression = this.parseExpression(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken)
+		parentParser.parserStack.setStack(this.parserStack)
 		return expression;
 	}
 	
@@ -31,25 +31,29 @@ function WaebricExpressionParser(){
      * 			NatExpression, ListExpression, RecordExpression}
      */
     this.parseExpression = function(token, ignoreFieldExpression, ignoreCatExpression){
-        this.currentToken = token;				
+		this.parserStack.addParser('Expression')
+		this.setCurrentToken(token);        			
 		
+		var expression;
         if (this.isCatExpression(this.currentToken) && !ignoreCatExpression) {
-            return this.parseCatExpression(this.currentToken);
+            expression = this.parseCatExpression(this.currentToken);
         } else if (this.isFieldExpression(this.currentToken) && !ignoreFieldExpression) {
-            return this.parseFieldExpression(this.currentToken);
+            expression = this.parseFieldExpression(this.currentToken);
         } else if (this.isText(this.currentToken)) {			
-            return this.parseTextExpression(this.currentToken);
+            expression = this.parseTextExpression(this.currentToken);
         } else if (this.isIdentifier(this.currentToken)) {
-            return this.parseVarExpression(this.currentToken);
+            expression = this.parseVarExpression(this.currentToken);
         } else if (this.isNatural(this.currentToken)) {
-            return this.parseNaturalExpression(this.currentToken)
+            expression = this.parseNaturalExpression(this.currentToken)
         } else if (this.isStartList(this.currentToken)) {
-            return this.parseListExpression(this.currentToken.nextToken())
+            expression = this.parseListExpression(this.currentToken.nextToken())
         } else if (this.isStartRecord(this.currentToken)) {
-            return this.parseRecordExpression(this.currentToken.nextToken())
+            expression = this.parseRecordExpression(this.currentToken.nextToken())
         } else {
-           throw "Unrecognized expression found"
+			throw new WaebricSyntaxException(this, 'Text, Natural, Identifier, "{" or "["', 'Start Expression');
         }
+		this.parserStack.removeParser();
+		return expression;
     }
 	
 	/**
@@ -77,12 +81,14 @@ function WaebricExpressionParser(){
      * @return {CatExpression}
      */
     this.parseCatExpression = function(token){
-        this.currentToken = token;
+		this.parserStack.addParser('CatExpression')
+		this.setCurrentToken(token);  
         
         var expressionLeft = this.parseExpression(this.currentToken, false, true);
         var expressionRight = this.parseExpression(this.currentToken.nextToken().nextToken());
         var catExpression = new CatExpression(expressionLeft, expressionRight);
         
+		this.parserStack.removeParser();
         return catExpression;
     }
 	
@@ -107,22 +113,28 @@ function WaebricExpressionParser(){
      * @return {FieldExpression}
      */
     this.parseFieldExpression = function(token){
-		
-        this.currentToken = token;
-        var expressionToken = this.currentToken;
-        var fieldToken = this.getTokenAfterExpression(this.currentToken).nextToken();
+		this.parserStack.addParser('FieldExpression')
+		this.setCurrentToken(token); 		
         
-        var expression = this.parseExpression(expressionToken, true);
-        var field = fieldToken.value.toString();
-        var fieldExpression = new FieldExpression(expression, field);
-        while (fieldToken.nextToken().value == WaebricToken.SYMBOL.DOT) {
-            if (this.isIdentifier(fieldToken.nextToken().nextToken())) {
-                var field = fieldToken.nextToken().nextToken().value.toString();
-                fieldExpression = new FieldExpression(fieldExpression, field);
-                fieldToken = this.currentToken;
+		//Parse token (currentToken is not updated)
+        var expression = this.parseExpression(this.currentToken, true);
+		
+		//Retreive token after expression and set it to currentToken
+		var fieldToken = this.getTokenAfterExpression(this.currentToken).nextToken(); 
+		this.setCurrentToken(fieldToken); 
+		
+		//Make new field expression		
+        var fieldExpression = new FieldExpression(expression, fieldToken.value.toString());		
+		
+        while (this.currentToken.nextToken().value == WaebricToken.SYMBOL.DOT) {
+            if (this.isIdentifier(this.currentToken.nextToken().nextToken())) {
+				//Update current token position
+				this.setCurrentToken(this.currentToken.nextToken().nextToken())
+				
+				//Make new field expression
+                fieldExpression = new FieldExpression(fieldExpression, this.currentToken.value.toString());
             } else {
-                print('Error parsing FieldExpression. Expected IDENTIFIER as FIELD but found ' + fieldToken.nextToken().nextToken().value);
-                return;
+				throw new WaebricSyntaxException(this, 'Identifier', 'Field');
             }
         }
         //If the fieldExpression is followed by a "PLUS" sign, than it is part of a catExpression.
@@ -132,9 +144,10 @@ function WaebricExpressionParser(){
             var expressionLeft = fieldExpression;
             var expressionRight = this.parseExpression(this.currentToken.nextToken().nextToken());
             var catExpression = new CatExpression(expressionLeft, expressionRight);
+			this.parserStack.removeParser();
             return catExpression;
         } else {
-			this.currentToken = fieldToken;
+			this.parserStack.removeParser();
             return fieldExpression;
         }
     }
@@ -148,10 +161,9 @@ function WaebricExpressionParser(){
 	this.isFieldExpression = function(token){
 	    var isValidExpression = this.isExpression(token);		
 	    var tokenAfterNextExpression = this.getTokenAfterExpression(token)
-	    var hasValidSeperator = tokenAfterNextExpression.value == WaebricToken.SYMBOL.DOT		
-	    var hasValidField = this.isIdentifier(tokenAfterNextExpression.nextToken());
+	    var hasValidSeperator = tokenAfterNextExpression.value == WaebricToken.SYMBOL.DOT
 	    
-	    return (isValidExpression && hasValidSeperator && hasValidField);
+	    return (isValidExpression && hasValidSeperator);
 	}
 	
     /**
@@ -161,7 +173,7 @@ function WaebricExpressionParser(){
      * @return {TextExpression}
      */
     this.parseTextExpression = function(token){
-        this.currentToken = token;
+		this.setCurrentToken(token); 
         return new TextExpression(this.currentToken.value.toString());
     }  
 	
@@ -172,7 +184,7 @@ function WaebricExpressionParser(){
 	 * @return {Boolean}
 	 */
 	this.isText = function(token){		
-	    var regExp = new RegExp('^([^\x00-\x1F\&\<\"\x80-\xFF]*[\n\r\t]*(\\\\&)*(\\\\")*(&#[0-9]+;)*(&#x[0-9a-fA-F]+;)*(&[a-zA-Z_:][a-zA-Z0-9.-_:]*;)*)*$');		
+	    var regExp = new RegExp('^([^\x00-\x1F\<\"\x80-\xFF]*[\n\r\t]*(\\\\&)*(\\\\")*(&#[0-9]+;)*(&#x[0-9a-fA-F]+;)*(&[a-zA-Z_:][a-zA-Z0-9.-_:]*;)*)*$');		
 	    return (token.value instanceof WaebricToken.TEXT) && (token.value.match(regExp) != null);
 	} 
 	
@@ -183,7 +195,7 @@ function WaebricExpressionParser(){
      * @return {VarExpression}
      */
     this.parseVarExpression = function(token){
-        this.currentToken = token;
+		this.setCurrentToken(token); 
         return new VarExpression(this.currentToken.value.toString());
     } 
 	
@@ -205,7 +217,7 @@ function WaebricExpressionParser(){
      * @return {NatExpression}
      */
     this.parseNaturalExpression = function(token){
-        this.currentToken = token;
+		this.setCurrentToken(token); 
         return new NatExpression(this.currentToken.value.toString());
     }
 	
@@ -227,7 +239,8 @@ function WaebricExpressionParser(){
      * @return {RecordExpression}
      */
     this.parseRecordExpression = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('RecordExpression')
+		this.setCurrentToken(token); 
         
         var list = new Array();
         while (this.currentToken.value != WaebricToken.SYMBOL.RIGHTCBRACKET) {
@@ -237,8 +250,8 @@ function WaebricExpressionParser(){
             if (hasMultipleRecordItems && hasValidSeperator) {
                 this.currentToken = this.currentToken.nextToken(); //Skip comma	
             } else if (hasMultipleRecordItems) {
-                print('Error parsing Record. Expected COMMA after previous record item but found ' + this.currentToken.value);
-                return;
+				throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COMMA, 
+					'Record seperator', 'RecordExpression');
             }
 
             //Parse KeyValuePair
@@ -246,6 +259,7 @@ function WaebricExpressionParser(){
             list.push(expression);
             this.currentToken = this.currentToken.nextToken()
         }
+		this.parserStack.removeParser();
         return new RecordExpression(list);
     }
 	
@@ -268,20 +282,30 @@ function WaebricExpressionParser(){
      * @return {KeyValuePair}
      */
     this.parseKeyValuePair = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('KeyValuePair')
+		this.setCurrentToken(token); 
         
         var key;
         var value;
         
+		//Parse Key
         key = this.currentToken.value.toString()
-        this.currentToken = this.currentToken.nextToken().nextToken(); //Skip colon
-        
+		
+		//Parse Colon
+		var hasValidSeperator = this.currentToken.nextToken().value == WaebricToken.SYMBOL.COLON;
+		if (!hasValidSeperator) {
+			throw new WaebricSyntaxException(this, ':', 'Key/Value seperator');
+        }
+        this.currentToken = this.currentToken.nextToken().nextToken(); 
+        		
+		//Parse Expression
         if (this.isExpression(this.currentToken)) {
            value = this.parseExpression(this.currentToken)
         } else {
-            print('Error parsing KeyValuePair. Expected EXPRESSION as VALUE but found ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Expression', 'Value');
         }
         
+		this.parserStack.removeParser();
         return new KeyValuePair(key, value);
     }
 	
@@ -303,7 +327,8 @@ function WaebricExpressionParser(){
      * @return {ListExpression}
      */
     this.parseListExpression = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('ListExpression')
+		this.setCurrentToken(token); 
         
         var list = new Array();
         while (this.currentToken.value != WaebricToken.SYMBOL.RIGHTBBRACKET) {
@@ -314,13 +339,13 @@ function WaebricExpressionParser(){
             if (hasMultipleListItems && hasValidSeperator) {
                 this.currentToken = this.currentToken.nextToken(); //Skip comma	
             } else if (hasMultipleListItems) {
-                print('Error parsing List. Expected COMMA after previous list item but found ' + this.currentToken.value);
-                return;
+				throw new WaebricSyntaxException(this, WaebricToken.SYMBOL.COMMA, 'List seperator');
             }
             var expression = this.parseExpression(this.currentToken);
             list.push(expression);
             this.currentToken = this.currentToken.nextToken()
         }
+		this.parserStack.removeParser();
         return new ListExpression(list);
     }
 	
@@ -362,3 +387,4 @@ function WaebricExpressionParser(){
 	    return token;
 	}
 }
+WaebricExpressionParser.prototype = new WaebricBaseParser();

@@ -5,8 +5,6 @@
  */
 function WaebricModuleParser(){
 	
-	this.currentToken;
-		
 	this.siteParser = new WaebricSiteParser();
     this.expressionParser = new WaebricExpressionParser();
 	this.functionParser = new WaebricFunctionDefinitionParser();
@@ -19,8 +17,10 @@ function WaebricModuleParser(){
 	 * @return {Module}
 	 */
 	this.parse = function(parentParser){
+		this.parserStack.setStack(parentParser.parserStack)
 		var module = this.parseModule(parentParser.currentToken);
-		parentParser.currentToken = this.currentToken;
+		parentParser.setCurrentToken(this.currentToken);
+		parentParser.parserStack.setStack(this.parserStack)
 		return module;
 	}
 	
@@ -41,25 +41,30 @@ function WaebricModuleParser(){
      * @return {Module}
      */
     this.parseModule = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('Module');
+		this.setCurrentToken(token);  
+		
         var moduleId;
-        var moduleElements;
+        var moduleElements = new Array();
         
         //Parse ModuleId
         if (this.isModuleIdElement(this.currentToken)) {
             moduleId = this.parseModuleId(this.currentToken);
         } else {
-            print('Error parsing module. Expected ModuleId but token is ' + this.currentToken.value);
+			throw new WaebricSyntaxException(this, 'Identifier', 'The name of the module');
         }       
 		
         //Parse ModuleElements
-        if (this.isStartModuleElement(this.currentToken.nextToken())) {
-            moduleElements = this.parseModuleElement(this.currentToken.nextToken());
-        } else {
-            print('Error parsing module. Expected start ModuleElement (SITE/DEF/IMPORT) but token is ' +
-            this.currentToken.value);
-        }
-        
+		if (this.currentToken.hasNextToken()) {
+			if (this.isStartModuleElement(this.currentToken.nextToken())) {
+				moduleElements = this.parseModuleElement(this.currentToken.nextToken());
+			} else {
+				this.currentToken = this.currentToken.nextToken();
+				throw new WaebricSyntaxException(this, '"SITE", "DEF" or "IMPORT"', 
+					'Start of a new ModuleElement');
+			}
+		}        
+		this.parserStack.removeParser();
         return new Module(moduleId, moduleElements);
     }
     
@@ -80,7 +85,7 @@ function WaebricModuleParser(){
      * @return {ModuleId}
      */
     this.parseModuleId = function(token){
-        this.currentToken = token;
+		this.setCurrentToken(token);  
 		
         //Parse first part ModuleId -> IdCon		
         var value = this.currentToken.value.toString();
@@ -92,7 +97,7 @@ function WaebricModuleParser(){
             value += this.currentToken.nextToken().nextToken().value.toString();
             this.currentToken = this.currentToken.nextToken().nextToken();
         }
-        
+		
         return new ModuleId(value)
     }
     
@@ -115,10 +120,17 @@ function WaebricModuleParser(){
      * @return {Array} An array of moduleElements
      */
     this.parseModuleElement = function(token){
-        this.currentToken = token;
+        this.parserStack.addParser('ModuleElements');
+		this.setCurrentToken(token);  
+		
         var moduleElements = new Array();
-        while (this.currentToken.hasNextToken()) {
-            if (this.isStartImport(this.currentToken)) {
+        while (this.currentToken != null) {			
+			this.parserStack.addParser('ModuleElement');
+
+			if(!this.currentToken.hasNextToken()){
+				throw new WaebricSyntaxException(this, '"SITE", "DEF" or "IMPORT"', 
+					'Start of a new ModuleElement');
+			}else if (this.isStartImport(this.currentToken)) {
                 var imprt = this.parseImport(this.currentToken.nextToken());
                 moduleElements.push(imprt);
             } else if (this.siteParser.isStartSite(this.currentToken)) {
@@ -130,12 +142,15 @@ function WaebricModuleParser(){
                 var def = this.functionParser.parse(this);
                 moduleElements.push(def);
             } else {
-                print('Error parsing module elements. Expected IMPORT/SITE/DEF but current token is ' + this.currentToken.value);
-                this.currentToken = this.currentToken.nextToken();
+				this.currentToken = this.currentToken.nextToken();
+				throw new WaebricSyntaxException(this, '"SITE", "DEF" or "IMPORT"', 
+					'Start of a new ModuleElement');
             }
-
 			this.currentToken = this.currentToken.nextToken();
-        }
+			
+			this.parserStack.removeParser();
+        }		
+		this.parserStack.removeParser();
         return moduleElements;
     }
 	
@@ -146,8 +161,15 @@ function WaebricModuleParser(){
      * @return {Import}
      */
 	this.parseImport = function(token){
+		this.parserStack.addParser('Import')
 		this.currentToken = token;		
+		
+		if(!this.isModuleIdElement(this.currentToken)){
+			throw new WaebricSyntaxException(this, 'Identifier', 'The name of the module to import');
+		}
+		
 		var moduleId = this.parseModuleId(this.currentToken)
+		this.parserStack.removeParser();
         return new Import(moduleId);
 	}
 	
@@ -160,6 +182,5 @@ function WaebricModuleParser(){
     this.isStartImport = function(token){
         return WaebricToken.KEYWORD.IMPORT.equals(token.value);
     }
-
-
 }
+WaebricModuleParser.prototype = new WaebricBaseParser();
