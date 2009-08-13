@@ -108,8 +108,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			if(content instanceof Element) {
 				document.setRootElement((Element) content);
 			} else {
-				document.setRootElement(createXHTMLTag());
-				document.addContent(content);
+				Element XHTML = createXHTMLTag();
+    			document.setRootElement(XHTML);
+    			XHTML.addContent(content);
 			}	
     			
 			current = document.getRootElement();
