@@ -359,13 +359,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.ListExpression list = (Expression.ListExpression) expression;
 			
 			// Execute statement for each element
-			Element root = current;
+			Element actualElement = current;
 			for(Expression e: list.getExpressions()) {
 				environment = new Environment(environment);
 				environment.defineVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				environment = environment.getParent();
-				current = root;
+				if(actualElement == null) { actualElement = document.getRootElement(); }
+				this.current = actualElement;
 			}
 		} else if(expression instanceof Expression.VarExpression) {
 			Expression.VarExpression var = (Expression.VarExpression) expression;
