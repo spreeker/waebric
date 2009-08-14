@@ -227,7 +227,7 @@ function WaebricInterpreterVisitor(){
 			} else if (statement instanceof MarkupExpressionStatement) {
 				statement.accept(new MarkupExpressionStatementVisitor(this.env, this.dom));
 			} else { //Statement is not recognizederror.");
-				print('unrecognized statement')
+				throw new WaebricInterpreterException("Expected Statement while interpreting.")
 			}
 						
 			//After statement is processed, the tags should be closed.
@@ -615,7 +615,7 @@ function WaebricInterpreterVisitor(){
 			if (lastYield != null) {	
 				lastYield.value.accept(new StatementVisitor(lastYield.env, this.dom));
 			}else{
-				throw new Error('Yield field is empty!');
+				env.addException('The yield value is empty')
 			}
 		}
 	}
@@ -873,7 +873,7 @@ function WaebricInterpreterVisitor(){
 			} else if (expression instanceof RecordExpression) {
 				expression.accept(new RecordExpressionVisitor(this.env, this.dom));
 			} else { //Expression is not recognized
-				print("Unrecognized Expression found. Parser should have thrown an error.");
+				throw new WaebricInterpreterException('Unrecognized Expression type found. Parser should have thrown an error.')
 			}
 		}
 	}	
@@ -1053,7 +1053,7 @@ function WaebricInterpreterVisitor(){
 			} else if (embed instanceof MarkupEmbedding) {
 				embed.accept(new MarkupEmbeddingVisitor(this.env, this.dom));
 			} else { //Embed is not recognized
-				print("Unrecognized Embed found. Parser should have thrown an error.");
+				throw new WaebricInterpreterException('Unrecognized Embed type found. Parser should have thrown an error.')
 			}
 		}
 	}
@@ -1073,7 +1073,7 @@ function WaebricInterpreterVisitor(){
 			} else if (textTail instanceof PostTextTail) {
 				textTail.accept(new PostTextTailVisitor(this.env, this.dom))
 			} else { //TextTail is not recognized
-				print("Unrecognized TextTail found. Parser should have thrown an error.");
+				throw new WaebricInterpreterException('Unrecognized TextTail type found. Parser should have thrown an error.')
 			}
 		}
 	}
@@ -1195,7 +1195,7 @@ function WaebricInterpreterVisitor(){
 			} else if (assignment instanceof FunctionBinding) {
 				assignment.accept(new FunctionBindingVisitor(this.env, this.dom));
 			} else { //Assignment is not recognized
-				print("Unrecognized Assignment found. Parser should have thrown an error.");
+				throw new WaebricInterpreterException('Unrecognized Assignment type found. Parser should have thrown an error.')
 			}
 		}
 	}

@@ -1,26 +1,29 @@
 /**
  * Waebric Parser
- *  
+ * 
+ * Parses a Waebric program to xHTML code
+ * - Reads in the Waebric program from the filesystem
+ * - Tokenizes the Waebric file
+ * - Parses the tokens to an Abstract Syntax Tree {Module}
+ * 
  * @author Nickolas Heirbaut
  */
 function WaebricParser(){
-	
-	var exceptions = new Array();
 	
 	/**
 	 * Parses the program source
 	 * 
 	 * @param {String} path The path of the Waebric program
 	 * @return {WaebricParserResult}
-	 * @exception {NonExistingModuleException, Error}
 	 */
 	this.parse = function(path){
-		try {			
+		var fileExists = (new File(path)).exists();
+		if (fileExists) {
 			var module = parseModule(path);
-			return new WaebricParserResult(module, exceptions);		
-		}catch(exception){
-			throw exception;
-		}	
+			return new WaebricParserResult(module);	
+		}else{
+			throw new NonExistingModuleException(path);
+		}
 	}
 	
 	/**
@@ -51,8 +54,7 @@ function WaebricParser(){
 	 * Outputs the result of the tokenizer
 	 * 
 	 * @param {Array} tokens An array of {WaebricToken}
-	 */
-	
+	 */	
 	function writeTokenizerResult(tokens){
 		var text = ""
 		for(tokenIndex in tokens){		
@@ -67,7 +69,7 @@ function WaebricParser(){
 	}
 	
 	/**
-	 * Returns transitive dependencies for a given module
+	 * Returns the (transitive) dependencies for a given module
 	 *
 	 * @param {String} parentPath The parent path of the waebric program
 	 * @param {Module} parentModule The module for which the transitive dependencies will be returned
@@ -145,13 +147,8 @@ function WaebricParser(){
  */
 WaebricParser.parse = function(path){
 	try {
-		var fileExists = (new File(path)).exists();
-		if (fileExists) {
-			var parser = new WaebricParser();
-			return parser.parse(path);
-		}else{
-			throw new NonExistingModuleException(path);
-		}
+		var parser = new WaebricParser();
+		return parser.parse(path);
 	}catch(exception if exception instanceof WaebricParserException){
 		throw exception;
 	}catch(exception){

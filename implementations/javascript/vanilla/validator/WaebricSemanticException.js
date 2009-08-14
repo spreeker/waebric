@@ -3,6 +3,9 @@
  * 
  * Represents exceptions found during semantic validation
  * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
+ * 
+ * @param {String} message A description of the exception
  */
 function WaebricSemanticException(message){
 	this.message = message;

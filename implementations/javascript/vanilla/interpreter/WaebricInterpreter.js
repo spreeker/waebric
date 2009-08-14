@@ -94,9 +94,16 @@ function WaebricInterpreter(){
  * 
  * @param {Module} module The Abstract Syntax Tree
  * @return {WaebricInterpreterResult}
+ * @exception {WaebricInterpreterException}
  */
-WaebricInterpreter.interprete = function(module){	
-	var interpreter = new WaebricInterpreter();
-	var environments = interpreter.interprete(module);
-	return new WaebricInterpreterResult(environments);
+WaebricInterpreter.interprete = function(module){
+	try {
+		var interpreter = new WaebricInterpreter();
+		var environments = interpreter.interprete(module);
+		return new WaebricInterpreterResult(environments);
+	}catch(exception if exception instanceof WaebricInterpreterException){
+		throw exception;
+	}catch(exception){
+		throw new WaebricInterpreterException(exception.toString())
+	}
 }

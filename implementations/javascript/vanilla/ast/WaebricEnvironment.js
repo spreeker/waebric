@@ -42,15 +42,6 @@ function WaebricEnvironment(){
 	}
 	
 	/**
-	 * Adds an exception to the exceptionlist
-	 * 
-	 * @param {WaebricSemanticException} exception The exception
-	 */
-	this.addException = function(exception){
-		this.exceptions.push(exception);
-	}
-	
-	/**
 	 * Adds an environment to the current environment
 	 * The new environment becomes child of the current environment
 	 * 
@@ -297,17 +288,24 @@ function WaebricEnvironment(){
 	 * @return {Array} Collection of exceptions
 	 */
 	this.getExceptions = function(){
-		var exceptionList = new Array();
-		exceptionList = exceptionList.concat(this.exceptions);
-		for(var i = 0; i < this.children.length; i++){
-			var child = this.children[i];
-			exceptionList = exceptionList.concat(child.getExceptions());
+		if(this.parent != null){
+			this.parent.getExceptions();
+		}else{
+			return this.exceptions;
 		}
-		for(var i = 0; i < this.dependencies.length; i++){
-			var dependency = this.dependencies[i];
-			exceptionList = exceptionList.concat(dependency.getExceptions());
+	}
+	
+	/**
+	 * Adds an exception to the exceptionlist
+	 * 
+	 * @param {WaebricSemanticException} exception The exception
+	 */
+	this.addException = function(exception){
+		if (this.parent != null) {
+			this.parent.addException(exception);
+		} else {
+			this.exceptions.push(exception);
 		}
-		return exceptionList;
 	}
 }
 
