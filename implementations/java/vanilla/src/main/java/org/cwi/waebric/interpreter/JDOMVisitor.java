@@ -361,11 +361,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			// Execute statement for each element
 			Element root = current;
 			for(Expression e: list.getExpressions()) {
-				current = root;
 				environment = new Environment(environment);
 				environment.defineVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				environment = environment.getParent();
+				current = root;
 			}
 		} else if(expression instanceof Expression.VarExpression) {
 			Expression.VarExpression var = (Expression.VarExpression) expression;
