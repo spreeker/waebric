@@ -112,7 +112,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
     				Element XHTML = createXHTMLTag();
         			document.setRootElement(XHTML);
         			XHTML.addContent(content);
-        			current = (Element) content;
+        			if(content instanceof Element) { current = (Element) content; }
     			}	
     		} else { // Add content to current element
 			current.addContent(content); // Attach content
