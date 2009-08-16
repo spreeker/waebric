@@ -160,12 +160,6 @@ public class WaebricInterpreter {
 	 * @throws IOException 
 	 */
 	private void outputDocument(Document document, OutputStream os) throws IOException {
-		// Brand-mark document
-		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Comment comment = new Comment("Generated on " + format.format(new Date()));
-		document.addContent(0, comment);
-		
-		// Output document
 		XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
 		out.output(document, os);
 	}
