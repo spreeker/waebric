@@ -375,21 +375,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			expression = environment.getVariable(var.getId().getName());
 			
 			// Execute function again
-			Statement.Each each = new Statement.Each();
-			each.setVar(statement.getVar());
-			each.setStatement(statement.getStatement());
-			each.setExpression(expression);
-			visit(each);
+			statement.setExpression(expression);
+			visit(statement);
 		} else if(expression instanceof Expression.Field) {
 			// Retrieve actual expression from field
 			expression = getFieldExpression((Expression.Field) expression);
 			
 			// Execute function again
-			Statement.Each each = new Statement.Each();
-			each.setVar(statement.getVar());
-			each.setStatement(statement.getStatement());
-			each.setExpression(expression);
-			visit(each);
+			statement.setExpression(expression);
+			visit(statement);
 		}
 	}
 	
@@ -868,14 +862,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public Document getDocument() {
 		return document;
 	}
-
-	/**
-	 * Retrieve current JDOM element.
-	 * @return
-	 */
-	public Element getCurrent() {
-		return current;
-	}
 	
 	/**
 	 * Modify current JDOM element.
@@ -892,14 +878,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public String getText() {
 		return text;
-	}
-	
-	/**
-	 * Modify current text value.
-	 * @param data
-	 */
-	public void setText(String text) {
-		if(text != null) { this.text = text; } 
 	}
 	
 	/**
