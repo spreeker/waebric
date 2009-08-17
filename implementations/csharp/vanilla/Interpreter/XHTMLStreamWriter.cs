@@ -50,15 +50,14 @@ namespace Interpreter
         /// </summary>
         public void WriteStream()
         {
-            Visit(Root, 0);
+            Visit(Root);
         }
 
         /// <summary>
         /// Visit XHTMLElement and write it to stream
         /// </summary>
         /// <param name="element">Element to visit</param>
-        /// <param name="level">Level of indenting</param>
-        public void Visit(XHTMLElement element, int level)
+        public void Visit(XHTMLElement element)
         {
             if (element.GetTag() == "cdata")
             {   //CData need different handling
@@ -71,7 +70,6 @@ namespace Interpreter
             else
             {   //Normal XHTML tag handling
                 
-                XhtmlWriter.Indent = level;
                 XhtmlWriter.BeginRender();
 
                 //Check if element is tag, if not write tag, otherwise handle as XHTML tag
@@ -83,8 +81,6 @@ namespace Interpreter
                     CharIterator charIterator = new CharIterator();
                     String tag = charIterator.ParseText(element.GetTag());
                     XhtmlWriter.Write(tag);
-
-                    //XhtmlWriter.WriteLine();
                     XhtmlWriter.EndRender();
                     XhtmlWriter.Flush();
                     return;
@@ -99,7 +95,6 @@ namespace Interpreter
                 if (IsEmptyElement(element.GetTag()))
                 {   //Nothing inside element, so write tag end
                     XhtmlWriter.Write(XhtmlTextWriter.SelfClosingTagEnd);
-                    XhtmlWriter.WriteLine();
                 }
                 else if (IsXHTMLTag(element.GetTag()))
                 {
@@ -108,20 +103,15 @@ namespace Interpreter
 
                     //Write content
                     XhtmlWriter.Write(element.GetContent());
-                    if (element.GetChildren().Count != 0)
-                    {
-                        XhtmlWriter.WriteLine();
-                    }
 
                     //Visit children
                     foreach (XHTMLElement child in element.GetChildren())
                     {
-                        Visit(child, level + 1);
+                        Visit(child);
                     }
 
                     //Write closing tag
                     XhtmlWriter.WriteEndTag(element.GetTag());
-                    XhtmlWriter.WriteLine();
                     XhtmlWriter.Flush();
                 }
                 else
@@ -141,7 +131,6 @@ namespace Interpreter
         {
             XhtmlWriter.BeginRender();
             XhtmlWriter.Write("<![CDATA[" + element.GetContent() + "]]>");
-            XhtmlWriter.WriteLine();
             XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
@@ -163,7 +152,6 @@ namespace Interpreter
 
             //Close comment tag
             XhtmlWriter.Write(" -->");
-            XhtmlWriter.WriteLine();
             XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
@@ -191,7 +179,6 @@ namespace Interpreter
                     XhtmlWriter.Write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">");
                     break;
             }
-            XhtmlWriter.WriteLine();
             XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }
