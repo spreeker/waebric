@@ -369,19 +369,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				this.current = actualElement;
 			}
 		} else if(expression instanceof Expression.VarExpression) {
-			Expression.VarExpression var = (Expression.VarExpression) expression;
-			
-			// Retrieve actual expression from variable cache
-			expression = environment.getVariable(var.getId().getName());
-			
-			// Execute function again
+			expression = environment.getVariable(((Expression.VarExpression) expression).getId().getName());
 			statement.setExpression(expression);
 			visit(statement);
 		} else if(expression instanceof Expression.Field) {
-			// Retrieve actual expression from field
 			expression = getFieldExpression((Expression.Field) expression);
-			
-			// Execute function again
 			statement.setExpression(expression);
 			visit(statement);
 		}
@@ -391,8 +383,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Attach <!-- COMMENT --> to current element.
 	 */
 	public void visit(Statement.Comment statement) {
-		Comment comment = new Comment(statement.getComment().getLiteral().toString());
-		addContent(comment);
+		addContent(new Comment(statement.getComment().getLiteral().toString()));
 	}
 	
 	/**
