@@ -140,14 +140,6 @@ namespace TestParser
             tree = parser.GetTree();
 
             Module module = tree.GetRoot();
-
-            //ISyntaxNode[] moduleElements = module.GetElements();
-
-  //          Assert.IsTrue(moduleElements[0].GetType() == typeof(Import));
-
-    //        Import import = (Import) moduleElements[0];
-            //TODO: As shown here it takes to much methods to get real identifier
-      //      Assert.IsTrue(import.GetIdentifier().GetIdentifier().ToString().ToString() == "importtest");
         }
 
         /// <summary>

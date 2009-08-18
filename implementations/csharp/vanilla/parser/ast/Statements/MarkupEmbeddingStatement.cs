@@ -51,8 +51,16 @@ namespace Parser.Ast.Statements
         }
 
         public override String ToString()
-        {   //To Implement
-            return null;
+        {
+            //Get Markups
+            String markups = "";
+            foreach (ISyntaxNode markup in MarkupList)
+            {
+                markups += ((Markup.Markup)markup).ToString();
+                markups += " ";
+            }
+
+            return markups + Embedding.ToString() + ";";
         }
 
         public override ISyntaxNode[]  GetSubNodes()

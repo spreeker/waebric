@@ -196,7 +196,7 @@ namespace Parser
             }
             if (letStatement.GetAssignments().Count == 0)
             {   //No assignments is not allowed
-                //Todo specify error message
+                throw new UnexpectedToken("LetStatement doesn't contain assignments.", "Expected at least one assignment ", CurrentToken.GetLine());
                 //throw new UnexpectedToken();
             }
 

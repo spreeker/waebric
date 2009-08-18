@@ -67,9 +67,22 @@ namespace Parser.Ast.Statements
         /// </summary>
         /// <returns></returns>
         public override String ToString()
-        {
-            //TODO: Implement this method
-            return null;
+        {   
+            //Get assignments
+            String assignments = "";
+            foreach (ISyntaxNode assignment in AssignmentList)
+            {
+                assignments += ((Assignment)assignment).ToString();
+            }
+
+            //Get statements
+            String statements = "";
+            foreach (ISyntaxNode statement in StatementList)
+            {
+                statements += ((Statement)statement).ToString();
+            }
+
+            return "let " + assignments + " in " + statements + " end";
         }
 
         public override ISyntaxNode[] GetSubNodes()

@@ -88,8 +88,25 @@ namespace Parser.Ast.Functions
         /// <returns>String</returns>
         public override String ToString()
         {
-            return null; //TO IMPLEMENT!
-            //return "def" + Identifier + "(" + Frmls.ToString() + ")" + StatementList.ToString() + "end";
+            //Get formals
+            String formals = "";
+            for (int i = 0; i <= (FormalList.Count() - 1); i++)
+            {
+                formals += ((Formal)FormalList.Get(i)).ToString();
+                if (i != (FormalList.Count() - 1))
+                {
+                    formals += ",";
+                }
+            }
+
+            //Get statements
+            String statements = "";
+            foreach (ISyntaxNode statement in StatementList)
+            {
+                statements += ((Statement)statement).ToString();
+            }
+
+            return "def " + Identifier + "(" + formals + ")" + statements + " end";
         }
 
         public ISyntaxNode[] GetSubNodes()

@@ -120,7 +120,6 @@ namespace TestParser
 
             //Check filename
             Assert.AreEqual("home", filename.GetName().GetPathElement());
-            //TODO: fix strange API
             Assert.AreEqual("html", filename.GetFileExtension().GetFileExtension());
         }
 
@@ -171,7 +170,6 @@ namespace TestParser
             FileName output = siteParser.ParseFileName();
 
             Assert.AreEqual("filename", output.GetName().GetPathElement());
-            //TODO: fix strange API
             Assert.AreEqual("ext", output.GetFileExtension().GetFileExtension());
 
         }

@@ -55,8 +55,17 @@ namespace Parser.Ast.Statements
 
         public override String ToString()
         {
-            //TO Implement
-            return null;
+            //Convert IdentifierList to string
+            String identifiers = "";
+            for(int i = 0; i <= (IdentifierList.Count - 1); i++)
+            {
+                identifiers += IdentifierList.ElementAt(i);
+                if(i != (IdentifierList.Count - 1))
+                {
+                    identifiers += ",";
+                }
+            }
+            return Identifier + "(" + identifiers + ")" + " = " + Statement.ToString();
         }
 
         public override ISyntaxNode[] GetSubNodes()

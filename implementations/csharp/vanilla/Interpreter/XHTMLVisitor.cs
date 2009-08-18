@@ -748,7 +748,6 @@ namespace Interpreter
                 //Add some content when node is an expression or embedding
                 if (node is Expression || node is Embedding)
                 {
-                    //TODO, MAYBE TEMP ELEMENT IS NEEDED!!!
                     XHTMLElement element = new XHTMLElement(TextValue, Current);
                     element.SetTagState(false);
                     Current.AddChild(element);
