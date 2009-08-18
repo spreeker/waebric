@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
@@ -18,7 +16,6 @@ import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.util.Environment;
 import org.cwi.waebric.util.ModuleRegister;
-import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
