@@ -3,7 +3,6 @@ package org.cwi.waebric.checker;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.TestUtilities;
@@ -16,12 +15,11 @@ import org.junit.Test;
 
 public class TestModuleChecker {
 	
+	private WaebricChecker checker;
 	private List<SemanticException> exceptions;
-	private ModuleVisitor checker;
 	
 	public TestModuleChecker() {
-		exceptions = new ArrayList<SemanticException>();
-		checker = new ModuleVisitor(exceptions);
+		checker = new WaebricChecker();
 	}
 	
 	@After
@@ -33,7 +31,7 @@ public class TestModuleChecker {
 	@Test
 	public void testInvalidImport() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/invalidimport.wae");
-		checker.visit(ast.getRoot());
+		exceptions = checker.checkAST(ast);
 		assertEquals(1, exceptions.size());
 		assertEquals(NonExistingModuleException.class, exceptions.get(0).getClass());
 	}
@@ -41,7 +39,7 @@ public class TestModuleChecker {
 	@Test
 	public void testInfiniteImportLoop() throws IOException {
 		AbstractSyntaxTree ast = TestUtilities.quickParse("src/test/waebric/mod/selfloop.wae");
-		checker.visit(ast.getRoot());
+		exceptions = checker.checkAST(ast);
 		assertEquals(0, exceptions.size()); // No faults
 	}
 	
