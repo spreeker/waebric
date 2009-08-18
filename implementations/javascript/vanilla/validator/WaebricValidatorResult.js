@@ -23,7 +23,7 @@ function WaebricValidatorResult(exceptions){
 		var exceptionString = "";
 		for(var exceptionIndex in this.exceptions){
 			var exception = this.exceptions[exceptionIndex];			
-			exceptionString += 'Warning: ' + exception.toString() + '\n';
+			exceptionString += '\nWarning: ' + exception.toString() + '\n';
 		}
 		return exceptionString
 	}

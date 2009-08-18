@@ -148,7 +148,7 @@ function convertToHTML(path, siteName){
 	try {
 		//Parsing
 		var parserResult = WaebricParser.parse(path);
-
+		
 		//Validating		
 		var validatorResult = WaebricValidator.validate(parserResult.module)
 		print(validatorResult)
@@ -164,7 +164,7 @@ function convertToHTML(path, siteName){
 	}catch(exception){
 		print('\n******************************************************************************')
 		print(exception.toString());
-		print('******************************************************************************\n')
+		print('\n******************************************************************************\n')
 	}
 }
 

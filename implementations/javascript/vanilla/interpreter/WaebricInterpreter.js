@@ -30,11 +30,10 @@ function WaebricInterpreter(){
 		
 		//Preprocessing
 		module.accept(visitor.getModuleVisitor(environment, document));	
-		
+
 		//Visit main function and write HTML output to document
 		module.accept(visitor.getMainVisitor(environment, document));
 		environment.document = document;
-		
 		//Returns the environment and the document
 		return environment;
 	}
@@ -97,7 +96,7 @@ function WaebricInterpreter(){
  * @exception {WaebricInterpreterException}
  */
 WaebricInterpreter.interprete = function(module){
-	try {
+	try {		
 		var interpreter = new WaebricInterpreter();
 		var environments = interpreter.interprete(module);
 		return new WaebricInterpreterResult(environments);

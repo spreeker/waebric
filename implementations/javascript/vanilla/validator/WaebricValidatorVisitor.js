@@ -62,7 +62,7 @@ function WaebricValidatorVisitor(env){
 				if (!this.env.containsFunction(functionDefinition.functionName)) {
 					this.env.addFunction(functionDefinition);
 				} else {
-					this.env.addException(new DuplicateDefinitionException(functionDefinition));
+					this.env.addException(new DuplicateDefinitionException(functionDefinition, this.env));
 				}
 			}
 			
@@ -92,8 +92,7 @@ function WaebricValidatorVisitor(env){
 			var existingDependency = this.env.getDependency(dependencyName);
 			//If dependency is not processed before, visit it
 			if (existingDependency == null) {
-				var new_env = this.env.addDependency('module');
-				new_env.name = module.moduleId.identifier;
+				var new_env = this.env.addDependency(dependencyName);
 				module.accept(new ModuleVisitor(new_env));
 			}    //If dependency was processed before, add existing dependecy to
 			//current environment but do not visit it again.
@@ -111,8 +110,13 @@ function WaebricValidatorVisitor(env){
 	function FunctionDefinitionVisitor(env){
 		this.env = env
 		this.visit = function(functionDefinition){
-			//Add Arguments of function to new environment	
-			var new_env = this.env.addEnvironment('func-def');
+			//Add new environment
+			var new_env = this.env;
+			if (!functionDefinition.isFunctionBinding) {
+				new_env = this.env.addEnvironment('func-def');
+			}
+			
+			//Process formals
 			for (var i = 0; i < functionDefinition.formals.length; i++) {
 				var formal = functionDefinition.formals[i];
 				new_env.addVariable(formal);
@@ -237,21 +241,19 @@ function WaebricValidatorVisitor(env){
 	function LetStatementVisitor(env){
 		this.env = env
 		this.visit = function(letStmt){
-			//Assignments and statements in a let statement require a new environment under
-			//the current environment since the scope of the assignments (function/variable declaration)
-			// is limited to the statements inside the let statement
-			var new_env = this.env.addEnvironment('let-stmt');
-			
 			//Visit Assignments
+			var new_env = this.env;
 			for (var i = 0; i < letStmt.assignments.length; i++) {
+				new_env = new_env.addEnvironment('let-stmt')
 				var assignment = letStmt.assignments[i];
-				assignment.accept(new AssignmentVisitor(this.env));
+				assignment.accept(new AssignmentVisitor(new_env));
 			}
 			
+			new_env = new_env.addEnvironment('let-stmt-stmts')
 			//Visit Statements
 			for (var j = 0; j < letStmt.statements.length; j++) {
 				var statement = letStmt.statements[j];
-				statement.accept(new StatementVisitor(this.env));
+				statement.accept(new StatementVisitor(new_env));
 			}
 		}
 	}
@@ -670,12 +672,12 @@ function WaebricValidatorVisitor(env){
 	 */
 	function FunctionBindingVisitor(env){
 		this.env = env
-		this.visit = function(funcbind){
+		this.visit = function(funcbind){						
 			//Convert function binding into function definition
 			var newFunctionName = funcbind.variable;
 			var newFunctionFormals = funcbind.formals;
 			var newFunctionStatements = [funcbind.statement];
-			var newFunction = new FunctionDefinition(newFunctionName, newFunctionFormals, newFunctionStatements);
+			var newFunction = new FunctionDefinition(newFunctionName, newFunctionFormals, newFunctionStatements, true);
 			
 			//Add function to current environment (let statement)
 			//(not done by FunctionDefinitionVisitor)
@@ -684,10 +686,9 @@ function WaebricValidatorVisitor(env){
 			} else {
 				this.env.addException(new DuplicateDefinitionException(newFunction, this.env));
 			}
-			
+
 			//Visit FunctionDefinition
-			newFunction.accept(new FunctionDefinitionVisitor(this.env));
-			
+			newFunction.accept(new FunctionDefinitionVisitor(this.env));			
 		}
 	}
 
@@ -698,37 +699,51 @@ function WaebricValidatorVisitor(env){
 	 */
 	function MarkupVisitor(env){
 		this.env = env
-		this.visit = function(markup){
-			if (markup instanceof MarkupCall) {
-				//Check if function already exists in current environment (incl dependecies)
-				var functionDefinition = this.env.getLocalFunction(markup.designator.idCon);
-				if (functionDefinition != null) {
-					//Check if number of the arguments equals
-					if (functionDefinition.formals.length != markup.arguments.length) {
-						//If arguments do not equal and the designator tag is not part
-						//of XHTML, then it must be a function call with incorrect arguments.
-						if (!XHTML.isXHTMLTag(markup.designator.idCon)) {
-							this.env.addException(new IncorrectArgumentsException(markup, this.env));
-						}
-					}
-				} else if (!XHTML.isXHTMLTag(markup.designator.idCon)) {
-					//If function does not exists and the designator tag is not part of
-					//XHTML, then it must be an undefined function						
-					this.env.addException(new UndefinedFunctionException(markup, this.env))
-				} else {//XHTML tag
-					//No action required
-				}
-				
-				//Visit arguments/formals
-				for (var i = 0; i < markup.arguments.length; i++) {
-					var argument = markup.arguments[i];
-					argument.accept(new ArgumentVisitor(this.env));
-				}
-			} else { //Markup is MarkupTag Expression			
-				//No action required
+		this.visit = function(markup){	
+			//Set correct environment for searching function	
+			var new_env = this.env;		
+			if(this.env.type == 'let-stmt'){
+				new_env = this.env.parent;				
 			}
+			
+			//Gather function information
+			var functionName;
+			var functionArguments;
+			var hasAttributes;			
+			if (markup instanceof MarkupCall) {
+				functionName = markup.designator.idCon;
+				functionArguments = markup.arguments;		
+				hasAttributes = (markup.designator.attributes.length > 0);
+			}else if(markup instanceof DesignatorTag){								
+				functionName = markup.idCon;
+				functionArguments = [];
+				hasAttributes = (markup.attributes.length > 0);
+			}				
+			
+			//Search for XHTML tag & Function definition
+			var functionDefinition = new_env.getLocalFunction(functionName);
+			var isXHTMLTag = XHTML.isXHTMLTag(functionName);
+
+			//Validate the Markup
+			if(hasAttributes && !isXHTMLTag){
+				new_env.addException(new UndefinedFunctionException(markup, new_env));
+			}else if(functionDefinition != null){
+				var hasEqualArguments = (functionDefinition.formals.length == functionArguments.length);
+				if(!hasEqualArguments){
+					new_env.addException(new IncorrectArgumentsException(markup, new_env));
+				}
+			}else if(!isXHTMLTag){	
+				new_env.addException(new UndefinedFunctionException(markup, new_env));
+			}	
+				
+			//Visit arguments/formals
+			for (var i = 0; i < functionArguments.length; i++) {
+				var argument = functionArguments[i];
+				//Visit with original environment to find variables
+				argument.accept(new ArgumentVisitor(this.env));
+			}			
 		}
-	}
+	} 
 	
 	/**
 	 * Visitor Argument

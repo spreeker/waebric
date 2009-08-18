@@ -148,7 +148,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(functionDefinition){
-			//Add Arguments of function to new environment	
+			//Add new environment
 			var new_env;
 			if (!functionDefinition.isFunctionBinding) {
 				new_env = this.env.addEnvironment('func-def');
@@ -509,23 +509,18 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(letStmt){
-			//Assignments and statements in a let statement require a new environment under
-			//the current environment since the scope of the assignments (function/variable declaration)
-			// is limited to the statements inside the let statement
-			var new_env = this.env;
-			
 			//Visit Assignments
 			for (var i = 0; i < letStmt.assignments.length; i++) {
-				new_env = new_env.addEnvironment('let-stmt');
+				this.env = this.env.addEnvironment('let-stmt');
 				var assignment = letStmt.assignments[i];
-				assignment.accept(new AssignmentVisitor(new_env, this.dom));
+				assignment.accept(new AssignmentVisitor(this.env, this.dom));
 			}
 			
 			//Visit Statements
 			var lastElement = this.dom.lastElement;
 			for (var j = 0; j < letStmt.statements.length; j++) {
 				var statement = letStmt.statements[j];
-				statement.accept(new StatementVisitor(new_env, this.dom));
+				statement.accept(new StatementVisitor(this.env, this.dom));
 				this.dom.lastElement = lastElement; //Prevent nested nodes
 			}
 		}
@@ -695,7 +690,7 @@ function WaebricInterpreterVisitor(){
 			return new MarkupStatementStatement(markups, tail);
 		}
 	}
-	
+		
 	/**
 	 * Checks whether the requested markup is a function call to a valid function;
 	 * 
@@ -707,11 +702,26 @@ function WaebricInterpreterVisitor(){
 			env = env.parent.parent.parent;	
 		}
 		
+		//Gather function information
+		var functionName;
+		var hasAttributes;	
+				
 		if (markup instanceof MarkupCall) {
-			return env.containsLocalFunction(markup.designator.idCon);
-		}else if(markup instanceof DesignatorTag){
-			return env.containsLocalFunction(markup.idCon);
+			functionName = markup.designator.idCon;
+			hasAttributes = (markup.designator.attributes.length > 0);
+		}else if(markup instanceof DesignatorTag){								
+			functionName = markup.idCon;
+			hasAttributes = (markup.attributes.length > 0);
+		}				
+		
+		//Search for Function definition
+		var functionDefinition = env.getLocalFunction(functionName);
+		
+		//Validate the Markup
+		if(!hasAttributes && functionDefinition != null){
+			return true
 		}
+		return false;		
 	}
 	
 	/**

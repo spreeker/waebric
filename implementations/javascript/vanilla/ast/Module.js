@@ -18,7 +18,9 @@ function Module(moduleId, moduleElements){
 	this.imports = new Array();
 	this.site = new Site(new Array());
 	this.functionDefinitions = new Array();
-	this.dependencies = new Array();
+	
+	//Collection of parsed imports (AST's)
+	this.dependencies = new Array(); 
 	
 	//Store different types of moduleElements seperate
 	for (i = 0; i < moduleElements.length; i++) {
@@ -29,7 +31,7 @@ function Module(moduleId, moduleElements){
 		} else if (moduleElements[i] instanceof FunctionDefinition) {
 			this.functionDefinitions.push(moduleElements[i]);
 		}
-	}
+	}	
 	
 	this.toString = function(){
 		return moduleId.identifier;

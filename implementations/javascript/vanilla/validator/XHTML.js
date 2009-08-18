@@ -61,6 +61,7 @@ XHTML.tags = [
 	'menu',
 	'meta',
 	'noframes',
+	'noscript',
 	'object',
 	'ol',
 	'optgroup',

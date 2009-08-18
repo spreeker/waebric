@@ -12,7 +12,7 @@ function WaebricInterpreterException(message){
 	
 	this.toString = function(){
 		return 'WaebricInterpreterException:' 
-				+ '\Interpreting failed'
-				+ '\n' + this.message
+				+ '\n====> Interpreting failed'
+				+ '\n====> ' + this.message
 	}
 }

@@ -1,12 +1,19 @@
 /**
- * Waebric Parser
- * 
- * Parses a Waebric program to xHTML code
- * - Reads in the Waebric program from the filesystem
+ * Vanilla parser for Waebric language
+ *
+ * The WaebricParser converts a Waebric program into an AST (Module).
+ * - Reads in the Waebric program from the filesystem using Rhino/Java
  * - Tokenizes the Waebric file
  * - Parses the tokens to an Abstract Syntax Tree {Module}
  * 
- * @author Nickolas Heirbaut
+ * Imports in the Waebric program are automaticly loaded from the filesystem and parsed 
+ * to an new AST (Module). The new AST is then added to the parent AST (Module) under the
+ * property "dependencies".
+ *
+ * Translated from the SDF specification (Meta-Environment: www.meta-environment.org/):
+ * http://code.google.com/p/waebric/source/browse/trunk/doc/waebric.pdf
+ * 
+ * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricParser(){
 	
@@ -139,9 +146,9 @@ function WaebricParser(){
 }
 
 /**
- * Parses the program source
+ * Parses a Waebric program to a {Module} AST
  * 
- * @param {String} The path of the Waebric program
+ * @param {String} The path of the Waebric program on the filesystem
  * @return {WaebricParserResult}
  * @exception {WaebricParserException}
  */

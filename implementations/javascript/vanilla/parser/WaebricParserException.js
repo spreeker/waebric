@@ -16,7 +16,7 @@ function WaebricParserException(message, position, filePath, childException){
 	this.filePath = filePath;
 	this.childException = childException;
 	
-	this.toString = function(indentCount){
+	this.toString = function(){
 		if (!childException) {
 			return 'WaebricParserException:' 
 				+ '\n====> ' + this.message;

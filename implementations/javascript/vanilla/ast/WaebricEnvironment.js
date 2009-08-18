@@ -11,6 +11,7 @@ function WaebricEnvironment(){
 	this.variables = new Array();
 	this.exceptions = new Array();
 	this.dependencies = new Array();	
+	this.markupCallQueue = new Array(); //For OMeta implementation
 	
 	this.path = '';
 	this.type = 'module';
@@ -62,24 +63,52 @@ function WaebricEnvironment(){
 	 * 
 	 * @return {WaebricEnvironment} The new environment
 	 */
-	this.addDependency = function(type){
+	this.addDependency = function(name){
 		var env = new WaebricEnvironment();
 		env.parent = this;
-		env.type = type
+		env.type = 'module';
+		env.name = name;
 		this.dependencies.push(env);		
 		return env;
 	}
 	
 	/**
 	 * Adds new dependency to the current environment
-	 * The new environment becomes child of the current environment
 	 * 
 	 * @return {WaebricEnvironment} The new environment
 	 */
 	this.addExistingDependency = function(existingDependency){
 		this.dependencies.push(existingDependency);		
+	}	
+	
+	/**
+	 * Adds a MarkupCall to the queue
+	 * Only used in the OMeta implementation
+	 * 
+	 * @param {Object} markupCall
+	 */
+	this.addMarkupCallToQueue = function(markupCall){
+		if (this.type != 'module') {
+			this.parent.addMarkupCallToQueue(markupCall);
+		} else {
+			this.markupCallQueue.push(markupCall);
+		}
 	}
 	
+	/**
+	 * Returns the queue of MarkupCall
+	 * Only used in the OMeta implementation
+	 * 
+	 * @param {Object} markupCall
+	 * @return {Array}
+	 */
+	this.getMarkupCallQueue = function(markupCall){
+		if (this.type != 'module') {
+			return this.parent.getMarkupCallQueue(markupCall);
+		} else {
+			return this.markupCallQueue;
+		}
+	}
 	
 	/**
 	 * Returns a function found in the root environment
@@ -220,18 +249,18 @@ function WaebricEnvironment(){
 	 * @return {Object} The requested variable. Null if not found.
 	 */
 	this.getVariable = function(name){
-		//Search function local environment
-		for(var i = 0; i < this.variables.length; i++){
+		//Search function local environment	
+		for (var i = 0; i < this.variables.length; i++) {
 			var _var = this.variables[i];
-			if(name == _var.name){			
+			if (name == _var.name) {
 				return _var;
 			}
-		}
+		}		
 		
 		//Search function in parent environment
 		if(this.parent != null && this.type != 'func-def') {
 			return this.parent.getVariable(name)
-		}		
+		}
 		
 		return null;
 	}
@@ -303,7 +332,7 @@ function WaebricEnvironment(){
 	this.addException = function(exception){
 		if (this.parent != null) {
 			this.parent.addException(exception);
-		} else {
+		} else {			
 			this.exceptions.push(exception);
 		}
 	}
