@@ -50,7 +50,6 @@ namespace Compiler
             
             lexer.LexicalizeStream();
             TokenIterator tokens = lexer.GetTokenIterator();
-            Console.WriteLine("Lexicalizing successful");
 
             if (tokens.GetSize() == 0)
             {   //Not tokens parsed
@@ -61,8 +60,6 @@ namespace Compiler
             //Lets parse the file
             WaebricParser parser = new WaebricParser(tokens);
             parser.Parse();
-
-            Console.WriteLine("Parsing successful");
 
             SyntaxTree parsedTree = parser.GetTree();
 
@@ -76,9 +73,6 @@ namespace Compiler
             //Lets interpret the tree and generate XHTML
             WaebricInterpreter interpreter = new WaebricInterpreter();
             interpreter.InterpretAST(parsedTree);
-
-            Console.WriteLine("Interpreting successful");
-            Console.Read();
         }
 
         #endregion
