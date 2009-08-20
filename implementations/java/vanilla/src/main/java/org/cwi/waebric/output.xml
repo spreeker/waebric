@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<cmtjava_long_report>
+	<header_info>
+		<cmtjava_version>2.2</cmtjava_version>
+		<copyright>Copyright (c) 2001-2008 Testwell Oy</copyright>
+		<license_notes>
+			<license_note>License note: This is a evaluation copy license</license_note>
+
+		</license_notes>
+		<date>Thu Aug 20 18:52:06 2009</date>
+		<cmtjava_options> -l -o output.xml</cmtjava_options>
+		<cwd>/home/jeroen/Research/WaebricJava/vanilla/src/main/java/org/cwi/waebric</cwd>
+	</header_info>
+	<file name="WaebricKeyword.java">
+		<package>org.cwi.waebric</package>
+		<imports>
+		</imports>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>30</LOCphy>
+			<LOCbl>6</LOCbl>
+			<LOCpro>9</LOCpro>
+			<LOCcom>15</LOCcom>
+			<semicolons>3</semicolons>
+		</file_total>
+	</file>
+	<file name="WaebricProcessor.java">
+		<package>org.cwi.waebric</package>
+		<imports>
+			<import>java.io.BufferedReader</import>
+			<import>java.io.FileReader</import>
+			<import>java.io.IOException</import>
+			<import>java.io.InputStreamReader</import>
+			<import>java.util.List</import>
+			<import>org.cwi.waebric.checker.WaebricChecker</import>
+			<import>org.cwi.waebric.checker.exception.SemanticException</import>
+			<import>org.cwi.waebric.interpreter.WaebricInterpreter</import>
+			<import>org.cwi.waebric.lexer.WaebricScanner</import>
+			<import>org.cwi.waebric.lexer.exception.LexicalException</import>
+			<import>org.cwi.waebric.parser.WaebricParser</import>
+			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
+		</imports>
+		<class name="WaebricProcessor" nesting="0" start_line="17">
+			<method name="main" nesting="1" start_line="19">
+				<vG alarmed="1">11</vG>
+				<vG_max>11</vG_max>
+				<vG_avg>11</vG_avg>
+				<LOCphy>88</LOCphy>
+				<LOCpro alarmed="1">69</LOCpro>
+				<LOCbl>15</LOCbl>
+				<LOCcom alarmed="1">8</LOCcom>
+				<N>460</N>
+				<N1>255</N1>
+				<N2>205</N2>
+				<n>93</n>
+				<n1>21</n1>
+				<n2>72</n2>
+				<V alarmed="1">3008.013</V>
+				<B>0.669</B>
+				<D>29.896</D>
+				<E>89927.055</E>
+				<L>0.033</L>
+				<T>01:23:15</T>
+				<MaxND>4</MaxND>
+				<MIwoc>54</MIwoc>
+				<MIcwc>23</MIcwc>
+				<MI alarmed="1">77</MI>
+			</method>
+			<class_total>
+				<vG>11</vG>
+				<vG_max>11</vG_max>
+				<vG_avg>11</vG_avg>
+				<LOCphy>92</LOCphy>
+				<LOCpro>71</LOCpro>
+				<LOCbl>17</LOCbl>
+				<LOCcom alarmed="1">8</LOCcom>
+				<N>464</N>
+				<N1>258</N1>
+				<N2>206</N2>
+				<n>95</n>
+				<n1>22</n1>
+				<n2>73</n2>
+				<V>3048.413</V>
+				<B>0.692</B>
+				<D>31.041</D>
+				<E>94626.078</E>
+				<L>0.032</L>
+				<T>01:27:37</T>
+				<MaxND>4</MaxND>
+				<MIwoc>54</MIwoc>
+				<MIcwc>22</MIcwc>
+				<MI alarmed="1">76</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>11</vG>
+			<LOCphy>108</LOCphy>
+			<LOCbl>20</LOCbl>
+			<LOCpro>84</LOCpro>
+			<LOCcom>8</LOCcom>
+			<semicolons>55</semicolons>
+		</file_total>
+	</file>
+	<file name="WaebricSymbol.java">
+		<package>org.cwi.waebric</package>
+		<imports>
+		</imports>
+		<class name="WaebricSymbol" nesting="0" start_line="3">
+			<class_total>
+				<vG>1</vG>
+				<vG_max>11</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>38</LOCphy>
+				<LOCpro>29</LOCpro>
+				<LOCbl>4</LOCbl>
+				<LOCcom alarmed="1">5</LOCcom>
+				<N>220</N>
+				<N1>138</N1>
+				<N2>82</N2>
+				<n>63</n>
+				<n1>7</n1>
+				<n2>56</n2>
+				<V>1315.002</V>
+				<B>0.119</B>
+				<D>5.125</D>
+				<E>6739.383</E>
+				<L>0.195</L>
+				<T>00:06:14</T>
+				<MaxND>0</MaxND>
+				<MIwoc>74</MIwoc>
+				<MIcwc>27</MIcwc>
+				<MI>101</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>40</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>30</LOCpro>
+			<LOCcom>5</LOCcom>
+			<semicolons>28</semicolons>
+		</file_total>
+	</file>
+	<file name="XHTMLTag.java">
+		<package>org.cwi.waebric</package>
+		<imports>
+		</imports>
+		<file_total>
+			<vG>2</vG>
+			<LOCphy>146</LOCphy>
+			<LOCbl>27</LOCbl>
+			<LOCpro>109</LOCpro>
+			<LOCcom>10</LOCcom>
+			<semicolons>5</semicolons>
+		</file_total>
+	</file>
+	<system>
+		<packages>1</packages>
+		<files>4</files>
+		<measured_items>3</measured_items>
+		<LOCphy>324</LOCphy>
+		<LOCpro>232</LOCpro>
+		<LOCcom>38</LOCcom>
+		<LOCbl>58</LOCbl>
+		<semicolons>91</semicolons>
+		<java_comment_blocks>6</java_comment_blocks>
+		<vG>11</vG>
+		<MIwoc>54</MIwoc>
+		<MIcw>23</MIcw>
+		<MI>77</MI>
+		<methods_on_two_top_levels>
+			<total>1</total>
+			<LOCpro_avg>69</LOCpro_avg>
+			<comment_percent_avg>9</comment_percent_avg>
+			<vG_avg>11</vG_avg>
+		</methods_on_two_top_levels>
+		<classes>
+			<total>2</total>
+			<on_top_level>2</on_top_level>
+			<extends>0</extends>
+			<implements>0</implements>
+		</classes>
+		<interfaces>
+			<total>0</total>
+			<on_top_level>0</on_top_level>
+			<extends>0</extends>
+			<implements>0</implements>
+		</interfaces>
+		<alarms>
+			<vG_alarmed>1</vG_alarmed>
+			<LOCpro_alarmed>1</LOCpro_alarmed>
+			<comment_percent_alarmed>3</comment_percent_alarmed>
+			<V_alarmed>1</V_alarmed>
+			<B_alarmed>0</B_alarmed>
+			<MI_alarmed>2</MI_alarmed>
+		</alarms>
+		<alarm_limits>
+			<top_level_classes>
+				<vG_low>1</vG_low>
+				<vG_high>100</vG_high>
+				<LOCpro_low>4</LOCpro_low>
+				<LOCpro_high>400</LOCpro_high>
+				<comment_percent_low>20</comment_percent_low>
+				<comment_percent_high>60</comment_percent_high>
+				<V_low>100</V_low>
+				<V_high>8000</V_high>
+				<B_low>0</B_low>
+				<B_high>2</B_high>
+				<MI_low>80</MI_low>
+			</top_level_classes>
+			<second_level_classes>
+				<vG_low>1</vG_low>
+				<vG_high>100</vG_high>
+				<LOCpro_low>4</LOCpro_low>
+				<LOCpro_high>400</LOCpro_high>
+				<comment_percent_low>20</comment_percent_low>
+				<comment_percent_high>60</comment_percent_high>
+				<V_low>100</V_low>
+				<V_high>8000</V_high>
+				<B_low>0</B_low>
+				<B_high>2</B_high>
+				<MI_low>80</MI_low>
+			</second_level_classes>
+			<methods>
+				<vG_low>1</vG_low>
+				<vG_high>10</vG_high>
+				<LOCpro_low>1</LOCpro_low>
+				<LOCpro_high>40</LOCpro_high>
+				<comment_percent_low>20</comment_percent_low>
+				<comment_percent_high>60</comment_percent_high>
+				<V_low>4</V_low>
+				<V_high>1000</V_high>
+				<MI_low>80</MI_low>
+			</methods>
+		</alarm_limits>
+		<error_messages count="0">
+		</error_messages>
+	</system>
+</cmtjava_long_report>
