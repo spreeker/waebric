@@ -57,7 +57,7 @@ public class ModuleRegister {
 		WaebricParser parser = new WaebricParser(scanner.iterator());
 		List<SyntaxException> se = parser.parseTokens(); // Parse module
 		
-		// Requested module contains lexical, s
+		// Requested module contains lexical or syntactical exceptions
 		if(le.size() + se.size() > 0) {
 			throw new ModuleLoadException(path, le, se);
 		}
@@ -155,8 +155,7 @@ public class ModuleRegister {
 	 * @return Default instance
 	 */
 	public static ModuleRegister getInstance() {
-		if(instance == null) { instance = new ModuleRegister(); }
-		return instance;
+		return instance == null ? newInstance() : instance;
 	}
 	
 	/**
@@ -164,7 +163,8 @@ public class ModuleRegister {
 	 * @return New instance
 	 */
 	public static ModuleRegister newInstance() {
-		return new ModuleRegister();
+		instance = new ModuleRegister();
+		return instance;
 	}
 
 	/**
