@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cwi.waebric.lexer.LexicalException;
 import org.cwi.waebric.lexer.WaebricScanner;
-import org.cwi.waebric.lexer.exception.LexicalException;
+import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
 import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.Modules;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * Module register allows users a clean interface to load the AST of modules based on

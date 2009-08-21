@@ -12,7 +12,6 @@ import org.cwi.waebric.parser.ast.basic.SymbolCon;
 import org.cwi.waebric.parser.ast.basic.Text;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/waebric/syntax/Expressions

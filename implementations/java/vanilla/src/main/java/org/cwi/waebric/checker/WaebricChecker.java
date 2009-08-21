@@ -5,12 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cwi.waebric.XHTMLTag;
-import org.cwi.waebric.checker.exception.ArityMismatchException;
-import org.cwi.waebric.checker.exception.DuplicateFunctionDefinition;
-import org.cwi.waebric.checker.exception.NonExistingModuleException;
-import org.cwi.waebric.checker.exception.SemanticException;
-import org.cwi.waebric.checker.exception.UndefinedFunctionException;
-import org.cwi.waebric.checker.exception.UndefinedVariableException;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;

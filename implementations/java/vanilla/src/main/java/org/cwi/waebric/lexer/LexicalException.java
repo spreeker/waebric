@@ -1,4 +1,4 @@
-package org.cwi.waebric.lexer.exception;
+package org.cwi.waebric.lexer;
 
 /**
  * Lexical exceptions are created during the scan phase.

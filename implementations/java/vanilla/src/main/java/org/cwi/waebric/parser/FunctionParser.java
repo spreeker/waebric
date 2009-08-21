@@ -7,7 +7,6 @@ import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/waebric/syntax/Functions

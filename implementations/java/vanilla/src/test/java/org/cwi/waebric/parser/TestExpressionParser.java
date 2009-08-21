@@ -12,7 +12,6 @@ import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.KeyValuePair;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
-import org.cwi.waebric.parser.exception.SyntaxException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

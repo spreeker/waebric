@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.exception;
+package org.cwi.waebric.parser;
 
 import org.cwi.waebric.lexer.token.Token;
 

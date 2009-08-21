@@ -14,7 +14,6 @@ import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Designator;
 import org.cwi.waebric.parser.ast.markup.Markup;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/waebric/syntax/Markup

@@ -1,4 +1,4 @@
-package org.cwi.waebric.checker.exception;
+package org.cwi.waebric.checker;
 
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 

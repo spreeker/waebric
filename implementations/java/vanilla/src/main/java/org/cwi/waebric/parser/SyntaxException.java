@@ -1,4 +1,4 @@
-package org.cwi.waebric.parser.exception;
+package org.cwi.waebric.parser;
 
 /**
  * Syntax exceptions are thrown when a token stream does not match

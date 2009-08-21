@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.cwi.waebric.checker.SemanticException;
 import org.cwi.waebric.checker.WaebricChecker;
-import org.cwi.waebric.checker.exception.SemanticException;
 import org.cwi.waebric.interpreter.WaebricInterpreter;
+import org.cwi.waebric.lexer.LexicalException;
 import org.cwi.waebric.lexer.WaebricScanner;
-import org.cwi.waebric.lexer.exception.LexicalException;
+import org.cwi.waebric.parser.SyntaxException;
 import org.cwi.waebric.parser.WaebricParser;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 public class WaebricProcessor {
 	

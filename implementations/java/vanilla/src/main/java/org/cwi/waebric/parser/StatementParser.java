@@ -18,7 +18,6 @@ import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/waebric/syntax/Statements

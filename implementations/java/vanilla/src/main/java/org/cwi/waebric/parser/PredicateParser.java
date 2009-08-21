@@ -9,7 +9,6 @@ import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
 import org.cwi.waebric.parser.ast.statement.predicate.Type;
-import org.cwi.waebric.parser.exception.SyntaxException;
 
 /**
  * module languages/Waebric/syntax/Predicate
