@@ -104,20 +104,22 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param content
 	 */
 	private void addContent(Content content) {
-		if(current == null) { // Construct root element
-    			if(content instanceof Element && ((Element) content).getName().equals("html")) {
-    				document.setRootElement((Element) content);
-    				current = document.getRootElement();
-    			} else {
-    				Element XHTML = createXHTMLTag();
-        			document.setRootElement(XHTML);
-        			XHTML.addContent(content);
-        			if(content instanceof Element) { current = (Element) content; }
-    			}	
-    		} else { // Add content to current element
-			current.addContent(content); // Attach content
-			if(content instanceof Element) { current = (Element) content; } // Update current
+		// Construct root element
+		if(current == null) {
+			if(content instanceof Element) {
+				Element rootElement = (Element) content;
+				document.setRootElement(rootElement);
+				current = rootElement;
+				return; // Content added, quit function
+			} else {
+				Element XHTML = createXHTMLTag();
+				document.setRootElement(XHTML);
+				current = XHTML;
+			}
 		}
+		
+		current.addContent(content); // Attach content
+		if(content instanceof Element) { current = (Element) content; } // Update current
 	}
 	
 	/**
@@ -359,23 +361,36 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.ListExpression list = (Expression.ListExpression) expression;
 			
 			// Execute statement for each element
-			Element actualElement = current;
+			Element root = current;
 			for(Expression e: list.getExpressions()) {
+				current = root;
 				environment = new Environment(environment);
 				environment.defineVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				environment = environment.getParent();
-				if(actualElement == null) { actualElement = document.getRootElement(); }
-				this.current = actualElement;
 			}
 		} else if(expression instanceof Expression.VarExpression) {
-			expression = environment.getVariable(((Expression.VarExpression) expression).getId().getName());
-			statement.setExpression(expression);
-			visit(statement);
+			Expression.VarExpression var = (Expression.VarExpression) expression;
+			
+			// Retrieve actual expression from variable cache
+			expression = environment.getVariable(var.getId().getName());
+			
+			// Execute function again
+			Statement.Each each = new Statement.Each();
+			each.setVar(statement.getVar());
+			each.setStatement(statement.getStatement());
+			each.setExpression(expression);
+			visit(each);
 		} else if(expression instanceof Expression.Field) {
+			// Retrieve actual expression from field
 			expression = getFieldExpression((Expression.Field) expression);
-			statement.setExpression(expression);
-			visit(statement);
+			
+			// Execute function again
+			Statement.Each each = new Statement.Each();
+			each.setVar(statement.getVar());
+			each.setStatement(statement.getStatement());
+			each.setExpression(expression);
+			visit(each);
 		}
 	}
 	
@@ -383,7 +398,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Attach <!-- COMMENT --> to current element.
 	 */
 	public void visit(Statement.Comment statement) {
-		addContent(new Comment(statement.getComment().getLiteral().toString()));
+		Comment comment = new Comment(statement.getComment().getLiteral().toString());
+		addContent(comment);
 	}
 	
 	/**
@@ -853,6 +869,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public Document getDocument() {
 		return document;
 	}
+
+	/**
+	 * Retrieve current JDOM element.
+	 * @return
+	 */
+	public Element getCurrent() {
+		return current;
+	}
 	
 	/**
 	 * Modify current JDOM element.
@@ -869,6 +893,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public String getText() {
 		return text;
+	}
+	
+	/**
+	 * Modify current text value.
+	 * @param data
+	 */
+	public void setText(String text) {
+		if(text != null) { this.text = text; } 
 	}
 	
 	/**
