@@ -7,10 +7,405 @@
 			<license_note>License note: This is a evaluation copy license</license_note>
 
 		</license_notes>
-		<date>Thu Aug 20 18:51:43 2009</date>
-		<cmtjava_options> -l -o output.xml</cmtjava_options>
+		<date>Sat Aug 22 18:45:23 2009</date>
+		<cmtjava_options> -l -o checker.xml</cmtjava_options>
 		<cwd>/home/jeroen/Research/WaebricJava/vanilla/src/main/java/org/cwi/waebric/checker</cwd>
 	</header_info>
+	<file name="ArityMismatchException.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+			<import>org.cwi.waebric.parser.ast.markup.Markup</import>
+		</imports>
+		<class name="ArityMismatchException" nesting="0" start_line="5">
+			<method name="ArityMismatchException" nesting="1" start_line="19">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>5</LOCphy>
+				<LOCpro>5</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>47</N>
+				<N1>28</N1>
+				<N2>19</N2>
+				<n>20</n>
+				<n1>6</n1>
+				<n2>14</n2>
+				<V>203.131</V>
+				<B>0.029</B>
+				<D>4.071</D>
+				<E>827.032</E>
+				<L>0.246</L>
+				<T>00:00:45</T>
+				<MaxND>1</MaxND>
+				<MIwoc>117</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>117</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>21</LOCphy>
+				<LOCpro>8</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>10</LOCcom>
+				<N>62</N>
+				<N1>38</N1>
+				<N2>24</N2>
+				<n>31</n>
+				<n1>13</n1>
+				<n2>18</n2>
+				<V>307.160</V>
+				<B>0.064</B>
+				<D>8.667</D>
+				<E>2662.055</E>
+				<L>0.115</L>
+				<T>00:02:27</T>
+				<MaxND>1</MaxND>
+				<MIwoc>92</MIwoc>
+				<MIcwc>44</MIcwc>
+				<MI>136</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>25</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>10</LOCpro>
+			<LOCcom>10</LOCcom>
+			<semicolons>4</semicolons>
+		</file_total>
+	</file>
+	<file name="DuplicateFunctionDefinition.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+			<import>org.cwi.waebric.parser.ast.module.function.FunctionDef</import>
+		</imports>
+		<class name="DuplicateFunctionDefinition" nesting="0" start_line="6">
+			<method name="DuplicateFunctionDefinition" nesting="1" start_line="19">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>5</LOCphy>
+				<LOCpro>5</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>39</N>
+				<N1>23</N1>
+				<N2>16</N2>
+				<n>18</n>
+				<n1>6</n1>
+				<n2>12</n2>
+				<V>162.627</V>
+				<B>0.025</B>
+				<D>4.000</D>
+				<E>650.508</E>
+				<L>0.250</L>
+				<T>00:00:36</T>
+				<MaxND>1</MaxND>
+				<MIwoc>118</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>118</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>20</LOCphy>
+				<LOCpro>8</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>9</LOCcom>
+				<N>54</N>
+				<N1>33</N1>
+				<N2>21</N2>
+				<n>29</n>
+				<n1>13</n1>
+				<n2>16</n2>
+				<V>262.331</V>
+				<B>0.057</B>
+				<D>8.531</D>
+				<E>2238.011</E>
+				<L>0.117</L>
+				<T>00:02:04</T>
+				<MaxND>1</MaxND>
+				<MIwoc>93</MIwoc>
+				<MIcwc>43</MIcwc>
+				<MI>136</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>25</LOCphy>
+			<LOCbl>6</LOCbl>
+			<LOCpro>10</LOCpro>
+			<LOCcom>9</LOCcom>
+			<semicolons>4</semicolons>
+		</file_total>
+	</file>
+	<file name="NonExistingModuleException.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+			<import>org.cwi.waebric.parser.ast.module.ModuleId</import>
+		</imports>
+		<class name="NonExistingModuleException" nesting="0" start_line="5">
+			<method name="NonExistingModuleException" nesting="1" start_line="19">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>5</LOCphy>
+				<LOCpro>5</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>31</N>
+				<N1>17</N1>
+				<N2>14</N2>
+				<n>18</n>
+				<n1>6</n1>
+				<n2>12</n2>
+				<V>129.268</V>
+				<B>0.020</B>
+				<D>3.500</D>
+				<E>452.437</E>
+				<L>0.286</L>
+				<T>00:00:25</T>
+				<MaxND>1</MaxND>
+				<MIwoc>119</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>119</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>21</LOCphy>
+				<LOCpro>8</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>10</LOCcom>
+				<N>46</N>
+				<N1>27</N1>
+				<N2>19</N2>
+				<n>29</n>
+				<n1>13</n1>
+				<n2>16</n2>
+				<V>223.467</V>
+				<B>0.048</B>
+				<D>7.719</D>
+				<E>1724.887</E>
+				<L>0.130</L>
+				<T>00:01:35</T>
+				<MaxND>1</MaxND>
+				<MIwoc>93</MIwoc>
+				<MIcwc>44</MIcwc>
+				<MI>137</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>25</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>10</LOCpro>
+			<LOCcom>10</LOCcom>
+			<semicolons>4</semicolons>
+		</file_total>
+	</file>
+	<file name="SemanticException.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+		</imports>
+		<class name="SemanticException" nesting="0" start_line="3">
+			<method name="SemanticException" nesting="1" start_line="18">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>7</LOCphy>
+				<LOCpro>3</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>4</LOCcom>
+				<N>10</N>
+				<N1>5</N1>
+				<N2>5</N2>
+				<n>8</n>
+				<n1>4</n1>
+				<n2>4</n2>
+				<V>30.000</V>
+				<B>0.006</B>
+				<D>2.500</D>
+				<E>75.000</E>
+				<L>0.400</L>
+				<T>00:00:04</T>
+				<MaxND>1</MaxND>
+				<MIwoc>122</MIwoc>
+				<MIcwc>46</MIcwc>
+				<MI>168</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>24</LOCphy>
+				<LOCpro>6</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>15</LOCcom>
+				<N>26</N>
+				<N1>16</N1>
+				<N2>10</N2>
+				<n>20</n>
+				<n1>12</n1>
+				<n2>8</n2>
+				<V>112.370</V>
+				<B>0.030</B>
+				<D>7.500</D>
+				<E>842.776</E>
+				<L>0.133</L>
+				<T>00:00:46</T>
+				<MaxND>1</MaxND>
+				<MIwoc>95</MIwoc>
+				<MIcwc>47</MIcwc>
+				<MI>142</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>26</LOCphy>
+			<LOCbl>4</LOCbl>
+			<LOCpro>7</LOCpro>
+			<LOCcom>15</LOCcom>
+			<semicolons>3</semicolons>
+		</file_total>
+	</file>
+	<file name="UndefinedFunctionException.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+			<import>org.cwi.waebric.parser.ast.markup.Markup</import>
+		</imports>
+		<class name="UndefinedFunctionException" nesting="0" start_line="5">
+			<method name="UndefinedFunctionException" nesting="1" start_line="22">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>5</LOCphy>
+				<LOCpro>5</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>47</N>
+				<N1>28</N1>
+				<N2>19</N2>
+				<n>20</n>
+				<n1>6</n1>
+				<n2>14</n2>
+				<V>203.131</V>
+				<B>0.029</B>
+				<D>4.071</D>
+				<E>827.032</E>
+				<L>0.246</L>
+				<T>00:00:45</T>
+				<MaxND>1</MaxND>
+				<MIwoc>117</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>117</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>24</LOCphy>
+				<LOCpro>8</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>13</LOCcom>
+				<N>62</N>
+				<N1>38</N1>
+				<N2>24</N2>
+				<n>31</n>
+				<n1>13</n1>
+				<n2>18</n2>
+				<V>307.160</V>
+				<B>0.064</B>
+				<D>8.667</D>
+				<E>2662.055</E>
+				<L>0.115</L>
+				<T>00:02:27</T>
+				<MaxND>1</MaxND>
+				<MIwoc>90</MIwoc>
+				<MIcwc>45</MIcwc>
+				<MI>135</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>28</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>10</LOCpro>
+			<LOCcom>13</LOCcom>
+			<semicolons>4</semicolons>
+		</file_total>
+	</file>
+	<file name="UndefinedVariableException.java">
+		<package>org.cwi.waebric.checker</package>
+		<imports>
+			<import>org.cwi.waebric.parser.ast.basic.IdCon</import>
+		</imports>
+		<class name="UndefinedVariableException" nesting="0" start_line="5">
+			<method name="UndefinedVariableException" nesting="1" start_line="20">
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>5</LOCphy>
+				<LOCpro>5</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>33</N>
+				<N1>19</N1>
+				<N2>14</N2>
+				<n>17</n>
+				<n1>6</n1>
+				<n2>11</n2>
+				<V>134.886</V>
+				<B>0.021</B>
+				<D>3.818</D>
+				<E>515.020</E>
+				<L>0.262</L>
+				<T>00:00:28</T>
+				<MaxND>1</MaxND>
+				<MIwoc>119</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>119</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>1</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>22</LOCphy>
+				<LOCpro>8</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>11</LOCcom>
+				<N>47</N>
+				<N1>28</N1>
+				<N2>19</N2>
+				<n>27</n>
+				<n1>12</n1>
+				<n2>15</n2>
+				<V>223.480</V>
+				<B>0.047</B>
+				<D>7.600</D>
+				<E>1698.446</E>
+				<L>0.132</L>
+				<T>00:01:34</T>
+				<MaxND>1</MaxND>
+				<MIwoc>93</MIwoc>
+				<MIcwc>44</MIcwc>
+				<MI>137</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>26</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>10</LOCpro>
+			<LOCcom>11</LOCcom>
+			<semicolons>4</semicolons>
+		</file_total>
+	</file>
 	<file name="WaebricChecker.java">
 		<package>org.cwi.waebric.checker</package>
 		<imports>
@@ -18,12 +413,6 @@
 			<import>java.util.ArrayList</import>
 			<import>java.util.List</import>
 			<import>org.cwi.waebric.XHTMLTag</import>
-			<import>org.cwi.waebric.checker.exception.ArityMismatchException</import>
-			<import>org.cwi.waebric.checker.exception.DuplicateFunctionDefinition</import>
-			<import>org.cwi.waebric.checker.exception.NonExistingModuleException</import>
-			<import>org.cwi.waebric.checker.exception.SemanticException</import>
-			<import>org.cwi.waebric.checker.exception.UndefinedFunctionException</import>
-			<import>org.cwi.waebric.checker.exception.UndefinedVariableException</import>
 			<import>org.cwi.waebric.parser.ast.AbstractSyntaxTree</import>
 			<import>org.cwi.waebric.parser.ast.DefaultNodeVisitor</import>
 			<import>org.cwi.waebric.parser.ast.basic.IdCon</import>
@@ -43,11 +432,11 @@
 			<import>org.cwi.waebric.util.Environment</import>
 			<import>org.cwi.waebric.util.ModuleRegister</import>
 		</imports>
-		<class name="WaebricChecker" nesting="0" start_line="33">
-			<method name="checkAST" nesting="1" start_line="45">
+		<class name="WaebricChecker" nesting="0" start_line="27">
+			<method name="checkAST" nesting="1" start_line="39">
 				<vG>5</vG>
 				<vG_max>5</vG_max>
-				<vG_avg>5</vG_avg>
+				<vG_avg>1</vG_avg>
 				<LOCphy>27</LOCphy>
 				<LOCpro>16</LOCpro>
 				<LOCbl>3</LOCbl>
@@ -69,7 +458,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>121</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="73">
+			<method name="visit" nesting="1" start_line="67">
 				<vG>2</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -94,7 +483,7 @@
 				<MIcwc>0</MIcwc>
 				<MI>109</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="82">
+			<method name="visit" nesting="1" start_line="76">
 				<vG>1</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -119,7 +508,7 @@
 				<MIcwc>35</MIcwc>
 				<MI>161</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="87">
+			<method name="visit" nesting="1" start_line="81">
 				<vG>3</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -144,7 +533,7 @@
 				<MIcwc>32</MIcwc>
 				<MI>129</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="103">
+			<method name="visit" nesting="1" start_line="97">
 				<vG>1</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -169,7 +558,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>154</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="111">
+			<method name="visit" nesting="1" start_line="105">
 				<vG>4</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -194,7 +583,7 @@
 				<MIcwc>33</MIcwc>
 				<MI>126</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="130">
+			<method name="visit" nesting="1" start_line="124">
 				<vG>3</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -219,7 +608,7 @@
 				<MIcwc>28</MIcwc>
 				<MI>117</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="151">
+			<method name="visit" nesting="1" start_line="145">
 				<vG>1</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -244,7 +633,7 @@
 				<MIcwc>32</MIcwc>
 				<MI>151</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="157">
+			<method name="visit" nesting="1" start_line="151">
 				<vG>2</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -269,7 +658,7 @@
 				<MIcwc>0</MIcwc>
 				<MI>115</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="164">
+			<method name="visit" nesting="1" start_line="158">
 				<vG>2</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -294,7 +683,7 @@
 				<MIcwc>0</MIcwc>
 				<MI>114</MI>
 			</method>
-			<method name="visit" nesting="1" start_line="171">
+			<method name="visit" nesting="1" start_line="165">
 				<vG>4</vG>
 				<vG_max>5</vG_max>
 				<vG_avg>1</vG_avg>
@@ -347,37 +736,37 @@
 		</class>
 		<file_total>
 			<vG>18</vG>
-			<LOCphy>194</LOCphy>
+			<LOCphy>188</LOCphy>
 			<LOCbl>29</LOCbl>
-			<LOCpro>141</LOCpro>
+			<LOCpro>135</LOCpro>
 			<LOCcom>33</LOCcom>
-			<semicolons>74</semicolons>
+			<semicolons>68</semicolons>
 		</file_total>
 	</file>
 	<system>
 		<packages>1</packages>
-		<files>1</files>
-		<measured_items>12</measured_items>
-		<LOCphy>194</LOCphy>
-		<LOCpro>141</LOCpro>
-		<LOCcom>33</LOCcom>
-		<LOCbl>29</LOCbl>
-		<semicolons>74</semicolons>
-		<java_comment_blocks>3</java_comment_blocks>
+		<files>7</files>
+		<measured_items>24</measured_items>
+		<LOCphy>343</LOCphy>
+		<LOCpro>192</LOCpro>
+		<LOCcom>101</LOCcom>
+		<LOCbl>59</LOCbl>
+		<semicolons>91</semicolons>
+		<java_comment_blocks>16</java_comment_blocks>
 		<vG>18</vG>
-		<MIwoc>100</MIwoc>
-		<MIcw>32</MIcw>
-		<MI>131</MI>
+		<MIwoc>105</MIwoc>
+		<MIcw>31</MIcw>
+		<MI>135</MI>
 		<methods_on_two_top_levels>
-			<total>11</total>
-			<LOCpro_avg>9</LOCpro_avg>
-			<comment_percent_avg>19</comment_percent_avg>
+			<total>17</total>
+			<LOCpro_avg>8</LOCpro_avg>
+			<comment_percent_avg>18</comment_percent_avg>
 			<vG_avg>2</vG_avg>
 		</methods_on_two_top_levels>
 		<classes>
-			<total>1</total>
-			<on_top_level>1</on_top_level>
-			<extends>1</extends>
+			<total>7</total>
+			<on_top_level>7</on_top_level>
+			<extends>7</extends>
 			<implements>0</implements>
 		</classes>
 		<interfaces>

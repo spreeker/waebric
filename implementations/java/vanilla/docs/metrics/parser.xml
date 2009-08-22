@@ -7,8 +7,8 @@
 			<license_note>License note: This is a evaluation copy license</license_note>
 
 		</license_notes>
-		<date>Thu Aug 20 18:46:46 2009</date>
-		<cmtjava_options> -l -o output.xml</cmtjava_options>
+		<date>Sat Aug 22 18:44:59 2009</date>
+		<cmtjava_options> -l -o parser.xml</cmtjava_options>
 		<cwd>/home/jeroen/Research/WaebricJava/vanilla/src/main/java/org/cwi/waebric/parser</cwd>
 	</header_info>
 	<file name="AbstractParser.java">
@@ -18,12 +18,9 @@
 			<import>org.cwi.waebric.lexer.token.Token</import>
 			<import>org.cwi.waebric.lexer.token.TokenIterator</import>
 			<import>org.cwi.waebric.lexer.token.WaebricTokenSort</import>
-			<import>org.cwi.waebric.parser.exception.MissingTokenException</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
-			<import>org.cwi.waebric.parser.exception.UnexpectedTokenException</import>
 		</imports>
-		<class name="AbstractParser" nesting="0" start_line="12">
-			<method name="AbstractParser" nesting="1" start_line="31">
+		<class name="AbstractParser" nesting="0" start_line="9">
+			<method name="AbstractParser" nesting="1" start_line="28">
 				<vG>1</vG>
 				<vG_max>1</vG_max>
 				<vG_avg>1</vG_avg>
@@ -48,7 +45,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>157</MI>
 			</method>
-			<method name="current" nesting="1" start_line="41">
+			<method name="current" nesting="1" start_line="38">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -73,7 +70,7 @@
 				<MIcwc>48</MIcwc>
 				<MI>149</MI>
 			</method>
-			<method name="current" nesting="1" start_line="55">
+			<method name="current" nesting="1" start_line="52">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -98,7 +95,7 @@
 				<MIcwc>48</MIcwc>
 				<MI>149</MI>
 			</method>
-			<method name="expect" nesting="1" start_line="69">
+			<method name="expect" nesting="1" start_line="66">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -123,7 +120,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>147</MI>
 			</method>
-			<method name="expect" nesting="1" start_line="84">
+			<method name="expect" nesting="1" start_line="81">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -148,7 +145,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="next" nesting="1" start_line="99">
+			<method name="next" nesting="1" start_line="96">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -173,7 +170,7 @@
 				<MIcwc>48</MIcwc>
 				<MI>152</MI>
 			</method>
-			<method name="next" nesting="1" start_line="112">
+			<method name="next" nesting="1" start_line="109">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -198,7 +195,7 @@
 				<MIcwc>45</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="next" nesting="1" start_line="126">
+			<method name="next" nesting="1" start_line="123">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -223,7 +220,7 @@
 				<MIcwc>48</MIcwc>
 				<MI>152</MI>
 			</method>
-			<method name="reportMissingToken" nesting="1" start_line="139">
+			<method name="reportMissingToken" nesting="1" start_line="136">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -248,7 +245,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>138</MI>
 			</method>
-			<method name="reportUnexpectedToken" nesting="1" start_line="159">
+			<method name="reportUnexpectedToken" nesting="1" start_line="156">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -301,11 +298,11 @@
 		</class>
 		<file_total>
 			<vG>7</vG>
-			<LOCphy>173</LOCphy>
+			<LOCphy>170</LOCphy>
 			<LOCbl>17</LOCbl>
-			<LOCpro>68</LOCpro>
+			<LOCpro>65</LOCpro>
 			<LOCcom>93</LOCcom>
-			<semicolons>32</semicolons>
+			<semicolons>29</semicolons>
 		</file_total>
 	</file>
 	<file name="EmbeddingParser.java">
@@ -324,10 +321,9 @@
 			<import>org.cwi.waebric.parser.ast.statement.embedding.PostText</import>
 			<import>org.cwi.waebric.parser.ast.statement.embedding.PreText</import>
 			<import>org.cwi.waebric.parser.ast.statement.embedding.TextTail</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="EmbeddingParser" nesting="0" start_line="19">
-			<method name="EmbeddingParser" nesting="1" start_line="32">
+		<class name="EmbeddingParser" nesting="0" start_line="18">
+			<method name="EmbeddingParser" nesting="1" start_line="31">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -352,7 +348,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>149</MI>
 			</method>
-			<method name="parseEmbedding" nesting="1" start_line="45">
+			<method name="parseEmbedding" nesting="1" start_line="44">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -377,7 +373,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>134</MI>
 			</method>
-			<method name="parsePreText" nesting="1" start_line="65">
+			<method name="parsePreText" nesting="1" start_line="64">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -402,7 +398,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="parseEmbed" nesting="1" start_line="77">
+			<method name="parseEmbed" nesting="1" start_line="76">
 				<vG>4</vG>
 				<vG_max>4</vG_max>
 				<vG_avg>1</vG_avg>
@@ -427,7 +423,7 @@
 				<MIcwc>41</MIcwc>
 				<MI>127</MI>
 			</method>
-			<method name="parseTextTail" nesting="1" start_line="101">
+			<method name="parseTextTail" nesting="1" start_line="100">
 				<vG>3</vG>
 				<vG_max>4</vG_max>
 				<vG_avg>1</vG_avg>
@@ -452,7 +448,7 @@
 				<MIcwc>36</MIcwc>
 				<MI>116</MI>
 			</method>
-			<method name="parsePostText" nesting="1" start_line="135">
+			<method name="parsePostText" nesting="1" start_line="134">
 				<vG>1</vG>
 				<vG_max>4</vG_max>
 				<vG_avg>1</vG_avg>
@@ -477,7 +473,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>146</MI>
 			</method>
-			<method name="parseMidText" nesting="1" start_line="148">
+			<method name="parseMidText" nesting="1" start_line="147">
 				<vG>1</vG>
 				<vG_max>4</vG_max>
 				<vG_avg>1</vG_avg>
@@ -502,7 +498,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="parseTextChars" nesting="1" start_line="160">
+			<method name="parseTextChars" nesting="1" start_line="159">
 				<vG>3</vG>
 				<vG_max>4</vG_max>
 				<vG_avg>1</vG_avg>
@@ -527,7 +523,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>139</MI>
 			</method>
-			<method name="isMarkup" nesting="1" start_line="176">
+			<method name="isMarkup" nesting="1" start_line="175">
 				<vG>8</vG>
 				<vG_max>8</vG_max>
 				<vG_avg>1</vG_avg>
@@ -580,11 +576,11 @@
 		</class>
 		<file_total>
 			<vG>16</vG>
-			<LOCphy>199</LOCphy>
+			<LOCphy>198</LOCphy>
 			<LOCbl>25</LOCbl>
-			<LOCpro>113</LOCpro>
+			<LOCpro>112</LOCpro>
 			<LOCcom>69</LOCcom>
-			<semicolons>71</semicolons>
+			<semicolons>70</semicolons>
 		</file_total>
 	</file>
 	<file name="ExpressionParser.java">
@@ -601,10 +597,9 @@
 			<import>org.cwi.waebric.parser.ast.basic.Text</import>
 			<import>org.cwi.waebric.parser.ast.expression.Expression</import>
 			<import>org.cwi.waebric.parser.ast.expression.KeyValuePair</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="ExpressionParser" nesting="0" start_line="17">
-			<method name="ExpressionParser" nesting="1" start_line="25">
+		<class name="ExpressionParser" nesting="0" start_line="16">
+			<method name="ExpressionParser" nesting="1" start_line="24">
 				<vG>1</vG>
 				<vG_max>8</vG_max>
 				<vG_avg>1</vG_avg>
@@ -629,7 +624,7 @@
 				<MIcwc>47</MIcwc>
 				<MI>162</MI>
 			</method>
-			<method name="parseExpression" nesting="1" start_line="34">
+			<method name="parseExpression" nesting="1" start_line="33">
 				<vG alarmed="1">17</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -654,7 +649,7 @@
 				<MIcwc>38</MIcwc>
 				<MI>96</MI>
 			</method>
-			<method name="isExpression" nesting="1" start_line="104">
+			<method name="isExpression" nesting="1" start_line="103">
 				<vG>4</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -679,7 +674,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>138</MI>
 			</method>
-			<method name="parseVarExpression" nesting="1" start_line="121">
+			<method name="parseVarExpression" nesting="1" start_line="120">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -704,7 +699,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>156</MI>
 			</method>
-			<method name="parseNatExpression" nesting="1" start_line="130">
+			<method name="parseNatExpression" nesting="1" start_line="129">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -729,7 +724,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>150</MI>
 			</method>
-			<method name="parseTextExpression" nesting="1" start_line="140">
+			<method name="parseTextExpression" nesting="1" start_line="139">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -754,7 +749,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>146</MI>
 			</method>
-			<method name="parseSymbolExpression" nesting="1" start_line="151">
+			<method name="parseSymbolExpression" nesting="1" start_line="150">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -779,7 +774,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>143</MI>
 			</method>
-			<method name="parseListExpression" nesting="1" start_line="163">
+			<method name="parseListExpression" nesting="1" start_line="162">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -804,7 +799,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>121</MI>
 			</method>
-			<method name="parseRecordExpression" nesting="1" start_line="189">
+			<method name="parseRecordExpression" nesting="1" start_line="188">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -829,7 +824,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>121</MI>
 			</method>
-			<method name="parseKeyValuePair" nesting="1" start_line="215">
+			<method name="parseKeyValuePair" nesting="1" start_line="214">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -882,11 +877,11 @@
 		</class>
 		<file_total>
 			<vG>28</vG>
-			<LOCphy>229</LOCphy>
+			<LOCphy>228</LOCphy>
 			<LOCbl>29</LOCbl>
-			<LOCpro>137</LOCpro>
+			<LOCpro>136</LOCpro>
 			<LOCcom>73</LOCcom>
-			<semicolons>80</semicolons>
+			<semicolons>79</semicolons>
 		</file_total>
 	</file>
 	<file name="FunctionParser.java">
@@ -898,10 +893,9 @@
 			<import>org.cwi.waebric.lexer.token.WaebricTokenSort</import>
 			<import>org.cwi.waebric.parser.ast.basic.IdCon</import>
 			<import>org.cwi.waebric.parser.ast.module.function.FunctionDef</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="FunctionParser" nesting="0" start_line="12">
-			<method name="FunctionParser" nesting="1" start_line="22">
+		<class name="FunctionParser" nesting="0" start_line="11">
+			<method name="FunctionParser" nesting="1" start_line="21">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -926,7 +920,7 @@
 				<MIcwc>30</MIcwc>
 				<MI>147</MI>
 			</method>
-			<method name="parseFunctionDef" nesting="1" start_line="29">
+			<method name="parseFunctionDef" nesting="1" start_line="28">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -979,11 +973,11 @@
 		</class>
 		<file_total>
 			<vG>3</vG>
-			<LOCphy>53</LOCphy>
+			<LOCphy>52</LOCphy>
 			<LOCbl>12</LOCbl>
-			<LOCpro>26</LOCpro>
+			<LOCpro>25</LOCpro>
 			<LOCcom>15</LOCcom>
-			<semicolons>18</semicolons>
+			<semicolons>17</semicolons>
 		</file_total>
 	</file>
 	<file name="MarkupParser.java">
@@ -1002,10 +996,9 @@
 			<import>org.cwi.waebric.parser.ast.markup.Attributes</import>
 			<import>org.cwi.waebric.parser.ast.markup.Designator</import>
 			<import>org.cwi.waebric.parser.ast.markup.Markup</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="MarkupParser" nesting="0" start_line="19">
-			<method name="MarkupParser" nesting="1" start_line="29">
+		<class name="MarkupParser" nesting="0" start_line="18">
+			<method name="MarkupParser" nesting="1" start_line="28">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1030,7 +1023,7 @@
 				<MIcwc>30</MIcwc>
 				<MI>147</MI>
 			</method>
-			<method name="parseMarkup" nesting="1" start_line="36">
+			<method name="parseMarkup" nesting="1" start_line="35">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1055,7 +1048,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>138</MI>
 			</method>
-			<method name="parseDesignator" nesting="1" start_line="53">
+			<method name="parseDesignator" nesting="1" start_line="52">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1080,7 +1073,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>143</MI>
 			</method>
-			<method name="parseAttributes" nesting="1" start_line="68">
+			<method name="parseAttributes" nesting="1" start_line="67">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1105,7 +1098,7 @@
 				<MIcwc>38</MIcwc>
 				<MI>140</MI>
 			</method>
-			<method name="isAttribute" nesting="1" start_line="82">
+			<method name="isAttribute" nesting="1" start_line="81">
 				<vG>7</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1130,7 +1123,7 @@
 				<MIcwc>0</MIcwc>
 				<MI>114</MI>
 			</method>
-			<method name="parseAttribute" nesting="1" start_line="88">
+			<method name="parseAttribute" nesting="1" start_line="87">
 				<vG>8</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1155,7 +1148,7 @@
 				<MIcwc>30</MIcwc>
 				<MI>95</MI>
 			</method>
-			<method name="parseArguments" nesting="1" start_line="142">
+			<method name="parseArguments" nesting="1" start_line="141">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1180,7 +1173,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>122</MI>
 			</method>
-			<method name="parseArgument" nesting="1" start_line="168">
+			<method name="parseArgument" nesting="1" start_line="167">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1233,11 +1226,102 @@
 		</class>
 		<file_total>
 			<vG>24</vG>
-			<LOCphy>190</LOCphy>
+			<LOCphy>189</LOCphy>
 			<LOCbl>29</LOCbl>
-			<LOCpro>120</LOCpro>
+			<LOCpro>119</LOCpro>
 			<LOCcom>48</LOCcom>
-			<semicolons>78</semicolons>
+			<semicolons>77</semicolons>
+		</file_total>
+	</file>
+	<file name="MissingTokenException.java">
+		<package>org.cwi.waebric.parser</package>
+		<imports>
+			<import>org.cwi.waebric.lexer.token.Token</import>
+		</imports>
+		<class name="MissingTokenException" nesting="0" start_line="5">
+			<method name="MissingTokenException" nesting="1" start_line="18">
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>10</LOCphy>
+				<LOCpro>4</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>6</LOCcom>
+				<N>33</N>
+				<N1>16</N1>
+				<N2>17</N2>
+				<n>20</n>
+				<n1>7</n1>
+				<n2>13</n2>
+				<V>142.624</V>
+				<B>0.025</B>
+				<D>4.577</D>
+				<E>652.777</E>
+				<L>0.218</L>
+				<T>00:00:36</T>
+				<MaxND>1</MaxND>
+				<MIwoc>108</MIwoc>
+				<MIcwc>47</MIcwc>
+				<MI>154</MI>
+			</method>
+			<method name="MissingTokenException" nesting="1" start_line="29">
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>8</LOCphy>
+				<LOCpro>3</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>5</LOCcom>
+				<N>21</N>
+				<N1>10</N1>
+				<N2>11</N2>
+				<n>14</n>
+				<n1>6</n1>
+				<n2>8</n2>
+				<V>79.954</V>
+				<B>0.016</B>
+				<D>4.125</D>
+				<E>329.812</E>
+				<L>0.242</L>
+				<T>00:00:18</T>
+				<MaxND>1</MaxND>
+				<MIwoc>114</MIwoc>
+				<MIcwc>47</MIcwc>
+				<MI>161</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>34</LOCphy>
+				<LOCpro>10</LOCpro>
+				<LOCbl>4</LOCbl>
+				<LOCcom>20</LOCcom>
+				<N>68</N>
+				<N1>35</N1>
+				<N2>33</N2>
+				<n>31</n>
+				<n1>13</n1>
+				<n2>18</n2>
+				<V>336.885</V>
+				<B>0.084</B>
+				<D>11.917</D>
+				<E>4014.550</E>
+				<L>0.084</L>
+				<T>00:03:43</T>
+				<MaxND>1</MaxND>
+				<MIwoc>98</MIwoc>
+				<MIcwc>46</MIcwc>
+				<MI>145</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>38</LOCphy>
+			<LOCbl>6</LOCbl>
+			<LOCpro>12</LOCpro>
+			<LOCcom>20</LOCcom>
+			<semicolons>5</semicolons>
 		</file_total>
 	</file>
 	<file name="ModuleParser.java">
@@ -1254,10 +1338,9 @@
 			<import>org.cwi.waebric.parser.ast.module.ModuleId</import>
 			<import>org.cwi.waebric.parser.ast.module.function.FunctionDef</import>
 			<import>org.cwi.waebric.parser.ast.module.site.Site</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="ModuleParser" nesting="0" start_line="17">
-			<method name="ModuleParser" nesting="1" start_line="28">
+		<class name="ModuleParser" nesting="0" start_line="16">
+			<method name="ModuleParser" nesting="1" start_line="27">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1282,7 +1365,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>149</MI>
 			</method>
-			<method name="parseModule" nesting="1" start_line="41">
+			<method name="parseModule" nesting="1" start_line="40">
 				<vG>6</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1307,7 +1390,7 @@
 				<MIcwc>32</MIcwc>
 				<MI>109</MI>
 			</method>
-			<method name="parseModuleId" nesting="1" start_line="76">
+			<method name="parseModuleId" nesting="1" start_line="75">
 				<vG>4</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1332,7 +1415,7 @@
 				<MIcwc>39</MIcwc>
 				<MI>129</MI>
 			</method>
-			<method name="parseImport" nesting="1" start_line="98">
+			<method name="parseImport" nesting="1" start_line="97">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1385,11 +1468,11 @@
 		</class>
 		<file_total>
 			<vG>9</vG>
-			<LOCphy>108</LOCphy>
+			<LOCphy>107</LOCphy>
 			<LOCbl>17</LOCbl>
-			<LOCpro>65</LOCpro>
+			<LOCpro>64</LOCpro>
 			<LOCcom>30</LOCcom>
-			<semicolons>41</semicolons>
+			<semicolons>40</semicolons>
 		</file_total>
 	</file>
 	<file name="PredicateParser.java">
@@ -1403,10 +1486,9 @@
 			<import>org.cwi.waebric.parser.ast.expression.Expression</import>
 			<import>org.cwi.waebric.parser.ast.statement.predicate.Predicate</import>
 			<import>org.cwi.waebric.parser.ast.statement.predicate.Type</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="PredicateParser" nesting="0" start_line="14">
-			<method name="PredicateParser" nesting="1" start_line="24">
+		<class name="PredicateParser" nesting="0" start_line="13">
+			<method name="PredicateParser" nesting="1" start_line="23">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1431,7 +1513,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>153</MI>
 			</method>
-			<method name="parsePredicate" nesting="1" start_line="36">
+			<method name="parsePredicate" nesting="1" start_line="35">
 				<vG alarmed="1">11</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1456,7 +1538,7 @@
 				<MIcwc>39</MIcwc>
 				<MI>105</MI>
 			</method>
-			<method name="parseType" nesting="1" start_line="86">
+			<method name="parseType" nesting="1" start_line="85">
 				<vG>4</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1509,11 +1591,11 @@
 		</class>
 		<file_total>
 			<vG>14</vG>
-			<LOCphy>109</LOCphy>
+			<LOCphy>108</LOCphy>
 			<LOCbl>15</LOCbl>
-			<LOCpro>69</LOCpro>
+			<LOCpro>68</LOCpro>
 			<LOCcom>33</LOCcom>
-			<semicolons>48</semicolons>
+			<semicolons>47</semicolons>
 		</file_total>
 	</file>
 	<file name="SiteParser.java">
@@ -1529,10 +1611,9 @@
 			<import>org.cwi.waebric.parser.ast.module.site.Mappings</import>
 			<import>org.cwi.waebric.parser.ast.module.site.Path</import>
 			<import>org.cwi.waebric.parser.ast.module.site.Site</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="SiteParser" nesting="0" start_line="16">
-			<method name="SiteParser" nesting="1" start_line="27">
+		<class name="SiteParser" nesting="0" start_line="15">
+			<method name="SiteParser" nesting="1" start_line="26">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1557,7 +1638,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>153</MI>
 			</method>
-			<method name="parseSite" nesting="1" start_line="40">
+			<method name="parseSite" nesting="1" start_line="39">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1582,7 +1663,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>145</MI>
 			</method>
-			<method name="parseMappings" nesting="1" start_line="52">
+			<method name="parseMappings" nesting="1" start_line="51">
 				<vG>4</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1607,7 +1688,7 @@
 				<MIcwc>36</MIcwc>
 				<MI>126</MI>
 			</method>
-			<method name="parseMapping" nesting="1" start_line="75">
+			<method name="parseMapping" nesting="1" start_line="74">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1632,7 +1713,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>145</MI>
 			</method>
-			<method name="parsePath" nesting="1" start_line="87">
+			<method name="parsePath" nesting="1" start_line="86">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1657,7 +1738,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>142</MI>
 			</method>
-			<method name="parseDirectory" nesting="1" start_line="102">
+			<method name="parseDirectory" nesting="1" start_line="101">
 				<vG>6</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1682,7 +1763,7 @@
 				<MIcwc>38</MIcwc>
 				<MI>119</MI>
 			</method>
-			<method name="isPathElement" nesting="1" start_line="133">
+			<method name="isPathElement" nesting="1" start_line="132">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1707,7 +1788,7 @@
 				<MIcwc>47</MIcwc>
 				<MI>163</MI>
 			</method>
-			<method name="parseFileName" nesting="1" start_line="142">
+			<method name="parseFileName" nesting="1" start_line="141">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1760,11 +1841,11 @@
 		</class>
 		<file_total>
 			<vG>11</vG>
-			<LOCphy>157</LOCphy>
+			<LOCphy>156</LOCphy>
 			<LOCbl>23</LOCbl>
-			<LOCpro>86</LOCpro>
+			<LOCpro>85</LOCpro>
 			<LOCcom>54</LOCcom>
-			<semicolons>51</semicolons>
+			<semicolons>50</semicolons>
 		</file_total>
 	</file>
 	<file name="StatementParser.java">
@@ -1787,10 +1868,9 @@
 			<import>org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression</import>
 			<import>org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement</import>
 			<import>org.cwi.waebric.parser.ast.statement.predicate.Predicate</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="StatementParser" nesting="0" start_line="23">
-			<method name="StatementParser" nesting="1" start_line="36">
+		<class name="StatementParser" nesting="0" start_line="22">
+			<method name="StatementParser" nesting="1" start_line="35">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1815,7 +1895,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>142</MI>
 			</method>
-			<method name="parseStatement" nesting="1" start_line="51">
+			<method name="parseStatement" nesting="1" start_line="50">
 				<vG alarmed="1">13</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1840,7 +1920,7 @@
 				<MIcwc>39</MIcwc>
 				<MI>107</MI>
 			</method>
-			<method name="parseIfStatement" nesting="1" start_line="102">
+			<method name="parseIfStatement" nesting="1" start_line="101">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1865,7 +1945,7 @@
 				<MIcwc>39</MIcwc>
 				<MI>122</MI>
 			</method>
-			<method name="parseEachStatement" nesting="1" start_line="132">
+			<method name="parseEachStatement" nesting="1" start_line="131">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1890,7 +1970,7 @@
 				<MIcwc>38</MIcwc>
 				<MI>125</MI>
 			</method>
-			<method name="parseLetStatement" nesting="1" start_line="156">
+			<method name="parseLetStatement" nesting="1" start_line="155">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1915,7 +1995,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>121</MI>
 			</method>
-			<method name="parseStatementCollection" nesting="1" start_line="182">
+			<method name="parseStatementCollection" nesting="1" start_line="181">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1940,7 +2020,7 @@
 				<MIcwc>38</MIcwc>
 				<MI>133</MI>
 			</method>
-			<method name="parseCommentStatement" nesting="1" start_line="199">
+			<method name="parseCommentStatement" nesting="1" start_line="198">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1965,7 +2045,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>137</MI>
 			</method>
-			<method name="parseEchoEmbeddingStatement" nesting="1" start_line="214">
+			<method name="parseEchoEmbeddingStatement" nesting="1" start_line="213">
 				<vG>2</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -1990,7 +2070,7 @@
 				<MIcwc>36</MIcwc>
 				<MI>130</MI>
 			</method>
-			<method name="parseEchoExpressionStatement" nesting="1" start_line="233">
+			<method name="parseEchoExpressionStatement" nesting="1" start_line="232">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2015,7 +2095,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>144</MI>
 			</method>
-			<method name="parseCDataStatement" nesting="1" start_line="246">
+			<method name="parseCDataStatement" nesting="1" start_line="245">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2040,7 +2120,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>144</MI>
 			</method>
-			<method name="parseYieldStatement" nesting="1" start_line="259">
+			<method name="parseYieldStatement" nesting="1" start_line="258">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2065,7 +2145,7 @@
 				<MIcwc>43</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="parseMarkupStatements" nesting="1" start_line="271">
+			<method name="parseMarkupStatements" nesting="1" start_line="270">
 				<vG alarmed="1">11</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2090,7 +2170,7 @@
 				<MIcwc>31</MIcwc>
 				<MI>91</MI>
 			</method>
-			<method name="isMarkup" nesting="1" start_line="342">
+			<method name="isMarkup" nesting="1" start_line="341">
 				<vG>10</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2115,7 +2195,7 @@
 				<MIcwc>45</MIcwc>
 				<MI>126</MI>
 			</method>
-			<method name="isMarkupFreeStatement" nesting="1" start_line="370">
+			<method name="isMarkupFreeStatement" nesting="1" start_line="369">
 				<vG>8</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2140,7 +2220,7 @@
 				<MIcwc>36</MIcwc>
 				<MI>126</MI>
 			</method>
-			<method name="parseAssignment" nesting="1" start_line="389">
+			<method name="parseAssignment" nesting="1" start_line="388">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2165,7 +2245,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>145</MI>
 			</method>
-			<method name="parseVarAssignment" nesting="1" start_line="402">
+			<method name="parseVarAssignment" nesting="1" start_line="401">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2190,7 +2270,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>137</MI>
 			</method>
-			<method name="parseFuncAssignment" nesting="1" start_line="417">
+			<method name="parseFuncAssignment" nesting="1" start_line="416">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2215,7 +2295,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>115</MI>
 			</method>
-			<method name="parseFormals" nesting="1" start_line="452">
+			<method name="parseFormals" nesting="1" start_line="451">
 				<vG>7</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2268,11 +2348,142 @@
 		</class>
 		<file_total>
 			<vG>60</vG>
-			<LOCphy>485</LOCphy>
+			<LOCphy>484</LOCphy>
 			<LOCbl>57</LOCbl>
-			<LOCpro>299</LOCpro>
+			<LOCpro>298</LOCpro>
 			<LOCcom>145</LOCcom>
-			<semicolons>172</semicolons>
+			<semicolons>171</semicolons>
+		</file_total>
+	</file>
+	<file name="SyntaxException.java">
+		<package>org.cwi.waebric.parser</package>
+		<imports>
+		</imports>
+		<class name="SyntaxException" nesting="0" start_line="3">
+			<method name="SyntaxException" nesting="1" start_line="17">
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>7</LOCphy>
+				<LOCpro>3</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>4</LOCcom>
+				<N>10</N>
+				<N1>5</N1>
+				<N2>5</N2>
+				<n>8</n>
+				<n1>4</n1>
+				<n2>4</n2>
+				<V>30.000</V>
+				<B>0.006</B>
+				<D>2.500</D>
+				<E>75.000</E>
+				<L>0.400</L>
+				<T>00:00:04</T>
+				<MaxND>1</MaxND>
+				<MIwoc>122</MIwoc>
+				<MIcwc>46</MIcwc>
+				<MI>168</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>23</LOCphy>
+				<LOCpro>6</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>14</LOCcom>
+				<N>26</N>
+				<N1>16</N1>
+				<N2>10</N2>
+				<n>20</n>
+				<n1>12</n1>
+				<n2>8</n2>
+				<V>112.370</V>
+				<B>0.030</B>
+				<D>7.500</D>
+				<E>842.776</E>
+				<L>0.133</L>
+				<T>00:00:46</T>
+				<MaxND>1</MaxND>
+				<MIwoc>95</MIwoc>
+				<MIcwc>47</MIcwc>
+				<MI>142</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>25</LOCphy>
+			<LOCbl>4</LOCbl>
+			<LOCpro>7</LOCpro>
+			<LOCcom>14</LOCcom>
+			<semicolons>3</semicolons>
+		</file_total>
+	</file>
+	<file name="UnexpectedTokenException.java">
+		<package>org.cwi.waebric.parser</package>
+		<imports>
+			<import>org.cwi.waebric.lexer.token.Token</import>
+		</imports>
+		<class name="UnexpectedTokenException" nesting="0" start_line="5">
+			<method name="UnexpectedTokenException" nesting="1" start_line="19">
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>4</LOCphy>
+				<LOCpro>4</LOCpro>
+				<LOCbl>0</LOCbl>
+				<LOCcom>0</LOCcom>
+				<N>31</N>
+				<N1>15</N1>
+				<N2>16</N2>
+				<n>19</n>
+				<n1>7</n1>
+				<n2>12</n2>
+				<V>131.686</V>
+				<B>0.024</B>
+				<D>4.667</D>
+				<E>614.534</E>
+				<L>0.214</L>
+				<T>00:00:34</T>
+				<MaxND>1</MaxND>
+				<MIwoc>123</MIwoc>
+				<MIcwc>0</MIcwc>
+				<MI>123</MI>
+			</method>
+			<class_total>
+				<vG>1</vG>
+				<vG_max>17</vG_max>
+				<vG_avg>1</vG_avg>
+				<LOCphy>20</LOCphy>
+				<LOCpro>7</LOCpro>
+				<LOCbl>3</LOCbl>
+				<LOCcom>10</LOCcom>
+				<N>46</N>
+				<N1>25</N1>
+				<N2>21</N2>
+				<n>30</n>
+				<n1>14</n1>
+				<n2>16</n2>
+				<V>225.717</V>
+				<B>0.054</B>
+				<D>9.188</D>
+				<E>2073.775</E>
+				<L>0.109</L>
+				<T>00:01:55</T>
+				<MaxND>1</MaxND>
+				<MIwoc>94</MIwoc>
+				<MIcwc>44</MIcwc>
+				<MI>139</MI>
+			</class_total>
+		</class>
+		<file_total>
+			<vG>1</vG>
+			<LOCphy>24</LOCphy>
+			<LOCbl>5</LOCbl>
+			<LOCpro>9</LOCpro>
+			<LOCcom>10</LOCcom>
+			<semicolons>4</semicolons>
 		</file_total>
 	</file>
 	<file name="WaebricParser.java">
@@ -2283,10 +2494,9 @@
 			<import>org.cwi.waebric.lexer.token.TokenIterator</import>
 			<import>org.cwi.waebric.parser.ast.AbstractSyntaxTree</import>
 			<import>org.cwi.waebric.parser.ast.module.Module</import>
-			<import>org.cwi.waebric.parser.exception.SyntaxException</import>
 		</imports>
-		<class name="WaebricParser" nesting="0" start_line="11">
-			<method name="WaebricParser" nesting="1" start_line="24">
+		<class name="WaebricParser" nesting="0" start_line="10">
+			<method name="WaebricParser" nesting="1" start_line="23">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2311,7 +2521,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>164</MI>
 			</method>
-			<method name="parseTokens" nesting="1" start_line="32">
+			<method name="parseTokens" nesting="1" start_line="31">
 				<vG>2</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2336,7 +2546,7 @@
 				<MIcwc>46</MIcwc>
 				<MI>143</MI>
 			</method>
-			<method name="getAbstractSyntaxTree" nesting="1" start_line="49">
+			<method name="getAbstractSyntaxTree" nesting="1" start_line="48">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2389,37 +2599,37 @@
 		</class>
 		<file_total>
 			<vG>2</vG>
-			<LOCphy>58</LOCphy>
+			<LOCphy>57</LOCphy>
 			<LOCbl>10</LOCbl>
-			<LOCpro>25</LOCpro>
+			<LOCpro>24</LOCpro>
 			<LOCcom>27</LOCcom>
-			<semicolons>15</semicolons>
+			<semicolons>14</semicolons>
 		</file_total>
 	</file>
 	<system>
 		<packages>1</packages>
-		<files>10</files>
-		<measured_items>85</measured_items>
-		<LOCphy>1761</LOCphy>
-		<LOCpro>1008</LOCpro>
-		<LOCcom>587</LOCcom>
-		<LOCbl>234</LOCbl>
+		<files>13</files>
+		<measured_items>92</measured_items>
+		<LOCphy>1836</LOCphy>
+		<LOCpro>1024</LOCpro>
+		<LOCcom>631</LOCcom>
+		<LOCbl>249</LOCbl>
 		<semicolons>606</semicolons>
-		<java_comment_blocks>84</java_comment_blocks>
+		<java_comment_blocks>93</java_comment_blocks>
 		<vG>165</vG>
-		<MIwoc>91</MIwoc>
+		<MIwoc>92</MIwoc>
 		<MIcw>40</MIcw>
 		<MI>132</MI>
 		<methods_on_two_top_levels>
-			<total>75</total>
-			<LOCpro_avg>11</LOCpro_avg>
+			<total>79</total>
+			<LOCpro_avg>10</LOCpro_avg>
 			<comment_percent_avg>36</comment_percent_avg>
 			<vG_avg>3</vG_avg>
 		</methods_on_two_top_levels>
 		<classes>
-			<total>10</total>
-			<on_top_level>10</on_top_level>
-			<extends>9</extends>
+			<total>13</total>
+			<on_top_level>13</on_top_level>
+			<extends>12</extends>
 			<implements>0</implements>
 		</classes>
 		<interfaces>
