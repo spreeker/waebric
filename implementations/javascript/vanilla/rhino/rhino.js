@@ -79,7 +79,7 @@ function createHTML(waebricEnvironments, siteName){
 	for(var i = 0; i < waebricEnvironments.length; i++){			
 		var waebricEnvironment = waebricEnvironments[i];
 		if (waebricEnvironment.path != '') {
-			var rootPath = '../../demos/vanilla/';
+			var rootPath = '../../../../../demos/output_vanilla/';
 			var sitePath = siteName + '/' + waebricEnvironment.path.toString();
 			createDirectories(rootPath, sitePath)
 			
@@ -129,10 +129,10 @@ function createTidyOutput(waebricEnvironments, siteName){
 	var output = '';
 	for(var i = 0; i < waebricEnvironments.length; i++){	
 		var waebricEnvironment = waebricEnvironments[i];
-		output += '../../demos/vanilla/' + siteName + '/' + waebricEnvironment.path.toString() + ' ';	
+		output += '../../../../../demos/output_vanilla/' + siteName + '/' + waebricEnvironment.path.toString() + ' ';	
 	}
 	//Write file
-	var fw = new FileWriter('../../demos/vanilla/tidy.txt');
+	var fw = new FileWriter('../../../../../demos/output_vanilla/tidy.txt');
 	var bf = new BufferedWriter(fw);
 	bf.write(output);
 	bf.close();
@@ -168,5 +168,5 @@ function convertToHTML(path, siteName){
 	}
 }
 
-convertToHTML('../../../../demos/lava/lava.wae', 'lava');
+convertToHTML('../../../../../demos/source/lava/lava.wae', 'lava');
 //convertToHTML('../programs/program.wae', 'program');

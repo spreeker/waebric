@@ -17,6 +17,8 @@
  */
 function WaebricParser(){
 	
+	var exceptionList = new Array();	
+	
 	/**
 	 * Parses the program source
 	 * 
@@ -27,7 +29,7 @@ function WaebricParser(){
 		var fileExists = (new File(path)).exists();
 		if (fileExists) {
 			var module = parseModule(path);
-			return new WaebricParserResult(module);	
+			return new WaebricParserResult(module, exceptionList);	
 		}else{
 			throw new NonExistingModuleException(path);
 		}
@@ -40,21 +42,27 @@ function WaebricParser(){
 	 * @return {Module}
 	 */
 	function parseModule(path){
-		//Get Waebric program	
-		print('\n---- Loading ' + path)
-		var programSource = getSourceWaebricProgram(path);
-
-		//Tokenize the module		
-		print('---- Tokenizing ' + path)
-		var tokenizerResult = WaebricTokenizer.tokenize(programSource, path);
-		writeTokenizerResult(tokenizerResult.tokens)
-		//Parse the tokenizerResult to a Module
-		print('---- Parsing ' + path)
-		var module = WaebricRootParser.parse(tokenizerResult, path)
-
-		//Parse the dependencies
-		module.dependencies = parseDependencies(path, module);
-		return module;		
+		try {
+			//Get Waebric program	
+			//print('\n---- Loading ' + path)
+			var programSource = getSourceWaebricProgram(path);
+			
+			//Tokenize the module		
+			//print('---- Tokenizing ' + path)			
+			
+			var tokenizerResult = WaebricTokenizer.tokenize(programSource, path);
+			
+			//Parse the tokenizerResult to a Module
+			//print('---- Parsing ' + path)
+			var module = WaebricRootParser.parse(tokenizerResult, path)
+			
+			//Parse the dependencies
+			module.dependencies = parseDependencies(path, module);
+			return module;
+		}catch(exception){
+			print('---- Parsing/tokenizing failed!\n')	
+			throw exception;
+		}
 	}
 	
 	/**
@@ -82,18 +90,19 @@ function WaebricParser(){
 	 * @param {Module} parentModule The module for which the transitive dependencies will be returned
 	 * @return {Array} An array of {Module} elements
 	 */
-	function parseDependencies(parentPath, parentModule){
-		var dependencies = new Array();
-		for (var i = 0; i < parentModule.imports.length; i++) {
-			try {
-				var dependency = parentModule.imports[i];
-				var dependencyPath = getDependencyPath(parentPath, dependency);
+	function parseDependencies(parentPath, parentModule){				
+		var dependencies = new Array();		
+		for (var i = 0; i < parentModule.imports.length; i++) {			
+			var dependency = parentModule.imports[i];
+			var dependencyPath = getDependencyPath(parentPath, dependency);
+			var fileExists = (new File(dependencyPath)).exists();
+			if (fileExists) {
 				var dependencyModule = parseModule(dependencyPath)
 				dependencies.push(dependencyModule)
-			}catch(exception){
-				print('---- Loading failed!\n')					
-				exceptions.push(exception);
-			}				
+			}else{
+				print('---- Loading failed!')					
+				exceptionList.push(new NonExistingModuleException(dependencyPath));
+			}					
 		}
 		return dependencies;
 	}
@@ -111,13 +120,32 @@ function WaebricParser(){
 		var directoryParent = directoriesParent.slice(0, directoriesParent.length - 1).join('/').concat("/");
 		
 		//Determine relative path of dependency towards parent module
-		var directoryDependency = dependency.moduleId.identifier.replace('.', '/');
-		
+		var directoryDependency = dependency.moduleId.identifier.replace(/\./g, '/');
+
 		//Determine relative path of dependency towards file system
 		var path = directoryParent + directoryDependency + ".wae"
 		
 		return path;
 	}
+	
+	/**
+	 * Returns the directory path of the dependency
+	 * 
+	 * @param {Object} imprt
+	 * @return {String} The directory path of the dependency
+	 */
+	this.getCurrentDirectoryPath = function(parentPath, imprt){
+		//Determine relative path of parent module towards file system
+		var directoriesParent = parentPath.split('/');
+		var directoryParent = directoriesParent.slice(0, directoriesParent.length - 1).join('/').concat("/");
+		
+		//Determine relative path of dependency towards parent module
+		var directoriesImport = imprt.moduleId.identifier.split('.');
+		var directoryImport = directoriesImport.slice(0, directoriesImport.length - 1).join('/').concat("/");
+
+		//Determine relative path of dependency towards file system
+		return(directoryParent + directoryImport)
+	}	
 	
 	/**
 	 * Returns the source of a Waebric program
@@ -162,5 +190,3 @@ WaebricParser.parse = function(path){
 		throw new WaebricParserException(exception.message, null, path, exception);
 	}
 }
-	
-	
