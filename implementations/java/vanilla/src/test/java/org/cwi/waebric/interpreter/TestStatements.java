@@ -484,34 +484,40 @@ public class TestStatements {
 		Predicate.Is validString = new Predicate.Is();
 		validString.setExpression(new Expression.TextExpression("test"));
 		validString.setType(new Type.StringType());
-		assertTrue(visitor.evaluatePredicate(validString));
+		visitor.visit(validString);
+		assertTrue(visitor.peval);
 		
 		Predicate.Is invalidString = new Predicate.Is();
 		invalidString.setExpression(new Expression.NatExpression(1337));
 		invalidString.setType(new Type.StringType());
-		assertFalse(visitor.evaluatePredicate(invalidString));
+		visitor.visit(invalidString);
+		assertFalse(visitor.peval);
 		
 		// Is-list predicate
 		Predicate.Is validList = new Predicate.Is();
 		validList.setExpression(new Expression.ListExpression());
 		validList.setType(new Type.ListType());
-		assertTrue(visitor.evaluatePredicate(validList));
+		visitor.visit(validList);
+		assertTrue(visitor.peval);
 		
 		Predicate.Is invalidList = new Predicate.Is();
 		invalidList.setExpression(new Expression.NatExpression(1337));
 		invalidList.setType(new Type.ListType());
-		assertFalse(visitor.evaluatePredicate(invalidList));
+		visitor.visit(invalidList);
+		assertFalse(visitor.peval);
 	
 		// Is-record predicate
 		Predicate.Is validRecord = new Predicate.Is();
 		validRecord.setExpression(new Expression.RecordExpression());
 		validRecord.setType(new Type.RecordType());
-		assertTrue(visitor.evaluatePredicate(validRecord));
+		visitor.visit(validRecord);
+		assertTrue(visitor.peval);
 		
 		Predicate.Is invalidRecord = new Predicate.Is();
 		invalidRecord.setExpression(new Expression.NatExpression(1337));
 		invalidRecord.setType(new Type.RecordType());
-		assertFalse(visitor.evaluatePredicate(invalidRecord));
+		visitor.visit(invalidRecord);
+		assertFalse(visitor.peval);
 		
 		// Field predicate, check if record element can be found
 		Expression.RecordExpression recordExpr = new Expression.RecordExpression();
@@ -522,37 +528,51 @@ public class TestStatements {
 		
 		Predicate.RegularPredicate validField = new Predicate.RegularPredicate();
 		validField.setExpression(new Expression.Field(recordExpr, new IdCon("valid")));
-		assertTrue(visitor.evaluatePredicate(validField));
+		visitor.visit(validField);
+		assertTrue(visitor.peval);
 		
 		Predicate.RegularPredicate invalidField = new Predicate.RegularPredicate();
 		invalidField.setExpression(new Expression.Field(recordExpr, new IdCon("invalid")));
-		assertFalse(visitor.evaluatePredicate(invalidField));
+		visitor.visit(invalidField);
+		assertFalse(visitor.peval);
 		
 		// Variable predicate, check if variable is defined
 		visitor.getEnvironment().defineVariable("valid", new Expression.TextExpression("success"));
 		Predicate.RegularPredicate validVar = new Predicate.RegularPredicate();
 		validVar.setExpression(new Expression.VarExpression(new IdCon("valid")));
-		assertTrue(visitor.evaluatePredicate(validVar));
+		visitor.visit(validVar);
+		assertTrue(visitor.peval);
 		
 		Predicate.RegularPredicate invalidVar = new Predicate.RegularPredicate();
 		invalidVar.setExpression(new Expression.VarExpression(new IdCon("invalid")));
-		assertFalse(visitor.evaluatePredicate(invalidVar));
+		visitor.visit(invalidVar);
+		assertFalse(visitor.peval);
 
 		// And predicate
-		assertTrue(visitor.evaluatePredicate(new Predicate.And(validString, validString))); // true && true = true
-		assertFalse(visitor.evaluatePredicate(new Predicate.And(validString, invalidString))); // true && false = false
-		assertFalse(visitor.evaluatePredicate(new Predicate.And(invalidString, validString))); // false && true = false
-		assertFalse(visitor.evaluatePredicate(new Predicate.And(invalidString, invalidString))); // false && false = false
+		visitor.visit(new Predicate.And(validString, validString));
+		assertTrue(visitor.peval);
+		visitor.visit(new Predicate.And(validString, invalidString));
+		assertFalse(visitor.peval);
+		visitor.visit(new Predicate.And(invalidString, validString));
+		assertFalse(visitor.peval);
+		visitor.visit(new Predicate.And(invalidString, invalidString));
+		assertFalse(visitor.peval);
 		
 		// Or predicate
-		assertTrue(visitor.evaluatePredicate(new Predicate.Or(validString, validString))); // true || true = true
-		assertTrue(visitor.evaluatePredicate(new Predicate.Or(validString, invalidString))); // true || false = true
-		assertTrue(visitor.evaluatePredicate(new Predicate.Or(invalidString, validString))); // false || true = true
-		assertFalse(visitor.evaluatePredicate(new Predicate.Or(invalidString, invalidString))); // false || false = false
+		visitor.visit(new Predicate.Or(validString, validString));
+		assertTrue(visitor.peval);
+		visitor.visit(new Predicate.Or(validString, invalidString));
+		assertTrue(visitor.peval);
+		visitor.visit(new Predicate.Or(invalidString, validString));
+		assertTrue(visitor.peval);
+		visitor.visit(new Predicate.Or(invalidString, invalidString));
+		assertFalse(visitor.peval);
 		
 		// Not predicate
-		assertTrue(visitor.evaluatePredicate(new Predicate.Not(invalidString))); // ! false = true
-		assertFalse(visitor.evaluatePredicate(new Predicate.Not(validString))); // ! true = false
+		visitor.visit(new Predicate.Not(invalidString));
+		assertTrue(visitor.peval);
+		visitor.visit(new Predicate.Not(validString));
+		assertFalse(visitor.peval);
 	}
 	
 }

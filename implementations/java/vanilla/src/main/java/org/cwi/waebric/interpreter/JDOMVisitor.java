@@ -62,7 +62,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	private final Document document;
 	private Element current;
-	private String text = "";
+	
+	/**
+	 * Expression evaluation
+	 */
+	public String eeval = "";
+	
+	/**
+	 * Predicate evaluation
+	 */
+	public boolean peval = false;
 	
 	/**
 	 * Function specific environments
@@ -171,9 +180,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				if(argument instanceof Argument.RegularArgument) {
 					// The combined value of regular arguments are stored as value attribute
 					argument.getExpression().accept(this);
-					if(text.equals("undef")) { text = "UNDEFINED"; } // Convert undef to UNDEFINED to match reference impl
-					if(! value.equals("") && ! text.equals("")) { value += " "; } // Attach separator
-					value += text; // Store text in value
+					if(eeval.equals("undef")) { eeval = "UNDEFINED"; } // Convert undef to UNDEFINED to match reference impl
+					if(! value.equals("") && ! eeval.equals("")) { value += " "; } // Attach separator
+					value += eeval; // Store text in value
 				} else if(argument instanceof Argument.Attr) {
 					// Attribute arguments are stored as separate attribute
 					argument.getExpression().accept(this);
@@ -181,7 +190,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					if(attribute.equals("xmlns")) {
 						current.setNamespace(Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
 					} else {
-						current.setAttribute(attribute, text);
+						current.setAttribute(attribute, eeval);
 					}
 				}
 			}
@@ -280,7 +289,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Evaluate predicate and potentially execute statement based on outcome.
 	 */
 	public void visit(Statement.If statement) {
-		if(evaluatePredicate(statement.getPredicate())) {
+		statement.getPredicate().accept(this);
+		if(peval) {
 			statement.getTrueStatement().accept(this);
 		}
 	}
@@ -289,55 +299,53 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Evaluate predicate and execute either of the statements based on outcome.
 	 */
 	public void visit(Statement.IfElse statement) {
-		if(evaluatePredicate(statement.getPredicate())) {
+		statement.getPredicate().accept(this);
+		if(peval) {
 			statement.getTrueStatement().accept(this);
 		} else {
 			statement.getFalseStatement().accept(this);
 		}
 	}
 	
-	/**
-	 * Evaluate predicate into a boolean value.
-	 * @param predicate
-	 * @return Boolean
-	 */
-	public boolean evaluatePredicate(Predicate predicate) {
-		if(predicate instanceof Predicate.Is) {
-			// Is predicates checks if an expression has the correct type
-			Predicate.Is is = (Predicate.Is) predicate;
-			if(is.getType() instanceof Type.StringType) {
-				return is.getExpression().getClass() == Expression.TextExpression.class;
-			} else if(is.getType() instanceof Type.ListType) {
-				return is.getExpression().getClass() == Expression.ListExpression.class;
-			} else if(is.getType() instanceof Type.RecordType) {
-				return is.getExpression().getClass() == Expression.RecordExpression.class;
-			} else { return false; } // Invalid type, should not be parsed in the first place
-		} else if(predicate instanceof Predicate.RegularPredicate) {
-			Predicate.RegularPredicate reg = (Predicate.RegularPredicate) predicate;
-			if(reg.getExpression() instanceof Expression.Field) {
-				// Field predicates check if the referenced field exists in record expression
-				Expression value = getFieldExpression((Expression.Field) reg.getExpression());
-				return value != null;
-			} else if(reg.getExpression() instanceof Expression.VarExpression) {
-				// Variable predicates check if the referenced variable is defined
-				String name = ((Expression.VarExpression) reg.getExpression()).getId().getName();
-				return environment.isDefinedVariable(name);
-			} else { return true; }
-		} else if(predicate instanceof Predicate.And) {
-			// And predicate return Left && Right
-			Predicate.And and = (Predicate.And) predicate;
-			return evaluatePredicate(and.getLeft()) && evaluatePredicate(and.getRight());
-		} else if(predicate instanceof Predicate.Or) {
-			// Or predicates return Left || Right
-			Predicate.Or or = (Predicate.Or) predicate;
-			return evaluatePredicate(or.getLeft()) || evaluatePredicate(or.getRight());			
-		} else if(predicate instanceof Predicate.Not) {
-			// Not predicates return ! Predicate
-			Predicate.Not and = (Predicate.Not) predicate;
-			return ! evaluatePredicate(and.getPredicate());			
-		}
-		
-		return false; // Unknown predicate type
+	public void visit(Predicate.Not not) {
+		not.getPredicate().accept(this);
+		peval = !peval;
+	}
+	
+	public void visit(Predicate.And and) {
+		and.getLeft().accept(this);
+		boolean eval = peval;
+		and.getRight().accept(this);
+		peval = eval && peval;
+	}
+	
+	public void visit(Predicate.Or or) {
+		or.getLeft().accept(this);
+		boolean eval = peval;
+		or.getRight().accept(this);
+		peval = eval || peval;
+	}
+	
+	public void visit(Predicate.Is is) {
+		if(is.getType() instanceof Type.StringType) {
+			peval = is.getExpression().getClass() == Expression.TextExpression.class;
+		} else if(is.getType() instanceof Type.ListType) {
+			peval = is.getExpression().getClass() == Expression.ListExpression.class;
+		} else if(is.getType() instanceof Type.RecordType) {
+			peval = is.getExpression().getClass() == Expression.RecordExpression.class;
+		} else { peval = false; } // Invalid type, should not be parsed in the first place
+	}
+	
+	public void visit(Predicate.RegularPredicate predicate) {
+		if(predicate.getExpression() instanceof Expression.Field) {
+			// Field predicates check if the referenced field exists in record expression
+			Expression value = getFieldExpression((Expression.Field) predicate.getExpression());
+			peval = value != null;
+		} else if(predicate.getExpression() instanceof Expression.VarExpression) {
+			// Variable predicates check if the referenced variable is defined
+			String name = ((Expression.VarExpression) predicate.getExpression()).getId().getName();
+			peval = environment.isDefinedVariable(name);
+		} else { peval = true; }
 	}
 
 	/**
@@ -407,7 +415,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.CData statement) {
 		statement.getExpression().accept(this);
-		addContent(new CDATA(text));
+		addContent(new CDATA(eeval));
 	}
 
 	/**
@@ -415,7 +423,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.Echo statement) {
 		statement.getExpression().accept(this);
-		addContent(new Text(text));
+		addContent(new Text(eeval));
 	}
 
 	/**
@@ -463,7 +471,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	
 			// Place text value in current element
 			if(replacement instanceof Expression || replacement instanceof Embedding) {
-				addContent(new Text(text));
+				addContent(new Text(eeval));
 			}
 			
 			yield = clone; // Restore yield stack
@@ -567,7 +575,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		
 		// Interpret element when mark-up chain is call free
 		statement.getExpression().accept(this);
-		addContent(new Text(text));
+		addContent(new Text(eeval));
 	}
 
 	/**
@@ -672,13 +680,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		String result = "";
 		
 		expression.getLeft().accept(this);
-		result += text; // Retrieve left value
+		result += eeval; // Retrieve left value
 		
 		expression.getRight().accept(this);
-		result += text; // Retrieve right value
+		result += eeval; // Retrieve right value
 		
 		// Store result
-		text = result;
+		eeval = result;
 	}
 
 	/**
@@ -730,14 +738,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 			
 			sub.accept(this); // Fill text field with expression value
-			result += text; // Store value in result string, before it is overwritten by next element
+			result += eeval; // Store value in result string, before it is overwritten by next element
 			
 			// Surround symbol and text expressions between double quotes
 			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { result += "\""; }
 		}
 		result += "]";
 
-		this.text = result;
+		this.eeval = result;
 	}
 
 	/**
@@ -757,7 +765,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			}
 			
 			pair.getExpression().accept(this); // Fill text field with expression value
-			result += text; // Store value in result string, before it is overwritten by next element
+			result += eeval; // Store value in result string, before it is overwritten by next element
 			
 			// Surround symbol and text expressions between double quotes
 			if(pair.getExpression() instanceof SymbolExpression || pair.getExpression() instanceof TextExpression) { 
@@ -766,28 +774,28 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		result += "}";
 
-		this.text = result;
+		this.eeval = result;
 	}
 	
 	/**
 	 * Store number in text field.
 	 */
 	public void visit(NatExpression expression) {
-		text = "" + expression.getNatural().getValue();
+		eeval = "" + expression.getNatural().getValue();
 	}
 
 	/**
 	 * Store symbol name in text field.
 	 */
 	public void visit(SymbolExpression expression) {
-		text = expression.getSymbol().getName().toString();
+		eeval = expression.getSymbol().getName().toString();
 	}
 
 	/**
 	 * Store text expression literal in text field.
 	 */
 	public void visit(TextExpression expression) {
-		text = expression.getText().getLiteral().toString();
+		eeval = expression.getText().getLiteral().toString();
 	}
 
 	/**
@@ -804,7 +812,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		if(reference != null) {
 			reference.accept(this);
 		} else {
-			this.text = "undef"; // Undeclared variable reference
+			this.eeval = "undef"; // Undeclared variable reference
 		}
 	}
 
@@ -885,22 +893,6 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void setCurrent(Element current) {
 		if(! document.hasRootElement()) { document.setRootElement(current); }
 		this.current = current;
-	}
-	
-	/**
-	 * Retrieve current text value.
-	 * @return
-	 */
-	public String getText() {
-		return text;
-	}
-	
-	/**
-	 * Modify current text value.
-	 * @param data
-	 */
-	public void setText(String text) {
-		if(text != null) { this.text = text; } 
 	}
 	
 	/**

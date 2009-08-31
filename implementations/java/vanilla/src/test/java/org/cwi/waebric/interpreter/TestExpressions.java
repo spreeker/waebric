@@ -25,7 +25,7 @@ public class TestExpressions {
 	public void testTextExpression() {
 		Expression.TextExpression expr = new Expression.TextExpression("success");
 		expr.accept(visitor);
-		assertEquals("success", visitor.getText());
+		assertEquals("success", visitor.eeval);
 	}
 	
 	@Test
@@ -33,7 +33,7 @@ public class TestExpressions {
 		Expression.VarExpression expr = new Expression.VarExpression(new IdCon("var"));
 		visitor.getEnvironment().defineVariable("var", new Expression.TextExpression("success"));
 		expr.accept(visitor);
-		assertEquals("success", visitor.getText());
+		assertEquals("success", visitor.eeval);
 	}
 	
 	@Test
@@ -41,14 +41,14 @@ public class TestExpressions {
 		Expression.SymbolExpression expr = new Expression.SymbolExpression();
 		expr.setSymbol(new SymbolCon("success"));
 		expr.accept(visitor);
-		assertEquals("success", visitor.getText());
+		assertEquals("success", visitor.eeval);
 	}
 	
 	@Test
 	public void testNatExpression() {
 		Expression.NatExpression expr = new Expression.NatExpression(1337);
 		expr.accept(visitor);
-		assertEquals("1337", visitor.getText());
+		assertEquals("1337", visitor.eeval);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class TestExpressions {
 		expr.addExpression(sub);
 		
 		expr.accept(visitor);
-		assertEquals("[\"success\",1337,[\"symbol\"]]", visitor.getText());
+		assertEquals("[\"success\",1337,[\"symbol\"]]", visitor.eeval);
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public class TestExpressions {
 		expr.addKeyValuePair(new KeyValuePair(new IdCon("record"), sub));
 
 		expr.accept(visitor);
-		assertEquals("{text:\"success\",number:1337,list:[],record:{symbol:\"symbol\"}}", visitor.getText());
+		assertEquals("{text:\"success\",number:1337,list:[],record:{symbol:\"symbol\"}}", visitor.eeval);
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class TestExpressions {
 		expr.setRight(sub);
 		
 		expr.accept(visitor);
-		assertEquals("testhassucceeded", visitor.getText());
+		assertEquals("testhassucceeded", visitor.eeval);
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class TestExpressions {
 		
 		Expression.Field field = new Expression.Field(record, new IdCon("test"));
 		field.accept(visitor);
-		assertEquals("success", visitor.getText());
+		assertEquals("success", visitor.eeval);
 	}
 	
 }
