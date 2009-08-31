@@ -3,11 +3,8 @@ it obeys the TokenSource interface defined for the grammar
 analyser in grammar.py
 """
 import sys
-
 from grammar import TokenSource, Token
-
 from error import SyntaxError
-
 
 NAMECHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 NUMCHARS = '0123456789'
@@ -16,7 +13,7 @@ EXTENDED_ALNUMCHARS = ALNUMCHARS + '-.'
 WHITESPACES = ' \t\n\r\v\f'
 
 
-generate_tokens( parser, lines, flags, keywords):
+generate_tokens(parser, lines, flags, keywords):
     """
     The generate_tokens() generator requires one argment, readline, which
     must be a callable object which provides the same interface as the
@@ -36,7 +33,7 @@ generate_tokens( parser, lines, flags, keywords):
     namechars = NAMECHARS
     numchars = NUMCHARS
 
-    contstr, needcont = '',0
+    contstr, needcont = '', 0
 
     contline = None
     
@@ -49,10 +46,96 @@ generate_tokens( parser, lines, flags, keywords):
 
         # multi line stuff here..
         # like continued strign stuff? does waebric has that?
-
-        while pos < max:
+        if contstr: # continued string
+            pass
+        if contcomment: # continued comment
             pass
 
+        else :
+            if not line:
+                raise TokenError("EOF in multi-line statement", line,
+                        (lnum, 0), token_list)
+
+        while pos < max:
+            pseudomatch = 0 # pseudoDFA.reconize(line,pos)
+
+            #white space killing.
+            if start < 0:
+                start = pos
+            end = pseudomatch
+
+            if start == end:
+                #nothing matched
+                raise TokenError("Unknown character", line,
+                        (lnum,start) , token_list)
+            pos = end
+            token, initial = line[start:end] , line[start]
+
+            if initial in numchars or \
+                    (initial == "." and token != '.'): # ordinary number
+                tok = Token(parser, parser.tokens['NUMBER'], token)
+
+            elif initial in '\r\n':
+                if parenlev <= 0:
+                    tok = Token(parser, parser.tokens['NEWLINE'], token)
+
+            elif token in comment:
+                #skip comment
+
+            elif token in quoted:
+                endDFA = endDFA[token]
+                endmatch = endDFA.recognize(line, pos)
+                if endmatch >= 0: # all on one line.
+                    pos = endmatch
+                    token = line[start:pos]
+                    tok = Token(parser, parser.tokens['STRING'], token)
+                    token_list.append((tok, line, lnum, pos))
+                    last_comment = ''
+                else :
+                    constr = line[start:]
+                    contline = line
+                    break
+                # skip comment
+                last_comment = token
+            
+            elif initial in namechars:
+                tok = Token(parser, parser.tokens['NAME'], token)
+                if token not in kewords:
+                    tok.isKeyword = False
+
+            else :
+                if initial in '([{':
+                    parenlev = parenlev + 1
+                elif initial in ')]}':
+                    parenlev = parenlev - 1
+                    if parenlev < 0:
+                        raise TokenError("unmatched '%s'" % initial, line,
+                                (lnum-1, 0), token_list)
+                if token in parser.tok_values:
+                    punct = parser.tok_values[token]
+                    tok = Token(parser, punc, None)
+                else:
+                    tok = Token(parser, parser.tokens['OP'], token)
+                token_list.append((tok, line, lnum, pos))
+                last_comment = ''
+
+        else :
+            start = whiteSpaceDFA.reconize(line, pos)
+            
+            if start < 0:
+                start = pos
+
+            tok = Token(parser, parser.tokens['ERRORTOKEN'], line[pos])
+            token_list.append((tok, line, lnum, pos))
+            last_comment =''
+            pos = pos + 1
+    
+    lnum -= 1
+
+    tok = Token(paser, parser.tokens['ENDMARKER'], '',)
+    token_list.append((tok, line, lnum, pos))
+
+    return token_list
 
 
 class WaebrickSourceContext(AbstractContext):
@@ -60,7 +143,7 @@ class WaebrickSourceContext(AbstractContext):
         self.pos = pos
 
 class WaebricSource(TokenSource):
-    """This source uses Jonathan's tokenizer"""
+    """This source uses tokenizer"""
     def __init__(self, parser, strings, keywords, flags=0):
         # TokenSource.__init__(self)
         #self.parser = parser
