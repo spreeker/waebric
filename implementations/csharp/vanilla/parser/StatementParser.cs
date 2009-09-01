@@ -591,8 +591,18 @@ namespace Parser
         private bool IsMarkupStatStatement()
         {
             String value = TokenStream.Peek(1).GetValue().ToString();
-            return value == "if" || value == "each" || value == "let" || value == "{" || value == "comment" 
-                || value == "echo" || value == "cdata" || value == "yield";
+            bool lookahead = TokenStream.HasNext(3);
+            if (lookahead)
+            {
+                String look = TokenStream.Peek(3).GetValue().ToString();
+                return value == "if" || value == "each" || value == "let" || (value == "{" && !(look == ";")) || value == "comment"
+                                    || value == "echo" || value == "cdata" || value == "yield";
+            }
+            else
+            {
+                return value == "if" || value == "each" || value == "let" || value == "{" || value == "comment"
+                    || value == "echo" || value == "cdata" || value == "yield";
+            }
         }
 
         private bool IsMarkupExpressionStatement()

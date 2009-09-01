@@ -90,10 +90,10 @@ namespace Parser.Ast.Functions
         {
             //Get formals
             String formals = "";
-            for (int i = 0; i <= (FormalList.Count() - 1); i++)
+            for (int i = 0; i <= (FormalList.Count - 1); i++)
             {
                 formals += ((Formal)FormalList.Get(i)).ToString();
-                if (i != (FormalList.Count() - 1))
+                if (i != (FormalList.Count - 1))
                 {
                     formals += ",";
                 }
