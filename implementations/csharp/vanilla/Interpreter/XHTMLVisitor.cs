@@ -54,6 +54,14 @@ namespace Interpreter
         /// <param name="functionDefinition">FunctionDefinition to interpret</param>
         public override void Visit(FunctionDefinition functionDefinition)
         {
+            //Create root XHTML element when multiple statements can be root and there's no root 
+            if (functionDefinition.GetStatements().Count > 1 && Root == null)
+            {
+                XHTMLElement newRoot = new XHTMLElement("html", null, true);
+                Root = newRoot;
+                Current = Root;
+            }
+
             //Interpret statements
             int depth = Depth;
             foreach(Statement statement in functionDefinition.GetStatements())
