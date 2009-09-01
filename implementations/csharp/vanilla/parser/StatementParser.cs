@@ -594,8 +594,9 @@ namespace Parser
             bool lookahead = TokenStream.HasNext(3);
             if (lookahead)
             {
+                String second = TokenStream.Peek(2).GetValue().ToString();
                 String look = TokenStream.Peek(3).GetValue().ToString();
-                return value == "if" || value == "each" || value == "let" || (value == "{" && !(look == ";")) || value == "comment"
+                return value == "if" || value == "each" || value == "let" || (value == "{" && !(second == "}" && look == ";")) || value == "comment"
                                     || value == "echo" || value == "cdata" || value == "yield";
             }
             else
