@@ -49,9 +49,9 @@ namespace Common
         /// <returns>Requested module if available</returns>
         public Module RequestModule(ModuleId identifier)
         {
-            if (ModuleTable.Contains(identifier.ToString()))
+            if (ModuleTable.ContainsKey(identifier))
             {   //Module already loaded so return instance of module
-                return (Module) ModuleTable[identifier.ToString()];
+                return (Module) ModuleTable[identifier];
             }
 
             //Module not cached, so load it
@@ -68,7 +68,7 @@ namespace Common
 
             //Add module to hashtable
             Module requestedModule = tree.GetRoot();
-            ModuleTable.Add(requestedModule.GetModuleId().ToString(), requestedModule);
+            ModuleTable.Add(identifier, requestedModule);
             
             return requestedModule;
         }
