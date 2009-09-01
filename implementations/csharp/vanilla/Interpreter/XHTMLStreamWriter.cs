@@ -143,7 +143,7 @@ namespace Interpreter
         {
             //Write comment open tag
             XhtmlWriter.BeginRender();
-            XhtmlWriter.Write("<!-- ");
+            XhtmlWriter.Write("<!--");
 
             //Lets parse the text, because the XhtmlWriter handles layout chars incorrectly           
             CharIterator charIterator = new CharIterator();
@@ -151,7 +151,7 @@ namespace Interpreter
             XhtmlWriter.Write(content);
 
             //Close comment tag
-            XhtmlWriter.Write(" -->");
+            XhtmlWriter.Write("-->");
             XhtmlWriter.EndRender();
             XhtmlWriter.Flush();
         }

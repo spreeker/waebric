@@ -397,8 +397,10 @@ namespace Interpreter
         public override void Visit(CdataStatement statement)
         {
             statement.GetExpression().AcceptVisitor(this);
+            XHTMLElement cdata = new XHTMLElement("cdata", Current);
+            cdata.SetTagState(false);
+            cdata.AddContent(TextValue);
             AddElement(new XHTMLElement("cdata", Current));
-            Current.AddContent(TextValue);
         }
 
         /// <summary>
@@ -407,8 +409,10 @@ namespace Interpreter
         /// <param name="statement">CommentStatement to interpret</param>
         public override void Visit(CommentStatement statement)
         {
-            AddElement(new XHTMLElement("comment", Current));
-            Current.AddContent(statement.GetCommentString());
+            XHTMLElement comment = new XHTMLElement("comment", Current);
+            comment.SetTagState(false);
+            comment.AddContent(statement.GetCommentString());
+            AddElement(comment);
         }
 
         /// <summary>
@@ -1049,11 +1053,16 @@ namespace Interpreter
                     XHTMLElement newRoot = new XHTMLElement("html", null, true);
                     Root = newRoot;
                     Current = Root;
-                }                
+                    newRoot.AddChild(element);
+                }
+            }
+            else
+            {
+                //Add element as child of current element
+                Current.AddChild(element);
             }
             
-            //Add element as child of current element
-            Current.AddChild(element);
+            
             if(element.GetTagState())
             {
                 Current = element;
