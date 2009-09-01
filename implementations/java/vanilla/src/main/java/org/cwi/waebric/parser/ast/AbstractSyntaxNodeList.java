@@ -148,8 +148,8 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		return list.size();
 	}
 
-	public List<E> subList(int fromIndex, int toIndex) {
-		return list.subList(fromIndex, toIndex);
+	public AbstractSyntaxNodeList<E> subList(int fromIndex, int toIndex) {
+		return new AbstractSyntaxNodeList<E>(list.subList(fromIndex, toIndex));
 	}
 
 	public Object[] toArray() {

@@ -283,7 +283,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 
 		if(function.getStatements().size() > 1) {
-			addContent(this.createXHTMLTag());
+			addContent(new Element("html"));
 		}
 		
 		// Process statement(s)
@@ -454,7 +454,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		}
 		
 		if(statement.getStatements().size() > 1) {
-			addContent(this.createXHTMLTag());
+			addContent(new Element("html"));
 		}
 		
 		// Visit sub-statements

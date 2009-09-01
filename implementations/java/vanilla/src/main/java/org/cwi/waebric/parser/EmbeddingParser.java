@@ -97,11 +97,11 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		// Lonely mark-up can be interpreted as expression
-		if(markups.size() == 1) {
-			Markup loner = markups.get(0);
-			if(loner.getDesignator().getAttributes().size() == 0 && !( loner instanceof Markup.Call ) ) {
-				Expression.VarExpression var = new Expression.VarExpression(loner.getDesignator().getIdentifier());
-				markups.clear();
+		if(markups.size() > 0) {
+			Markup end = markups.get(markups.size()-1);
+			if(! ( end instanceof Markup.Call ) ) {
+				Expression.VarExpression var = new Expression.VarExpression(end.getDesignator().getIdentifier());
+				markups = markups.subList(0, markups.size()-1);
 				Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
 				embed.setExpression(var);
 				return embed;
