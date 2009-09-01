@@ -278,19 +278,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(FunctionDef function) {	
 		// Construct XHTML tag when multiple statements can be root
-		if(function.getStatements().size() > 1 && ! document.hasRootElement()) {
-			addContent(createXHTMLTag());
-		}
-
-		if(function.getStatements().size() > 1) {
-			addContent(new Element("html"));
-		}
+		if(function.getStatements().size() > 1 && ! document.hasRootElement()) { addContent(createXHTMLTag()); }
 		
 		// Process statement(s)
 		for(Statement statement: function.getStatements()) {
-			Element curr = current;
+			Element backup = current;
 			statement.accept(this);
-			if(curr != null) current = curr;
+			restoreCurrent(backup);
 		}
 	}
 
@@ -361,10 +355,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
-		Element root = current;
+		if(current == null && statement.getStatements().size() > 1) { addContent(new Element("html")); }
 		for(Statement sub: statement.getStatements()) {
-			current = root; // Reset current to root
+			Element backup = current;
 			sub.accept(this);
+			restoreCurrent(backup);
 		}
 	}
 
@@ -453,15 +448,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			assignment.accept(this);
 		}
 		
-		if(statement.getStatements().size() > 1) {
-			addContent(new Element("html"));
-		}
-		
+		if(current == null && statement.getStatements().size() > 1) { addContent(new Element("html")); }
+
 		// Visit sub-statements
 		for(Statement sub: statement.getStatements()) {
-			Element curr = current;
+			Element backup = current;
 			sub.accept(this);
-			if(curr != null) current = curr;
+			restoreCurrent(backup);
 		}
 		
 		// Restore previous state by removing each assignment environment
@@ -924,6 +917,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public Environment getEnvironment() {
 		return environment;
+	}
+	
+	private void restoreCurrent(Element arg) {
+		current = arg; // Restore element
+		if(current != null && arg!= null) {	current.setText(arg.getText());	}
 	}
 	
 	/**
