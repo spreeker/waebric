@@ -121,6 +121,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				document.setRootElement((Element) content);
 			} else {
 				createXHTMLRoot(false);
+				document.getRootElement().addContent(content);
 			}
 		} else { current.addContent(content); }
 
