@@ -50,6 +50,10 @@ namespace Lexer.Tokenizer
         /// <returns>Value</returns>
         public Object GetValue()
         {
+            if (Value == null)
+            {
+                return "nullvalue";
+            }
             return Value;
         }
         
@@ -97,7 +101,6 @@ namespace Lexer.Tokenizer
         {
             this.Line = line;
         }
-
         
     }
 }
