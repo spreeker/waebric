@@ -410,7 +410,7 @@ namespace Interpreter
             XHTMLElement cdata = new XHTMLElement("cdata", Current);
             cdata.SetTagState(false);
             cdata.AddContent(TextValue);
-            AddElement(new XHTMLElement("cdata", Current));
+            AddElement(cdata);
         }
 
         /// <summary>
@@ -508,7 +508,6 @@ namespace Interpreter
                 ListExpression listExpression = (ListExpression)expr;
                 
                 //Iterate through list with expression
-           //     int depth = Depth;
                 foreach (Expression currentExpr in listExpression.GetExpressions())
                 {
                     //New scope
@@ -520,9 +519,6 @@ namespace Interpreter
 
                     //Return to parent scope
                     SymbolTable = SymbolTable.GetParentSymbolTable();
-
-                    //Return to parent current
-           //         BackToParentXHTMLElement(depth);
                 }
             }
             else if(expr is FieldExpression)
@@ -1030,10 +1026,6 @@ namespace Interpreter
         /// <param name="requestedDepth">Depth of parents</param>
         private void BackToParentXHTMLElement(int requestedDepth)
         {
-            if (requestedDepth == 5)
-            {
-                int t = 0;
-            }
             for (int i = 0; Depth > requestedDepth; i++)
             {
                 Current = Current.GetParent();

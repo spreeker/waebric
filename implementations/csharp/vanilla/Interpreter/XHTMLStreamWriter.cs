@@ -50,7 +50,7 @@ namespace Interpreter
         public void WriteStream()
         {
             //If root is generated, no doctype, otherwise write a doctype header
-            if (!Root.IsGenerated())
+            if (!Root.IsGenerated() || !IsEmptyElement(Root))
             {
                 //Write doctype before starting document
                 WriteDocType(DocTyping);
