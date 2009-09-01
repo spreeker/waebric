@@ -49,7 +49,7 @@ namespace Interpreter
             }
 
             //Interpret the main function
-            if (ContainsMainFunction(root))
+            if (SymbolTable.ContainsFunction("main"))
             {
                 XHTMLVisitor xhtmlVisitor = new XHTMLVisitor(SymbolTable);
                 SymbolTable.GetFunctionDefinition("main").AcceptVisitor(xhtmlVisitor);
@@ -102,23 +102,6 @@ namespace Interpreter
             //Create file and return StreamWriter which writes to new file
             FileStream stream = File.Create(path);
             return new StreamWriter(stream);
-        }
-
-        /// <summary>
-        /// Method which checks if the specified module contains an main function
-        /// </summary>
-        /// <param name="module">Module to check</param>
-        /// <returns>True if main found, otherwise false</returns>
-        private bool ContainsMainFunction(Module module)
-        {
-            foreach (FunctionDefinition def in module.GetFunctionDefinitions())
-            {
-                if (def.GetIdentifier() == "main")
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         #endregion
