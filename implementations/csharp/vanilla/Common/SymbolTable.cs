@@ -132,14 +132,12 @@ namespace Common
         /// <returns>True if in SymbolTable, otherwise false</returns>
         public bool ContainsVariable(String identifier)
         {
-            if(ParentSymbolTable != null)
+            bool contains = VariableDefinitions.ContainsKey(identifier);
+            if(!contains && ParentSymbolTable != null)
             {
-                return VariableDefinitions.ContainsKey(identifier) || ParentSymbolTable.ContainsVariable(identifier);
+                return ParentSymbolTable.ContainsVariable(identifier);
             }
-            else
-            {
-                return VariableDefinitions.ContainsKey(identifier);
-            }
+            return contains;
         }
 
         /// <summary>
@@ -149,14 +147,12 @@ namespace Common
         /// <returns>True if in SymbolTable, otherwise false</returns>
         public bool ContainsFunction(String identifier)
         {
-            if (ParentSymbolTable != null)
+            bool contains = FunctionDefinitions.ContainsKey(identifier);
+            if (!contains && ParentSymbolTable != null)
             {
-                return FunctionDefinitions.ContainsKey(identifier) || ParentSymbolTable.ContainsFunction(identifier);
+                return ParentSymbolTable.ContainsFunction(identifier);
             }
-            else
-            {
-                return FunctionDefinitions.ContainsKey(identifier);
-            }
+            return contains;
         }
 
         /// <summary>
