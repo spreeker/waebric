@@ -331,6 +331,10 @@ class StatementParser extends AbstractParser {
 	 */
 	public boolean isMarkup(int k, boolean first) {
 		if(tokens.hasNext(k) && tokens.peek(k).getSort() == WaebricTokenSort.IDCON) {
+			if(tokens.hasNext(k+1) && tokens.peek(k+1).getLexeme().equals(WaebricSymbol.PLUS)) {
+				return false; // Cat expression
+			}
+			
 			while(tokens.hasNext(k+1)) { // Absorb attributes
 				Token peek = tokens.peek(k+1);
 				if(MarkupParser.isAttribute(peek)) {

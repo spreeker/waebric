@@ -115,8 +115,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param content
 	 */
 	private void addContent(Content content) {
-		current.addContent(content);
-		
+		// Update JDOM objects
+		if(current == null) {
+			if(content instanceof Element) {
+				document.setRootElement((Element) content);
+			} else {
+				createXHTMLRoot(false);
+			}
+		} else { current.addContent(content); }
+
+		// Maintain field information
 		if(content instanceof Element) {
 			current = (Element) content;
 			depth++;
@@ -159,11 +167,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				if(arguments.size() > index) {
 					Expression expression = arguments.get(index).getExpression();
 					environment.defineVariable(formal.getName(), expression);
-				} else { 
-					environment.defineVariable(formal.getName(), new Expression.TextExpression("undef"));
-				}
-				
-				index++;
+					index++;
+				} else { break; }
 			}
 			
 			function.accept(this); // Visit function
@@ -273,7 +278,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(FunctionDef function) {	
 		// Construct XHTML tag when multiple statements can be root
-		if(current == null && function.getStatements().size() > 1) { createXHTMLRoot(false); }
+		if(function.getStatements().size() > 1) { createXHTMLRoot(false); }
 		
 		// Process statement(s)
 		for(Statement statement: function.getStatements()) {
@@ -350,7 +355,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
-		if(current == null && statement.getStatements().size() > 1) { createXHTMLRoot(false); }
+		if(statement.getStatements().size() > 1) { createXHTMLRoot(false); }
 		for(Statement sub: statement.getStatements()) {
 			int depth = this.depth;
 			sub.accept(this);
@@ -443,7 +448,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			assignment.accept(this);
 		}
 		
-		if(current == null && statement.getStatements().size() > 1) { createXHTMLRoot(false); }
+		if(statement.getStatements().size() > 1) { createXHTMLRoot(false); }
 
 		// Visit sub-statements
 		for(Statement sub: statement.getStatements()) {
