@@ -278,11 +278,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(FunctionDef function) {	
 		// Construct XHTML tag when multiple statements can be root
-		if(function.getStatements().size() > 1) { createXHTMLRoot(false); }
+		if(function.getStatements().size() > 1 && ! document.hasRootElement()) { 
+			createXHTMLRoot(false);
+		}
 		
 		// Process statement(s)
+		int depth = this.depth;
 		for(Statement statement: function.getStatements()) {
-			int depth = this.depth;
 			statement.accept(this);
 			restoreCurrent(depth);
 		}
@@ -293,9 +295,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.If statement) {
 		statement.getPredicate().accept(this);
-		if(peval) {
-			statement.getTrueStatement().accept(this);
-		}
+		if(peval) {	statement.getTrueStatement().accept(this); }
 	}
 
 	/**
@@ -355,9 +355,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
-		if(statement.getStatements().size() > 1) { createXHTMLRoot(false); }
+		int depth = this.depth;
 		for(Statement sub: statement.getStatements()) {
-			int depth = this.depth;
 			sub.accept(this);
 			restoreCurrent(depth);
 		}
@@ -448,11 +447,9 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			assignment.accept(this);
 		}
 		
-		if(statement.getStatements().size() > 1) { createXHTMLRoot(false); }
-
 		// Visit sub-statements
+		int depth = this.depth;
 		for(Statement sub: statement.getStatements()) {
-			int depth = this.depth;
 			sub.accept(this);
 			restoreCurrent(depth);
 		}
