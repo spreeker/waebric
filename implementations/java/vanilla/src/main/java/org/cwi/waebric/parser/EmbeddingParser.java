@@ -87,6 +87,7 @@ class EmbeddingParser extends AbstractParser {
 			try { // Backtracking
 				markups.add(markupParser.parseMarkup());
 			} catch(SyntaxException e) {
+				super.exceptions.remove(super.exceptions.size()-1);
 				tokens.seek(index);
 				expression = expressionParser.parseExpression();
 				next(WaebricSymbol.GREATER_THAN, "Expression embedding closure", "markup+ expression >");

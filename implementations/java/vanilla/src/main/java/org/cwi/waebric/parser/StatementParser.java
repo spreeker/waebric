@@ -285,9 +285,7 @@ class StatementParser extends AbstractParser {
 			// Retrieve remaining mark-up tokens (Markup+)
 			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
 			markups.add(markup);
-			while(isMarkup(1, false)) {
-				markups.add(markupParser.parseMarkup());
-			}
+			while(isMarkup(1, false)) {	markups.add(markupParser.parseMarkup()); }
 			
 			if(tokens.hasNext()) {
 				// Determine mark-ups statement type
@@ -301,37 +299,24 @@ class StatementParser extends AbstractParser {
 					return statement;
 				} else if(peek.getSort() == WaebricTokenSort.EMBEDDING) {
 					MarkupsEmbedding statement = new MarkupsEmbedding(markups);
-					try {
-						statement.setEmbedding(embeddingParser.parseEmbedding());
-					} catch(Exception e) {
-						reportUnexpectedToken(tokens.current(), "Embedding statement", "Markup+ Embedding");
-					}
+					statement.setEmbedding(embeddingParser.parseEmbedding());
 					next(WaebricSymbol.SEMICOLON, "Markup embedding closure ;", "Markup+ Embedding \";\"");
 					return statement;
 				} else {
-					if(StatementParser.isMarkupFreeStatement(peek)) {
-						// Markup+ Statement ";"
+					int index = tokens.index();
+					try { // Backtracking
+						MarkupsExpression statement = new MarkupsExpression(markups);
+						statement.setExpression(expressionParser.parseExpression());
+						next(WaebricSymbol.SEMICOLON, "Markup expression closure ;", "Markup+ Expression \";\"");
+						return statement;
+					} catch(SyntaxException e) {
+						super.exceptions.remove(super.exceptions.size()-1);
+						tokens.seek(index);
 						MarkupsStatement statement = new MarkupsStatement(markups);
 						statement.setStatement(parseStatement());
 						return statement;
-					} else if(ExpressionParser.isExpression(peek)) {
-						// Markup+ Expression
-						MarkupsExpression statement = new MarkupsExpression(markups);
-						try {
-							statement.setExpression(expressionParser.parseExpression());
-						} catch(SyntaxException e) {
-							reportUnexpectedToken(tokens.current(), "Markup expression", "Markup+ Expression \";\"");
-						}
-						next(WaebricSymbol.SEMICOLON, "Markup expression closure ;", "Markup+ Expression \";\"");
-						return statement;
-					} else {
-						reportUnexpectedToken(peek, "Markups statement", 
-								"Markup+ { Markup, Expression, Embedding or Statement } \";\"");
 					}
 				}
-			} else {
-				reportMissingToken(tokens.current(), "Markups statement", 
-						"Markup+ { Markup, Expression, Embedding or Statement } \";\"");
 			}
 		}
 		

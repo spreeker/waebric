@@ -63,6 +63,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	private final Document document;
 	private Element current;
+	private int depth;
 	
 	/**
 	 * Expression evaluation
@@ -114,33 +115,27 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param content
 	 */
 	private void addContent(Content content) {
-		// Construct root element
-		if(current == null) {
-			if(content instanceof Element) {
-				Element rootElement = (Element) content;
-				document.setRootElement(rootElement);
-				current = rootElement;
-				return; // Content added, quit function
-			} else {
-				Element XHTML = createXHTMLTag();
-				document.setRootElement(XHTML);
-				current = XHTML;
-			}
-		}
+		current.addContent(content);
 		
-		current.addContent(content); // Attach content
-		if(content instanceof Element) { current = (Element) content; } // Update current
+		if(content instanceof Element) {
+			current = (Element) content;
+			depth++;
+		}
 	}
 	
 	/**
 	 * Create default XHTML root tag
 	 * @return
 	 */
-	private Element createXHTMLTag() {
-		Namespace XHTML = Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml");
-		Element tag = new Element("html", XHTML);
-		tag.setAttribute("lang", "en");
-		return tag;
+	private void createXHTMLRoot(boolean namespace) {
+		Element html;
+		if(namespace) {
+			Namespace XHTML = Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml");
+			html = new Element("html", XHTML);
+			html.setAttribute("lang", "en");
+		} else { html = new Element("html"); }
+		document.setRootElement(html);
+		current = html;
 	}
 	
 	/**
@@ -278,13 +273,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(FunctionDef function) {	
 		// Construct XHTML tag when multiple statements can be root
-		if(function.getStatements().size() > 1 && ! document.hasRootElement()) { addContent(createXHTMLTag()); }
+		if(current == null && function.getStatements().size() > 1) { createXHTMLRoot(false); }
 		
 		// Process statement(s)
 		for(Statement statement: function.getStatements()) {
-			Element backup = current;
+			int depth = this.depth;
 			statement.accept(this);
-			restoreCurrent(backup);
+			restoreCurrent(depth);
 		}
 	}
 
@@ -355,11 +350,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
-		if(current == null && statement.getStatements().size() > 1) { addContent(new Element("html")); }
+		if(current == null && statement.getStatements().size() > 1) { createXHTMLRoot(false); }
 		for(Statement sub: statement.getStatements()) {
-			Element backup = current;
+			int depth = this.depth;
 			sub.accept(this);
-			restoreCurrent(backup);
+			restoreCurrent(depth);
 		}
 	}
 
@@ -448,13 +443,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			assignment.accept(this);
 		}
 		
-		if(current == null && statement.getStatements().size() > 1) { addContent(new Element("html")); }
+		if(current == null && statement.getStatements().size() > 1) { createXHTMLRoot(false); }
 
 		// Visit sub-statements
 		for(Statement sub: statement.getStatements()) {
-			Element backup = current;
+			int depth = this.depth;
 			sub.accept(this);
-			restoreCurrent(backup);
+			restoreCurrent(depth);
 		}
 		
 		// Restore previous state by removing each assignment environment
@@ -919,9 +914,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		return environment;
 	}
 	
-	private void restoreCurrent(Element arg) {
-		current = arg; // Restore element
-		if(current != null && arg!= null) {	current.setText(arg.getText());	}
+	private void restoreCurrent(int arg) {
+		for(int i = 0; i < depth-arg; i++) {
+			current = current.getParentElement();
+		}
 	}
 	
 	/**

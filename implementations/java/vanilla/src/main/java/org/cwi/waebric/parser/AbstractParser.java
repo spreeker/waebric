@@ -113,11 +113,8 @@ public abstract class AbstractParser {
 	 * @throws MissingTokenException No next token available
 	 */
 	protected void next(String name, String syntax) throws MissingTokenException {
-		if(tokens.hasNext()) {
-			tokens.next(); // Retrieve next token in stream
-		} else {
-			reportMissingToken(tokens.current(), name, syntax);
-		}
+		if(tokens.hasNext()) { tokens.next(); } 
+		else { reportMissingToken(tokens.current(), name, syntax); }
 	}
 	
 	/**
