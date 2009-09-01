@@ -370,7 +370,7 @@ namespace Interpreter
             XHTMLElement echoElement = new XHTMLElement(TextValue, Current);
             echoElement.SetTagState(false);
 
-            Current.AddChild(echoElement);
+            AddElement(echoElement);
             
         }
 
@@ -611,7 +611,7 @@ namespace Interpreter
 
             XHTMLElement element = new XHTMLElement(TextValue, Current);
             element.SetTagState(false);
-            Current.AddChild(element);
+            AddElement(element);
         }
 
         /// <summary>
@@ -750,7 +750,7 @@ namespace Interpreter
                 {
                     XHTMLElement element = new XHTMLElement(TextValue, Current);
                     element.SetTagState(false);
-                    Current.AddChild(element);
+                    AddElement(element);
                 }
 
                 //Restore YieldStack in original shape before interpreting
@@ -804,7 +804,7 @@ namespace Interpreter
             //Add content of pretext
             XHTMLElement element = new XHTMLElement(embedding.GetPreText().GetText(), Current);
             element.SetTagState(false);
-            Current.AddChild(element);
+            AddElement(element);
             
             //Interpret Embed and TextTail
             XHTMLElement temp = Current;
@@ -847,7 +847,7 @@ namespace Interpreter
         {
             XHTMLElement element = new XHTMLElement(textTail.GetMidText().GetText(), Current);
             element.SetTagState(false);
-            Current.AddChild(element);
+            AddElement(element);
 
             XHTMLElement temp = Current;
             textTail.GetEmbed().AcceptVisitor(this);
@@ -863,7 +863,7 @@ namespace Interpreter
         {
             XHTMLElement element = new XHTMLElement(textTail.GetPostText().GetText(), Current);
             element.SetTagState(false);
-            Current.AddChild(element);
+            AddElement(element);
         }
 
         /// <summary>
@@ -1017,8 +1017,10 @@ namespace Interpreter
             
             //Add element as child of current element
             Current.AddChild(element);
-            //Set current to last added element
-            Current = element;
+            if(element.GetTagState())
+            {
+                Current = element;
+            }
         }
 
         /// <summary>
