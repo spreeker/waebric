@@ -67,22 +67,12 @@ public abstract class Embed extends AbstractSyntaxNode {
 	 */
 	public static class MarkupEmbed extends Embed {
 		
-		private Markup markup;
-		
 		public MarkupEmbed(Collection<Markup> args) {
 			markups.addAll(args);
 		}
 
-		public Markup getMarkup() {
-			return markup;
-		}
-
-		public void setMarkup(Markup markup) {
-			this.markup = markup;
-		}
-
 		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, markup };
+			return new AbstractSyntaxNode[] { markups };
 		}
 		
 		@Override

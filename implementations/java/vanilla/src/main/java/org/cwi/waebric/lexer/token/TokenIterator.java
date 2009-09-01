@@ -120,5 +120,13 @@ public class TokenIterator implements Iterator<Token>, Cloneable {
 	public String toString() {
 		return curr == -1 ? collection.toString() : current().toString();
 	}
+	
+	public int index() {
+		return curr;
+	}
 
+	public void seek(int index) {
+		curr = index;
+	}
+	
 }

@@ -7,6 +7,7 @@ import org.cwi.waebric.lexer.token.Token;
 import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.lexer.token.WaebricTokenSort;
 import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
@@ -79,22 +80,35 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Embed parseEmbed() throws SyntaxException {	
-		// Parse mark-up tokens
 		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
-		while(tokens.hasNext(2) && ! tokens.peek(2).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
-			markups.add(markupParser.parseMarkup());
+		Expression expression = null;
+		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
+			int index = tokens.index();
+			try { // Backtracking
+				markups.add(markupParser.parseMarkup());
+			} catch(SyntaxException e) {
+				tokens.seek(index);
+				expression = expressionParser.parseExpression();
+				next(WaebricSymbol.GREATER_THAN, "Expression embedding closure", "markup+ expression >");
+				Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
+				embed.setExpression(expression);
+				return embed;
+			}
 		}
 		
-		// Determine type based on look-ahead information
-		if(isMarkup(1) && markups.size() > 0) { // Markup* Markup -> Markup
-			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
-			embed.setMarkup(markupParser.parseMarkup());
-			return embed;
-		} else { // Markup* Expression -> Markup
-			Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
-			embed.setExpression(expressionParser.parseExpression());
-			return embed;
+		// Lonely mark-up can be interpreted as expression
+		if(markups.size() == 1) {
+			Markup loner = markups.get(0);
+			if(loner.getDesignator().getAttributes().size() == 0 && !( loner instanceof Markup.Call ) ) {
+				Expression.VarExpression var = new Expression.VarExpression(loner.getDesignator().getIdentifier());
+				markups.clear();
+				Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
+				embed.setExpression(var);
+				return embed;
+			}
 		}
+		
+		return new Embed.MarkupEmbed(markups);
 	}
 	
 	/**

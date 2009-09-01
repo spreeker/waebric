@@ -850,8 +850,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Embed.MarkupEmbed embed) {
 		// Interpret similar to mark-up mark-up
-		Statement.MarkupsMarkup stm = new Statement.MarkupsMarkup(embed.getMarkups());
-		stm.setMarkup(embed.getMarkup());
+		Statement.MarkupsMarkup stm = new Statement.MarkupsMarkup(embed.getMarkups().subList(1, embed.getMarkups().size()));
+		stm.setMarkup(embed.getMarkups().get(0));
 		stm.accept(this);
 	}
 	
