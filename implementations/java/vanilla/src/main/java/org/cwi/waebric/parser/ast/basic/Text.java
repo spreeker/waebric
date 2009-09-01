@@ -23,6 +23,11 @@ public class Text extends AbstractSyntaxNode {
 	}
 	
 	@Override
+	public String toString() {
+		return value;
+	}
+	
+	@Override
 	public void accept(INodeVisitor visitor) {
 		visitor.visit(this);
 	}

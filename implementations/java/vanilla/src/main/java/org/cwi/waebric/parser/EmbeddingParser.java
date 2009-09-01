@@ -86,7 +86,7 @@ class EmbeddingParser extends AbstractParser {
 		}
 		
 		// Determine type based on look-ahead information
-		if(isMarkup(1)) { // Markup* Markup -> Markup
+		if(isMarkup(1) && markups.size() > 0) { // Markup* Markup -> Markup
 			Embed.MarkupEmbed embed = new Embed.MarkupEmbed(markups);
 			embed.setMarkup(markupParser.parseMarkup());
 			return embed;
