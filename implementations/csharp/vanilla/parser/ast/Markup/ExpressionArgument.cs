@@ -32,7 +32,7 @@ namespace Parser.Ast.Markup
         /// Get expression of ExpressionArgument
         /// </summary>
         /// <returns>Expression</returns>
-        public Expression GetExpression()
+        public override Expression GetExpression()
         {
             return Expr;
         }

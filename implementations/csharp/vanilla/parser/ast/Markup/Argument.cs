@@ -13,6 +13,7 @@ namespace Parser.Ast.Markup
     {
         #region Public Methods
 
+        public abstract Expression GetExpression();
         public abstract void AcceptVisitor(ISyntaxNodeVisitor visitor);
         public abstract ISyntaxNode[] GetSubNodes();
 
