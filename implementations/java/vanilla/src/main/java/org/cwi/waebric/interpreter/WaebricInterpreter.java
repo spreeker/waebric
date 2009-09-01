@@ -17,6 +17,7 @@ import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.util.Environment;
 import org.cwi.waebric.util.ModuleRegister;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -85,7 +86,13 @@ public class WaebricInterpreter {
 
 			try {
 				// Output document
-				if(os != null && visitor.getCurrent() != null) { outputDocument(document, os); }
+				if(os != null) {
+					if(visitor.getCurrent() == null) { 
+						visitor.setCurrent(new Element("html")); 
+					}
+					
+					outputDocument(document, os); 
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -113,7 +120,12 @@ public class WaebricInterpreter {
 					try {
 						// Output document
 						OutputStream os = getOutputStream(path);
-						if(visitor.getCurrent() != null) { outputDocument(document, os); }
+						
+						if(visitor.getCurrent() == null) { 
+							visitor.setCurrent(new Element("html")); 
+						}
+						
+						outputDocument(document, os); 
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
