@@ -167,6 +167,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				} else { 
 					environment.defineVariable(formal.getName(), new Expression.TextExpression("undef"));
 				}
+				
+				index++;
 			}
 			
 			function.accept(this); // Visit function
