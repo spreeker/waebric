@@ -755,7 +755,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Convert record in [id1:expr1,id2:expr2,...] text value
 	 */
 	public void visit(RecordExpression expression) {
-		String result = "{";
+		String result = "[";
 		for(KeyValuePair pair: expression.getPairs()) {
 			// Attach a comma separator in front of each element, except first in list
 			if(expression.getPairs().indexOf(pair) != 0) { result += ","; }
@@ -775,7 +775,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 				result += "\"";
 			}
 		}
-		result += "}";
+		result += "]";
 
 		this.eeval = result;
 	}
@@ -917,6 +917,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	private void restoreCurrent(int arg) {
 		for(int i = 0; i < depth-arg; i++) {
 			current = current.getParentElement();
+			depth--;
 		}
 	}
 	
