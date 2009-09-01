@@ -83,7 +83,7 @@ namespace Interpreter
                 NodeList arguments = markup.GetArguments();
                 foreach (Formal formal in functionDefinition.GetFormals())
                 {
-                    if (index < arguments.Count())
+                    if (arguments.Count > index)
                     {
                         Argument arg = (Argument)arguments.Get(index);
                         Expression expr = arg.GetExpression();
@@ -91,7 +91,10 @@ namespace Interpreter
                         index++;
                     }
                     else 
-                    {   //Arity mismatch, so ignore 
+                    {   //Arity mismatch, so fill with undef to prevent looking in parent symboltables
+                        TextExpression expr = new TextExpression();
+                        expr.SetText("undef");
+                        SymbolTable.AddVariableDefinition(formal.GetIdentifier(), expr);
                         break; 
                     }
                 }
@@ -790,8 +793,6 @@ namespace Interpreter
                 functionDefinition.AddFormal(frml);
             }
 
-
-
             //Create new SymbolTable for function
             FunctionSymbolTable.Add(functionDefinition, (SymbolTable)SymbolTable.Clone());
            
@@ -1015,7 +1016,7 @@ namespace Interpreter
             else if (predicate is NotPredicate)
             {   //Evaluate Not Predicate
                 NotPredicate notPredicate = (NotPredicate) predicate;
-                return !EvaluatePredicate(notPredicate);
+                return !EvaluatePredicate(notPredicate.GetPredicate());
             }
             return false;
         }
