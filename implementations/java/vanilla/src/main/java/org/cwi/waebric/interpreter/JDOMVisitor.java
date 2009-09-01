@@ -282,11 +282,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			addContent(createXHTMLTag());
 		}
 
+		if(function.getStatements().size() > 1) {
+			addContent(this.createXHTMLTag());
+		}
+		
 		// Process statement(s)
-		Element root = current;
 		for(Statement statement: function.getStatements()) {
-			current = root; // Reset current to root
+			Element curr = current;
 			statement.accept(this);
+			if(curr != null) current = curr;
 		}
 	}
 
@@ -449,9 +453,15 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			assignment.accept(this);
 		}
 		
+		if(statement.getStatements().size() > 1) {
+			addContent(this.createXHTMLTag());
+		}
+		
 		// Visit sub-statements
 		for(Statement sub: statement.getStatements()) {
+			Element curr = current;
 			sub.accept(this);
+			if(curr != null) current = curr;
 		}
 		
 		// Restore previous state by removing each assignment environment
