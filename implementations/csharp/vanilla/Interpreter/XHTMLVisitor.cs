@@ -872,6 +872,12 @@ namespace Interpreter
         /// <returns>XHTMLElement which is root of the tree</returns>
         public XHTMLElement GetTree()
         {
+            //If tree is empty return only root html tag
+            if (Root == null)
+            {
+                Root = new XHTMLElement("html", null);
+            }
+
             return Root;
         }
 
