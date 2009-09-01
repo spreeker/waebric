@@ -157,7 +157,7 @@ public class WaebricInterpreter {
 	 * @throws IOException 
 	 */
 	private void outputDocument(Document document, OutputStream os) throws IOException {
-		XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+		XMLOutputter out = new XMLOutputter(Format.getRawFormat());
 		out.output(document, os);
 	}
 	
