@@ -1007,12 +1007,21 @@ namespace Interpreter
         /// <param name="element">Element to add</param>
         private void AddElement(XHTMLElement element)
         {
-            //If no root element, new element is root
+            //If no root element, create new root
             if (Root == null)
             {
-                Root = element;
-                Current = Root;
-                return;
+                if (element.GetTagState())
+                {
+                    Root = element;
+                    Current = Root;
+                    return;
+                }
+                else
+                {
+                    XHTMLElement newRoot = new XHTMLElement("html", null);
+                    Root = newRoot;
+                    Current = Root;
+                }                
             }
             
             //Add element as child of current element
