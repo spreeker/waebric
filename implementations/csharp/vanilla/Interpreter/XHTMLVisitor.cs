@@ -54,11 +54,14 @@ namespace Interpreter
         public override void Visit(FunctionDefinition functionDefinition)
         {
             //Interpret statements
-            XHTMLElement temp = Current;
             foreach(Statement statement in functionDefinition.GetStatements())
             {
-                Current = temp;
+                XHTMLElement temp = Current;
                 statement.AcceptVisitor(this);
+                if (temp != null)
+                {
+                    Current = temp;
+                }
             }
         }
 
@@ -77,15 +80,20 @@ namespace Interpreter
                 SymbolTable = new SymbolTable(GetSymbolTableOfFunction(functionDefinition));
 
                 //Store arguments in SymbolTable as variables
-                int parameternr = 0;
-                foreach (Argument argument in markup.GetArguments())
+                int index = 0;
+                NodeList arguments = markup.GetArguments();
+                foreach (Formal formal in functionDefinition.GetFormals())
                 {
-                    //Store parameters in symboltable
-                    if (argument is ExpressionArgument)
+                    if (index <= arguments.Count())
                     {
-                        Formal parameter = (Formal) functionDefinition.GetFormals().Get(parameternr);
-                        SymbolTable.AddVariableDefinition(parameter.GetIdentifier(), ((ExpressionArgument)argument).GetExpression());
-                        parameternr++;
+                        Argument arg = (Argument)arguments.Get(index);
+                        Expression expr = arg.GetExpression();
+                        SymbolTable.AddVariableDefinition(formal.GetIdentifier(), expr);
+                        index++;
+                    }
+                    else 
+                    {   //Arity mismatch, so ignore 
+                        break; 
                     }
                 }
 
@@ -438,11 +446,14 @@ namespace Interpreter
         /// <param name="statement">BlockStatement to interpret</param>
         public override void Visit(BlockStatement statement)
         {
-            XHTMLElement temp = Current;
             foreach(Statement currentStatement in statement.GetStatements())
             {
-                Current = temp;
-                currentStatement.AcceptVisitor(this);
+                XHTMLElement temp = Current;
+                currentStatement.AcceptVisitor(this); 
+                if (temp != null)
+                {
+                    Current = temp;
+                }
             }
         }
 
@@ -460,11 +471,14 @@ namespace Interpreter
             }
 
             //Interpret statements
-            XHTMLElement temp = Current;
             foreach (Statement stmt in statement.GetStatements())
             {
-                Current = temp;
+                XHTMLElement temp = Current;
                 stmt.AcceptVisitor(this);
+                if (temp != null)
+                {
+                    Current = temp;
+                }
             }
 
             //Go back to scope outside let statement
@@ -875,7 +889,7 @@ namespace Interpreter
             //If tree is empty return only root html tag
             if (Root == null)
             {
-                Root = new XHTMLElement("html", null);
+                Root = new XHTMLElement("html", null, true);
             }
 
             return Root;
@@ -1024,7 +1038,7 @@ namespace Interpreter
                 }
                 else
                 {
-                    XHTMLElement newRoot = new XHTMLElement("html", null);
+                    XHTMLElement newRoot = new XHTMLElement("html", null, true);
                     Root = newRoot;
                     Current = Root;
                 }                

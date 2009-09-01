@@ -92,7 +92,7 @@ namespace Interpreter
                     XhtmlWriter.WriteAttribute(pair.Key, pair.Value, false);
                 }
 
-                if (IsEmptyElement(element.GetTag()))
+                if (IsEmptyElement(element))
                 {   //Nothing inside element, so write tag end
                     XhtmlWriter.Write(XhtmlTextWriter.SelfClosingTagEnd);
                 }
@@ -186,11 +186,25 @@ namespace Interpreter
         /// <summary>
         /// Method which determines if the tag needs alternative closing, like <img />, <br />, <hr />
         /// </summary>
-        /// <param name="tag">Tag to check</param>
+        /// <param name="element">Element to check</param>
         /// <returns>True if empty element, otherwise false</returns>
-        private bool IsEmptyElement(String tag)
+        private bool IsEmptyElement(XHTMLElement element)
         {
+            //Check if element has childs, if not it's empty
+            if (element.GetChildren().Count == 0 && !element.IsGenerated())
+            {
+                return true;
+            }
+            
+            //Generated elements like html in empty file should not be shortened in ending
+            if (element.IsGenerated())
+            {
+                return false;
+            }
+
+            //Some elements are always empty
             String[] xhtmlEmptyTags = Enum.GetNames(typeof(EmptyXHTMLElement));
+            String tag = element.GetTag();
             foreach (String item in xhtmlEmptyTags)
             {
                 if (item.Equals(tag.ToUpper()))

@@ -18,6 +18,7 @@ namespace Interpreter
         private Dictionary<String, String> AttributeMap;
         private String Content;
         private bool IsTag;
+        private bool Generated;
 
         #endregion
 
@@ -31,6 +32,18 @@ namespace Interpreter
             Children = new List<XHTMLElement>();
             Content = "";
             IsTag = true;
+            Generated = false;
+        }
+
+        public XHTMLElement(String tag, XHTMLElement parent, bool generated)
+        {
+            Parent = parent;
+            Tag = tag;
+            AttributeMap = new Dictionary<String, String>();
+            Children = new List<XHTMLElement>();
+            Content = "";
+            IsTag = true;
+            Generated = generated;
         }
 
         /// <summary>
@@ -111,6 +124,15 @@ namespace Interpreter
         public String GetContent()
         {
             return Content;
+        }
+
+        /// <summary>
+        /// Retrieve generated state of element
+        /// </summary>
+        /// <returns>IsGenerated</returns>
+        public bool IsGenerated()
+        {
+            return Generated;
         }
 
         /// <summary>
