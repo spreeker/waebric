@@ -67,13 +67,9 @@ public class WaebricChecker extends DefaultNodeVisitor {
 	}
 	
 	public void visit(Module module) {
-		for(Import imprt: module.getImports()) {
-			imprt.accept(this);
-		}
-		
-		for(Site site: module.getSites()) {
-			site.accept(this);
-		}
+		for(Import imprt: module.getImports()) { imprt.accept(this); }
+		for(Site site: module.getSites()) {	site.accept(this); }
+		for(FunctionDef func: module.getFunctionDefinitions()) { func.accept(this); }
 	}
 	
 	@Override

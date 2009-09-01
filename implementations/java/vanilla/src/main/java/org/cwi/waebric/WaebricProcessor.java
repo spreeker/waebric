@@ -96,8 +96,6 @@ public class WaebricProcessor {
 				for(SemanticException exception : seme) {
 					exception.printStackTrace();
 				}
-				
-				return; // Quit application
 			}
 			
 			WaebricInterpreter interpreter = new WaebricInterpreter(os);

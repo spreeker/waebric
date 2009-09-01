@@ -20,6 +20,7 @@ import org.cwi.waebric.parser.ast.expression.Expression.SymbolExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Argument;
+import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
 import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Markup;
@@ -158,14 +159,16 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			
 			// Store function variables
 			int index = 0; 
-			for(Argument argument: markup.getArguments()) {
-				if(argument instanceof Argument.RegularArgument) {
-					IdCon variable = function.getFormals().getIdentifiers().get(index);
-					environment.defineVariable(variable.getName(), argument.getExpression());
-					index++;
+			Arguments arguments = markup.getArguments();
+			for(IdCon formal: function.getFormals().getIdentifiers()) {
+				if(arguments.size() > index) {
+					Expression expression = arguments.get(index).getExpression();
+					environment.defineVariable(formal.getName(), expression);
+				} else { 
+					environment.defineVariable(formal.getName(), new Expression.TextExpression("undef"));
 				}
 			}
-
+			
 			function.accept(this); // Visit function
 			
 			// Restore parent environment
