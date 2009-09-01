@@ -83,7 +83,7 @@ namespace Interpreter
                 NodeList arguments = markup.GetArguments();
                 foreach (Formal formal in functionDefinition.GetFormals())
                 {
-                    if (index <= arguments.Count())
+                    if (index < arguments.Count())
                     {
                         Argument arg = (Argument)arguments.Get(index);
                         Expression expr = arg.GetExpression();
