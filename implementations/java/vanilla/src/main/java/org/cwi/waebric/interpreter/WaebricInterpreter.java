@@ -85,7 +85,7 @@ public class WaebricInterpreter {
 
 			try {
 				// Output document
-				if(os != null) { outputDocument(document, os); }
+				if(os != null && visitor.getCurrent() != null) { outputDocument(document, os); }
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -113,7 +113,7 @@ public class WaebricInterpreter {
 					try {
 						// Output document
 						OutputStream os = getOutputStream(path);
-						outputDocument(document, os);
+						if(visitor.getCurrent() != null) { outputDocument(document, os); }
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
