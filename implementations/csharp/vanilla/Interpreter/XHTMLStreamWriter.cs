@@ -15,6 +15,7 @@ namespace Interpreter
     {
         #region Private Members
 
+        private DocType DocTyping;
         private XHTMLElement Root;
         private XhtmlTextWriter XhtmlWriter;
 
@@ -38,11 +39,9 @@ namespace Interpreter
         /// <param name="docType">DocType of XHTML document</param>
         public XHTMLStreamWriter(TextWriter writer, DocType docType, XHTMLElement tree)
         {
+            DocTyping = docType;
             XhtmlWriter = new XhtmlTextWriter(writer);
             Root = tree;
-
-            //Write doctype before starting document
-            WriteDocType(docType);
         }
 
         /// <summary>
@@ -50,6 +49,12 @@ namespace Interpreter
         /// </summary>
         public void WriteStream()
         {
+            //If root is generated, no doctype, otherwise write a doctype header
+            if (!Root.IsGenerated())
+            {
+                //Write doctype before starting document
+                WriteDocType(DocTyping);
+            }
             Visit(Root);
         }
 
