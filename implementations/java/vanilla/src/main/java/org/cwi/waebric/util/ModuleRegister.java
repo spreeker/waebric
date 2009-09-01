@@ -120,7 +120,7 @@ public class ModuleRegister {
 						// Recursively additional dependencies
 						loadDependancies(dependancy, container);
 					} catch (Exception e) {
-						// Skip invalid import directives
+						e.printStackTrace();
 					}
 				}
 			}

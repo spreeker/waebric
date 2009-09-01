@@ -920,7 +920,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	private void restoreCurrent(int arg) {
-		for(int i = 0; i < depth-arg; i++) {
+		for(int i = 0; depth > arg; i++) {
 			current = current.getParentElement();
 			depth--;
 		}

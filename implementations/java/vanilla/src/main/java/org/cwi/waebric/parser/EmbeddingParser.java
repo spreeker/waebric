@@ -90,7 +90,6 @@ class EmbeddingParser extends AbstractParser {
 				super.exceptions.remove(super.exceptions.size()-1);
 				tokens.seek(index);
 				expression = expressionParser.parseExpression();
-				next(WaebricSymbol.GREATER_THAN, "Expression embedding closure", "markup+ expression >");
 				Embed.ExpressionEmbed embed = new Embed.ExpressionEmbed(markups);
 				embed.setExpression(expression);
 				return embed;
