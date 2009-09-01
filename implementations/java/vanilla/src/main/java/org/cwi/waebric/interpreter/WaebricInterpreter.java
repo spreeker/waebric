@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Module;
+import org.cwi.waebric.parser.ast.module.Modules;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
 import org.cwi.waebric.parser.ast.module.site.Site;
@@ -57,19 +57,19 @@ public class WaebricInterpreter {
 	 * @param tree
 	 */
 	public void interpretProgram(AbstractSyntaxTree ast) {
-		interpretModule(ast.getRoot());
+		Modules modules = ModuleRegister.getInstance().loadDependencies(ast.getRoot());
+		interpretModules(modules);
 	}
 	
 	/**
 	 * Write module contents to XHTML file.
 	 * @param module
 	 */
-	public void interpretModule(Module module) {
+	public void interpretModules(Modules modules) {
 		// Retrieve function definitions
-		List<Module> dependancies = ModuleRegister.getInstance().loadDependencies(module);
 		Collection<FunctionDef> functions = new ArrayList<FunctionDef>();
-		for(Module dependancy: dependancies) {
-			functions.addAll(dependancy.getFunctionDefinitions());
+		for(Module module: modules) {
+			functions.addAll(module.getFunctionDefinitions());
 		}
 		
 		// Create environment
@@ -77,7 +77,7 @@ public class WaebricInterpreter {
 		environment.defineFunctions(functions);
 		
 		// Interpret "main" function and write to output stream
-		if(containsMain(module)) {
+		if(environment.isDefinedFunction("main")) {
 			Document document = new Document();
 			
 			// Visit function
@@ -87,10 +87,7 @@ public class WaebricInterpreter {
 			try {
 				// Output document
 				if(os != null) {
-					if(visitor.getCurrent() == null) { 
-						visitor.setCurrent(new Element("html")); 
-					}
-					
+					if(visitor.getCurrent() == null) { visitor.setCurrent(new Element("html")); }
 					outputDocument(document, os); 
 				}
 			} catch (IOException e) {
@@ -99,14 +96,13 @@ public class WaebricInterpreter {
 		}
 		
 		// Interpret sites of all used modules and store on file system
-		for(Module mod: dependancies) {
-			for(Site site: mod.getSites()) {
+		for(Module module: modules) {
+			for(Site site: module.getSites()) {
 				for(Mapping mapping: site.getMappings()) {
 					Document document = new Document();
 					
 					Markup markup = mapping.getMarkup();
 					if(markup instanceof Markup.Tag) {
-						// Interpret mapping tag as call
 						markup = new Markup.Call(markup.getDesignator());
 					}
 					
@@ -118,13 +114,8 @@ public class WaebricInterpreter {
 					String path = mapping.getPath().getValue().toString();
 					
 					try {
-						// Output document
 						OutputStream os = getOutputStream(path);
-						
-						if(visitor.getCurrent() == null) { 
-							visitor.setCurrent(new Element("html")); 
-						}
-						
+						if(visitor.getCurrent() == null) { visitor.setCurrent(new Element("html")); }
 						outputDocument(document, os); 
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -173,17 +164,4 @@ public class WaebricInterpreter {
 		out.output(document, os);
 	}
 	
-	/**
-	 * Check if module contains a main function.
-	 * @param module
-	 * @return
-	 */
-	public static boolean containsMain(Module module) {
-		for(FunctionDef function: module.getFunctionDefinitions()) {
-			if(function.getIdentifier().getName().equals("main")) { return true; }
-		}
-		
-		return false;
-	}
-
 }
