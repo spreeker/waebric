@@ -1,9 +1,13 @@
 package org.cwi.waebric;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.util.List;
 
 import org.cwi.waebric.checker.SemanticException;
@@ -19,31 +23,34 @@ public class WaebricProcessor {
 	/**
 	 * 
 	 * @param args
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
-		String path = "";
+	public static void main(String[] args) throws FileNotFoundException {
+		Reader is = null; // Input stream
+		OutputStream os = System.out; // Output stream
+		
 		if(args.length == 0) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			System.out.println("Enter file path: ");
-			try {
-				path = br.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
+			is = new InputStreamReader(System.in);
+		} else if(args.length > 0) {
+			is = new FileReader(args[0]); // Retrieve path from arguments
+			System.out.println("Processing... " + args[0]);
+			if(args.length > 1) {
+				try {
+					os = getOutputStream(args[1]);
+					System.out.println("Storing... " + args[1]);
+				} catch(IOException e) {
+					e.printStackTrace();
+					System.out.println("Could not write to " + args[1] + " writing to console instead.");
+				}
 			}
-		} else if(args.length == 1) {
-			path = args[0]; // Retrieve path from arguments
 		} else {
 			System.err.println("Usage:\tparser || parser -path");
 			System.exit(1);
 		}
 
 		try {
-			System.out.println("Processing " + path + "...");
-
-			FileReader reader = new FileReader(path);
-			WaebricScanner scanner = new WaebricScanner(reader);
-			
+			WaebricScanner scanner = new WaebricScanner(is);
+	
 			long curr = System.currentTimeMillis();
 			List<LexicalException> le = scanner.tokenizeStream();
 			long scan_time = System.currentTimeMillis() - curr;
@@ -93,7 +100,7 @@ public class WaebricProcessor {
 				return; // Quit application
 			}
 			
-			WaebricInterpreter interpreter = new WaebricInterpreter(System.out);
+			WaebricInterpreter interpreter = new WaebricInterpreter(os);
 
 			System.out.println("\nInterpreting program and writing to output stream:\n");
 			curr = System.currentTimeMillis();
@@ -103,6 +110,34 @@ public class WaebricProcessor {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Convert requested output file path into output stream. In case
+	 * the interpreted was construct with an output stream, this stream
+	 * will be returned instead.
+	 * 
+	 * When a directory or file in the specified path does not exist
+	 * they will be created, this might result in an IOException.
+	 * 
+	 * @param module
+	 * @return
+	 * @throws IOException
+	 */
+	public static OutputStream getOutputStream(String path) throws IOException {
+		int dirLength = path.lastIndexOf("/");
+		
+		// Create directories
+		if(dirLength != -1) {
+			File directory = new File(path.substring(0, dirLength));
+			directory.mkdirs();
+		}
+		
+		// Create file
+		File file = new File(path);
+		file.createNewFile(); // Create new file
+		
+		return new FileOutputStream(path);
 	}
 	
 }
