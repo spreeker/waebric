@@ -10,11 +10,13 @@ import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
+import org.cwi.waebric.parser.ast.module.Import;
 import org.cwi.waebric.parser.ast.module.Module;
 import org.cwi.waebric.parser.ast.module.ModuleId;
 import org.cwi.waebric.parser.ast.module.function.Formals;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Mapping;
+import org.cwi.waebric.parser.ast.module.site.Site;
 import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
@@ -62,6 +64,16 @@ public class WaebricChecker extends DefaultNodeVisitor {
 		}
 		
 		return exceptions;
+	}
+	
+	public void visit(Module module) {
+		for(Import imprt: module.getImports()) {
+			imprt.accept(this);
+		}
+		
+		for(Site site: module.getSites()) {
+			site.accept(this);
+		}
 	}
 	
 	@Override
