@@ -29,7 +29,7 @@ namespace Interpreter
         private Dictionary<FunctionDefinition, SymbolTable> FunctionSymbolTable;//Stores symboltables per function
         private String TextValue = "";                                          //Buffer used for buffering values
         private Stack<ISyntaxNode> YieldStack;                                  //Stack containing nodes which are referred by a yield
-        private int Depth = 0;                                                  //Depth to walk through XHTMLTree properly
+        private int Depth;                                                  //Depth to walk through XHTMLTree properly
 
         #endregion
 
@@ -63,10 +63,9 @@ namespace Interpreter
             }
 
             //Interpret statements
-            int depth = Depth;
+            int depth = this.Depth;
             foreach(Statement statement in functionDefinition.GetStatements())
             {
-                XHTMLElement temp = Current;
                 statement.AcceptVisitor(this);
                 BackToParentXHTMLElement(depth);
             }
@@ -460,7 +459,7 @@ namespace Interpreter
         /// <param name="statement">BlockStatement to interpret</param>
         public override void Visit(BlockStatement statement)
         {
-            int depth = Depth;
+            int depth = this.Depth;
             foreach(Statement currentStatement in statement.GetStatements())
             {
                 currentStatement.AcceptVisitor(this);
@@ -482,7 +481,7 @@ namespace Interpreter
             }
 
             //Interpret statements
-            int depth = Depth;
+            int depth = this.Depth;
             foreach (Statement stmt in statement.GetStatements())
             {
                 stmt.AcceptVisitor(this);
@@ -509,7 +508,7 @@ namespace Interpreter
                 ListExpression listExpression = (ListExpression)expr;
                 
                 //Iterate through list with expression
-                int depth = Depth;
+           //     int depth = Depth;
                 foreach (Expression currentExpr in listExpression.GetExpressions())
                 {
                     //New scope
@@ -523,7 +522,7 @@ namespace Interpreter
                     SymbolTable = SymbolTable.GetParentSymbolTable();
 
                     //Return to parent current
-                    BackToParentXHTMLElement(depth);
+           //         BackToParentXHTMLElement(depth);
                 }
             }
             else if(expr is FieldExpression)
@@ -829,9 +828,7 @@ namespace Interpreter
             AddElement(element);
             
             //Interpret Embed and TextTail
-            XHTMLElement temp = Current;
             embedding.GetEmbed().AcceptVisitor(this);
-            Current = temp;
             embedding.GetTextTail().AcceptVisitor(this);
         }
 
@@ -871,9 +868,7 @@ namespace Interpreter
             element.SetTagState(false);
             AddElement(element);
 
-            XHTMLElement temp = Current;
             textTail.GetEmbed().AcceptVisitor(this);
-            Current = temp;
             textTail.GetTextTail().AcceptVisitor(this);
         }
 
@@ -1035,6 +1030,10 @@ namespace Interpreter
         /// <param name="requestedDepth">Depth of parents</param>
         private void BackToParentXHTMLElement(int requestedDepth)
         {
+            if (requestedDepth == 5)
+            {
+                int t = 0;
+            }
             for (int i = 0; Depth > requestedDepth; i++)
             {
                 Current = Current.GetParent();
@@ -1054,8 +1053,6 @@ namespace Interpreter
                 if (element.GetTagState())
                 {
                     Root = element;
-                    Current = Root;
-                    return;
                 }
                 else
                 {
