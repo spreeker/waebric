@@ -362,6 +362,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Interpret all sub-statements embedded in block.
 	 */
 	public void visit(Statement.Block statement) {
+		if(statement.getStatements().size() > 1 && ! document.hasRootElement()) { 
+			createXHTMLRoot(false);
+		}
+		
 		int depth = this.depth;
 		for(Statement sub: statement.getStatements()) {
 			sub.accept(this);
@@ -456,6 +460,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 		for(Assignment assignment: statement.getAssignments()) {
 			environment = new Environment(environment);
 			assignment.accept(this);
+		}
+		
+		if(statement.getStatements().size() > 1 && ! document.hasRootElement()) { 
+			createXHTMLRoot(false);
 		}
 		
 		// Visit sub-statements
