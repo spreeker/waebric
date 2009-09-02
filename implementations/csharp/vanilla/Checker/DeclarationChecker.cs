@@ -94,7 +94,8 @@ namespace Checker
             foreach(Formal formal in functionDefinition.GetFormals())
             {   
                 //Add variable, but with nullvalue, because value is undefined in definition
-                SymbolTable.AddVariableDefinition(formal.GetIdentifier(), null);
+                TextExpression textExpression = new TextExpression();
+                SymbolTable.AddVariableDefinition(formal.GetIdentifier(), textExpression);
             }
 
             //Check Statements of function

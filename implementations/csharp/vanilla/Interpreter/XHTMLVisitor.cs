@@ -29,7 +29,7 @@ namespace Interpreter
         private Dictionary<FunctionDefinition, SymbolTable> FunctionSymbolTable;//Stores symboltables per function
         private String TextValue = "";                                          //Buffer used for buffering values
         private Stack<YieldElement> YieldStack;                                 //Stack containing nodes which are referred by a yield
-        private int Depth;                                                      //Depth to walk through XHTMLTree properly
+        private int Depth = 0;                                                      //Depth to walk through XHTMLTree properly
 
         #endregion
 

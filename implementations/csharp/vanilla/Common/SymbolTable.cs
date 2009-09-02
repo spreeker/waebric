@@ -50,7 +50,12 @@ namespace Common
         /// <param name="functionDefinition">FunctionDefinition to add</param>
         public void AddFunctionDefinition(FunctionDefinition functionDefinition)
         {
-            FunctionDefinitions.Add(functionDefinition.GetIdentifier(), functionDefinition);
+            if (functionDefinition == null)
+            {
+                return;
+            }
+            String identifier = functionDefinition.GetIdentifier() == null ? "" : functionDefinition.GetIdentifier();
+            FunctionDefinitions.Add(identifier, functionDefinition);
         }
 
         /// <summary>
