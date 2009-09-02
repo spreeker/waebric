@@ -133,6 +133,10 @@ namespace Common
         public bool ContainsVariable(String identifier)
         {
             bool contains = VariableDefinitions.ContainsKey(identifier);
+            if (contains)
+            {
+                return VariableDefinitions[identifier] != null;
+            }
             if(!contains && ParentSymbolTable != null)
             {
                 return ParentSymbolTable.ContainsVariable(identifier);

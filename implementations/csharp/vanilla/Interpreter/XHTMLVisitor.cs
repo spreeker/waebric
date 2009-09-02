@@ -90,20 +90,15 @@ namespace Interpreter
                 NodeList arguments = markup.GetArguments();
                 foreach (Formal formal in functionDefinition.GetFormals())
                 {
+                    Expression expr = null;
+
                     if (arguments.Count > index)
                     {
                         Argument arg = (Argument)arguments.Get(index);
-                        Expression expr = arg.GetExpression();
-                        SymbolTable.AddVariableDefinition(formal.GetIdentifier(), expr);
-                        index++;
+                        expr = arg.GetExpression();
                     }
-                    else 
-                    {   //Arity mismatch, so fill with undef to prevent looking in parent symboltables
-                        TextExpression expr = new TextExpression();
-                        expr.SetText("undef");
-                        SymbolTable.AddVariableDefinition(formal.GetIdentifier(), expr);
-                        break; 
-                    }
+                    SymbolTable.AddVariableDefinition(formal.GetIdentifier(), expr);
+                    index++;
                 }
 
                 //Visit functiondefinition
