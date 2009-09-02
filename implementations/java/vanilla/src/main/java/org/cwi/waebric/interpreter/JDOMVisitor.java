@@ -62,7 +62,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 
 	private final Document document;
 	private Element current;
-	private int depth;
+	private int depth = 0;
 	
 	/**
 	 * Expression evaluation
