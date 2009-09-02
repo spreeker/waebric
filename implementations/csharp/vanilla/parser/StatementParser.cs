@@ -537,6 +537,11 @@ namespace Parser
             int j = 1; 
             if (TokenStream.HasNext(1) && TokenStream.Peek(1).GetType() == TokenType.IDENTIFIER)
             {
+                if(TokenStream.HasNext(j+1) && TokenStream.Peek(j+1).GetValue().ToString() == "+")
+                {   //CatExpression isn't markup
+                    return false;
+                }
+
                 //Determine if arguments exists
                 while (TokenStream.HasNext(j + 1))
                 {
