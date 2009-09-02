@@ -109,8 +109,9 @@ public class Environment implements Cloneable {
 	 */
 	public boolean isDefinedVariable(String name) {
 		boolean contains = variables.containsKey(name);
+		if(contains) { return variables.get(name) != null; }
 		if(! contains && parent != null) { return parent.isDefinedVariable(name); }
-		return contains;
+		return false;
 	}
 	
 	/**

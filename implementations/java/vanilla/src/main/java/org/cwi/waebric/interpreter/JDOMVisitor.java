@@ -164,11 +164,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			int index = 0; 
 			Arguments arguments = markup.getArguments();
 			for(IdCon formal: function.getFormals().getIdentifiers()) {
+				Expression expression = null;
+				
 				if(arguments.size() > index) {
-					Expression expression = arguments.get(index).getExpression();
-					environment.defineVariable(formal.getName(), expression);
-					index++;
-				} else { break; }
+					expression = arguments.get(index).getExpression();
+				}
+				
+				environment.defineVariable(formal.getName(), expression);
+				index++;
 			}
 			
 			function.accept(this); // Visit function
