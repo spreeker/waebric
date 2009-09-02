@@ -52,10 +52,14 @@ public class ModuleRegister {
 		String path = getPath(identifier);
 		try {
 			FileReader reader = new FileReader(path);
+			
 			WaebricScanner scanner = new WaebricScanner(reader);
 			List<LexicalException> le = scanner.tokenizeStream(); // Scan module
+			if(le.size() > 0) { return null; }
+			
 			WaebricParser parser = new WaebricParser(scanner.iterator());
 			List<SyntaxException> se = parser.parseTokens(); // Parse module
+			if(se.size() > 0) { return null; }
 			
 			// Retrieve modules
 			Module module = parser.getAbstractSyntaxTree().getRoot();
