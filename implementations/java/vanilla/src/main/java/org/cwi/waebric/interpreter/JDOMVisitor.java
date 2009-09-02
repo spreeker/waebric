@@ -22,7 +22,6 @@ import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
-import org.cwi.waebric.parser.ast.markup.Attributes;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.markup.Markup.Call;
 import org.cwi.waebric.parser.ast.markup.Markup.Tag;
@@ -223,55 +222,59 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	/**
-	 * Attach attributes to current JDOM element.
+	 * Attach attribute value to current element
+	 * @param att Attribute name
+	 * @param value Added value
 	 */
-	public void visit(Attributes attributes) {
-		for(Attribute attribute: attributes) {
-			attribute.accept(this);
-		}
+	private void addAttributeValue(String att, String value) {
+		org.jdom.Attribute attribute = current.getAttribute(att);
+		
+		String actual = "";
+		if(attribute != null) { actual = attribute.getValue() + " "; }
+		current.setAttribute(att, actual + value);
 	}
-	
+
 	/**
 	 * Store class attribute.
 	 */
 	public void visit(Attribute.ClassAttribute attribute) {
-		current.setAttribute("class", attribute.getIdentifier().getName());
+		addAttributeValue("class", attribute.getIdentifier().getName());
 	}
 	
 	/**
 	 * Store id attribute.
 	 */
 	public void visit(Attribute.IdAttribute attribute) {
-		current.setAttribute("id", attribute.getIdentifier().getName());
+		addAttributeValue("id", attribute.getIdentifier().getName());
 	}
 	
 	/**
 	 * Store name attribute.
 	 */
 	public void visit(Attribute.NameAttribute attribute) {
-		current.setAttribute("name", attribute.getIdentifier().getName());
+		addAttributeValue("name", attribute.getIdentifier().getName());
 	}
 	
 	/**
 	 * Store type attribute.
 	 */
 	public void visit(Attribute.TypeAttribute attribute) {
-		current.setAttribute("type", attribute.getIdentifier().getName());
+		addAttributeValue("type", attribute.getIdentifier().getName());
 	}
 	
 	/**
 	 * Store width attribute.
 	 */
 	public void visit(Attribute.WidthAttribute attribute) {
-		current.setAttribute("width", "" + attribute.getWidth().getValue());
+		addAttributeValue("width", "" + attribute.getWidth().getValue());
 	}
 	
 	/**
 	 * Store width and height attribute.
 	 */
 	public void visit(Attribute.WidthHeightAttribute attribute) {
-		current.setAttribute("width", "" + attribute.getWidth().getValue());
-		current.setAttribute("height", "" + attribute.getHeight().getValue());
+		addAttributeValue("width", "" + attribute.getWidth().getValue());
+		addAttributeValue("height", "" + attribute.getHeight().getValue());
 	}
 	
 	/**
