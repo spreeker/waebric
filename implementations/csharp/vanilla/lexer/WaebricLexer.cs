@@ -207,6 +207,7 @@ namespace Lexer
                 { //Embedding found, so lexicalize embedding
                     LexicalizeEmbedding(stringBuilder.ToString());
                     tokenizer.SetIgnoreComments(false);
+                    tokenizer.SetIgnoreNumeric(false);
                     return;
                 }
                 
