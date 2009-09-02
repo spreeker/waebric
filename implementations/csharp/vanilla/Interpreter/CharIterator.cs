@@ -66,7 +66,23 @@ namespace Interpreter
                 else if (Current == '\\' && HasNext() && Peek(1) == '\"')
                 {
                     MoveIndex(1);
-                    newString += '\"';
+                    newString += "\"";
+                }
+                else if (Current == '&')
+                {
+                    newString += "&amp;"; //ampersand
+                }
+                else if (Current == '>')
+                {
+                    newString += "&gt;"; //greater than
+                }
+                else if(Current == '<')
+                {
+                    newString += "&lt;"; //less than
+                }
+                else if (Current == '\'')
+                {
+                    newString += "&apos;"; //apostrophe
                 }
                 else
                 {
