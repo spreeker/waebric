@@ -371,6 +371,10 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * create a local element variable during each loop.
 	 */
 	public void visit(Statement.Each statement) {
+		if(! document.hasRootElement()) { 
+			createXHTMLRoot(false);
+		}
+		
 		Expression expression = statement.getExpression();
 		if(expression instanceof Expression.ListExpression) {
 			Expression.ListExpression list = (Expression.ListExpression) expression;
