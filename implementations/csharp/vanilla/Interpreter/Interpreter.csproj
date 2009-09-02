@@ -53,6 +53,7 @@
     <Compile Include="XHTMLElement.cs" />
     <Compile Include="XHTMLStreamWriter.cs" />
     <Compile Include="XHTMLVisitor.cs" />
+    <Compile Include="YieldElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Checker\Checker.csproj">

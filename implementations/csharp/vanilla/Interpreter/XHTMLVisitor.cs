@@ -28,8 +28,8 @@ namespace Interpreter
         private XHTMLElement Current;                                           //Pointer to current element in XHTMLTree
         private Dictionary<FunctionDefinition, SymbolTable> FunctionSymbolTable;//Stores symboltables per function
         private String TextValue = "";                                          //Buffer used for buffering values
-        private Stack<ISyntaxNode> YieldStack;                                  //Stack containing nodes which are referred by a yield
-        private int Depth;                                                  //Depth to walk through XHTMLTree properly
+        private Stack<YieldElement> YieldStack;                                 //Stack containing nodes which are referred by a yield
+        private int Depth;                                                      //Depth to walk through XHTMLTree properly
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace Interpreter
             //Prepare members to start visiting ISyntaxNodes
             SymbolTable = symbolTable;
             FunctionSymbolTable = new Dictionary<FunctionDefinition, SymbolTable>();
-            YieldStack = new Stack<ISyntaxNode>();
+            YieldStack = new Stack<YieldElement>();
         }
 
         /// <summary>
@@ -459,6 +459,14 @@ namespace Interpreter
         /// <param name="statement">BlockStatement to interpret</param>
         public override void Visit(BlockStatement statement)
         {
+            //Create root XHTML element when multiple statements can be root and there's no root 
+            if (statement.GetStatements().Count > 1 && Root == null)
+            {
+                XHTMLElement newRoot = new XHTMLElement("html", null, true);
+                Root = newRoot;
+                Current = Root;
+            }
+
             int depth = this.Depth;
             foreach(Statement currentStatement in statement.GetStatements())
             {
@@ -473,6 +481,14 @@ namespace Interpreter
         /// <param name="statement">LetStatement to interpret</param>
         public override void Visit(LetStatement statement)
         {
+            //If no root element, create one
+            if (Root == null)
+            {
+                XHTMLElement newRoot = new XHTMLElement("html", null, true);
+                Root = newRoot;
+                Current = Root;
+            }
+
             //Create SymbolTable's for each assignment to let referencing work properly
             foreach (Assignment asgn in statement.GetAssignments())
             {
@@ -501,6 +517,14 @@ namespace Interpreter
         /// <param name="statement">EachStatement to interpret</param>
         public override void Visit(EachStatement statement)
         {
+            //If no root element, create one
+            if (Root == null)
+            {
+                XHTMLElement newRoot = new XHTMLElement("html", null, true);
+                Root = newRoot;
+                Current = Root;
+            }
+
             Expression expr = statement.GetExpression();
             //Different looping with different expression types
             if(expr is ListExpression)
@@ -508,8 +532,11 @@ namespace Interpreter
                 ListExpression listExpression = (ListExpression)expr;
                 
                 //Iterate through list with expression
+                XHTMLElement temp = Current;
                 foreach (Expression currentExpr in listExpression.GetExpressions())
                 {
+                    Current = temp;
+
                     //New scope
                     SymbolTable = new SymbolTable(SymbolTable);
 
@@ -571,7 +598,7 @@ namespace Interpreter
                         MarkupEmbeddingStatement markupEmbeddingStatement = new MarkupEmbeddingStatement();
                         markupEmbeddingStatement.SetMarkups(nonInterpretedMarkups);
                         markupEmbeddingStatement.SetEmbedding(statement.GetEmbedding());
-                        YieldStack.Push(markupEmbeddingStatement);
+                        PushYieldNode(markupEmbeddingStatement);
                     }
                     //Interpret markup
                     ((Markup)MarkupArray[i]).AcceptVisitor(this);
@@ -613,7 +640,7 @@ namespace Interpreter
                         MarkupExpressionStatement markupExpressionStatement = new MarkupExpressionStatement();
                         markupExpressionStatement.SetMarkups(nonInterpretedMarkups);
                         markupExpressionStatement.SetExpression(statement.GetExpression());
-                        YieldStack.Push(markupExpressionStatement);
+                        PushYieldNode(markupExpressionStatement);
                     }
                     //Interpret markup
                     ((Markup)MarkupArray[i]).AcceptVisitor(this);
@@ -659,7 +686,7 @@ namespace Interpreter
                         MarkupMarkupStatement markupMarkupStatement = new MarkupMarkupStatement();
                         markupMarkupStatement.SetMarkups(nonInterpretedMarkups);
                         markupMarkupStatement.SetMarkup(statement.GetMarkup());
-                        YieldStack.Push(markupMarkupStatement);
+                        PushYieldNode(markupMarkupStatement);
                     }
                     //Interpret markup
                     ((Markup)MarkupArray[i]).AcceptVisitor(this);
@@ -721,7 +748,7 @@ namespace Interpreter
                         MarkupStatStatement markupStatStatement = new MarkupStatStatement();
                         markupStatStatement.SetMarkups(nonInterpretedMarkups);
                         markupStatStatement.SetStatement(statement.GetStatement());
-                        YieldStack.Push(markupStatStatement);
+                        PushYieldNode(markupStatStatement);
                     }
                     //Interpret markup
                     ((Markup)MarkupArray[i]).AcceptVisitor(this);
@@ -749,28 +776,34 @@ namespace Interpreter
             }
             
             //Pop from YieldStack and lets interpet it
-            ISyntaxNode node = YieldStack.Pop();
+            YieldElement yieldElement = YieldStack.Pop();
 
-            if (node != null)
+            if (yieldElement != null && yieldElement.GetRootElement() != null)
             {
                 //Let's copy yieldstack, because there are possible yields in the yield. 
-                Stack<ISyntaxNode> tempYieldStack = new Stack<ISyntaxNode>();
-                List<ISyntaxNode> yieldList = YieldStack.ToList();
-                foreach (ISyntaxNode yieldNode in yieldList)
+                Stack<YieldElement> tempYieldStack = new Stack<YieldElement>();
+                List<YieldElement> yieldList = YieldStack.ToList();
+                foreach (YieldElement yieldNode in yieldList)
                 {
                     tempYieldStack.Push(yieldNode);
                 }
 
-                //Lets interpret it
-                node.AcceptVisitor(this);
+                //Lets interpret it with specific symboltable
+                SymbolTable temp = (SymbolTable)SymbolTable.Clone();
+                SymbolTable = yieldElement.GetSymbolTable();
+
+                yieldElement.GetRootElement().AcceptVisitor(this);
 
                 //Add some content when node is an expression or embedding
-                if (node is Expression || node is Embedding)
+                if (yieldElement.GetRootElement() is Expression || yieldElement.GetRootElement() is Embedding)
                 {
                     XHTMLElement element = new XHTMLElement(TextValue, Current);
                     element.SetTagState(false);
                     AddElement(element);
                 }
+
+                //Restore symboltable
+                SymbolTable = temp;
 
                 //Restore YieldStack in original shape before interpreting
                 YieldStack = tempYieldStack;
@@ -834,11 +867,15 @@ namespace Interpreter
         /// <param name="embed">MarkupEmbed to interpret</param>
         public override void Visit(MarkupEmbed embed)
         {
+            int depth = this.Depth;
+
             //Structure is same as MarkupMarkupStatement, so convert and interpret
             MarkupMarkupStatement markupMarkupStatement = new MarkupMarkupStatement();
             markupMarkupStatement.SetMarkups(embed.GetMarkups());
             markupMarkupStatement.SetMarkup(embed.GetMarkup());
             markupMarkupStatement.AcceptVisitor(this);
+
+            BackToParentXHTMLElement(depth);
         }
 
         /// <summary>
@@ -847,11 +884,15 @@ namespace Interpreter
         /// <param name="embed">ExpressionEmbed to interpret</param>
         public override void Visit(ExpressionEmbed embed)
         {
+            int depth = this.Depth;
+
             //Structure is same as MarkupExpressionStatement, so convert and interpret
             MarkupExpressionStatement markupExpressionStatement = new MarkupExpressionStatement();
             markupExpressionStatement.SetMarkups(embed.GetMarkups());
             markupExpressionStatement.SetExpression(embed.GetExpression());
             markupExpressionStatement.AcceptVisitor(this);
+
+            BackToParentXHTMLElement(depth);
         }
 
         /// <summary>
@@ -920,6 +961,18 @@ namespace Interpreter
                 return FunctionSymbolTable[function];
             }
             return SymbolTable;
+        }
+
+        /// <summary>
+        /// Push node to yieldstack with current symboltable state
+        /// </summary>
+        /// <param name="node">Node to push</param>
+        private void PushYieldNode(ISyntaxNode node)
+        {
+            YieldElement element = new YieldElement();
+            element.SetRootElement(node);
+            element.SetSymbolTable((SymbolTable)SymbolTable.Clone());
+            YieldStack.Push(element);
         }
 
         /// <summary>
