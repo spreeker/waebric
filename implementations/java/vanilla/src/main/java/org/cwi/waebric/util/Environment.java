@@ -40,8 +40,12 @@ public class Environment implements Cloneable {
 	 * @return Cloned environment
 	 */
 	public Environment clone() {
-		Environment clone = new Environment(this.getParent());
+		Environment clone = new Environment(getParent());
+		
+		// Clone function definitions
 		clone.defineFunctions(this.getFunctionDefinitions());
+		
+		// Clone variable definitions
 		for(String variable: this.getVariableNames()) {
 			clone.defineVariable(variable, this.getVariable(variable));
 		}
@@ -95,7 +99,7 @@ public class Environment implements Cloneable {
 	 * @return
 	 */
 	public Collection<String> getVariableNames() {
-		return functions.keySet();
+		return variables.keySet();
 	}
 	
 	/**

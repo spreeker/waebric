@@ -87,7 +87,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	/**
 	 * Current yield stack
 	 */
-	private Stack<AbstractSyntaxNode> yield;
+	private Stack<Yieldable> yield;
 	
 	/**
 	 * Construct JDOM visitor
@@ -104,7 +104,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public JDOMVisitor(Document document, Environment environment) {
 		this.document = document;
 		this.environment = environment;
-		yield = new Stack<AbstractSyntaxNode>();
+		yield = new Stack<Yieldable>();
 		functionEnvs = new HashMap<FunctionDef, Environment>();
 	}
 
@@ -469,20 +469,23 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.Yield statement) {
 		if(yield.isEmpty()) { return; }
-		AbstractSyntaxNode replacement = yield.pop(); // Retrieve replacement
+		Yieldable e = yield.pop(); // Retrieve replacement
 
-		if(replacement != null) {
+		if(e != null && e.root != null) {
 			// Clone yield stack
-			Stack<AbstractSyntaxNode> clone = new Stack<AbstractSyntaxNode>();
+			Stack<Yieldable> clone = new Stack<Yieldable>();
 			clone.addAll(yield);
 			
-			replacement.accept(this); // Visit replacement
+			Environment actual = environment.clone();
+		    environment = e.environment;
+			e.root.accept(this); // Visit replacement
 	
 			// Place text value in current element
-			if(replacement instanceof Expression || replacement instanceof Embedding) {
+			if(e.root instanceof Expression || e.root instanceof Embedding) {
 				addContent(new Text(eeval));
 			}
 			
+			environment = actual; // Restore environment
 			yield = clone; // Restore yield stack
 		}
 	}
@@ -518,7 +521,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsMarkup replacement = new MarkupsMarkup(remainder);
 					replacement.setMarkup(statement.getMarkup());
-					yield.add(replacement);
+					addYield(replacement);
 				}
 				markup.accept(this); // Interpret call
 				return; // Quit interpreting after call
@@ -573,7 +576,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsExpression replacement = new MarkupsExpression(remainder);
 					replacement.setExpression(statement.getExpression());
-					yield.add(replacement);
+					addYield(replacement);
 				}
 				markup.accept(this); // Interpret call
 				return; // Quit interpreting after call
@@ -604,7 +607,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsStatement replacement = new MarkupsStatement(remainder);
 					replacement.setStatement(statement.getStatement());
-					yield.add(replacement);
+					addYield(replacement);
 				}
 				markup.accept(this); // Interpret call
 				return; // Quit interpreting after call
@@ -634,7 +637,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					while(markups.hasNext()) { remainder.add(markups.next()); }
 					MarkupsEmbedding replacement = new MarkupsEmbedding(remainder);
 					replacement.setEmbedding(statement.getEmbedding());
-					yield.add(replacement);
+					addYield(replacement);
 				}
 				markup.accept(this); // Interpret call
 				return; // Quit interpreting after call
@@ -916,8 +919,11 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * 
 	 * @param statement
 	 */
-	public void addYield(AbstractSyntaxNode statement) {
-		yield.push(statement);
+	public void addYield(AbstractSyntaxNode node) {
+		Yieldable element = new Yieldable();
+		element.root = node;
+		element.environment = this.environment.clone();
+		yield.push(element);
 	}
 	
 	/**
