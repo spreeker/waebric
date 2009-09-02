@@ -100,7 +100,7 @@ public class TestEmbeddingParser {
 		// Embed Markup* Markup
 		iterator = TestUtilities.quickScan("func1(arg1) func2 func3>");
 		parser = new EmbeddingParser(iterator, exceptions);
-		Embed.MarkupEmbed markupemb = (MarkupEmbed) parser.parseEmbed();
+		Embed.ExpressionEmbed markupemb = (ExpressionEmbed) parser.parseEmbed();
 		assertEquals(2, markupemb.getMarkups().size());
 		assertEquals(Markup.Call.class, markupemb.getMarkups().get(0).getClass());
 	}

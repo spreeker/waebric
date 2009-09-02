@@ -89,7 +89,7 @@ public class TestExpressions {
 		expr.addKeyValuePair(new KeyValuePair(new IdCon("record"), sub));
 
 		expr.accept(visitor);
-		assertEquals("{text:\"success\",number:1337,list:[],record:{symbol:\"symbol\"}}", visitor.eeval);
+		assertEquals("[text:\"success\",number:1337,list:[],record:[symbol:\"symbol\"]]", visitor.eeval);
 	}
 	
 	/**

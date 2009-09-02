@@ -45,27 +45,25 @@ public class ModuleRegister {
 	 * @param identifier Module identifier, maps on relative file position.
 	 * @throws IOException 
 	 */
-	public Module requestModule(ModuleId identifier) throws IOException, ModuleLoadException {
+	public Module requestModule(ModuleId identifier) {
 		if(hasCached(identifier)) { return cache.get(identifier); } // Already checked module.
 		if(identifier.size() == 0) { return null; } // Invalid identifier, quit cache for performance
 
-		// Attempt to process file
 		String path = getPath(identifier);
-		FileReader reader = new FileReader(path);
-		WaebricScanner scanner = new WaebricScanner(reader);
-		List<LexicalException> le = scanner.tokenizeStream(); // Scan module
-		WaebricParser parser = new WaebricParser(scanner.iterator());
-		List<SyntaxException> se = parser.parseTokens(); // Parse module
-		
-		// Requested module contains lexical or syntactical exceptions
-		if(le.size() + se.size() > 0) {
-			throw new ModuleLoadException(path, le, se);
+		try {
+			FileReader reader = new FileReader(path);
+			WaebricScanner scanner = new WaebricScanner(reader);
+			List<LexicalException> le = scanner.tokenizeStream(); // Scan module
+			WaebricParser parser = new WaebricParser(scanner.iterator());
+			List<SyntaxException> se = parser.parseTokens(); // Parse module
+			
+			// Retrieve modules
+			Module module = parser.getAbstractSyntaxTree().getRoot();
+			if(module != null) { cacheModule(identifier, module); } // Cache dependent modules
+			return module;
+		} catch(IOException e) {
+			return null;
 		}
-		
-		// Retrieve modules
-		Module module = parser.getAbstractSyntaxTree().getRoot();
-		if(module != null) { cacheModule(identifier, module); } // Cache dependent modules
-		return module;
 	}
 	
 	/**
@@ -116,9 +114,7 @@ public class ModuleRegister {
 					try {
 						// Retrieve AST of imported module
 						Module dependancy = requestModule(imprt.getIdentifier()); 
-						
-						// Recursively additional dependencies
-						loadDependancies(dependancy, container);
+						if(dependancy != null) { loadDependancies(dependancy, container); }
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -165,24 +161,6 @@ public class ModuleRegister {
 	public static ModuleRegister newInstance() {
 		instance = new ModuleRegister();
 		return instance;
-	}
-
-	/**
-	 * Thrown when lexical or syntactical exceptions occured during
-	 * the loading of a module.
-	 * @author Jeroen van Schagen
-	 */
-	public class ModuleLoadException extends Exception {
-
-		/**
-		 * Generated ID
-		 */
-		private static final long serialVersionUID = -1908201843040907562L;
-		
-		public ModuleLoadException(String path, List<LexicalException> le, List<SyntaxException> se) {
-			super("Module \"" + path + "\" could not be loaded, because several errors occured: " + le.toString() + se.toString());
-		}
-		
 	}
 	
 }
