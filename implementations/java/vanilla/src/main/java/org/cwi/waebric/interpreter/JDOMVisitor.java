@@ -310,11 +310,8 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 */
 	public void visit(Statement.IfElse statement) {
 		statement.getPredicate().accept(this);
-		if(peval) {
-			statement.getTrueStatement().accept(this);
-		} else {
-			statement.getFalseStatement().accept(this);
-		}
+		if(peval) { statement.getTrueStatement().accept(this); } 
+		else { statement.getFalseStatement().accept(this); }
 	}
 	
 	public void visit(Predicate.Not not) {
@@ -337,12 +334,19 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	}
 	
 	public void visit(Predicate.Is is) {
+		Expression expression = is.getExpression();
+		if(expression instanceof VarExpression) {
+			expression = getReference((VarExpression) expression);
+			if(expression == null) { peval = false; return; }
+		}
+		
 		if(is.getType() instanceof Type.StringType) {
-			peval = is.getExpression().getClass() == Expression.TextExpression.class;
+			peval = expression.getClass() == Expression.TextExpression.class;
 		} else if(is.getType() instanceof Type.ListType) {
-			peval = is.getExpression().getClass() == Expression.ListExpression.class;
+			peval = expression.getClass() == Expression.ListExpression.class;
 		} else if(is.getType() instanceof Type.RecordType) {
-			peval = is.getExpression().getClass() == Expression.RecordExpression.class;
+			is.getExpression().accept(this);
+			peval = expression.getClass() == Expression.RecordExpression.class;
 		} else { peval = false; } // Invalid type, should not be parsed in the first place
 	}
 	
@@ -824,18 +828,26 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	public void visit(TextExpression expression) {
 		eeval = expression.getText().getLiteral().toString();
 	}
+	
+	public Expression getReference(VarExpression expression) {
+		String name = expression.getId().getName();
+		Expression reference = null;
+		do {
+			if(environment.isDefinedVariable(name)) {
+				reference = environment.getVariable(name);
+				if(reference == expression && environment.getParent() != null) {
+					reference = environment.getParent().getVariable(name);
+				}
+			}
+		} while(reference instanceof VarExpression);
+		return reference;
+	}
 
 	/**
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		String name = expression.getId().getName();
-		
-		Expression reference = environment.getVariable(name);
-		if(reference == expression && environment.getParent() != null) {
-			reference = environment.getParent().getVariable(name);
-		}
-		
+		Expression reference = getReference(expression);	
 		if(reference != null) {
 			reference.accept(this);
 		} else {
