@@ -8,6 +8,7 @@ import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
 import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
+import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.module.Import;
@@ -91,7 +92,7 @@ public class WaebricChecker extends DefaultNodeVisitor {
 		// Store formals in local environment
 		environment = new Environment(environment);
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
-			environment.defineVariable(identifier.getName(), null);
+			environment.defineVariable(identifier.getName(), new Expression.TextExpression(""));
 		}
 
 		for(Statement statement: function.getStatements()) {

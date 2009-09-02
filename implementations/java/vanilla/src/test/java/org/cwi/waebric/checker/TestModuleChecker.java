@@ -22,7 +22,6 @@ public class TestModuleChecker {
 	
 	@After
 	public void tearDown() {
-		exceptions.clear();
 		ModuleRegister.getInstance().clearCache();
 	}
 

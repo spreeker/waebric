@@ -847,7 +847,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * Delegate visit to variable value.
 	 */
 	public void visit(VarExpression expression) {
-		Expression reference = getReference(expression);	
+		String name = expression.getId().getName();
+		
+		Expression reference = environment.getVariable(name);
+		if(reference == expression && environment.getParent() != null) {
+			reference = environment.getParent().getVariable(name);
+		}
+		
 		if(reference != null) {
 			reference.accept(this);
 		} else {
