@@ -195,7 +195,7 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 					if(attribute.equals("xmlns")) {
 						current.setNamespace(Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
 					} else {
-						current.setAttribute(attribute, eeval);
+						addAttributeValue(attribute, eeval);
 					}
 				}
 			}
@@ -376,13 +376,13 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 			Expression.ListExpression list = (Expression.ListExpression) expression;
 			
 			// Execute statement for each element
-			Element root = current;
+			int depth = this.depth;
 			for(Expression e: list.getExpressions()) {
-				current = root;
 				environment = new Environment(environment);
 				environment.defineVariable(statement.getVar().getName(), e);
 				statement.getStatement().accept(this);
 				environment = environment.getParent();
+				restoreCurrent(depth);
 			}
 		} else if(expression instanceof Expression.VarExpression) {
 			Expression.VarExpression var = (Expression.VarExpression) expression;
