@@ -839,10 +839,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param embed
 	 */
 	public void visit(Embed.ExpressionEmbed embed) {
+		int depth = this.depth;
+
 		// Interpret similar to mark-up expression
 		Statement.MarkupsExpression stm = new Statement.MarkupsExpression(embed.getMarkups());
 		stm.setExpression(embed.getExpression());
 		stm.accept(this);
+		
+		restoreCurrent(depth);
 	}
 	
 	/**
@@ -850,10 +854,14 @@ public class JDOMVisitor extends DefaultNodeVisitor {
 	 * @param embed
 	 */
 	public void visit(Embed.MarkupEmbed embed) {
+		int depth = this.depth;
+
 		// Interpret similar to mark-up mark-up
 		Statement.MarkupsMarkup stm = new Statement.MarkupsMarkup(embed.getMarkups().subList(1, embed.getMarkups().size()));
 		stm.setMarkup(embed.getMarkups().get(0));
 		stm.accept(this);
+		
+		restoreCurrent(depth);
 	}
 	
 	/**
