@@ -481,13 +481,6 @@ namespace Interpreter
         /// <param name="statement">LetStatement to interpret</param>
         public override void Visit(LetStatement statement)
         {
-            //If no root element, create one
-            if (Root == null)
-            {
-                XHTMLElement newRoot = new XHTMLElement("html", null, true);
-                Root = newRoot;
-                Current = Root;
-            }
 
             //Create SymbolTable's for each assignment to let referencing work properly
             foreach (Assignment asgn in statement.GetAssignments())
@@ -496,6 +489,14 @@ namespace Interpreter
                 asgn.AcceptVisitor(this);
             }
 
+            //If no root element, create one
+            if (statement.GetStatements().Count > 1 && Root == null)
+            {
+                XHTMLElement newRoot = new XHTMLElement("html", null, true);
+                Root = newRoot;
+                Current = Root;
+            }
+            
             //Interpret statements
             int depth = this.Depth;
             foreach (Statement stmt in statement.GetStatements())
@@ -1004,6 +1005,29 @@ namespace Interpreter
             }
             return null;
         }
+        
+        /// <summary>
+        /// Retrieve real expression of varexpression
+        /// </summary>
+        /// <param name="expression">VarExpression to get real expression from</param>
+        /// <returns>Real expression value</returns>
+        private Expression GetReferenceExpression(VarExpression expression)
+        {
+            String identifier = expression.GetVariableIdentifier();
+            Expression referenceExpr = null;
+            do 
+            {
+                if(SymbolTable.ContainsVariable(identifier)) 
+                {
+                    referenceExpr = SymbolTable.GetVariableDefinition(identifier);
+                    if(referenceExpr == expression && SymbolTable.GetParentSymbolTable() != null)
+                    {   //Get reference from parent symboltable
+                        referenceExpr = SymbolTable.GetParentSymbolTable().GetVariableDefinition(identifier);
+                    }
+                }
+            } while (referenceExpr is VarExpression);
+            return referenceExpr;
+        }
 
         /// <summary>
         /// Method which evaluates an predicate and returns true or false
@@ -1016,19 +1040,29 @@ namespace Interpreter
             {   //Evaluate Expression Predicate
                 IsPredicate isPredicate = (IsPredicate)predicate;
                 Expression expression = isPredicate.GetExpression();
+
+                //In case of VarExpression, get expression from symboltable
+                if (expression is VarExpression)
+                {
+                    expression = GetReferenceExpression((VarExpression)expression);
+                    if (expression == null)
+                    {
+                        return false;
+                    }
+                }
                 
                 //If right type return true, otherwise false
                 if (isPredicate.GetType() is StringType)
                 {
-                    return isPredicate.GetExpression() is TextExpression;
+                    return expression is TextExpression;
                 }
                 else if (isPredicate.GetType() is ListType)
                 {
-                    return isPredicate.GetExpression() is ListExpression;
+                    return expression is ListExpression;
                 }
                 else if (isPredicate.GetType() is RecordType)
                 {
-                    return isPredicate.GetExpression() is RecordExpression;
+                    return expression is RecordExpression;
                 }
                 else
                 {   //No match between types which could be checked, so false
