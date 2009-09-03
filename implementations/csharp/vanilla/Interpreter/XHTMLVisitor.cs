@@ -13,6 +13,7 @@ using Parser.Ast.Expressions;
 using Parser.Ast.Predicates;
 using System.Collections;
 using Parser.Ast.Embedding;
+using System.Text.RegularExpressions;
 
 namespace Interpreter
 {
@@ -218,7 +219,7 @@ namespace Interpreter
         /// <param name="expression">SymExpression to interpret</param>
         public override void Visit(SymExpression expression)
         {
-            TextValue = expression.GetSym();
+            TextValue = RewriteText(expression.GetSym());
         }
 
         /// <summary>
@@ -227,7 +228,7 @@ namespace Interpreter
         /// <param name="expression">TextExpression to interpret</param>
         public override void Visit(TextExpression expression)
         {
-            TextValue = expression.GetText();
+            TextValue = RewriteText(expression.GetText());
         }
 
         /// <summary>
@@ -1148,6 +1149,65 @@ namespace Interpreter
                 Current = element;
                 Depth++;
             }
+        }
+
+        /// <summary>
+        /// Method which replaces all &'s which are not part of an TextEntity
+        /// are being replaced with &amp;
+        /// </summary>
+        /// <param name="text">Input</param>
+        /// <returns>Output</returns>
+        private String RewriteText(String text)
+        {
+            //Find all TextEntityRefs in text
+            Regex textRefMatcher = new Regex("&([#0-9a-zA-Z_:]+);", RegexOptions.None);
+            List<int> textRefPositions = new List<int>();
+            Match matchObj = textRefMatcher.Match(text);
+            while(matchObj.Success)
+            {
+                int position = matchObj.Index;
+                textRefPositions.Add(position);
+                matchObj = matchObj.NextMatch();
+            }
+
+            //Find all &'s in text
+            Regex ampMatcher = new Regex("&", RegexOptions.None);
+            List<int> ampPositions = new List<int>();
+            Match match = ampMatcher.Match(text);
+            while (match.Success)
+            {
+                int position = match.Index;
+                ampPositions.Add(position);
+                match = match.NextMatch();
+            }
+
+            //Loop through founded &'s and replace &'s which are not part of textRef
+            String newtext = "";
+            int lastposition = -1;
+            foreach (int position in ampPositions)
+            {
+                //Check if positions is also in textRefPositions
+                bool partofRef = false;
+                for (int i = 0; i <= (textRefPositions.Count - 1); i++)
+                {
+                    if (textRefPositions.ElementAt(i) == position)
+                    {
+                        partofRef = true;
+                        break;
+                    }
+                }
+                if (partofRef)
+                {
+                    continue;
+                }
+
+                //Replace & with &amp;
+                String start = text.Substring((lastposition+1), (position-(lastposition+1)));
+                newtext += start + "&amp;";
+                lastposition = position;
+            }
+            newtext += text.Substring((lastposition + 1), (text.Length - (lastposition + 1)));
+            return newtext;
         }
 
         /// <summary>
