@@ -7,8 +7,8 @@
 			<license_note>License note: This is a evaluation copy license</license_note>
 
 		</license_notes>
-		<date>Sat Aug 22 18:44:59 2009</date>
-		<cmtjava_options> -l -o parser.xml</cmtjava_options>
+		<date>Thu Sep  3 10:44:06 2009</date>
+		<cmtjava_options> -l -o /home/jeroen/Desktop/parser.xml</cmtjava_options>
 		<cwd>/home/jeroen/Research/WaebricJava/vanilla/src/main/java/org/cwi/waebric/parser</cwd>
 	</header_info>
 	<file name="AbstractParser.java">
@@ -174,10 +174,10 @@
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>13</LOCphy>
-				<LOCpro>7</LOCpro>
+				<LOCphy>10</LOCphy>
+				<LOCpro>4</LOCpro>
 				<LOCbl>0</LOCbl>
-				<LOCcom>7</LOCcom>
+				<LOCcom>6</LOCcom>
 				<N>36</N>
 				<N1>20</N1>
 				<N2>16</N2>
@@ -191,11 +191,11 @@
 				<L>0.139</L>
 				<T>00:01:01</T>
 				<MaxND>2</MaxND>
-				<MIwoc>103</MIwoc>
-				<MIcwc>45</MIcwc>
-				<MI>148</MI>
+				<MIwoc>107</MIwoc>
+				<MIcwc>47</MIcwc>
+				<MI>154</MI>
 			</method>
-			<method name="next" nesting="1" start_line="123">
+			<method name="next" nesting="1" start_line="120">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -220,7 +220,7 @@
 				<MIcwc>48</MIcwc>
 				<MI>152</MI>
 			</method>
-			<method name="reportMissingToken" nesting="1" start_line="136">
+			<method name="reportMissingToken" nesting="1" start_line="133">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -245,7 +245,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>138</MI>
 			</method>
-			<method name="reportUnexpectedToken" nesting="1" start_line="156">
+			<method name="reportUnexpectedToken" nesting="1" start_line="153">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -274,10 +274,10 @@
 				<vG>7</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>162</LOCphy>
-				<LOCpro>60</LOCpro>
+				<LOCphy>159</LOCphy>
+				<LOCpro>57</LOCpro>
 				<LOCbl>14</LOCbl>
-				<LOCcom>93</LOCcom>
+				<LOCcom>92</LOCcom>
 				<N>399</N>
 				<N1>203</N1>
 				<N2>196</N2>
@@ -291,17 +291,17 @@
 				<L>0.016</L>
 				<T>02:16:05</T>
 				<MaxND>2</MaxND>
-				<MIwoc>97</MIwoc>
+				<MIwoc>98</MIwoc>
 				<MIcwc>46</MIcwc>
 				<MI>144</MI>
 			</class_total>
 		</class>
 		<file_total>
 			<vG>7</vG>
-			<LOCphy>170</LOCphy>
+			<LOCphy>167</LOCphy>
 			<LOCbl>17</LOCbl>
-			<LOCpro>65</LOCpro>
-			<LOCcom>93</LOCcom>
+			<LOCpro>62</LOCpro>
+			<LOCcom>92</LOCcom>
 			<semicolons>29</semicolons>
 		</file_total>
 	</file>
@@ -314,6 +314,7 @@
 			<import>org.cwi.waebric.lexer.token.TokenIterator</import>
 			<import>org.cwi.waebric.lexer.token.WaebricTokenSort</import>
 			<import>org.cwi.waebric.parser.ast.AbstractSyntaxNodeList</import>
+			<import>org.cwi.waebric.parser.ast.expression.Expression</import>
 			<import>org.cwi.waebric.parser.ast.markup.Markup</import>
 			<import>org.cwi.waebric.parser.ast.statement.embedding.Embed</import>
 			<import>org.cwi.waebric.parser.ast.statement.embedding.Embedding</import>
@@ -322,8 +323,8 @@
 			<import>org.cwi.waebric.parser.ast.statement.embedding.PreText</import>
 			<import>org.cwi.waebric.parser.ast.statement.embedding.TextTail</import>
 		</imports>
-		<class name="EmbeddingParser" nesting="0" start_line="18">
-			<method name="EmbeddingParser" nesting="1" start_line="31">
+		<class name="EmbeddingParser" nesting="0" start_line="19">
+			<method name="EmbeddingParser" nesting="1" start_line="32">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -348,7 +349,7 @@
 				<MIcwc>44</MIcwc>
 				<MI>149</MI>
 			</method>
-			<method name="parseEmbedding" nesting="1" start_line="44">
+			<method name="parseEmbedding" nesting="1" start_line="45">
 				<vG>2</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -373,7 +374,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>134</MI>
 			</method>
-			<method name="parsePreText" nesting="1" start_line="64">
+			<method name="parsePreText" nesting="1" start_line="65">
 				<vG>1</vG>
 				<vG_max>2</vG_max>
 				<vG_avg>1</vG_avg>
@@ -398,34 +399,34 @@
 				<MIcwc>43</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="parseEmbed" nesting="1" start_line="76">
-				<vG>4</vG>
-				<vG_max>4</vG_max>
+			<method name="parseEmbed" nesting="1" start_line="77">
+				<vG>6</vG>
+				<vG_max>6</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>23</LOCphy>
-				<LOCpro>15</LOCpro>
-				<LOCbl>1</LOCbl>
-				<LOCcom>9</LOCcom>
-				<N>107</N>
-				<N1>61</N1>
-				<N2>46</N2>
-				<n>42</n>
-				<n1>16</n1>
-				<n2>26</n2>
-				<V>576.978</V>
-				<B>0.135</B>
-				<D>14.154</D>
-				<E>8166.458</E>
-				<L>0.071</L>
-				<T>00:07:33</T>
-				<MaxND>2</MaxND>
-				<MIwoc>86</MIwoc>
-				<MIcwc>41</MIcwc>
-				<MI>127</MI>
+				<LOCphy>36</LOCphy>
+				<LOCpro>28</LOCpro>
+				<LOCbl>2</LOCbl>
+				<LOCcom alarmed="1">7</LOCcom>
+				<N>212</N>
+				<N1>118</N1>
+				<N2>94</N2>
+				<n>63</n>
+				<n1>20</n1>
+				<n2>43</n2>
+				<V alarmed="1">1267.183</V>
+				<B>0.305</B>
+				<D>21.860</D>
+				<E>27701.217</E>
+				<L>0.046</L>
+				<T>00:25:38</T>
+				<MaxND>3</MaxND>
+				<MIwoc>74</MIwoc>
+				<MIcwc>32</MIcwc>
+				<MI>106</MI>
 			</method>
-			<method name="parseTextTail" nesting="1" start_line="100">
+			<method name="parseTextTail" nesting="1" start_line="114">
 				<vG>3</vG>
-				<vG_max>4</vG_max>
+				<vG_max>6</vG_max>
 				<vG_avg>1</vG_avg>
 				<LOCphy>33</LOCphy>
 				<LOCpro>21</LOCpro>
@@ -448,9 +449,9 @@
 				<MIcwc>36</MIcwc>
 				<MI>116</MI>
 			</method>
-			<method name="parsePostText" nesting="1" start_line="134">
+			<method name="parsePostText" nesting="1" start_line="148">
 				<vG>1</vG>
-				<vG_max>4</vG_max>
+				<vG_max>6</vG_max>
 				<vG_avg>1</vG_avg>
 				<LOCphy>12</LOCphy>
 				<LOCpro>6</LOCpro>
@@ -473,9 +474,9 @@
 				<MIcwc>42</MIcwc>
 				<MI>146</MI>
 			</method>
-			<method name="parseMidText" nesting="1" start_line="147">
+			<method name="parseMidText" nesting="1" start_line="161">
 				<vG>1</vG>
-				<vG_max>4</vG_max>
+				<vG_max>6</vG_max>
 				<vG_avg>1</vG_avg>
 				<LOCphy>11</LOCphy>
 				<LOCpro>6</LOCpro>
@@ -498,9 +499,9 @@
 				<MIcwc>43</MIcwc>
 				<MI>148</MI>
 			</method>
-			<method name="parseTextChars" nesting="1" start_line="159">
+			<method name="parseTextChars" nesting="1" start_line="173">
 				<vG>3</vG>
-				<vG_max>4</vG_max>
+				<vG_max>6</vG_max>
 				<vG_avg>1</vG_avg>
 				<LOCphy>15</LOCphy>
 				<LOCpro>9</LOCpro>
@@ -523,7 +524,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>139</MI>
 			</method>
-			<method name="isMarkup" nesting="1" start_line="175">
+			<method name="isMarkup" nesting="1" start_line="189">
 				<vG>8</vG>
 				<vG_max>8</vG_max>
 				<vG_avg>1</vG_avg>
@@ -549,38 +550,38 @@
 				<MI>127</MI>
 			</method>
 			<class_total>
-				<vG>16</vG>
+				<vG>18</vG>
 				<vG_max>8</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>181</LOCphy>
-				<LOCpro>98</LOCpro>
-				<LOCbl>22</LOCbl>
-				<LOCcom>69</LOCcom>
-				<N>651</N>
-				<N1>362</N1>
-				<N2>289</N2>
-				<n>118</n>
-				<n1>24</n1>
-				<n2>94</n2>
-				<V>4480.601</V>
-				<B>1.004</B>
-				<D>36.894</D>
-				<E>165305.562</E>
-				<L>0.027</L>
-				<T>02:33:03</T>
+				<LOCphy>194</LOCphy>
+				<LOCpro>111</LOCpro>
+				<LOCbl>23</LOCbl>
+				<LOCcom>67</LOCcom>
+				<N>756</N>
+				<N1>419</N1>
+				<N2>337</N2>
+				<n>136</n>
+				<n1>28</n1>
+				<n2>108</n2>
+				<V>5358.122</V>
+				<B>1.266</B>
+				<D>43.685</D>
+				<E>234070.547</E>
+				<L>0.023</L>
+				<T>03:36:43</T>
 				<MaxND>3</MaxND>
-				<MIwoc>90</MIwoc>
-				<MIcwc>41</MIcwc>
-				<MI>131</MI>
+				<MIwoc>88</MIwoc>
+				<MIcwc>39</MIcwc>
+				<MI>127</MI>
 			</class_total>
 		</class>
 		<file_total>
-			<vG>16</vG>
-			<LOCphy>198</LOCphy>
-			<LOCbl>25</LOCbl>
-			<LOCpro>112</LOCpro>
-			<LOCcom>69</LOCcom>
-			<semicolons>70</semicolons>
+			<vG>18</vG>
+			<LOCphy>212</LOCphy>
+			<LOCbl>26</LOCbl>
+			<LOCpro>126</LOCpro>
+			<LOCcom>67</LOCcom>
+			<semicolons>80</semicolons>
 		</file_total>
 	</file>
 	<file name="ExpressionParser.java">
@@ -2146,56 +2147,56 @@
 				<MI>148</MI>
 			</method>
 			<method name="parseMarkupStatements" nesting="1" start_line="270">
-				<vG alarmed="1">11</vG>
+				<vG>8</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>70</LOCphy>
-				<LOCpro alarmed="1">56</LOCpro>
+				<LOCphy>55</LOCphy>
+				<LOCpro alarmed="1">43</LOCpro>
 				<LOCbl>3</LOCbl>
-				<LOCcom alarmed="1">13</LOCcom>
-				<N>336</N>
-				<N1>190</N1>
-				<N2>146</N2>
-				<n>84</n>
+				<LOCcom>12</LOCcom>
+				<N>299</N>
+				<N1>166</N1>
+				<N2>133</N2>
+				<n>76</n>
 				<n1>20</n1>
-				<n2>64</n2>
-				<V alarmed="1">2147.819</V>
-				<B>0.446</B>
-				<D>22.812</D>
-				<E>48997.113</E>
-				<L>0.044</L>
-				<T>00:45:22</T>
-				<MaxND>6</MaxND>
-				<MIwoc>60</MIwoc>
-				<MIcwc>31</MIcwc>
-				<MI>91</MI>
+				<n2>56</n2>
+				<V alarmed="1">1868.130</V>
+				<B>0.418</B>
+				<D>23.750</D>
+				<E>44368.094</E>
+				<L>0.042</L>
+				<T>00:41:04</T>
+				<MaxND>5</MaxND>
+				<MIwoc>65</MIwoc>
+				<MIcwc>33</MIcwc>
+				<MI>98</MI>
 			</method>
-			<method name="isMarkup" nesting="1" start_line="341">
-				<vG>10</vG>
+			<method name="isMarkup" nesting="1" start_line="326">
+				<vG alarmed="1">12</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>27</LOCphy>
-				<LOCpro>20</LOCpro>
-				<LOCbl>1</LOCbl>
-				<LOCcom>14</LOCcom>
-				<N>145</N>
-				<N1>83</N1>
-				<N2>62</N2>
-				<n>39</n>
+				<LOCphy>31</LOCphy>
+				<LOCpro>23</LOCpro>
+				<LOCbl>2</LOCbl>
+				<LOCcom>15</LOCcom>
+				<N>174</N>
+				<N1>99</N1>
+				<N2>75</N2>
+				<n>40</n>
 				<n1>16</n1>
-				<n2>23</n2>
-				<V>766.383</V>
-				<B>0.216</B>
-				<D>21.565</D>
-				<E>16527.223</E>
-				<L>0.046</L>
-				<T>00:15:18</T>
+				<n2>24</n2>
+				<V>926.016</V>
+				<B>0.271</B>
+				<D>25.000</D>
+				<E>23150.387</E>
+				<L>0.040</L>
+				<T>00:21:26</T>
 				<MaxND>5</MaxND>
-				<MIwoc>81</MIwoc>
-				<MIcwc>45</MIcwc>
-				<MI>126</MI>
+				<MIwoc>77</MIwoc>
+				<MIcwc>44</MIcwc>
+				<MI>121</MI>
 			</method>
-			<method name="isMarkupFreeStatement" nesting="1" start_line="369">
+			<method name="isMarkupFreeStatement" nesting="1" start_line="358">
 				<vG>8</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2220,7 +2221,7 @@
 				<MIcwc>36</MIcwc>
 				<MI>126</MI>
 			</method>
-			<method name="parseAssignment" nesting="1" start_line="388">
+			<method name="parseAssignment" nesting="1" start_line="377">
 				<vG>3</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2245,7 +2246,7 @@
 				<MIcwc>42</MIcwc>
 				<MI>145</MI>
 			</method>
-			<method name="parseVarAssignment" nesting="1" start_line="401">
+			<method name="parseVarAssignment" nesting="1" start_line="390">
 				<vG>1</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2270,7 +2271,7 @@
 				<MIcwc>40</MIcwc>
 				<MI>137</MI>
 			</method>
-			<method name="parseFuncAssignment" nesting="1" start_line="416">
+			<method name="parseFuncAssignment" nesting="1" start_line="405">
 				<vG>5</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2295,7 +2296,7 @@
 				<MIcwc>37</MIcwc>
 				<MI>115</MI>
 			</method>
-			<method name="parseFormals" nesting="1" start_line="451">
+			<method name="parseFormals" nesting="1" start_line="440">
 				<vG>7</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
@@ -2321,36 +2322,36 @@
 				<MI>117</MI>
 			</method>
 			<class_total>
-				<vG>60</vG>
+				<vG>59</vG>
 				<vG_max>17</vG_max>
 				<vG_avg>1</vG_avg>
-				<LOCphy>463</LOCphy>
-				<LOCpro>280</LOCpro>
-				<LOCbl>54</LOCbl>
+				<LOCphy>452</LOCphy>
+				<LOCpro>270</LOCpro>
+				<LOCbl>55</LOCbl>
 				<LOCcom>145</LOCcom>
-				<N>2000</N>
-				<N1>1131</N1>
+				<N>1992</N>
+				<N1>1123</N1>
 				<N2>869</N2>
-				<n>249</n>
+				<n>244</n>
 				<n1>31</n1>
-				<n2>218</n2>
-				<V alarmed="1">15920.004</V>
-				<B alarmed="1">3.297</B>
-				<D>61.787</D>
-				<E>983644.438</E>
+				<n2>213</n2>
+				<V alarmed="1">15798.028</V>
+				<B alarmed="1">3.331</B>
+				<D>63.237</D>
+				<E>999021.375</E>
 				<L>0.016</L>
-				<T>15:10:46</T>
-				<MaxND>6</MaxND>
-				<MIwoc>82</MIwoc>
+				<T>15:25:01</T>
+				<MaxND>5</MaxND>
+				<MIwoc>83</MIwoc>
 				<MIcwc>38</MIcwc>
-				<MI>120</MI>
+				<MI>121</MI>
 			</class_total>
 		</class>
 		<file_total>
-			<vG>60</vG>
-			<LOCphy>484</LOCphy>
-			<LOCbl>57</LOCbl>
-			<LOCpro>298</LOCpro>
+			<vG>59</vG>
+			<LOCphy>473</LOCphy>
+			<LOCbl>58</LOCbl>
+			<LOCpro>288</LOCpro>
 			<LOCcom>145</LOCcom>
 			<semicolons>171</semicolons>
 		</file_total>
@@ -2611,12 +2612,12 @@
 		<files>13</files>
 		<measured_items>92</measured_items>
 		<LOCphy>1836</LOCphy>
-		<LOCpro>1024</LOCpro>
-		<LOCcom>631</LOCcom>
-		<LOCbl>249</LOCbl>
-		<semicolons>606</semicolons>
+		<LOCpro>1025</LOCpro>
+		<LOCcom>628</LOCcom>
+		<LOCbl>251</LOCbl>
+		<semicolons>616</semicolons>
 		<java_comment_blocks>93</java_comment_blocks>
-		<vG>165</vG>
+		<vG>166</vG>
 		<MIwoc>92</MIwoc>
 		<MIcw>40</MIcw>
 		<MI>132</MI>
@@ -2642,7 +2643,7 @@
 			<vG_alarmed>4</vG_alarmed>
 			<LOCpro_alarmed>3</LOCpro_alarmed>
 			<comment_percent_alarmed>2</comment_percent_alarmed>
-			<V_alarmed>6</V_alarmed>
+			<V_alarmed>7</V_alarmed>
 			<B_alarmed>1</B_alarmed>
 			<MI_alarmed>0</MI_alarmed>
 		</alarms>
