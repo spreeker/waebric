@@ -81,7 +81,7 @@ public class WaebricInterpreter {
 			Document document = new Document();
 			
 			// Visit function
-			JDOMVisitor visitor = new JDOMVisitor(document, environment);
+			WaebricEvaluator visitor = new WaebricEvaluator(document, environment);
 			environment.getFunction("main").accept(visitor);
 
 			try {
@@ -107,7 +107,7 @@ public class WaebricInterpreter {
 					}
 					
 					// Visit mapping
-					JDOMVisitor visitor = new JDOMVisitor(document, environment);
+					WaebricEvaluator visitor = new WaebricEvaluator(document, environment);
 					markup.accept(visitor);
 
 					// Retrieve relative file path

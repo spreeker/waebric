@@ -27,7 +27,7 @@ import org.cwi.waebric.parser.ast.statement.Statement.Let;
 import org.cwi.waebric.util.Environment;
 import org.cwi.waebric.util.ModuleRegister;
 
-public class WaebricChecker extends NullVisitor {
+public class WaebricChecker extends NullVisitor<Object> {
 
 	/**
 	 * Current environment

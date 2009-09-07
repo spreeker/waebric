@@ -5,20 +5,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.NullVisitor;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
-import org.cwi.waebric.parser.ast.expression.KeyValuePair;
-import org.cwi.waebric.parser.ast.expression.Expression.CatExpression;
 import org.cwi.waebric.parser.ast.expression.Expression.Field;
-import org.cwi.waebric.parser.ast.expression.Expression.ListExpression;
-import org.cwi.waebric.parser.ast.expression.Expression.NatExpression;
-import org.cwi.waebric.parser.ast.expression.Expression.RecordExpression;
-import org.cwi.waebric.parser.ast.expression.Expression.SymbolExpression;
-import org.cwi.waebric.parser.ast.expression.Expression.TextExpression;
-import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
 import org.cwi.waebric.parser.ast.markup.Argument;
 import org.cwi.waebric.parser.ast.markup.Arguments;
 import org.cwi.waebric.parser.ast.markup.Attribute;
@@ -31,18 +23,15 @@ import org.cwi.waebric.parser.ast.statement.Assignment;
 import org.cwi.waebric.parser.ast.statement.Statement;
 import org.cwi.waebric.parser.ast.statement.Assignment.FuncBind;
 import org.cwi.waebric.parser.ast.statement.Assignment.VarBind;
+import org.cwi.waebric.parser.ast.statement.Statement.MarkupStatement;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsEmbedding;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsExpression;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsMarkup;
 import org.cwi.waebric.parser.ast.statement.Statement.MarkupsStatement;
-import org.cwi.waebric.parser.ast.statement.Statement.MarkupStatement;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
 import org.cwi.waebric.parser.ast.statement.embedding.Embedding;
 import org.cwi.waebric.parser.ast.statement.embedding.TextTail;
-import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
-import org.cwi.waebric.parser.ast.statement.predicate.Type;
 import org.cwi.waebric.util.Environment;
-
 import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.Content;
@@ -58,42 +47,24 @@ import org.jdom.Text;
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
-public class JDOMVisitor extends NullVisitor<Object> {
+public class WaebricEvaluator extends NullVisitor<Object> {
 
 	private final Document document;
 	private Element current;
 	private int depth = 0;
 	
-	/**
-	 * Expression evaluation
-	 */
-	public String eeval = "";
-	
-	/**
-	 * Predicate evaluation
-	 */
-	public boolean peval = false;
-	
-	/**
-	 * Function specific environments
-	 */
-	private final Map<FunctionDef, Environment> functionEnvs;
-	
-	/**
-	 * Current environment
-	 */
-	private Environment environment;
-	
-	/**
-	 * Current yield stack
-	 */
 	private Stack<Yieldable> yield;
+	private Environment environment;
+	private final Map<FunctionDef, Environment> functionEnvironments;
+
+	private final ExpressionEvaluator expressionEvaluator;
+	private final PredicateEvaluator predicateEvaluator;
 	
 	/**
 	 * Construct JDOM visitor
 	 * @param document
 	 */
-	public JDOMVisitor(Document document) {
+	public WaebricEvaluator(Document document) {
 		this(document, new Environment());
 	}
 	
@@ -101,11 +72,15 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * Construct JDOM visitor
 	 * @param document Document
 	 */
-	public JDOMVisitor(Document document, Environment environment) {
+	public WaebricEvaluator(Document document, Environment environment) {
 		this.document = document;
 		this.environment = environment;
+		
 		yield = new Stack<Yieldable>();
-		functionEnvs = new HashMap<FunctionDef, Environment>();
+		
+		functionEnvironments = new HashMap<FunctionDef, Environment>();
+		expressionEvaluator = new ExpressionEvaluator(this);
+		predicateEvaluator = new PredicateEvaluator(this);
 	}
 
 	/**
@@ -152,7 +127,6 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 */
 	public Object visit(Call markup) {
 		String name = markup.getDesignator().getIdentifier().getName();
-
 		if(environment.isDefinedFunction(name)) { // Call to defined function
 			FunctionDef function = environment.getFunction(name); // Retrieve function definition
 			
@@ -187,18 +161,18 @@ public class JDOMVisitor extends NullVisitor<Object> {
 			for(Argument argument: markup.getArguments()) {
 				if(argument instanceof Argument.RegularArgument) {
 					// The combined value of regular arguments are stored as value attribute
-					argument.getExpression().accept(this);
-					if(eeval.equals("undef")) { eeval = "UNDEFINED"; } // Convert undef to UNDEFINED to match reference impl
-					if(! value.equals("") && ! eeval.equals("")) { value += " "; } // Attach separator
-					value += eeval; // Store text in value
+					String eval = argument.getExpression().accept(expressionEvaluator);
+					if(eval.equals("undef")) { eval = "UNDEFINED"; } // Convert undef to UNDEFINED to match reference impl
+					if(! value.equals("") && ! eval.equals("")) { value += " "; } // Attach separator
+					value += eval; // Store text in value
 				} else if(argument instanceof Argument.Attr) {
 					// Attribute arguments are stored as separate attribute
-					argument.getExpression().accept(this);
 					String attribute = ((Argument.Attr) argument).getIdentifier().getName();
+					String eval = argument.getExpression().accept(expressionEvaluator);
 					if(attribute.equals("xmlns")) {
 						current.setNamespace(Namespace.getNamespace("xhtml", "http://www.w3.org/1999/xhtml"));
 					} else {
-						addAttributeValue(attribute, eeval);
+						addAttributeValue(attribute, eval);
 					}
 				}
 			}
@@ -313,8 +287,8 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * Evaluate predicate and potentially execute statement based on outcome.
 	 */
 	public Object visit(Statement.If statement) {
-		statement.getPredicate().accept(this);
-		if(peval) {	statement.getTrueStatement().accept(this); }
+		Boolean eval = statement.getPredicate().accept(predicateEvaluator);
+		if(eval) {	statement.getTrueStatement().accept(this); }
 		return null;
 	}
 
@@ -322,66 +296,13 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * Evaluate predicate and execute either of the statements based on outcome.
 	 */
 	public Object visit(Statement.IfElse statement) {
-		statement.getPredicate().accept(this);
-		if(peval) { statement.getTrueStatement().accept(this); } 
+		Boolean eval = statement.getPredicate().accept(predicateEvaluator);
+		if(eval) { statement.getTrueStatement().accept(this); } 
 		else { statement.getFalseStatement().accept(this); }
 		return null;
 	}
 	
-	public Object visit(Predicate.Not not) {
-		not.getPredicate().accept(this);
-		peval = !peval;
-		return null;
-	}
-	
-	public Object visit(Predicate.And and) {
-		and.getLeft().accept(this);
-		boolean eval = peval;
-		and.getRight().accept(this);
-		peval = eval && peval;
-		return null;
-	}
-	
-	public Object visit(Predicate.Or or) {
-		or.getLeft().accept(this);
-		boolean eval = peval;
-		or.getRight().accept(this);
-		peval = eval || peval;
-		return null;
-	}
-	
-	public Object visit(Predicate.Is is) {
-		Expression expression = is.getExpression();
-		if(expression instanceof VarExpression) {
-			expression = getReference((VarExpression) expression);
-			if(expression == null) { peval = false; return null; }
-		}
-		
-		if(is.getType() instanceof Type.StringType) {
-			peval = expression.getClass() == Expression.TextExpression.class;
-		} else if(is.getType() instanceof Type.ListType) {
-			peval = expression.getClass() == Expression.ListExpression.class;
-		} else if(is.getType() instanceof Type.RecordType) {
-			is.getExpression().accept(this);
-			peval = expression.getClass() == Expression.RecordExpression.class;
-		} else { peval = false; } // Invalid type, should not be parsed in the first place
-		
-		return null;
-	}
-	
-	public Object visit(Predicate.RegularPredicate predicate) {
-		if(predicate.getExpression() instanceof Expression.Field) {
-			// Field predicates check if the referenced field exists in record expression
-			Expression value = getFieldExpression((Expression.Field) predicate.getExpression());
-			peval = value != null;
-		} else if(predicate.getExpression() instanceof Expression.VarExpression) {
-			// Variable predicates check if the referenced variable is defined
-			String name = ((Expression.VarExpression) predicate.getExpression()).getId().getName();
-			peval = environment.isDefinedVariable(name);
-		} else { peval = true; }
-		
-		return null;
-	}
+
 
 	/**
 	 * Interpret all sub-statements embedded in block.
@@ -435,8 +356,8 @@ public class JDOMVisitor extends NullVisitor<Object> {
 			each.setExpression(expression);
 			visit(each);
 		} else if(expression instanceof Expression.Field) {
-			// Retrieve actual expression from field
-			expression = getFieldExpression((Expression.Field) expression);
+			Field field = (Expression.Field) expression;
+			expression = ExpressionEvaluator.getFieldExpression(field, environment);
 			
 			// Execute function again
 			Statement.Each each = new Statement.Each();
@@ -462,8 +383,8 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * Attach <-CDATA TEXT -> to current element.
 	 */
 	public CDATA visit(Statement.CData statement) {
-		statement.getExpression().accept(this);
-		CDATA cdata = new CDATA(eeval);
+		String eval = statement.getExpression().accept(expressionEvaluator);
+		CDATA cdata = new CDATA(eval);
 		addContent(cdata);
 		return cdata;
 	}
@@ -472,8 +393,8 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * Attach text to current element.
 	 */
 	public Object visit(Statement.Echo statement) {
-		statement.getExpression().accept(this);
-		addContent(new Text(eeval));
+		String eval = statement.getExpression().accept(expressionEvaluator);
+		addContent(new Text(eval));
 		return null;
 	}
 
@@ -529,12 +450,12 @@ public class JDOMVisitor extends NullVisitor<Object> {
 			
 			Environment actual = environment.clone();
 		    environment = e.environment;
-			e.root.accept(this); // Visit replacement
-	
-			// Place text value in current element
-			if(e.root instanceof Expression || e.root instanceof Embedding) {
-				addContent(new Text(eeval));
-			}
+
+		    // Visit replacement
+			if(e.root instanceof Expression) {
+				String eval = e.root.accept(expressionEvaluator);
+				addContent(new Text(eval));
+			} else { e.root.accept(this); }
 			
 			environment = actual; // Restore environment
 			yield = clone; // Restore yield stack
@@ -641,8 +562,8 @@ public class JDOMVisitor extends NullVisitor<Object> {
 		}
 		
 		// Interpret element when mark-up chain is call free
-		statement.getExpression().accept(this);
-		addContent(new Text(eeval));
+		String eval = statement.getExpression().accept(expressionEvaluator);
+		addContent(new Text(eval));
 		return null;
 	}
 
@@ -729,7 +650,7 @@ public class JDOMVisitor extends NullVisitor<Object> {
 		}
 
 		// Store hard-copy of current environment
-		functionEnvs.put(definition, environment.clone()); 
+		functionEnvironments.put(definition, environment.clone()); 
 		
 		// Extend current environment with new function definition
 		environment.defineFunction(definition);
@@ -742,172 +663,6 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 */
 	public Object visit(VarBind bind) {
 		environment.defineVariable(bind.getIdentifier().getName(), bind.getExpression());
-		return null;
-	}
-
-	/**
-	 * Execute left and right expression after each other.
-	 */
-	public Object visit(CatExpression expression) {
-		String result = "";
-		
-		expression.getLeft().accept(this);
-		result += eeval; // Retrieve left value
-		
-		expression.getRight().accept(this);
-		result += eeval; // Retrieve right value
-		
-		// Store result
-		eeval = result;
-		return null;
-	}
-
-	/**
-	 * Retrieve expression element from record expression, when
-	 * undefined or other expression type return "undef".
-	 */
-	public Object visit(Field field) {
-		Expression expr = getFieldExpression(field);
-		if(expr == null) { new Expression.TextExpression("undef"); }
-		expr.accept(this); // Visit expression
-		return null;
-	}
-	
-	/**
-	 * Retrieve defined value from record expression.
-	 * @param field
-	 * @return
-	 */
-	public Expression getFieldExpression(Field field) {
-		Expression expression = field.getExpression();
-		while(expression instanceof Expression.VarExpression) {
-			// Browse over variable expressions until a raw type is detected
-			Expression.VarExpression var = (Expression.VarExpression) expression;
-			expression = environment.getVariable(var.getId().getName());
-		}
-		
-		if(expression instanceof Expression.RecordExpression) {
-			Expression.RecordExpression record = (Expression.RecordExpression) expression;
-			
-			// Retrieve referenced element from record and visit it
-			Expression result = record.getExpression(field.getIdentifier());
-			if(result != null) { return result; }
-		}
-
-		return null; // Undefined value
-	}
-
-	/**
-	 * Convert list in [element1,element2,...] text value
-	 */
-	public Object visit(ListExpression expression) {
-		String result = "[";
-		for(Expression sub: expression.getExpressions()) {
-			// Attach a comma separator in front of each element, except first in list
-			if(expression.getExpressions().indexOf(sub) != 0) { result += ","; }
-			
-			// Surround symbol and text expressions between double quotes
-			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { 
-				result += "\"";
-			}
-			
-			sub.accept(this); // Fill text field with expression value
-			result += eeval; // Store value in result string, before it is overwritten by next element
-			
-			// Surround symbol and text expressions between double quotes
-			if(sub instanceof SymbolExpression || sub instanceof TextExpression) { result += "\""; }
-		}
-		result += "]";
-
-		this.eeval = result;
-		return null;
-	}
-
-	/**
-	 * Convert record in [id1:expr1,id2:expr2,...] text value
-	 */
-	public Object visit(RecordExpression expression) {
-		String result = "[";
-		for(KeyValuePair pair: expression.getPairs()) {
-			// Attach a comma separator in front of each element, except first in list
-			if(expression.getPairs().indexOf(pair) != 0) { result += ","; }
-			
-			result += pair.getIdentifier().getName() + ":";
-			
-			// Surround symbol and text expressions between double quotes
-			if(pair.getExpression() instanceof SymbolExpression || pair.getExpression() instanceof TextExpression) { 
-				result += "\"";
-			}
-			
-			pair.getExpression().accept(this); // Fill text field with expression value
-			result += eeval; // Store value in result string, before it is overwritten by next element
-			
-			// Surround symbol and text expressions between double quotes
-			if(pair.getExpression() instanceof SymbolExpression || pair.getExpression() instanceof TextExpression) { 
-				result += "\"";
-			}
-		}
-		result += "]";
-
-		this.eeval = result;
-		return null;
-	}
-	
-	/**
-	 * Store number in text field.
-	 */
-	public Object visit(NatExpression expression) {
-		eeval = "" + expression.getNatural().getValue();
-		return null;
-	}
-
-	/**
-	 * Store symbol name in text field.
-	 */
-	public Object visit(SymbolExpression expression) {
-		eeval = expression.getSymbol().getName().toString();
-		return null;
-	}
-
-	/**
-	 * Store text expression literal in text field.
-	 */
-	public Object visit(TextExpression expression) {
-		eeval = expression.getText().getLiteral().toString();
-		return null;
-	}
-	
-	public Expression getReference(VarExpression expression) {
-		String name = expression.getId().getName();
-		Expression reference = null;
-		do {
-			if(environment.isDefinedVariable(name)) {
-				reference = environment.getVariable(name);
-				if(reference == expression && environment.getParent() != null) {
-					reference = environment.getParent().getVariable(name);
-				}
-			}
-		} while(reference instanceof VarExpression);
-		return reference;
-	}
-
-	/**
-	 * Delegate visit to variable value.
-	 */
-	public Object visit(VarExpression expression) {
-		String name = expression.getId().getName();
-		
-		Expression reference = environment.getVariable(name);
-		if(reference == expression && environment.getParent() != null) {
-			reference = environment.getParent().getVariable(name);
-		}
-		
-		if(reference != null) {
-			reference.accept(this);
-		} else {
-			this.eeval = "undef"; // Undeclared variable reference
-		}
-		
 		return null;
 	}
 
@@ -1036,7 +791,7 @@ public class JDOMVisitor extends NullVisitor<Object> {
 	 * @return
 	 */
 	private Environment getEnvironment(FunctionDef function) {
-		if(functionEnvs.containsKey(function)) { return functionEnvs.get(function); }
+		if(functionEnvironments.containsKey(function)) { return functionEnvironments.get(function); }
 		return environment;
 	}
 	

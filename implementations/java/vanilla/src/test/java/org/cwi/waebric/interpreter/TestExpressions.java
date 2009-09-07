@@ -12,43 +12,39 @@ import org.junit.Test;
 
 public class TestExpressions {
 
-	private JDOMVisitor visitor;
-	private Document document;
+	private ExpressionEvaluator visitor;
+	private WaebricEvaluator evaluator;
 
 	@Before
 	public void setUp() {
-		this.document = new Document();
-		this.visitor = new JDOMVisitor(document);
+		evaluator = new WaebricEvaluator(new Document());
+		this.visitor = new ExpressionEvaluator(evaluator);
 	}
 	
 	@Test
 	public void testTextExpression() {
 		Expression.TextExpression expr = new Expression.TextExpression("success");
-		expr.accept(visitor);
-		assertEquals("success", visitor.eeval);
+		assertEquals("success", expr.accept(visitor));
 	}
 	
 	@Test
 	public void testVarExpression() {
 		Expression.VarExpression expr = new Expression.VarExpression(new IdCon("var"));
-		visitor.getEnvironment().defineVariable("var", new Expression.TextExpression("success"));
-		expr.accept(visitor);
-		assertEquals("success", visitor.eeval);
+		evaluator.getEnvironment().defineVariable("var", new Expression.TextExpression("success"));
+		assertEquals("success", expr.accept(visitor));
 	}
 	
 	@Test
 	public void testSymbolExpression() {
 		Expression.SymbolExpression expr = new Expression.SymbolExpression();
 		expr.setSymbol(new SymbolCon("success"));
-		expr.accept(visitor);
-		assertEquals("success", visitor.eeval);
+		assertEquals("success", expr.accept(visitor));
 	}
 	
 	@Test
 	public void testNatExpression() {
 		Expression.NatExpression expr = new Expression.NatExpression(1337);
-		expr.accept(visitor);
-		assertEquals("1337", visitor.eeval);
+		assertEquals("1337", expr.accept(visitor));
 	}
 	
 	/**
@@ -67,8 +63,7 @@ public class TestExpressions {
 		sub.addExpression(new Expression.SymbolExpression(new SymbolCon("symbol")));
 		expr.addExpression(sub);
 		
-		expr.accept(visitor);
-		assertEquals("[\"success\",1337,[\"symbol\"]]", visitor.eeval);
+		assertEquals("[\"success\",1337,[\"symbol\"]]", expr.accept(visitor));
 	}
 	
 	/**
@@ -88,8 +83,7 @@ public class TestExpressions {
 		sub.addKeyValuePair(new KeyValuePair(new IdCon("symbol"), new Expression.SymbolExpression(new SymbolCon("symbol"))));
 		expr.addKeyValuePair(new KeyValuePair(new IdCon("record"), sub));
 
-		expr.accept(visitor);
-		assertEquals("[text:\"success\",number:1337,list:[],record:[symbol:\"symbol\"]]", visitor.eeval);
+		assertEquals("[text:\"success\",number:1337,list:[],record:[symbol:\"symbol\"]]", expr.accept(visitor));
 	}
 	
 	/**
@@ -106,8 +100,7 @@ public class TestExpressions {
 		sub.setRight(new Expression.TextExpression("succeeded"));
 		expr.setRight(sub);
 		
-		expr.accept(visitor);
-		assertEquals("testhassucceeded", visitor.eeval);
+		assertEquals("testhassucceeded", expr.accept(visitor));
 	}
 	
 	/**
@@ -120,8 +113,7 @@ public class TestExpressions {
 		record.addKeyValuePair(new KeyValuePair(new IdCon("test"), new Expression.TextExpression("success")));
 		
 		Expression.Field field = new Expression.Field(record, new IdCon("test"));
-		field.accept(visitor);
-		assertEquals("success", visitor.eeval);
+		assertEquals("success", field.accept(visitor));
 	}
 	
 }
