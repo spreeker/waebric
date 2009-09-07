@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.cwi.waebric.XHTMLTag;
 import org.cwi.waebric.parser.ast.AbstractSyntaxTree;
-import org.cwi.waebric.parser.ast.DefaultNodeVisitor;
+import org.cwi.waebric.parser.ast.NullVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.expression.Expression.VarExpression;
@@ -27,7 +27,7 @@ import org.cwi.waebric.parser.ast.statement.Statement.Let;
 import org.cwi.waebric.util.Environment;
 import org.cwi.waebric.util.ModuleRegister;
 
-public class WaebricChecker extends DefaultNodeVisitor {
+public class WaebricChecker extends NullVisitor {
 
 	/**
 	 * Current environment
@@ -67,28 +67,31 @@ public class WaebricChecker extends DefaultNodeVisitor {
 		return exceptions;
 	}
 	
-	public void visit(Module module) {
+	public Object visit(Module module) {
 		for(Import imprt: module.getImports()) { imprt.accept(this); }
 		for(Site site: module.getSites()) {	site.accept(this); }
 		for(FunctionDef func: module.getFunctionDefinitions()) { func.accept(this); }
+		return null;
 	}
 	
 	@Override
-	public void visit(ModuleId identifier) {
+	public Object visit(ModuleId identifier) {
 		String path = ModuleRegister.getPath(identifier);
 		File file = new File(path);
 		if(! file.isFile()) {
 			exceptions.add(new NonExistingModuleException(identifier));
 		}
+		return null;
 	}
 	
 	@Override
-	public void visit(Mapping mapping) {
+	public Object visit(Mapping mapping) {
 		mapping.getMarkup().accept(this); // Skip path
+		return null;
 	}
 	
 	@Override
-	public void visit(FunctionDef function) {
+	public Object visit(FunctionDef function) {
 		// Store formals in local environment
 		environment = new Environment(environment);
 		for(IdCon identifier: function.getFormals().getIdentifiers()) {
@@ -101,18 +104,20 @@ public class WaebricChecker extends DefaultNodeVisitor {
 		
 		// Restore previous environment
 		environment = environment.getParent();
+		return null;
 	}
 	
 	@Override
-	public void visit(Each statement) {
+	public Object visit(Each statement) {
 		environment = new Environment(environment); // Store variable in local environment
 		environment.defineVariable(statement.getVar().getName(), statement.getExpression());
 		statement.getStatement().accept(this); // Visit sub-statement
 		environment = environment.getParent(); // Restore previous environment
+		return null;
 	}
 	
 	@Override
-	public void visit(Let statement) {
+	public Object visit(Let statement) {
 		// Create local environment for each assignment
 		for(Assignment assignment: statement.getAssignments()) {
 			environment = new Environment(environment);
@@ -128,10 +133,12 @@ public class WaebricChecker extends DefaultNodeVisitor {
 		for(int i = 0; i < statement.getAssignments().size(); i++) {
 			environment = environment.getParent();
 		}
+		
+		return null;
 	}
 	
 	@Override
-	public void visit(FuncBind bind) {
+	public Object visit(FuncBind bind) {
 		// Convert function binding in function definition
 		FunctionDef definition = new FunctionDef();
 		definition.setIdentifier(bind.getIdentifier());
@@ -149,30 +156,36 @@ public class WaebricChecker extends DefaultNodeVisitor {
 
 		definition.accept(this); // Check internal function
 		environment.defineFunction(definition); // Store definition
+		return null;
 	}
 	
 	@Override
-	public void visit(VarBind bind) {
+	public Object visit(VarBind bind) {
 		bind.getExpression().accept(this); // Check expression
 		environment.defineVariable(bind.getIdentifier().getName(), bind.getExpression());
+		return null;
 	}
 	
 	@Override
-	public void visit(VarExpression expression) {
+	public Object visit(VarExpression expression) {
 		if(! environment.isDefinedVariable(expression.getId().getName())) {
 			exceptions.add(new UndefinedVariableException(expression.getId()));
 		}
+		
+		return null;
 	}
 	
 	@Override
-	public void visit(Markup.Tag tag) {
+	public Object visit(Markup.Tag tag) {
 		if(environment.isDefinedFunction(tag.getDesignator().getIdentifier().getName())) {
 			new Markup.Call(tag.getDesignator()).accept(this);
 		}
+		
+		return null;
 	}
 	
 	@Override
-	public void visit(Markup.Call call) {
+	public Object visit(Markup.Call call) {
 		String name = call.getDesignator().getIdentifier().getName();
 		
 		// Check if call is made to a defined function
@@ -192,6 +205,8 @@ public class WaebricChecker extends DefaultNodeVisitor {
 				exceptions.add(new UndefinedFunctionException(call));
 			}
 		}
+		
+		return null;
 	}
 	
 }

@@ -2,8 +2,8 @@ package org.cwi.waebric.parser.ast.expression;
 
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.NatCon;
@@ -16,7 +16,7 @@ import org.cwi.waebric.parser.ast.basic.Text;
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
-public abstract class Expression extends AbstractSyntaxNode {
+public abstract class Expression extends SyntaxNode {
 
 	/**
 	 * Text -> Expression
@@ -37,14 +37,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return text;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { text };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { text };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -63,14 +63,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return identifier;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { identifier };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { identifier };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -95,14 +95,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.symbol = symbol;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { symbol };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { symbol };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -125,14 +125,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return natural;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { natural };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { natural };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -141,10 +141,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class ListExpression extends Expression {
 
-		private AbstractSyntaxNodeList<Expression> expressions;
+		private SyntaxNodeList<Expression> expressions;
 		
 		public ListExpression() {
-			expressions = new AbstractSyntaxNodeList<Expression>();
+			expressions = new SyntaxNodeList<Expression>();
 		}
 		
 		public boolean addExpression(Expression expression) {
@@ -155,14 +155,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return expressions;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expressions };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expressions };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -171,10 +171,10 @@ public abstract class Expression extends AbstractSyntaxNode {
 	 */
 	public static class RecordExpression extends Expression {
 
-		private AbstractSyntaxNodeList<KeyValuePair> pairs;
+		private SyntaxNodeList<KeyValuePair> pairs;
 		
 		public RecordExpression() {
-			pairs = new AbstractSyntaxNodeList<KeyValuePair>();
+			pairs = new SyntaxNodeList<KeyValuePair>();
 		}
 		
 		public boolean addKeyValuePair(KeyValuePair pair) {
@@ -195,14 +195,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			return null;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { pairs	};
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { pairs	};
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -237,14 +237,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.right = right;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { left, right };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { left, right };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -279,14 +279,14 @@ public abstract class Expression extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression, identifier };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression, identifier };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

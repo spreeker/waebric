@@ -3,9 +3,9 @@ package org.cwi.waebric.parser.ast.statement;
 import java.util.Collection;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -18,7 +18,7 @@ import org.cwi.waebric.parser.ast.statement.predicate.Predicate;
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
-public abstract class Statement extends AbstractSyntaxNode {
+public abstract class Statement extends SyntaxNode {
 
 	/**
 	 * Markup statements are an abstraction for all statements
@@ -29,7 +29,7 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public abstract static class AbstractMarkupStatement extends Statement {
 		
-		protected AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+		protected SyntaxNodeList<Markup> markups = new SyntaxNodeList<Markup>();
 		
 		public void addMarkup(Markup markup) {
 			markups.add(markup);
@@ -79,13 +79,13 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.trueStatement = trueStatement;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { predicate, trueStatement };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { predicate, trueStatement };
 		}
 		
 		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
+		public <T> T accept(INodeVisitor<T> visitor) {
+			return visitor.visit(this);
 		}
 		
 	}
@@ -121,14 +121,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.elseStatement = elseStatement;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { predicate, trueStatement,	elseStatement };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { predicate, trueStatement,	elseStatement };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 
@@ -172,14 +172,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.statement = statement;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { var, expression, statement };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { var, expression, statement };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -194,12 +194,12 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class Let extends Statement {
 
-		private AbstractSyntaxNodeList<Assignment> assignments;
-		private AbstractSyntaxNodeList<Statement> statements;
+		private SyntaxNodeList<Assignment> assignments;
+		private SyntaxNodeList<Statement> statements;
 		
 		public Let() {
-			assignments = new AbstractSyntaxNodeList<Assignment>();
-			statements = new AbstractSyntaxNodeList<Statement>();
+			assignments = new SyntaxNodeList<Assignment>();
+			statements = new SyntaxNodeList<Statement>();
 		}
 		
 		public boolean addAssignment(Assignment assignment) {
@@ -218,14 +218,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return statements.clone();
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { assignments, statements };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { assignments, statements };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -240,10 +240,10 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class Block extends Statement {
 
-		private AbstractSyntaxNodeList<Statement> statements;
+		private SyntaxNodeList<Statement> statements;
 		
 		public Block() {
-			statements = new AbstractSyntaxNodeList<Statement>();
+			statements = new SyntaxNodeList<Statement>();
 		}
 		
 		public boolean addStatement(Statement statement) {
@@ -254,14 +254,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			return statements;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { statements };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { statements };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -285,14 +285,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.comment = comment;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { comment };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { comment };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -323,14 +323,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -349,14 +349,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.embedding = embedding;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { embedding	};
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { embedding	};
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -380,14 +380,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -396,14 +396,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 	 */
 	public static class Yield extends Statement {
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { /* No children */ };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { /* No children */ };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -422,14 +422,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.markup = markup;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markup };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markup };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -458,14 +458,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.markup = markup;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, markup};
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups, markup};
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -494,14 +494,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.statement = statement;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, statement };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups, statement };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -530,14 +530,14 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups, expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -566,13 +566,13 @@ public abstract class Statement extends AbstractSyntaxNode {
 			this.embedding = embedding;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, embedding };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups, embedding };
 		}
 		
 		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
+		public <T> T accept(INodeVisitor<T> visitor) {
+			return visitor.visit(this);
 		}
 		
 	}

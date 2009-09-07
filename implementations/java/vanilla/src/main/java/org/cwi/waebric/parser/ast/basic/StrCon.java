@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.basic;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -14,7 +14,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class StrCon extends AbstractSyntaxNode {
+public class StrCon extends SyntaxNode {
 	
 	/**
 	 * String literal value.
@@ -45,8 +45,8 @@ public class StrCon extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

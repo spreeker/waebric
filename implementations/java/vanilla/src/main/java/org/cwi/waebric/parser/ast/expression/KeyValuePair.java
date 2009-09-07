@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.expression;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -9,7 +9,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author schagen
  *
  */
-public class KeyValuePair extends AbstractSyntaxNode {
+public class KeyValuePair extends SyntaxNode {
 
 	private IdCon identifier;
 	private Expression expression;
@@ -37,16 +37,16 @@ public class KeyValuePair extends AbstractSyntaxNode {
 		this.expression = expression;
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { 
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { 
 			identifier,
 			expression
 		};
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

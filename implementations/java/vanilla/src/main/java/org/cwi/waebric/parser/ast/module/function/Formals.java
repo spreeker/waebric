@@ -3,9 +3,9 @@ package org.cwi.waebric.parser.ast.module.function;
 import java.util.Collection;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
 /**
@@ -15,7 +15,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author Jeroen van Schagen
  * @date 09-06-2009
  */
-public abstract class Formals extends AbstractSyntaxNode {
+public abstract class Formals extends SyntaxNode {
 	
 	public abstract List<IdCon> getIdentifiers();
 
@@ -26,14 +26,14 @@ public abstract class Formals extends AbstractSyntaxNode {
 	 */
 	public static class RegularFormal extends Formals {
 		
-		private AbstractSyntaxNodeList<IdCon> identifiers;
+		private SyntaxNodeList<IdCon> identifiers;
 		
 		public RegularFormal() {
-			this.identifiers = new AbstractSyntaxNodeList<IdCon>();
+			this.identifiers = new SyntaxNodeList<IdCon>();
 		}
 		
 		public RegularFormal(Collection<IdCon> args) {
-			this.identifiers = new AbstractSyntaxNodeList<IdCon>();
+			this.identifiers = new SyntaxNodeList<IdCon>();
 			this.identifiers.addAll(args);
 		}
 
@@ -41,18 +41,18 @@ public abstract class Formals extends AbstractSyntaxNode {
 			return identifiers.add(identifier);
 		}
 		
-		public AbstractSyntaxNodeList<IdCon> getIdentifiers() {
+		public SyntaxNodeList<IdCon> getIdentifiers() {
 			return identifiers.clone();
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { getIdentifiers() };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { getIdentifiers() };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 
 	}
 	
@@ -65,13 +65,13 @@ public abstract class Formals extends AbstractSyntaxNode {
 
 		@Override
 		public List<IdCon> getIdentifiers() {
-			return new AbstractSyntaxNodeList<IdCon>();
+			return new SyntaxNodeList<IdCon>();
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

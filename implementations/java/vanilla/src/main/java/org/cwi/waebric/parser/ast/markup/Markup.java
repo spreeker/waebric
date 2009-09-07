@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 22-05-2009
  */
-public abstract class Markup extends AbstractSyntaxNode {
+public abstract class Markup extends SyntaxNode {
 	
 	protected Designator designator;
 	
@@ -58,14 +58,14 @@ public abstract class Markup extends AbstractSyntaxNode {
 			this.arguments = arguments;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { designator, arguments };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { designator, arguments };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -80,14 +80,14 @@ public abstract class Markup extends AbstractSyntaxNode {
 			this.designator = designator;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { designator };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { designator };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

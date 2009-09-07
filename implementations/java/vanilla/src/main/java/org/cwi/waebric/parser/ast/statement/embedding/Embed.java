@@ -3,9 +3,9 @@ package org.cwi.waebric.parser.ast.statement.embedding;
 import java.util.Collection;
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
@@ -15,9 +15,9 @@ import org.cwi.waebric.parser.ast.markup.Markup;
  * @author Jeroen van Schagen
  * @date 02-06-2009
  */
-public abstract class Embed extends AbstractSyntaxNode {
+public abstract class Embed extends SyntaxNode {
 
-	protected AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+	protected SyntaxNodeList<Markup> markups = new SyntaxNodeList<Markup>();
 
 	public List<Markup> getMarkups() {
 		return markups.clone();
@@ -51,14 +51,14 @@ public abstract class Embed extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups, expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups, expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -71,14 +71,14 @@ public abstract class Embed extends AbstractSyntaxNode {
 			markups.addAll(args);
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { markups };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { markups };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

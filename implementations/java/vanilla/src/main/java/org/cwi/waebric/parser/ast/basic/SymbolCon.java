@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.basic;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author schagen
  *
  */
-public class SymbolCon extends AbstractSyntaxNode {
+public class SymbolCon extends SyntaxNode {
 	
 	/**
 	 * Symbol name literal.
@@ -39,8 +39,8 @@ public class SymbolCon extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

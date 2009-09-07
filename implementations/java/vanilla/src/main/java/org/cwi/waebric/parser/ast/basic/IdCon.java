@@ -1,7 +1,7 @@
 package org.cwi.waebric.parser.ast.basic;
 
 import org.cwi.waebric.lexer.token.Token;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.TokenNode;
 
@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.TokenNode;
  * @author Jeroen van Schagen
  * @date 02-06-2009
  */
-public class IdCon extends AbstractSyntaxNode {
+public class IdCon extends SyntaxNode {
 
 	/**
 	 * Reference to lexical token.
@@ -87,13 +87,13 @@ public class IdCon extends AbstractSyntaxNode {
 	}
 
 	@Override
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { node };
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { node };
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

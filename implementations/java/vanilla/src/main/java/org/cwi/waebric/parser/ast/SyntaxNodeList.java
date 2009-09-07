@@ -6,98 +6,108 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-
 /**
- * Generic syntax node list implementation for syntax nodes that
- * represent a list structure.
+ * Generic syntax node list implementation for syntax nodes that represent a
+ * list structure.
  * 
  * @param <E>
  * 
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends AbstractSyntaxNode implements List<E> {
+public class SyntaxNodeList<E extends SyntaxNode> extends SyntaxNode implements
+		List<E> {
 
 	/**
 	 * Element collection
 	 */
 	protected List<E> list;
-	
+
 	/**
 	 * Construct syntax node list.
 	 */
-	public AbstractSyntaxNodeList() {
-		list =  new ArrayList<E>();
+	public SyntaxNodeList() {
+		list = new ArrayList<E>();
 	}
 
 	/**
 	 * Construct syntax node list.
-	 * @param list Collection of all elements
+	 * 
+	 * @param list
+	 *            Collection of all elements
 	 */
-	public AbstractSyntaxNodeList(List<E> list) {
+	public SyntaxNodeList(List<E> list) {
 		this.list = list;
 	}
-	
+
 	public boolean add(E element) {
-		if(element == null) { return false; }
-		if(this.contains(element)) { return false; }
+		if (element == null) {
+			return false;
+		}
+		if (this.contains(element)) {
+			return false;
+		}
 		return list.add(element);
 	}
-	
+
 	public void add(int index, E element) {
 		list.add(index, element);
 	}
-	
+
 	public boolean addAll(Collection<? extends E> c) {
 		return list.addAll(c);
 	}
-	
+
 	public boolean addAll(int index, Collection<? extends E> c) {
 		return list.addAll(index, c);
 	}
-	
+
 	public void clear() {
 		list.clear();
 	}
-	
+
 	@Override
-	public AbstractSyntaxNodeList<E> clone() {
-		return new AbstractSyntaxNodeList<E>(new ArrayList<E>(list));
+	public SyntaxNodeList<E> clone() {
+		return new SyntaxNodeList<E>(new ArrayList<E>(list));
 	}
-	
+
 	public boolean contains(Object o) {
 		return list.contains(o);
 	}
-	
+
 	public boolean containsAll(Collection<?> c) {
 		return list.containsAll(c);
 	}
-	
+
 	@Override
 	public boolean equals(Object arg) {
-		if(arg instanceof AbstractSyntaxNodeList) {
-			AbstractSyntaxNodeList<?> nodeList = (AbstractSyntaxNodeList<?>) arg;
-			
+		if (arg instanceof SyntaxNodeList) {
+			SyntaxNodeList<?> nodeList = (SyntaxNodeList<?>) arg;
+
 			// Check if size matches
-			if(nodeList.size() != this.size()) { return false; }
-			
-			for(int i = 0; i < this.size(); i++) {
-				// Check if each element matches
-				if(! this.get(i).equals(nodeList.get(i))) { return false; }
+			if (nodeList.size() != this.size()) {
+				return false;
 			}
-			
+
+			for (int i = 0; i < this.size(); i++) {
+				// Check if each element matches
+				if (!this.get(i).equals(nodeList.get(i))) {
+					return false;
+				}
+			}
+
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public E get(int index) {
 		return list.get(index);
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return list.toArray(new AbstractSyntaxNode[0]);
+	public SyntaxNode[] getChildren() {
+		return list.toArray(new SyntaxNode[0]);
 	}
 
 	public int indexOf(Object o) {
@@ -148,8 +158,8 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 		return list.size();
 	}
 
-	public AbstractSyntaxNodeList<E> subList(int fromIndex, int toIndex) {
-		return new AbstractSyntaxNodeList<E>(list.subList(fromIndex, toIndex));
+	public SyntaxNodeList<E> subList(int fromIndex, int toIndex) {
+		return new SyntaxNodeList<E>(list.subList(fromIndex, toIndex));
 	}
 
 	public Object[] toArray() {
@@ -159,23 +169,25 @@ public class AbstractSyntaxNodeList<E extends AbstractSyntaxNode> extends Abstra
 	public <T> T[] toArray(T[] a) {
 		return list.toArray(a);
 	}
-	
+
 	@Override
 	public String toString() {
 		String name = "[";
-		
-		AbstractSyntaxNode[] children = this.getChildren();
-		for(int i = 0; i < children.length; i++) {
-			if(i != 0) { name += ","; }
+
+		SyntaxNode[] children = this.getChildren();
+		for (int i = 0; i < children.length; i++) {
+			if (i != 0) {
+				name += ",";
+			}
 			name += children[i].toString();
 		}
 
 		return name + "]";
 	}
-	
+
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

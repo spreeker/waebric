@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.expression.Expression;
@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.expression.Expression;
  * @author Jeroen van Schagen
  * @date 22-06-2009
  */
-public abstract class Argument extends AbstractSyntaxNode {
+public abstract class Argument extends SyntaxNode {
 
 	protected Expression expression;
 
@@ -35,14 +35,14 @@ public abstract class Argument extends AbstractSyntaxNode {
 			setExpression(expression);
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -72,17 +72,17 @@ public abstract class Argument extends AbstractSyntaxNode {
 			this.identifier = identifier;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { 
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { 
 				identifier,
 				expression
 			};
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

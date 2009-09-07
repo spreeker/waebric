@@ -6,7 +6,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.lexer.token.Token;
 import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.lexer.token.WaebricTokenSort;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.expression.Expression;
 import org.cwi.waebric.parser.ast.markup.Markup;
 import org.cwi.waebric.parser.ast.statement.embedding.Embed;
@@ -80,7 +80,7 @@ class EmbeddingParser extends AbstractParser {
 	 * @throws SyntaxException 
 	 */
 	public Embed parseEmbed() throws SyntaxException {	
-		AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+		SyntaxNodeList<Markup> markups = new SyntaxNodeList<Markup>();
 		Expression expression = null;
 		while(tokens.hasNext() && ! tokens.peek(1).getLexeme().equals(WaebricSymbol.GREATER_THAN)) {
 			int index = tokens.index();

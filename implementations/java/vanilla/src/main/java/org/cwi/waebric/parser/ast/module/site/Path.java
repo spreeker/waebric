@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.module.site;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -9,7 +9,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Path extends AbstractSyntaxNode {
+public class Path extends SyntaxNode {
 
 	private String path;
 	
@@ -35,8 +35,8 @@ public class Path extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		this.accept(visitor);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 	
 }

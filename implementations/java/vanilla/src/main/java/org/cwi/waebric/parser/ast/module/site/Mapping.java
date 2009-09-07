@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.module.site;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.markup.Markup;
 
@@ -11,7 +11,7 @@ import org.cwi.waebric.parser.ast.markup.Markup;
  * @date 22-05-2009
  *
  */
-public class Mapping extends AbstractSyntaxNode {
+public class Mapping extends SyntaxNode {
 
 	private Path path;
 	private Markup markup;
@@ -32,13 +32,13 @@ public class Mapping extends AbstractSyntaxNode {
 		this.markup = markup;
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { path, markup };
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { path, markup };
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

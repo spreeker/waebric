@@ -7,7 +7,7 @@ import org.cwi.waebric.WaebricSymbol;
 import org.cwi.waebric.lexer.token.Token;
 import org.cwi.waebric.lexer.token.TokenIterator;
 import org.cwi.waebric.lexer.token.WaebricTokenSort;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.basic.StrCon;
 import org.cwi.waebric.parser.ast.markup.Markup;
@@ -283,7 +283,7 @@ class StatementParser extends AbstractParser {
 			return statement;
 		} else {
 			// Retrieve remaining mark-up tokens (Markup+)
-			AbstractSyntaxNodeList<Markup> markups = new AbstractSyntaxNodeList<Markup>();
+			SyntaxNodeList<Markup> markups = new SyntaxNodeList<Markup>();
 			markups.add(markup);
 			while(isMarkup(1, false)) {	markups.add(markupParser.parseMarkup()); }
 			

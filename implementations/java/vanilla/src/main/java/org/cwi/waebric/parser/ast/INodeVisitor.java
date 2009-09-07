@@ -11,102 +11,164 @@ import org.cwi.waebric.parser.ast.module.site.*;
 import org.cwi.waebric.parser.ast.module.function.*;
 
 /**
- * Used visitor pattern to remove the need to cast everywhere during
- * compilation and interpretation.
+ * Used visitor pattern to remove the need to cast everywhere during compilation
+ * and interpretation.
+ * 
  * @author Jeroen van Schagen
  * @date 11-06-2009
  */
-public interface INodeVisitor {
+public interface INodeVisitor<T> {
 
 	// Module
-	public void visit(Module module);
-	public void visit(ModuleId id);
-	public void visit(Import imprt);
-	
+	public T visit(Module module);
+
+	public T visit(ModuleId id);
+
+	public T visit(Import imprt);
+
 	// Site
-	public void visit(Site site);
-	public void visit(Mappings mappings);
-	public void visit(Mapping mapping);
-	public void visit(Path path);
-	
+	public T visit(Site site);
+
+	public T visit(Mappings mappings);
+
+	public T visit(Mapping mapping);
+
+	public T visit(Path path);
+
 	// Function
-	public void visit(FunctionDef function);
-	public void visit(Formals.RegularFormal formals);
-	public void visit(Formals.EmptyFormal formals);
-	
+	public T visit(FunctionDef function);
+
+	public T visit(Formals.RegularFormal formals);
+
+	public T visit(Formals.EmptyFormal formals);
+
 	// Statements
-	public void visit(Statement.If statement);
-	public void visit(Statement.IfElse statement);
-	public void visit(Statement.Block statement);
-	public void visit(Statement.CData statement);
-	public void visit(Statement.Comment statement);
-	public void visit(Statement.Each statement);
-	public void visit(Statement.Echo statement);
-	public void visit(Statement.EchoEmbedding statement);
-	public void visit(Statement.Let statement);
-	public void visit(Statement.Yield statement);
-	
-	public void visit(Statement.MarkupStatement statement);
-	public void visit(Statement.MarkupsMarkup statement);
-	public void visit(Statement.MarkupsExpression statement);
-	public void visit(Statement.MarkupsStatement statement);
-	public void visit(Statement.MarkupsEmbedding statement);
-	
-	public void visit(Assignment.FuncBind bind);
-	public void visit(Assignment.VarBind bind);
-	
+	public T visit(Statement.If statement);
+
+	public T visit(Statement.IfElse statement);
+
+	public T visit(Statement.Block statement);
+
+	public T visit(Statement.CData statement);
+
+	public T visit(Statement.Comment statement);
+
+	public T visit(Statement.Each statement);
+
+	public T visit(Statement.Echo statement);
+
+	public T visit(Statement.EchoEmbedding statement);
+
+	public T visit(Statement.Let statement);
+
+	public T visit(Statement.Yield statement);
+
+	public T visit(Statement.MarkupStatement statement);
+
+	public T visit(Statement.MarkupsMarkup statement);
+
+	public T visit(Statement.MarkupsExpression statement);
+
+	public T visit(Statement.MarkupsStatement statement);
+
+	public T visit(Statement.MarkupsEmbedding statement);
+
+	public T visit(Assignment.FuncBind bind);
+
+	public T visit(Assignment.VarBind bind);
+
 	// Predicate
-	public void visit(Predicate.RegularPredicate predicate);
-	public void visit(Predicate.And predicate);
-	public void visit(Predicate.Is predicate);
-	public void visit(Predicate.Not predicate);
-	public void visit(Predicate.Or predicate);
-	public void visit(Type type);
-	
+	public T visit(Predicate.RegularPredicate predicate);
+
+	public T visit(Predicate.And predicate);
+
+	public T visit(Predicate.Is predicate);
+
+	public T visit(Predicate.Not predicate);
+
+	public T visit(Predicate.Or predicate);
+
+	public T visit(Type.ListType type);
+
+	public T visit(Type.RecordType type);
+
+	public T visit(Type.StringType type);
+
 	// Embedding
-	public void visit(Embedding embedding);
-	public void visit(Embed.ExpressionEmbed embed);
-	public void visit(Embed.MarkupEmbed embed);
-	public void visit(PreText text);
-	public void visit(MidText text);
-	public void visit(PostText text);
-	public void visit(TextTail.MidTail tail);
-	public void visit(TextTail.PostTail tail);
-	
+	public T visit(Embedding embedding);
+
+	public T visit(Embed.ExpressionEmbed embed);
+
+	public T visit(Embed.MarkupEmbed embed);
+
+	public T visit(PreText text);
+
+	public T visit(MidText text);
+
+	public T visit(PostText text);
+
+	public T visit(TextTail.MidTail tail);
+
+	public T visit(TextTail.PostTail tail);
+
 	// Mark-ups
-	public void visit(Markup.Call markup);
-	public void visit(Markup.Tag markup);
-	public void visit(Designator designator);
-	public void visit(Attributes attributes);
-	public void visit(Attribute.ClassAttribute attribute);
-	public void visit(Attribute.IdAttribute attribute);
-	public void visit(Attribute.NameAttribute attribute);
-	public void visit(Attribute.TypeAttribute attribute);
-	public void visit(Attribute.WidthAttribute attribute);
-	public void visit(Attribute.WidthHeightAttribute attribute);
-	public void visit(Arguments arguments);
-	public void visit(Argument argument);
-	
+	public T visit(Markup.Call markup);
+
+	public T visit(Markup.Tag markup);
+
+	public T visit(Designator designator);
+
+	public T visit(Attributes attributes);
+
+	public T visit(Attribute.ClassAttribute attribute);
+
+	public T visit(Attribute.IdAttribute attribute);
+
+	public T visit(Attribute.NameAttribute attribute);
+
+	public T visit(Attribute.TypeAttribute attribute);
+
+	public T visit(Attribute.WidthAttribute attribute);
+
+	public T visit(Attribute.WidthHeightAttribute attribute);
+
+	public T visit(Arguments arguments);
+
+	public T visit(Argument argument);
+
 	// Expressions
-	public void visit(Expression.CatExpression expression);
-	public void visit(Expression.Field expression);
-	public void visit(Expression.ListExpression expression);
-	public void visit(Expression.NatExpression expression);
-	public void visit(Expression.RecordExpression expression);
-	public void visit(Expression.SymbolExpression expression);
-	public void visit(Expression.TextExpression expression);
-	public void visit(Expression.VarExpression expression);
-	public void visit(KeyValuePair pair);
-	public void visit(Text text);
+	public T visit(Expression.CatExpression expression);
+
+	public T visit(Expression.Field expression);
+
+	public T visit(Expression.ListExpression expression);
+
+	public T visit(Expression.NatExpression expression);
+
+	public T visit(Expression.RecordExpression expression);
+
+	public T visit(Expression.SymbolExpression expression);
+
+	public T visit(Expression.TextExpression expression);
+
+	public T visit(Expression.VarExpression expression);
+
+	public T visit(KeyValuePair pair);
+
+	public T visit(Text text);
 
 	// Basic
-	public void visit(IdCon id);
-	public void visit(NatCon nat);
-	public void visit(StrCon str);
-	public void visit(SymbolCon symbol);
-	
+	public T visit(IdCon id);
+
+	public T visit(NatCon nat);
+
+	public T visit(StrCon str);
+
+	public T visit(SymbolCon symbol);
+
 	// Generic
-	public void visit(AbstractSyntaxNodeList<?> list);
-	public void visit(TokenNode node);
-	
+	public T visit(SyntaxNodeList<?> list);
+
+	public T visit(TokenNode node);
+
 }

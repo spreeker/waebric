@@ -2,9 +2,9 @@ package org.cwi.waebric.parser.ast.module;
 
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.module.function.FunctionDef;
 import org.cwi.waebric.parser.ast.module.site.Site;
 
@@ -14,20 +14,20 @@ import org.cwi.waebric.parser.ast.module.site.Site;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Module extends AbstractSyntaxNode {
+public class Module extends SyntaxNode {
 
 	private ModuleId identifier;
-	private AbstractSyntaxNodeList<Import> imports;
-	private AbstractSyntaxNodeList<Site> sites;
-	private AbstractSyntaxNodeList<FunctionDef> defs;
+	private SyntaxNodeList<Import> imports;
+	private SyntaxNodeList<Site> sites;
+	private SyntaxNodeList<FunctionDef> defs;
 	
 	/**
 	 * Construct module
 	 */
 	public Module() {
-		imports = new AbstractSyntaxNodeList<Import>();
-		sites = new AbstractSyntaxNodeList<Site>();
-		defs = new AbstractSyntaxNodeList<FunctionDef>();
+		imports = new SyntaxNodeList<Import>();
+		sites = new SyntaxNodeList<Site>();
+		defs = new SyntaxNodeList<FunctionDef>();
 	}
 	
 	/**
@@ -100,8 +100,8 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] {
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] {
 			identifier,
 			imports,
 			sites,
@@ -120,8 +120,8 @@ public class Module extends AbstractSyntaxNode {
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

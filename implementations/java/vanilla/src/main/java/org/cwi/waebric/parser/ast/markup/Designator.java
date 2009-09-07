@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.markup;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -15,7 +15,7 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author Jeroen van Schagen
  * @date 25-05-2009
  */
-public class Designator extends AbstractSyntaxNode {
+public class Designator extends SyntaxNode {
 
 	protected IdCon identifier;
 	protected Attributes attributes;
@@ -45,13 +45,13 @@ public class Designator extends AbstractSyntaxNode {
 		this.attributes = attributes;
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { identifier, attributes };
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { identifier, attributes };
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

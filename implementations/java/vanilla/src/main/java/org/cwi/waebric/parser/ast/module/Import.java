@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.module;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -9,7 +9,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class Import extends AbstractSyntaxNode {
+public class Import extends SyntaxNode {
 		
 	private ModuleId identifier;
 
@@ -21,13 +21,13 @@ public class Import extends AbstractSyntaxNode {
 		this.identifier = identifier;
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { identifier };
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { identifier };
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

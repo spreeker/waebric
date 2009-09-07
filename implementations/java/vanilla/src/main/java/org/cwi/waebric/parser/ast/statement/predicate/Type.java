@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.statement.predicate;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 
 /**
@@ -8,7 +8,7 @@ import org.cwi.waebric.parser.ast.INodeVisitor;
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
-public abstract class Type extends AbstractSyntaxNode {
+public abstract class Type extends SyntaxNode {
 	
 	/**
 	 * Grammar:<br>
@@ -18,14 +18,14 @@ public abstract class Type extends AbstractSyntaxNode {
 	 */
 	public static class StringType extends Type {
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { /* No children */ };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { /* No children */ };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -37,14 +37,14 @@ public abstract class Type extends AbstractSyntaxNode {
 	 */
 	public static class ListType extends Type {
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { /* No children */ };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { /* No children */ };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -56,14 +56,14 @@ public abstract class Type extends AbstractSyntaxNode {
 	 */
 	public static class RecordType extends Type {
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { /* No children */ };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { /* No children */ };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 

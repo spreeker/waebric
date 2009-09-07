@@ -2,9 +2,9 @@ package org.cwi.waebric.parser.ast.module.function;
 
 import java.util.List;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 import org.cwi.waebric.parser.ast.statement.Statement;
 
@@ -13,14 +13,14 @@ import org.cwi.waebric.parser.ast.statement.Statement;
  * @author schagen
  *
  */
-public class FunctionDef extends AbstractSyntaxNode {
+public class FunctionDef extends SyntaxNode {
 
-	private AbstractSyntaxNodeList<Statement> statements;
+	private SyntaxNodeList<Statement> statements;
 	private IdCon identifier;
 	private Formals formals;
 
 	public FunctionDef() {
-		this.statements = new AbstractSyntaxNodeList<Statement>();
+		this.statements = new SyntaxNodeList<Statement>();
 	}
 	
 	public FunctionDef(IdCon identifier) {
@@ -30,7 +30,7 @@ public class FunctionDef extends AbstractSyntaxNode {
 	public FunctionDef(IdCon identifier, Formals formals) {
 		this.identifier = identifier;
 		this.formals = formals;
-		this.statements = new AbstractSyntaxNodeList<Statement>();
+		this.statements = new SyntaxNodeList<Statement>();
 	}
 	
 	public IdCon getIdentifier() {
@@ -57,13 +57,13 @@ public class FunctionDef extends AbstractSyntaxNode {
 		return statements.clone();
 	}
 
-	public AbstractSyntaxNode[] getChildren() {
-		return new AbstractSyntaxNode[] { identifier, formals, statements };
+	public SyntaxNode[] getChildren() {
+		return new SyntaxNode[] { identifier, formals, statements };
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

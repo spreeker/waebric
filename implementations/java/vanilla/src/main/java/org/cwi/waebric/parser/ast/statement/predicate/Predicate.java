@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.statement.predicate;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNode;
+import org.cwi.waebric.parser.ast.SyntaxNode;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.expression.Expression;
 
@@ -10,7 +10,7 @@ import org.cwi.waebric.parser.ast.expression.Expression;
  * @author Jeroen van Schagen
  * @date 27-05-2009
  */
-public abstract class Predicate extends AbstractSyntaxNode {
+public abstract class Predicate extends SyntaxNode {
 
 	/**
 	 * Grammar:<br>
@@ -36,14 +36,14 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.expression = expression;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -72,14 +72,14 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.type = type;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { expression, type };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { expression, type };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -107,14 +107,14 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.predicate = predicate;
 		}
 
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { predicate	};
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { predicate	};
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -152,14 +152,14 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.right = right;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { left, right };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { left, right };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	
@@ -197,14 +197,14 @@ public abstract class Predicate extends AbstractSyntaxNode {
 			this.right = right;
 		}
 		
-		public AbstractSyntaxNode[] getChildren() {
-			return new AbstractSyntaxNode[] { left, right };
+		public SyntaxNode[] getChildren() {
+			return new SyntaxNode[] { left, right };
 		}
 		
-		@Override
-		public void accept(INodeVisitor visitor) {
-			visitor.visit(this);
-		}
+			@Override
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
 		
 	}
 	

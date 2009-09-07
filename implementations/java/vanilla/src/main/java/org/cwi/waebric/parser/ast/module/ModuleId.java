@@ -1,6 +1,6 @@
 package org.cwi.waebric.parser.ast.module;
 
-import org.cwi.waebric.parser.ast.AbstractSyntaxNodeList;
+import org.cwi.waebric.parser.ast.SyntaxNodeList;
 import org.cwi.waebric.parser.ast.INodeVisitor;
 import org.cwi.waebric.parser.ast.basic.IdCon;
 
@@ -10,15 +10,15 @@ import org.cwi.waebric.parser.ast.basic.IdCon;
  * @author Jeroen van Schagen
  * @date 20-05-2009
  */
-public class ModuleId extends AbstractSyntaxNodeList<IdCon> {
+public class ModuleId extends SyntaxNodeList<IdCon> {
 
 	public ModuleId() {
 		super();
 	}
 	
 	@Override
-	public void accept(INodeVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(INodeVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 	
 }
