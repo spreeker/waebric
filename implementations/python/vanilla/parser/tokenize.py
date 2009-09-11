@@ -120,7 +120,7 @@ def generate_tokens(readline):
             else :
                 contstr = contstr + line
                 contline = contline + line
-                continue 
+                continue
         elif contcomment :
             if not line:
                 raise TokenError, ("EOF in multi-line comment", commentstart)
@@ -159,7 +159,7 @@ def generate_tokens(readline):
                     yield (NUMBER, token, spos, epos, line)
                 elif initial in '\r\n':
                     yield (parenlev > 0 and NL or NEWLINE,
-                               token, spos, epos, line)   
+                               token, spos, epos, line)
                 elif initial == '/' and token[:2] == '//': # comment
                     yield (COMMENT, token, spos, epos, line)
                     continue
@@ -167,15 +167,15 @@ def generate_tokens(readline):
                     if token[-1] == '\n':                  # multiline comment
                         contline = line
                         commentstart = (lnum, start)
-                        contcomment, needcont = line[start:], 1                        
+                        contcomment, needcont = line[start:], 1
                         break
                     else :                                 # ordinary comment
                         yield( COMMENT, token, spos, epos, line)
                         continue
-                elif initial in single_quoted: 
+                elif initial in single_quoted:
                     if token[-1] == '\n':                  # continued string
                         strstart = (lnum, start)
-                        endprog = endprogs[initial] 
+                        endprog = endprogs[initial]
                         contstr, needcont = line[start:], 1
                         contline = line
                         break
