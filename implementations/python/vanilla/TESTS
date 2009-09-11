@@ -1,0 +1,2 @@
+export PYTHONPATH=~/waebric/implementations/python/vanilla:
+python tests/test.py
