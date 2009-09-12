@@ -1,0 +1,6 @@
+>> WAEBRIC Java implementation <<
+Author: Jeroen van Schagen
+Date: 12-09-2009
+
+Usage:
+java -jar java-waebric.jar [optional: program.wae] [optional: output.html]
