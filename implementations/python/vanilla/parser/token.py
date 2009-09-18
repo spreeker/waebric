@@ -1,19 +1,21 @@
 
-ENDMARKER = 0
+ENDMARKER = 0 
 NAME = 1
-NUMBER = 2 
-STRING = 3 
-NEWLINE = 4 
-LPAR = 5 
-RPAR = 6 
-LSQB = 7 
-RSQB = 8 
-COLON = 9
-COMMA = 10 
-#SEMI 
-#PLUS 
+NUMBER = 2
+PRESTRING = 3
+STRING = 4
+EMBSTRING = 5
+NEWLINE = 6
+LPAR = 7
+RPAR = 8
+LSQB = 9
+RSQB = 10
+COLON = 11
+COMMA = 12
+#SEMI
+#PLUS
 #MINUS
-#STAR 
+#STAR
 #SLASH
 #VBAR 
 #AMPER 
@@ -44,13 +46,14 @@ COMMA = 10
 
 OP = 40
 ERRORTOKEN = 50
-N_TOKENS = 12 
+N_TOKENS = 14
 
 tok_name = {}
 for _name, _value in globals().items():
     if type(_value) is type(0):
         tok_name[_value] = _name
 
+NT_OFFSET = 13
 
 def ISTERMINAL(x):
     return x < NT_OFFSET

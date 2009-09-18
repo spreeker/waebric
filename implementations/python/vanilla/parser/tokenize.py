@@ -20,46 +20,49 @@ Decnumber = r'[1-9]\d*'
 Pointfloat = group(r'\d+\.\d*', r'\.\d+')
 Number = group(Pointfloat, Decnumber)
 
-String = group(r"'[^\n'\\]*(?:\\.[^\n'\\]*)*'",
-               r'"[^\n"\\]*(?:\\.[^\n"\\]*)*"')
+String =  r'"[^\n"\\]*(?:\\.[^\n"\\]*)*"'
 
-ContStr = group(r"'[^\n'\\]*(?:\\.[^\n'\\]*)*" +
-                group("'", r'\n'),
-                r'"[^\n"\\]*(?:\\.[^\n"\\]*)*' +
-                group('"', r'\n'))
+embed = r'<.*' + group('>', r'\n')
 
-# Tail end of ' string.
-Single = r"[^'\\]*(?:\\.[^'\\]*)*'"
+ContStr = r'"[^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('"', r'\n', r'<')
+ContEmb = r'<[^\n<>\\]*(?:\\.[^\n<>\\]*)*' + group('>', r'\n')
+ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
+
 # Tail end of " string.
-Double = r'[^"\\]*(?:\\.[^"\\]*)*"'
+endString = r'[^"\\]*(?:\\.[^"\\]*)*' + group('"', '<')
+# Tail end of < string.
+endEmbed = r'[^><\\]*(?:\\.[^<>\\]*)*' + group('>')
 
-endprogs = {"'": re.compile(Single), '"': re.compile(Double)}
+endprog = re.compile(endString)
+endembed = re.compile(endEmbed)
 
 # continued comment
-ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
 endcomment = re.compile(r'[^*\\]*(?:\\.[^*\\]*)*\*/')
+# one line comment
 Comment = r'//[^\r\n]*'
 
-Operator = r"/+%&|^=?"
+Operator = r"[/+%&|^`=?]"
 
 Bracket = r'[][(){}]'
-Special = group(r'\r?\n', r'[:;.,`@]')
-Funny = group( Bracket, Special, )
+Special = group(r'\r?\n', r'[:;.,@]')
+Funny = group( Bracket, Special, Operator )
 
 Ignore = Whitespace + any(r'\\\r?\n' + Whitespace) + maybe(Comment)
 PlainToken = group(Number, Funny, String, Name)
 Token = Ignore + PlainToken
 
 PseudoExtras = group(r'\\\r?\n', Comment, )
-PseudoToken = Whitespace + group(PseudoExtras, Number, Funny , Name, ContStr, ContComment)
+PseudoToken = Whitespace + group(PseudoExtras, Number, Funny , Name,
+                ContStr, ContComment, ContEmb)
 
 pseudoprog = re.compile( PseudoToken )
 
-single_quoted = {"'" : "'", '"' : '"'}
 
 def printtoken(type, token, (srow, scol), (erow, ecol), line): # for testing
     print "%d,%d-%d,%d:\t%s\t%s" % \
         (srow, scol, erow, ecol, tok_name[type], repr(token))
+
+class TokenError(Exception): pass
 
 def tokenize(readline, tokeneater=printtoken):
     """
@@ -95,7 +98,7 @@ def generate_tokens(readline):
     """
     lnum = parenlev = 0
     namechars, numchars = string.ascii_letters + '_', '0123456789'
-    contstr, contcomment =  '', ''
+    contemb, contstr, contcomment =  '', '', ''
     contline = None
 
     while 1:                                   # loop over lines in stream
@@ -113,7 +116,11 @@ def generate_tokens(readline):
             endmatch = endprog.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
-                yield (STRING, contstr + line[:end],
+                if line[end-1] == '<':         # embedding
+                    yield (PRESTRING, contstr + line[:end],
+                            strstart, (lnum,end), contline + line)
+                else:
+                    yield (STRING, contstr + line[:end],
                            strstart, (lnum, end), contline + line)
                 contstr = ''
                 contline = None
@@ -121,7 +128,7 @@ def generate_tokens(readline):
                 contstr = contstr + line
                 contline = contline + line
                 continue
-        elif contcomment :
+        elif contcomment:                       # continued comment
             if not line:
                 raise TokenError, ("EOF in multi-line comment", commentstart)
             endmatch = endcomment.match(line)
@@ -135,6 +142,19 @@ def generate_tokens(readline):
                 contcomment = contcomment + line
                 contline = contline + line
                 continue
+        elif contemb:                            # continued embedding
+            if not line:
+                raise TokenError, ("EOF in multi-line embedded string", commentstart)
+            endmatch = endembed.match(line)
+            if endmatch:
+                pos = end = endmatch.end(0)
+                yield(EMBSTRING, contemb + line[:end],
+                        embstart, (lnum, end), contline + line)
+                contemb = ''
+                contline = None
+            else:
+                contemb = ''
+                conline = None
         elif parenlev == 0 :  # new statement
             if not line: break
             column = 0
@@ -165,22 +185,37 @@ def generate_tokens(readline):
                     continue
                 elif initial == '/' and token[:2] == '/*':
                     if token[-1] == '\n':                  # multiline comment
+                        print "multiline comment"
                         contline = line
                         commentstart = (lnum, start)
-                        contcomment, needcont = line[start:], 1
+                        contcomment = line[start:]
                         break
                     else :                                 # ordinary comment
                         yield( COMMENT, token, spos, epos, line)
                         continue
-                elif initial in single_quoted:
+                elif initial in "\"":
                     if token[-1] == '\n':                  # continued string
+                        print "multiline string"
                         strstart = (lnum, start)
-                        endprog = endprogs[initial]
-                        contstr, needcont = line[start:], 1
+                        contstr = line[start:]
                         contline = line
                         break
+                    elif token[-1] == '<':                 # embedding
+                        pos = pos - 1
+                        yield(PRESTRING, token[:-1], spos, (lnum, pos), line)
                     else:                                  # ordinary string
                         yield (STRING, token, spos, epos, line)
+                elif initial in "<":
+                    if token[-1] == '\n':                  # multiline embed
+                        print "multiline embed"
+                        embstart = (lnum, start)
+                        contemb  = line[start:]
+                        contline = line
+                        break
+                    else:
+                        yield (EMBSTRING, token, spos, epos, line)
+                        poststring = True
+                elif 
                 elif initial in namechars:                 # ordinary name
                     yield (NAME, token, spos, epos, line)
                 else:
