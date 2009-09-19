@@ -176,7 +176,7 @@ var Envjs = function(){
 (function($env){
     
     $env.log = function(msg, level){
-         print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
+         //print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
     };
     
     $env.lineSource = function(e){
@@ -2400,12 +2400,17 @@ __extend__(DOMElement.prototype, {
         
         // serialize Attribute declarations
         var attrs = this.attributes.xml;
-        if (attrs.length > 0) attrs = " "+ attrs;
+        //if (attrs.length > 0) attrs = " "+ attrs.substr(0, attrs.length-1);
+		if (attrs.length > 0) attrs = " "+ attrs;
         
         // serialize this Element
-        ret += "<" + this.nodeName.toLowerCase() + ns + attrs +">";
-        ret += this.childNodes.xml;
-        ret += "</" + this.nodeName.toLowerCase()+">";
+		if(this.childNodes.length > 0){
+	        ret += "<" + this.nodeName.toLowerCase() + ns + attrs +">";
+	        ret += this.childNodes.xml;
+	        ret += "</" + this.nodeName.toLowerCase()+">";
+		}else{
+			ret += "<" + this.nodeName.toLowerCase() + ns + attrs +"/>";
+		}
         return ret;
     },
     toString : function(){
@@ -4848,7 +4853,11 @@ __extend__(DOMDocument.prototype, {
     },
     get xml(){
         //$log("Serializing " + this);
-        return this.doctype + '\n' + this.documentElement.xml;
+		if(this.doctype != null){
+			return this.doctype + '\n' + this.documentElement.xml;
+		}else{
+			return this.documentElement.xml;
+		}        
     },
 	toString: function(){ 
 	    return "Document" +  (typeof this._url == "string" ? ": " + this._url : ""); 
