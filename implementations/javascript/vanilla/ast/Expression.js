@@ -134,7 +134,7 @@ function ListExpression(list){
 	
 	//Methods
 	this.toString = function(){
-		return "[" + this.list.toString() + "]";
+		return "[" + this.list.toSource() + "]";
 	}
 }
 ListExpression.prototype = new Node(); //Inheritance base class
@@ -162,7 +162,7 @@ function RecordExpression(records){
 	}	
 	
 	this.toString = function(){
-		return "{" + this.records.toString() + "}";
+		return this.records.toSource();
 	}
 }
 RecordExpression.prototype = new Node(); //Inheritance base class
