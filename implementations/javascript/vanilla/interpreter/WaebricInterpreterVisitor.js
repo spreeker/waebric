@@ -4,6 +4,8 @@
  * @author Nickolas Heirbaut [nickolas.heirbaut@dejasmijn.be]
  */
 function WaebricInterpreterVisitor(){	
+
+	TEXT_NODE_TYPE_ID = 3;
 	
 	/**
 	 * Returns a module visitor
@@ -55,7 +57,6 @@ function WaebricInterpreterVisitor(){
 				this.env.path = module.moduleId.identifier + '.htm';
 				
 				//Output main function
-				this.dom.createXHTMLRoot();
 				mainFunction.accept(new FunctionDefinitionVisitor(this.env, this.dom));
 			}
 		}
@@ -74,8 +75,7 @@ function WaebricInterpreterVisitor(){
 			//Set path for output location
 			this.env.path = mapping.path;
 			
-			//Output mapping markup			
-			this.dom.createXHTMLRoot();		
+			//Output mapping markup	
 			mapping.markup.accept(new MarkupVisitor(this.env, this.dom));
 		}
 	}
@@ -235,6 +235,7 @@ function WaebricInterpreterVisitor(){
 		}
 	}
 	
+	
 	/**
 	 * Checks whether the input value is a valid expression
 	 * 
@@ -254,17 +255,32 @@ function WaebricInterpreterVisitor(){
 		}else if(expression instanceof NotPredicate){
 			return !isValidExpression(expression.predicate, env)
 		}else if(expression instanceof IsAPredicate){
-			return getExpressionValue(expression.expression, env) instanceof expression.type.type;
+			return isValidTypePredicate(expression, env)
+		}else if(expression instanceof VarExpression){
+			var variable = env.getVariable(expression.variable);
+			return variable != null && variable.value != 'undef';
 		}else{//Return true for text, symbols, natcons and concat
 			return true;
 		}
 	}
 	
 	/**
+	 * Checks whether the input value is a {IsAPredicate}
+	 * 
+	 * @param {IsAPredicate} typePredicate The predicate to evaluate
+	 * @param {WaebricEnvironment} env The parent environment 
+	 * @return {Boolean}
+	 */
+	function isValidTypePredicate(typePredicate, env){
+		var exprValue = getExpressionValue(typePredicate.expression, env);
+		return exprValue instanceof typePredicate.type.astObject
+	}
+	
+	/**
 	 * Checks whether the input value is a valid {FieldExpression}
 	 * 
-	 * @param {WaebricEnvironment} env The parent environment
-	 * @param {DOM} dom The Document Object Model
+	 * @param {Expression} expression The expression to evaluate
+	 * @param {WaebricEnvironment} env The parent environment 
 	 * @return {Boolean}
 	 */
 	function isValidFieldExpression(expression, env){
@@ -300,7 +316,9 @@ function WaebricInterpreterVisitor(){
 			return getRecordExpressionValue(expression, env);
 		}else if(expression instanceof ListExpression){
 			return getListExpressionValue(expression, env);
-		}else{
+		}else if (expression instanceof CatExpression) {
+			return getCatExpressionValue(expression, env);
+		} else {
 			return expression;
 		}
 	}
@@ -404,28 +422,63 @@ function WaebricInterpreterVisitor(){
 	 * @return {String}
 	 */	
 	function getRecordExpressionStringValue(recordExpr, env){
-		var records = '{'
+		var records = '['
 		for (var i = 0; i < recordExpr.records.length; i++) {
 			var keyValuePair = recordExpr.records[i];
-			records = records.concat(keyValuePair.key).concat(':').concat(getExpressionValue(keyValuePair.value)).concat(',');
+			records = records.concat(keyValuePair.key).concat(':').concat(getExpressionValue(keyValuePair.value, env)).concat(',');
 		}
-		return records.substr(0, records.length - 1).concat('}')
+		return records.substr(0, records.length - 1).concat(']')
 	}
 	
 	/**
-	 * Returns a String representation of a {ListExpression}
+	 * Returns the value of a {ListExpression}
 	 * 
+	 * @param {Expression} catExpr The Expression
 	 * @param {WaebricEnvironment} env The parent environment
-	 * @param {DOM} dom The Document Object Model
 	 * @return {String}
 	 */
 	function getListExpressionStringValue(listExpr, env){
 		var list = '[';
 		for (var i = 0; i < listExpr.list.length; i++) {
 			var expression = listExpr.list[i];			
-			list = list.concat(getExpressionValue(expression)).concat(',');
+			list = list.concat(getExpressionValue(expression, env)).concat(',');
 		}
-		return list.substr(0, list.length - 1).concat(']')
+		
+		if(listExpr.list.length > 0){
+			list.substr(0, list.length - 1)
+		}
+		return list.concat(']')		
+	}
+	
+	/**
+	 * Returns the value of a {CatExpression}
+	 * 
+	 * @param {Expression} catExpr The Expression
+	 * @param {WaebricEnvironment} env The parent environment
+	 * @return {String}
+	 */
+	function getCatExpressionValue(catExpr, env){
+		var leftExpression = getExpressionValue(catExpr.expressionLeft, env);
+		var rightExpression = getExpressionValue(catExpr.expressionRight, env);
+		return leftExpression + rightExpression;
+	}	
+	
+	/**
+	 * Add a textnode to the last processed element in the DOM
+	 * 
+	 * @param {String} value The value of the text
+	 * @param {DOM} dom The Document Object Model
+	 */
+	function createTextNode(value, dom){
+		var hasChild = (dom.lastElement.lastChild != null);
+		var hasTextNodeChild = hasChild && (dom.lastElement.lastChild.nodeType == TEXT_NODE_TYPE_ID)
+		
+		if(hasTextNodeChild){
+			dom.lastElement.lastChild.data += normalize(value);
+		}else{			
+			var textNode = dom.document.createTextNode(normalize(value));
+			dom.lastElement.appendChild(textNode);
+		}
 	}
 			
 	/**
@@ -483,16 +536,16 @@ function WaebricInterpreterVisitor(){
 			var expressionValue = getExpressionValue(eachStmt.expression, this.env);
 			
 			//Expression value should be an array
-			var lastElement = this.dom.lastElement;
+			var lastElement = this.dom.lastElement;			
 			if(expressionValue instanceof ListExpression){				
 				//Loop all records and output statement
-				for(var i = 0; i < expressionValue.list.length; i++){					
+				for(var i = 0; i < expressionValue.list.length; i++){								
 					var listValue = expressionValue.list[i];			
 					//Save variable to environment
-					new_env.addVariable(eachStmt.identifier, listValue);	
+					new_env.addVariable(eachStmt.identifier, listValue);
 					//Visit statement				
 					eachStmt.statement.accept(new StatementVisitor(new_env, this.dom));
-					//Set last element back to original (otherwise nesting)
+					//Set last element back to original (prevent nesting)
 					this.dom.lastElement = lastElement;
 				}				
 			}
@@ -573,9 +626,8 @@ function WaebricInterpreterVisitor(){
 			//Visit Expression	
 			echoStmt.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
-			//Create textnode
-			var text = this.dom.document.createTextNode(normalize(this.dom.lastValue));			
-			this.dom.lastElement.appendChild(text);
+			//Create text node			
+			createTextNode(this.dom.lastValue, this.dom);
 		}
 	}
 	
@@ -851,8 +903,7 @@ function WaebricInterpreterVisitor(){
 			markupExprStmt.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
 			//Print out HTML from expression
-			var text = this.dom.document.createTextNode(normalize(this.dom.lastValue));	
-			this.dom.lastElement.appendChild(text);
+			createTextNode(this.dom.lastValue, this.dom)
 		}
 	}
 	
@@ -898,7 +949,7 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(variable){
-			var _var = this.env.getVariable(variable);	
+			var _var = this.env.getVariable(variable);
 			if (_var != null) {
 				this.dom.lastValue = _var.value;
 			}else{
@@ -948,7 +999,7 @@ function WaebricInterpreterVisitor(){
 		this.dom = dom;
 		this.visit = function(text){
 			//Save value temporary
-			this.dom.lastValue = normalize(text);
+			this.dom.lastValue = text;
 		}
 	}
 	
@@ -1030,8 +1081,7 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(embedding){
 			//Add PreText as normal text to document
 			if (normalize(embedding.head) != "") {
-				var text = this.dom.document.createTextNode(normalize(embedding.head));
-				this.dom.lastElement.appendChild(text);
+				createTextNode(embedding.head, this.dom);
 			}
 				
 			//Prepare swap	
@@ -1100,8 +1150,7 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(midTextTail){				
 			//Add mid text as normal text to document
 			if ((normalize(midTextTail.mid)) != "") {
-				var text = this.dom.document.createTextNode((normalize(midTextTail.mid)));
-				this.dom.lastElement.appendChild(text);
+				createTextNode(midTextTail.mid, this.dom);
 			}
 			
 			//Prepare swap
@@ -1124,9 +1173,8 @@ function WaebricInterpreterVisitor(){
 	 * @param {String} str The input string
 	 */
 	function normalize(str){
-		str = str.toString().replace(/\n/g,' ');
-		str = str.toString().replace(/[\r\t\\]/g,'');
-		return str;
+		var new_str = str.toString().replace(/&/g, "&amp;");
+		return new_str;
 	}
 	
 	/**
@@ -1141,8 +1189,7 @@ function WaebricInterpreterVisitor(){
 		this.visit = function(postText){	
 			//Add mid post text to document			
 			if ((normalize(postText.text)) != "") {
-				var text = this.dom.document.createTextNode((normalize(postText.text)));
-				this.dom.lastElement.appendChild(text);
+				createTextNode(postText.text, this.dom);
 			}	
 		}
 	}
@@ -1166,9 +1213,8 @@ function WaebricInterpreterVisitor(){
 			//Visit expression
 			exprEmbed.expression.accept(new ExpressionVisitor(this.env, this.dom));
 			
-			//Add expression value to document			
-			var text = this.dom.document.createTextNode(normalize(this.dom.lastValue));
-			this.dom.lastElement.appendChild(text);
+			//Add expression value to document		
+			createTextNode(this.dom.lastValue, this.dom);
 		}
 	}
 	
@@ -1221,8 +1267,8 @@ function WaebricInterpreterVisitor(){
 		this.dom = dom;
 		this.visit = function(varbind){
 			//Add variable to current environment (let statement)
-			this.env.addVariable(varbind.variable, getExpressionValue(varbind.expression));
-			
+			this.env.addVariable(varbind.variable, getExpressionValue(varbind.expression, env));
+
 			//Visit expression
 			varbind.expression.accept(new ExpressionVisitor(this.env, this.dom));
 		}
@@ -1304,8 +1350,12 @@ function WaebricInterpreterVisitor(){
 						
 			//Store variables
 			for(var i = 0; i < markup.arguments.length; i++){
-				var variableValue = getExpressionValue(markup.arguments[i], this.env);	
-				new_env.addVariable('arg' + i, variableValue);
+				var variableValue = getExpressionValue(markup.arguments[i], this.env);
+				if(variableValue instanceof Argument){
+					new_env.addVariable('arg' + i, variableValue.expression);
+				}else{
+					new_env.addVariable('arg' + i, variableValue);
+				}
 			}	
 
 			//Visit function definition
@@ -1314,6 +1364,17 @@ function WaebricInterpreterVisitor(){
 			}else{
 				markup.accept(new MarkupXHTMLTagVisitor(this.env, this.dom))
 			}	
+		}
+	}
+	
+	function createElement(value, dom){
+		//Create element
+		if (value.toString().toUpperCase() != 'HTML') {
+			var element = dom.document.createElement(value.toString());
+			dom.lastElement.appendChild(element);
+			dom.lastElement = element;			
+		}else{
+			dom.HTMLElementDefined = true;
 		}
 	}
 	
@@ -1327,12 +1388,8 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(markup){	
-			//Add tag/element to document (ignore html tags)
-			if (markup.designator.idCon != 'html') {
-				var element = this.dom.document.createElement(markup.designator.idCon.toString());
-				this.dom.lastElement.appendChild(element);
-				this.dom.lastElement = element;
-			}			
+			//Add tag to document
+			createElement(markup.designator.idCon, this.dom);
 			
 			//Visit short-hand arguments of tag/element
 			for(var i = 0; i < markup.designator.attributes.length; i++){
@@ -1346,8 +1403,8 @@ function WaebricInterpreterVisitor(){
 				argument.accept(new ArgumentExpressionVisitor(this.env, this.dom));
 			}
 		}
-	}
-	
+	}	
+
 	/**
 	 * Visitor Markup Tags
 	 * 
@@ -1358,12 +1415,8 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(markup){
-			//Add tag/element to document (ignore html tags)
-			if (markup.idCon != 'html') {
-				var element = this.dom.document.createElement(markup.idCon.toString());
-				this.dom.lastElement.appendChild(element);
-				this.dom.lastElement = element;
-			}	
+			//Add tag to document
+			createElement(markup.idCon, this.dom);
 			
 			//Visit short-hand arguments of tag/element
 			for(var i = 0; i < markup.attributes.length; i++){
@@ -1550,14 +1603,19 @@ function WaebricInterpreterVisitor(){
 		this.env = env;
 		this.dom = dom;
 		this.visit = function(argument){
-			//If argument is Expression, than this is an argument of an XHTML Tag.
+			//If argument is Expression, then the expression is an argument of an XHTML Tag.
 			//The arguments should then be processed as key/value where key is always "value"
 			if (argument instanceof Argument) {			
 				//Visit Expression
 				argument.expression.accept(new ExpressionVisitor(this.env, this.dom));
 				
 				//Add attribute to last element
-				this.dom.lastElement.setAttribute(argument.variable.toString(), this.dom.lastValue.toString());
+				this.previousValue = this.dom.lastElement.getAttribute(argument.variable.toString());			
+				if(this.previousValue != null){
+					this.dom.lastElement.setAttribute(argument.variable.toString(), this.previousValue + ' ' + this.dom.lastValue.toString());
+				}else{
+					this.dom.lastElement.setAttribute(argument.variable.toString(), this.dom.lastValue.toString());
+				}
 			}else{
 				//Visit Expression
 				argument.accept(new ExpressionVisitor(this.env, this.dom));
