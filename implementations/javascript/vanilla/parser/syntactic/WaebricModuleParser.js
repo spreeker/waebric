@@ -85,18 +85,20 @@ function WaebricModuleParser(){
      * @return {ModuleId}
      */
     this.parseModuleId = function(token){
-		this.setCurrentToken(token);  
+		this.setCurrentToken(token);
 		
-        //Parse first part ModuleId -> IdCon		
-        var value = this.currentToken.value.toString();
-        
-        //Parse remaining parts ModuleID -> listOf("." IdCon)
-        while (this.currentToken.nextToken().value == WaebricToken.SYMBOL.DOT &&
-        this.isModuleIdElement(this.currentToken.nextToken().nextToken())) {
-            value += this.currentToken.nextToken().value.toString();
-            value += this.currentToken.nextToken().nextToken().value.toString();
-            this.setCurrentToken(this.currentToken.nextToken().nextToken());
-        }
+		//Parse first part ModuleId -> IdCon		
+		var value = this.currentToken.value.toString();
+		
+		//Parse remaining parts ModuleID -> listOf("." IdCon)
+		if (this.currentToken.hasNextToken()) {		
+			while (this.currentToken.nextToken().value == WaebricToken.SYMBOL.DOT &&
+			this.isModuleIdElement(this.currentToken.nextToken().nextToken())) {
+				value += this.currentToken.nextToken().value.toString();
+				value += this.currentToken.nextToken().nextToken().value.toString();
+				this.setCurrentToken(this.currentToken.nextToken().nextToken());
+			}
+		}
 		
         return new ModuleId(value)
     }
@@ -126,12 +128,12 @@ function WaebricModuleParser(){
         var moduleElements = new Array();
         while (this.currentToken != null) {			
 			this.parserStack.addParser('ModuleElement');
-
+			
 			if(!this.currentToken.hasNextToken()){
 				throw new WaebricSyntaxException(this, '"SITE", "DEF" or "IMPORT"', 
 					'Start of a new ModuleElement');
 			}else if (this.isStartImport(this.currentToken)) {
-                var imprt = this.parseImport(this.currentToken.nextToken());
+                var imprt = this.parseImport(this.currentToken.nextToken());				
                 moduleElements.push(imprt);
             } else if (this.siteParser.isStartSite(this.currentToken)) {
 				this.setCurrentToken(this.currentToken.nextToken());
@@ -167,7 +169,6 @@ function WaebricModuleParser(){
 		if(!this.isModuleIdElement(this.currentToken)){
 			throw new WaebricSyntaxException(this, 'Identifier', 'The name of the module to import');
 		}
-		
 		var moduleId = this.parseModuleId(this.currentToken)
 		this.parserStack.removeParser();
         return new Import(moduleId);

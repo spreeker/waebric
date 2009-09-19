@@ -269,10 +269,27 @@ function WaebricExpressionParser(){
 	 * @param {WaebricParserToken} token The token to evaluate
 	 * @return {Boolean}
 	 */
-	this.isStartRecord = function(token){
-	    return (token.value == WaebricToken.SYMBOL.LEFTCBRACKET)
-			&& this.isIdentifier(token.nextToken()) 
-			&& token.nextToken().nextToken().value == WaebricToken.SYMBOL.COLON;
+	this.isStartRecord = function(token){		
+		var hasValidStartSymbol = token.value == WaebricToken.SYMBOL.LEFTCBRACKET
+		if(!hasValidStartSymbol){
+			return false
+		}
+		
+		var hasValidContent = this.isIdentifier(token.nextToken()) 
+			&& token.nextToken().nextToken().value == WaebricToken.SYMBOL.COLON;			
+		if (hasValidContent) {			
+			return true;
+		}
+		
+		var isEmptyRecordList = token.nextToken().value == WaebricToken.SYMBOL.RIGHTCBRACKET;
+		if(isEmptyRecordList){
+			var tokenAfterList =  token.nextToken().nextToken();			
+			var nextTokenIsKeyword = WaebricToken.KEYWORD.contains(tokenAfterList.value.value);
+			var nextTokenIsIdCon = tokenAfterList.value instanceof WaebricToken.IDENTIFIER;
+			return !nextTokenIsKeyword && !nextTokenIsIdCon;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -364,6 +381,24 @@ function WaebricExpressionParser(){
 	    } else {
 	        return token.nextToken();
 	    }
+	}
+	
+	/**
+	 * Returns the token that follows a record, list, concatentation or fieldexpression.
+	 * Nested records or lists are ignored
+	 *
+	 * @param {WaebricParserToken} token Start token of Expression
+	 * @return {WaebricParserToken} The token that follows the record or list
+	 */
+	this.getTokenAfterExpression3 = function(token){
+	    var newToken = this.getTokenAfterExpression(token);
+		if(newToken.value == WaebricToken.SYMBOL.DOT){
+			return this.getTokenAfterExpression3(newToken.nextToken())
+		}else if(newToken.value == WaebricToken.SYMBOL.PLUS){
+			return this.getTokenAfterExpression3(newToken.nextToken())
+		}else{
+			return newToken;
+		}
 	}
 	
 	/**

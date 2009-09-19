@@ -113,7 +113,6 @@ function WaebricStatementParser(){
 			if (this.currentToken.hasNextToken()) {
 				this.setCurrentToken(this.currentToken.nextToken());
 			}else{
-				print(this.currentToken.value.position)
 				this.currentToken.value.value = 'EOF (End of File)'
 				throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'Closing function definition');
 			}
@@ -550,7 +549,7 @@ function WaebricStatementParser(){
         if (isMarkupStatement) {
             return false;
         }
-        
+		        
         var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(tokenAfterMarkup);
 		var lastMarkup = this.markupParser.getLastMarkup(token);
         var hasMarkupClosing = !this.expressionParser.isExpression(tokenAfterMarkups) 
@@ -672,26 +671,43 @@ function WaebricStatementParser(){
      * @param {WaebricParserToken} token The token to evaluate
      * @return {MarkupExpressionStatement}
      */
-    this.isMarkupExpressionStatement = function(token){		
-        var hasValidMarkup = token.value instanceof WaebricToken.IDENTIFIER;
-        if (!hasValidMarkup) {
+    this.isMarkupExpressionStatement = function(token){
+		//Check first token
+        var firstTokenIsMarkup = token.value instanceof WaebricToken.IDENTIFIER;
+        if (!firstTokenIsMarkup) {
             return false
-        };
-        
-        var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(token);
-        var hasNoClosingAfterMarkups = (tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON);
+        }
+		
+		//Retrieve tokens
+        var tokenAfterMarkups = this.markupParser.getTokenAfterMarkups(token);		
 		var lastMarkup = this.markupParser.getLastMarkup(token);
-        var hasExpressionAfterMarkup = hasNoClosingAfterMarkups && tokenAfterMarkups != null && this.expressionParser.isExpression(tokenAfterMarkups);
+		var hasTokenAfterMarkup = tokenAfterMarkups.value != WaebricToken.SYMBOL.SEMICOLON;	
+		
+		//Token after markup may be an expression
+        var hasExpressionAfterMarkup = hasTokenAfterMarkup && tokenAfterMarkups != null &&this.expressionParser.isExpression(tokenAfterMarkups);		
+		if(hasExpressionAfterMarkup){
+			var tokenAfterExpression = this.expressionParser.getTokenAfterExpression(tokenAfterMarkups);
+			var isStartRecord = tokenAfterExpression.value == WaebricToken.SYMBOL.SEMICOLON;
+			var isFieldExpression = tokenAfterExpression.value == WaebricToken.SYMBOL.DOT;
+			var isCatExpression = tokenAfterExpression.value == WaebricToken.SYMBOL.PLUS;
+			return isStartRecord || isFieldExpression || isCatExpression
+		}
+		
+		//Last markup may be start of an expression
+        var lastMarkupStartsExpr = lastMarkup != null && this.expressionParser.isExpression(lastMarkup);
+		if(lastMarkupStartsExpr){			
+			var tokenAfterExpression = this.expressionParser.getTokenAfterExpression3(lastMarkup);
+			return (tokenAfterExpression.value == WaebricToken.SYMBOL.SEMICOLON);		
+		}
+		
+		//Token after markup may be an identifier
 		var hasIdentifierAfterMarkup = lastMarkup != null && !this.markupParser.isMarkupCall(lastMarkup);
+		if(hasIdentifierAfterMarkup){
+			return (tokenAfterMarkups.value == WaebricToken.SYMBOL.SEMICOLON);			
+		}
 		
-		var tokenAfterExpression = this.expressionParser.getTokenAfterExpression(tokenAfterMarkups);
-		var hasValidClosingExpression = hasExpressionAfterMarkup 
-			&& (tokenAfterExpression.value == WaebricToken.SYMBOL.SEMICOLON || tokenAfterExpression.value == WaebricToken.SYMBOL.DOT)
-		var hasValidClosingIdentifier = hasIdentifierAfterMarkup && tokenAfterMarkups.value == WaebricToken.SYMBOL.SEMICOLON
-        var result = (hasExpressionAfterMarkup && hasValidClosingExpression) || (hasValidClosingIdentifier && hasIdentifierAfterMarkup);
-		
-		return result
-    }
+		return false;
+    }		
     		
 	/**
 	 * Parses the input to a {MarkupMarkupStatement}

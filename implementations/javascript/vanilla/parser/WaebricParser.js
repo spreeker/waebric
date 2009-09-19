@@ -18,6 +18,7 @@
 function WaebricParser(){
 	
 	var exceptionList = new Array();	
+	var allParsedModules = new Array();
 	
 	/**
 	 * Parses the program source
@@ -28,7 +29,7 @@ function WaebricParser(){
 	this.parse = function(path){
 		var fileExists = (new File(path)).exists();
 		if (fileExists) {
-			var module = parseModule(path);
+			var module = parseModule(path);			
 			return new WaebricParserResult(module, exceptionList);	
 		}else{
 			throw new NonExistingModuleException(path);
@@ -41,46 +42,33 @@ function WaebricParser(){
 	 * @param {String} path The path of the Waebric program
 	 * @return {Module}
 	 */
-	function parseModule(path){
+	function parseModule(path, parentModule){
 		try {
-			//Get Waebric program	
-			//print('\n---- Loading ' + path)
+			print('---- Parsing module ' + path)
+			//Get Waebric program
+			//fileloaderTimer.start();
 			var programSource = getSourceWaebricProgram(path);
+			//fileloaderTimer.stop();
 			
-			//Tokenize the module		
-			//print('---- Tokenizing ' + path)			
-			
+			//Tokenize the module					
+			//lexicalTimer.start();
 			var tokenizerResult = WaebricTokenizer.tokenize(programSource, path);
+			//lexicalTimer.stop();
 			
 			//Parse the tokenizerResult to a Module
-			//print('---- Parsing ' + path)
-			var module = WaebricRootParser.parse(tokenizerResult, path)
-			
+			//syntacticTimer.start();
+			var module = WaebricRootParser.parse(tokenizerResult, path)			
+			module.parent = parentModule;
+			allParsedModules.push(module);
+
 			//Parse the dependencies
 			module.dependencies = parseDependencies(path, module);
+			
+			//syntacticTimer.stop();
 			return module;
-		}catch(exception){
-			print('---- Parsing/tokenizing failed!\n')	
+		}catch(exception){	
 			throw exception;
 		}
-	}
-	
-	/**
-	 * Outputs the result of the tokenizer
-	 * 
-	 * @param {Array} tokens An array of {WaebricToken}
-	 */	
-	function writeTokenizerResult(tokens){
-		var text = ""
-		for(tokenIndex in tokens){		
-			token = (tokens[tokenIndex])	
-			text += (token.type + ' : ' + token.value + '\n');
-		}
-		
-		var fw = new FileWriter('output_scanner.txt');
-		var bf = new BufferedWriter(fw);
-		bf.write(text);
-		bf.close();
 	}
 	
 	/**
@@ -90,22 +78,59 @@ function WaebricParser(){
 	 * @param {Module} parentModule The module for which the transitive dependencies will be returned
 	 * @return {Array} An array of {Module} elements
 	 */
-	function parseDependencies(parentPath, parentModule){				
+	function parseDependencies(parentPath, parentModule){		
 		var dependencies = new Array();		
-		for (var i = 0; i < parentModule.imports.length; i++) {			
+		for (var i = 0; i < parentModule.imports.length; i++) {
 			var dependency = parentModule.imports[i];
-			var dependencyPath = getDependencyPath(parentPath, dependency);
-			var fileExists = (new File(dependencyPath)).exists();
-			if (fileExists) {
-				var dependencyModule = parseModule(dependencyPath)
-				dependencies.push(dependencyModule)
-			}else{
-				print('---- Loading failed!')					
-				exceptionList.push(new NonExistingModuleException(dependencyPath));
-			}					
+			if (!isCyclicImport(dependency.moduleId.toString(), parentModule)) {
+				var parsedDependency = parseDependency(dependency, parentPath, parentModule);
+				dependencies.push(parsedDependency);
+			}				
 		}
 		return dependencies;
 	}
+	
+	function isCyclicImport(importName, parentModule){
+		if(parentModule.parent != null){
+			if(parentModule.parent.moduleId.toString() == importName){
+				return true;
+			}else{
+				return isCyclicImport(importName, parentModule.parent);
+			}
+		}
+		return false
+	}
+	
+	function parseDependency(dependency, parentPath, parentModule){				
+		var existingModule = getExistingModule(dependency.moduleId);
+		if (existingModule) {	
+			existingModule.parent = parentModule;
+			return existingModule;
+		} else {
+			var dependencyPath = getDependencyPath(parentPath, dependency);
+			return parseNewDependency(dependencyPath, parentModule);
+		}			
+	}
+	
+	function parseNewDependency(dependencyPath, parentModule){
+		var fileExists = (new File(dependencyPath)).exists();
+		if (fileExists) {
+			return parseModule(dependencyPath, parentModule)
+		} else {
+			exceptionList.push(new NonExistingModuleException(dependencyPath));
+			return null;
+		}
+	}
+	
+	function getExistingModule(moduleId){
+		for(var i = 0; i < allParsedModules.length; i++){
+			var parsedDependency = allParsedModules[i];
+			if(moduleId.toString() == parsedDependency.moduleId.toString()){
+				return parsedDependency;
+			}
+		}
+		return null;
+	}	
 	
 	/**
 	 * Returns the path of the dependency based on the parentpath
@@ -124,7 +149,6 @@ function WaebricParser(){
 
 		//Determine relative path of dependency towards file system
 		var path = directoryParent + directoryDependency + ".wae"
-		
 		return path;
 	}
 	
@@ -182,8 +206,12 @@ function WaebricParser(){
  */
 WaebricParser.parse = function(path){
 	try {
-		var parser = new WaebricParser();
-		return parser.parse(path);
+		var parser = new WaebricParser();		
+		var result = parser.parse(path);		
+		//lexicalTimer.write(reportPath, ";")
+		//syntacticTimer.write(reportPath, ";")
+		//fileloaderTimer.write(reportPath, ";")
+		return result;
 	}catch(exception if exception instanceof WaebricParserException){
 		throw exception;
 	}catch(exception){

@@ -80,7 +80,6 @@ function WaebricSiteParser(){
             //Check mapping ending
             var hasSemicolonEnding = this.currentToken != null && WaebricToken.SYMBOL.SEMICOLON.equals(this.currentToken.value);				
             if (hasSemicolonEnding) {
-				print('2')
 				var hasEndEnding = !this.currentToken.hasNextToken() || WaebricToken.KEYWORD.END.equals(this.currentToken.nextToken().value)
 				if (hasEndEnding) {
 					throw new WaebricSyntaxException(this, WaebricToken.KEYWORD.END, 'Closing of last Site Mapping should be end');

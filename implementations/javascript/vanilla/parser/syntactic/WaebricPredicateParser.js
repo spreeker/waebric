@@ -55,14 +55,13 @@ function WaebricPredicateParser(){
         //Parse SINGLE predicates
         if (this.isNotPredicate(this.currentToken.value)) {
             predicate = this.parseNotPredicate(this.currentToken.nextToken());
-        } else if (this.expressionParser.isExpression(this.currentToken)) {
-            predicate = this.expressionParser.parse(this)
-            
-            //If the expression is followed by a question mark, then this is a predicate of type "is-a-predicate"
-            if (this.isEndPredicateType(this.currentToken.nextToken())) {
-                var type = this.parsePredicateType(this.currentToken);
-                predicate = new IsAPredicate(predicate, type)
-            }
+        } else if (this.expressionParser.isExpression(this.currentToken)) {	
+			var tokenAfterExpression = this.expressionParser.getTokenAfterExpression3(this.currentToken);
+            if (this.isEndPredicateType(tokenAfterExpression)) {
+                predicate = this.parsePredicateType(this.currentToken, tokenAfterExpression)
+            }else{
+				predicate = this.expressionParser.parse(this)
+			}
         }
         
         //Parse AND and OR predicates
@@ -116,26 +115,30 @@ function WaebricPredicateParser(){
      * @param {WaebricParserToken} token The token to parse
      * @return {PredicateType}
      */
-    this.parsePredicateType = function(token){
+    this.parsePredicateType = function(token, tokenAfterExpression){
         this.parserStack.addParser('IsAPredicate');
-		this.setCurrentToken(token);  
-        
-		var type;
-        switch (this.currentToken.value.toString()) {
+		this.setCurrentToken(token); 
+		
+		var expression = this.expressionParser.parse(this).expression
+		
+		var type;		
+        switch (tokenAfterExpression.previousToken().value.toString()) {
             case "list":
-                this.setCurrentToken(token.nextToken());
                 type = new ListType();
+				break;
             case "record":
-                this.setCurrentToken(token.nextToken());
                 type = new RecordType();
+				break;
             case "string":
-	            this.setCurrentToken(token.nextToken());
                 type = new StringType();
+				break;
             default:
 				throw new WaebricSyntaxException(this, '"list", "record" or "string"', 'Predicate type to evaluate an expression');
         }
+		
+		this.setCurrentToken(tokenAfterExpression);
 		this.parserStack.removeParser();
-		return type;
+		return new IsAPredicate(expression, type);
     }
     
     /**
