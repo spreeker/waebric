@@ -24,7 +24,7 @@ String =  r'"[^\n"\\]*(?:\\.[^\n"\\]*)*"'
 
 embed = r'<.*' + group('>', r'\n')
 
-ContStr = r'"[^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('"', r'\n', r'<')
+ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('"', r'\n', r'<')
 ContEmb = r'<[^\n<>\\]*(?:\\.[^\n<>\\]*)*' + group('>', r'\n')
 ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
 
@@ -41,7 +41,7 @@ endcomment = re.compile(r'[^*\\]*(?:\\.[^*\\]*)*\*/')
 # one line comment
 Comment = r'//[^\r\n]*'
 
-Operator = r"[/+%&|^`=?]"
+Operator = r"[+%&|^`=?]"
 
 Bracket = r'[][(){}]'
 Special = group(r'\r?\n', r'[:;.,@]')
@@ -100,6 +100,7 @@ def generate_tokens(readline):
     namechars, numchars = string.ascii_letters + '_', '0123456789'
     contemb, contstr, contcomment =  '', '', ''
     contline = None
+    postembed = False
 
     while 1:                                   # loop over lines in stream
         try :
@@ -116,12 +117,17 @@ def generate_tokens(readline):
             endmatch = endprog.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
-                if line[end-1] == '<':         # embedding
+                if line[end] == '<':         # embedding
+                    pos = end = end-1
                     yield (PRESTRING, contstr + line[:end],
+                            strstart, (lnum,end), contline + line)
+                if postembed:
+                    yield (POSTSTRING, contstr + line[:end],
                             strstart, (lnum,end), contline + line)
                 else:
                     yield (STRING, contstr + line[:end],
                            strstart, (lnum, end), contline + line)
+                postembed = False
                 contstr = ''
                 contline = None
             else :
@@ -153,8 +159,8 @@ def generate_tokens(readline):
                 contemb = ''
                 contline = None
             else:
-                contemb = ''
-                conline = None
+                contemb = contemb + line
+                conline = conline +  line
         elif parenlev == 0 :  # new statement
             if not line: break
             column = 0
@@ -193,7 +199,10 @@ def generate_tokens(readline):
                     else :                                 # ordinary comment
                         yield( COMMENT, token, spos, epos, line)
                         continue
-                elif initial in "\"":
+                elif initial in "\"" or initial in ">":
+                    if initial in ">":
+                        start = start + 1
+                        postembed = True
                     if token[-1] == '\n':                  # continued string
                         print "multiline string"
                         strstart = (lnum, start)
@@ -201,8 +210,12 @@ def generate_tokens(readline):
                         contline = line
                         break
                     elif token[-1] == '<':                 # embedding
-                        pos = pos - 1
-                        yield(PRESTRING, token[:-1], spos, (lnum, pos), line)
+                        pos = pos - 1 # Enable recognizeing strt point embed.
+                        token = token[:-1]
+                        if postembed: token = token[1:]
+                        yield(PRESTRING, token, spos, (lnum, pos), line)
+                    elif initial in ">":
+                        yield (POSTSTRING, token[1:], spos, (lnum, pos), line)
                     else:                                  # ordinary string
                         yield (STRING, token, spos, epos, line)
                 elif initial in "<":
@@ -212,10 +225,9 @@ def generate_tokens(readline):
                         contemb  = line[start:]
                         contline = line
                         break
-                    else:
+                    elif token[-1] == '>':
                         yield (EMBSTRING, token, spos, epos, line)
-                        poststring = True
-                elif 
+                        pos = pos - 1 # Enables recognizing post embed string
                 elif initial in namechars:                 # ordinary name
                     yield (NAME, token, spos, epos, line)
                 else:
