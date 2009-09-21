@@ -68,4 +68,6 @@ load("../vanilla/interpreter/WaebricInterpreterException.js");
 load('../vanilla/interpreter/WaebricInterpreterResult.js');
 load("../vanilla/interpreter/WaebricInterpreterVisitor.js");
 load('../vanilla/interpreter/DOM.js');
+
+load('../vanilla/WaebricConverter.js');
 load('env.rhino.js')
