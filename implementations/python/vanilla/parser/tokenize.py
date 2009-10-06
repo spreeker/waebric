@@ -210,7 +210,7 @@ def generate_tokens(readline):
                         contline = line
                         break
                     elif token[-1] == '<':                 # embedding
-                        pos = pos - 1 # Enable recognizeing strt point embed.
+                        pos = pos - 1 # Enable recognizeing start point embed.
                         token = token[:-1]
                         if postembed: token = token[1:]
                         yield(PRESTRING, token, spos, (lnum, pos), line)
