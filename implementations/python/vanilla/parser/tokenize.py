@@ -2,12 +2,6 @@
 import string, re
 from token import *
 
-COMMENT = N_TOKENS
-tok_name[COMMENT] = 'COMMENT'
-NL = N_TOKENS + 1
-tok_name[NL] = 'NL'
-N_TOKENS += 2
-
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def any(*choices): return group(*choices) + '*'
 def maybe(*choices): return group(*choices) + '?'

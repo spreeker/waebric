@@ -7,13 +7,15 @@ PRESTRING = 4
 EMBSTRING = 5
 POSTSTRING = 6
 NEWLINE = 7
-LPAR = 8
-RPAR = 9
-LSQB = 10
-RSQB = 11
-COLON = 12
-COMMA = 13
-SEMI = 14
+NL = 8
+LPAR = 9
+RPAR = 10
+LSQB = 11
+RSQB = 12
+COLON = 13
+COMMA = 14
+SEMI = 15
+COMMENT = 16
 #PLUS
 #MINUS
 #STAR
@@ -47,7 +49,7 @@ SEMI = 14
 
 OP = 40
 ERRORTOKEN = 50
-N_TOKENS = 15
+N_TOKENS = 17
 
 tok_name = {}
 for _name, _value in globals().items():
