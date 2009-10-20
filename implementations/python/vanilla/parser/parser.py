@@ -19,26 +19,30 @@ keywords = {'IF':'if', 'ELSE':'else',
             'LIST':'list', 'RECORD':'record', 'STRING':'string',
             }
 
+
 def logToken(type, token, (srow, scol), (erow, ecol), line):
     logging.debug("%d,%d-%d,%d:\t%s\t%s" % \
         (srow, scol, erow, ecol, tok_name[type], repr(token)))
 
 
+class UnexpectedToken(Exception):
 
-class UnexpectedToken(Exception): 
-
-    def __init__(self, *args):
+    def __init__(self, token):
         logging.debug("raised exception")
-        logToken(*args) 
+        logToken(*token)
+
 
 class AbstractParser():
 
-    exceptions = []
-    currentToken = ""
-    peekedTokens = [] 
+    tokens = []
+    peekedTokens = []
+    currentToken = []
 
-    def __init__(self,tokenIterator):
-        self.tokens = tokenIterator
+    def __init__(self, Parser=None):
+        if Parser:
+            self.tokens = Parser.tokens
+            self.peekedTokens = Parser.peekedTokens
+            self.currentToken = Parser.currentToken
 
     def matchLexeme(self, lexeme):
         """ return boolean if current token matches lexeme """
@@ -53,19 +57,30 @@ class AbstractParser():
     def check(self, name, syntax, tokensort=None, lexeme=None):
         """ check if current token is tokensort of lexeme """
         if lexeme:
-           logToken(*self.currentToken)
            if not self.currentToken[1] == lexeme:
-                raise UnexpectedToken(*self.currentToken)
-        elif tokensort:
+                raise UnexpectedToken(self.currentToken)
+        if tokensort:
             if not self.currentToken[0] == tokensort:
-                raise UnexpectedToken(*self.currentToken)
+                raise UnexpectedToken(self.currentToken)
 
-    def peek(self, x=1):
+    def peek(self, name, syntax, x=1, tokensort=None, lexeme=None):
+        """ lookahead x tokens in advance, returns true if tokensort of lexeme
+            matches
+        """
+        x = x - len(self.peekedTokens)
 
-        for i in range(x):
-            peekedTokens.append(self.tokens.next())
+        if x > 0:
+            for i in range(x):
+                self.peekedTokens.append(self.tokens.next())
 
-        return peekedTokens[x-1]
+        peekToken = self.peekedTokens[x-1]
+        if tokensort:
+            if not peektoken[0] == tokensort:
+                return False
+        if lexeme:
+            if not peektoken[1] == lexeme:
+                return False
+        return True
 
     def next(self, name="", syntax="", tokensort=None, lexeme=None):
         """
@@ -73,24 +88,19 @@ class AbstractParser():
         checks if next token matches tokensort of lexeme.
         """
         if self.peekedTokens:
-            currentToken = self.peekedTokens.pop(0)
+            self.currentToken = self.peekedTokens.pop(0)
         else:
-            currentToken = self.tokens.next()
+            self.currentToken = self.tokens.next()
 
         if tokensort or lexeme:
             self.check(name, syntax, tokensort, lexeme)
 
         if DEBUG:
-            tokenize.printtoken(*self.currentToken)
+            logToken(*self.currentToken)
 
         if self.matchTokensort(NEWLINE):
             return self.next(name,syntax,tokensort,lexeme)
 
-        return self.currentToken
-
-    def current(self, name, syntax, tokensort=None, lexeme=None):
-        """ Get current token.  """
-        self.check(name, syntax, tokensort, lexeme)
         return self.currentToken
 
     def __repr__(self):
@@ -99,21 +109,15 @@ class AbstractParser():
 
 
 class WaebricParser(AbstractParser):
-    """ Parse a waberic file. Start the root to the AST."""
-
+    """ start the parsing!"""
     def parse(self):
+        logging.debug('start parsing tokens')
         module = ModuleParser(self)
         module.parseModule()
 
 
 class ModuleParser(AbstractParser):
     """ Parse module stmt defined in module """
-
-    def __init__(self, Parser):
-        self.tokens = Parser.tokens
-        self.currentToken = Parser.currentToken
-        self.siteParser = SiteParser(tokens)
-        self.functionParser = FunctionParser(tokens)
 
     def parseModule(self):
         """parse module statements """
@@ -127,13 +131,14 @@ class ModuleParser(AbstractParser):
         # parse for Site , Function and Import statements
         while(self.next()):
             if self.matchLexeme(keywords['IMPORT']):
-                site = SiteParser(self.tokens)
+                imports = ImportParser(self.tokens)
                 logging.debug("parsing IMPORT")
             elif self.matchLexeme(keywords['DEF']):
-                function = FunctionParser(self.tokens)
+                function = FunctionParser(self)
+                function.parseFunction()
                 logging.debug("parsing Function")
             elif self.matchLexeme(keywords['SITE']):
-                site = SiteParser(self.tokens)
+                site = SiteParser(self)
                 logging.debug("parsing SITE")
                 site.parseSite()
             elif self.matchTokensort(NL):
@@ -153,19 +158,18 @@ class ModuleParser(AbstractParser):
             try:
                 self.check("DOT", ".", lexeme=".")
                 self.next("Module Identifier", "head:[azAZ] body:[azAZ09]", tokensort=NAME)
+                moduleID.append(self.currentToken)
             except UnexpectedToken :
                 break
-
-        return moduleID
 
 
 class SiteParser(AbstractParser):
     """ Parse Site function defined in module."""
 
     def parseSite(self):
-        """ parse site """
-        #
-        tokenize.printtoken(*self.currentToken)
+        # AST
+        logging.debug('parse site')
+        logToken(*self.currentToken)
         self.check("Site Defenition", "Site begin, Mapping, end", lexeme=keywords['SITE'])
         # check mapping
         self.parseMapping()
@@ -175,13 +179,26 @@ class SiteParser(AbstractParser):
         """ parse content in between site and end."""
 
         while(self.next()):
-            if self.current[1].equals(keywords['END']):
+            if self.matchLexeme(keywords['END']):
+                return
+
+        # if site is not ending with an end we might end up here.
+        raise UnexpectedToken(self.currentToken)
+
+
+class FunctionParser(AbstractParser):
+
+    def parseFunction(self):
+        logging.debug('parse function')
+
+        self.matchLexeme(keywords['DEF'])
+
+        while(self.next()):
+            #TODO staments of all sorts...
+            if self.matchLexeme(keywords['END']):
                 return
 
         raise UnexpectedToken(self.currentToken)
-
-class FunctionParser(AbstractParser):
-    pass
 
 
 class ExpressionParser(AbstractParser):
@@ -206,7 +223,8 @@ class MarkupParser(AbstractParser):
 
 def parse(source):
     tokens = tokenize.generate_tokens(source)
-    parser = WaebricParser(tokens)
+    parser = WaebricParser()
+    parser.tokens = tokens
     parser.parse()
 
 if __name__ == '__main__':                     # testing
