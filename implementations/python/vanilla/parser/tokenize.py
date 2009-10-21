@@ -14,20 +14,18 @@ Decnumber = r'[1-9]\d*'
 Pointfloat = group(r'\d+\.\d*', r'\.\d+')
 Number = group(Pointfloat, Decnumber)
 
-String =  r'"[^\n"\\]*(?:\\.[^\n"\\]*)*"'
-
 embed = r'<.*' + group('>', r'\n')
 
-ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('"', r'\n', r'<')
+ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('<', r'\n', r'"')
 ContEmb = r'<[^\n<>\\]*(?:\\.[^\n<>\\]*)*' + group('>', r'\n')
 ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
 
-# Tail end of " string.
-endString = r'[^"\\]*(?:\\.[^"\\]*)*' + group('"', '<')
-# Tail end of < string.
-endEmbed = r'[^><\\]*(?:\\.[^<>\\]*)*' + group('>')
+preString = r'[^"\\]*(?:\\.[^"\\]*)*<'
+endString = r'[^"\\]*(?:\\.[^"\\]*)*"'
+endEmbed = r'[^><\\]*(?:\\.[^<>\\]*)*>'
 
-endprog = re.compile(endString)
+end_string = re.compile(endString)
+pre_string = re.compile(preString)
 endembed = re.compile(endEmbed)
 
 # continued comment
@@ -40,10 +38,6 @@ Operator = r"[+%&|^`=?]"
 Bracket = r'[][(){}]'
 Special = group(r'\r?\n', r'[:;.,@]')
 Funny = group( Bracket, Special, Operator )
-
-Ignore = Whitespace + any(r'\\\r?\n' + Whitespace) + maybe(Comment)
-PlainToken = group(Number, Funny, String, Name)
-Token = Ignore + PlainToken
 
 PseudoExtras = group(r'\\\r?\n', Comment, )
 PseudoToken = Whitespace + group(PseudoExtras, Number, Funny , Name,
@@ -108,14 +102,17 @@ def generate_tokens(readline):
         if contstr:                            # continued string
             if not line:
                 raise TokenError, ("EOF in multi-line string", strstart)
-            endmatch = endprog.match(line)
+
+            endmatch = pre_string.match(line) # pre string of an embedding
+            if not endmatch:
+                endmatch = end_string.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
-                if line[end] == '<':         # embedding
+                if line[end-1] == '<':         # embedding
                     pos = end = end-1
                     yield (PRESTRING, contstr + line[:end],
                             strstart, (lnum,end), contline + line)
-                if postembed:
+                elif postembed:
                     yield (POSTSTRING, contstr + line[:end],
                             strstart, (lnum,end), contline + line)
                 else:
