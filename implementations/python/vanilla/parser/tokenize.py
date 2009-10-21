@@ -30,7 +30,7 @@ endembed = re.compile(endEmbed)
 
 # continued comment
 endcomment = re.compile(r'[^*\\]*(?:\\.[^*\\]*)*\*/')
-# one line comment
+# single comment line
 Comment = r'//[^\r\n]*'
 
 Operator = r"[+%&|^`=?]"
@@ -149,6 +149,7 @@ def generate_tokens(readline):
                         embstart, (lnum, end), contline + line)
                 contemb = ''
                 contline = None
+                pos = pos - 1 # Enables recognizing post embed string
             else:
                 contemb = contemb + line
                 conline = conline +  line
@@ -203,7 +204,6 @@ def generate_tokens(readline):
                     elif token[-1] == '<':                 # embedding
                         pos = pos - 1 # Enable recognizeing start point embed.
                         token = token[:-1]
-                        if postembed: token = token[1:]
                         yield(PRESTRING, token, spos, (lnum, pos), line)
                     elif initial in ">":
                         yield (POSTSTRING, token[1:], spos, (lnum, pos), line)
