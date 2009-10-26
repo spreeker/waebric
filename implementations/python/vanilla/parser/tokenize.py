@@ -50,6 +50,11 @@ def printtoken(type, token, (srow, scol), (erow, ecol), line): # for testing
     print "%d,%d-%d,%d:\t%s\t%s" % \
         (srow, scol, erow, ecol, tok_name[type], repr(token))
 
+def tokentostring(type, token, (srow, scol), (erow, ecol), line): # for testing
+    return "%d,%d-%d,%d:\t%s\t%s" % \
+        (srow, scol, erow, ecol, tok_name[type], repr(token))
+
+
 class TokenError(Exception): pass
 
 def tokenize(readline, tokeneater=printtoken):
@@ -158,7 +163,7 @@ def generate_tokens(readline):
             column = 0
 
             if line[pos] in '\r\n':           # skip blank lines
-                yield (NL, line[pos:], (lnum, pos), (lnum, len(line)), line)
+                #yield (NL, line[pos:], (lnum, pos), (lnum, len(line)), line)
                 continue
 
         else :                                # continued statement
@@ -176,14 +181,15 @@ def generate_tokens(readline):
                    (initial == '.' and token != '.'):      # ordinary number
                     yield (NUMBER, token, spos, epos, line)
                 elif initial in '\r\n':
-                    yield (parenlev > 0 and NL or NEWLINE,
-                               token, spos, epos, line)
+                    #yield (parenlev > 0 and NL or NEWLINE,
+                    #           token, spos, epos, line)
+                    break
                 elif initial == '/' and token[:2] == '//': # comment
                     yield (COMMENT, token, spos, epos, line)
                     continue
                 elif initial == '/' and token[:2] == '/*':
                     if token[-1] == '\n':                  # multiline comment
-                        print "multiline comment"
+                        #print "multiline comment"
                         contline = line
                         commentstart = (lnum, start)
                         contcomment = line[start:]
@@ -196,7 +202,7 @@ def generate_tokens(readline):
                         start = start + 1
                         postembed = True
                     if token[-1] == '\n':                  # continued string
-                        print "multiline string"
+                        #print "multiline string"
                         strstart = (lnum, start)
                         contstr = line[start:]
                         contline = line
@@ -211,7 +217,7 @@ def generate_tokens(readline):
                         yield (STRING, token, spos, epos, line)
                 elif initial in "<":
                     if token[-1] == '\n':                  # multiline embed
-                        print "multiline embed"
+                        #print "multiline embed"
                         embstart = (lnum, start)
                         contemb  = line[start:]
                         contline = line

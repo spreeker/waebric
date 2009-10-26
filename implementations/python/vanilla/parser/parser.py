@@ -4,6 +4,9 @@ import tokenize
 from token import *
 
 DEBUG = True
+SHOWTOKENS = False
+SHOWPARSER = True
+
 if DEBUG:
     LOG_FILENAME = 'parser logging.out'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
@@ -27,12 +30,19 @@ def logToken(type, token, (srow, scol), (erow, ecol), line):
 
 class UnexpectedToken(Exception):
 
-    def __init__(self, token):
-        logging.debug("raised exception")
+    def __init__(self, token, expected=""):
+        self.token = token
+        self.expected = expected
+        logging.debug("raised exception %s")
         logToken(*token)
+        tokenize.printtoken(*token)
+        logging.debug("expected: %s" % expected)
+
+    def __str__(self):
+        return tokenize.tokentostring(*self.token)
 
 
-class AbstractParser():
+class Parser(object):
 
     tokens = []
     peekedTokens = []
@@ -43,6 +53,9 @@ class AbstractParser():
             self.tokens = Parser.tokens
             self.peekedTokens = Parser.peekedTokens
             self.currentToken = Parser.currentToken
+
+            if DEBUG and SHOWPARSER:
+                logging.debug(type(self))
 
     def matchLexeme(self, lexeme):
         """ return boolean if current token matches lexeme """
@@ -63,22 +76,25 @@ class AbstractParser():
             if not self.currentToken[0] == tokensort:
                 raise UnexpectedToken(self.currentToken)
 
-    def peek(self, name, syntax, x=1, tokensort=None, lexeme=None):
+    def peek(self, x=1, tokensort=None, lexeme=None):
         """ lookahead x tokens in advance, returns true if tokensort of lexeme
             matches
         """
-        x = x - len(self.peekedTokens)
 
-        if x > 0:
-            for i in range(x):
-                self.peekedTokens.append(self.tokens.next())
+        d = x - len(self.peekedTokens)
+        if d > -1:
+            try:
+                for i in range(d+1):
+                    self.peekedTokens.append(self.tokens.next())
+            except StopIteration:
+                return False
 
         peekToken = self.peekedTokens[x-1]
         if tokensort:
-            if not peektoken[0] == tokensort:
+            if not peekToken[0] == tokensort:
                 return False
         if lexeme:
-            if not peektoken[1] == lexeme:
+            if not peekToken[1] == lexeme:
                 return False
         return True
 
@@ -90,15 +106,19 @@ class AbstractParser():
         if self.peekedTokens:
             self.currentToken = self.peekedTokens.pop(0)
         else:
-            self.currentToken = self.tokens.next()
+            try:
+                self.currentToken = self.tokens.next()
+            except StopIteration:
+                logging.debug(" no next token available ")
+                raise StopIteration
 
         if tokensort or lexeme:
             self.check(name, syntax, tokensort, lexeme)
 
-        if DEBUG:
+        if DEBUG and SHOWTOKENS:
             logToken(*self.currentToken)
 
-        if self.matchTokensort(NEWLINE):
+        if self.matchTokensort(NEWLINE) or self.matchTokensort(NL):
             return self.next(name,syntax,tokensort,lexeme)
 
         return self.currentToken
@@ -108,15 +128,17 @@ class AbstractParser():
         pass
 
 
-class WaebricParser(AbstractParser):
+class WaebricParser(Parser):
     """ start the parsing!"""
     def parse(self):
+        logging.debug("--------------------")
         logging.debug('start parsing tokens')
+        logging.debug("--------------------")
         module = ModuleParser(self)
         module.parseModule()
 
 
-class ModuleParser(AbstractParser):
+class ModuleParser(Parser):
     """ Parse module stmt defined in module """
 
     def parseModule(self):
@@ -135,18 +157,17 @@ class ModuleParser(AbstractParser):
                 logging.debug("parsing IMPORT")
             elif self.matchLexeme(keywords['DEF']):
                 function = FunctionParser(self)
-                function.parseFunction()
                 logging.debug("parsing Function")
+                function.parseFunction()
             elif self.matchLexeme(keywords['SITE']):
                 site = SiteParser(self)
                 logging.debug("parsing SITE")
                 site.parseSite()
-            elif self.matchTokensort(NL):
-                pass
-            elif self.matchTokensort(NEWLINE):
-                pass
+            elif self.matchTokensort(ENDMARKER):
+                return
             else:
-               raise UnexpectedToken(self.currentToken)
+               raise UnexpectedToken(self.currentToken,
+            expected="import, def, site, newline" )
 
     def parseModuleId(self):
         """Parse the module identifier """
@@ -155,21 +176,17 @@ class ModuleParser(AbstractParser):
         self.next("Module Identifier", "head:[azAZ] body:[azAZ09]", tokensort=NAME)
         moduleID.append(self.currentToken)
         while(self.next()):
-            try:
-                self.check("DOT", ".", lexeme=".")
+            if self.peek(x=1, lexeme="."):
                 self.next("Module Identifier", "head:[azAZ] body:[azAZ09]", tokensort=NAME)
                 moduleID.append(self.currentToken)
-            except UnexpectedToken :
-                break
+            else:
+                return
 
-
-class SiteParser(AbstractParser):
+class SiteParser(Parser):
     """ Parse Site function defined in module."""
 
     def parseSite(self):
         # AST
-        logging.debug('parse site')
-        logToken(*self.currentToken)
         self.check("Site Defenition", "Site begin, Mapping, end", lexeme=keywords['SITE'])
         # check mapping
         self.parseMapping()
@@ -183,41 +200,77 @@ class SiteParser(AbstractParser):
                 return
 
         # if site is not ending with an end we might end up here.
-        raise UnexpectedToken(self.currentToken)
+        raise UnexpectedToken(self.currentToken, )
 
 
-class FunctionParser(AbstractParser):
+class FunctionParser(Parser):
 
     def parseFunction(self):
-        logging.debug('parse function')
 
-        self.matchLexeme(keywords['DEF'])
-
+        ## parse identifier
+        ## parse formals
+        ## parser statements.
         while(self.next()):
-            #TODO staments of all sorts...
             if self.matchLexeme(keywords['END']):
                 return
+            if self.peek(x=1,lexeme=keywords['LET']): #should be moved.
+                statement = StatementParser(self)
+                statement.parseStatement()
 
-        raise UnexpectedToken(self.currentToken)
+        raise UnexpectedToken(self.currentToken,)
 
 
-class ExpressionParser(AbstractParser):
+class ExpressionParser(Parser):
     pass
 
 
-class PredicateParser(AbstractParser):
+class PredicateParser(Parser):
     pass
 
 
-class StatementParser(AbstractParser):
+class StatementParser(Parser):
+
+    def parseStatement(self):
+        while(self.next()):
+            if self.matchLexeme(keywords['LET']):
+                logging.debug("parse LET .. IN .. END block")
+                self.parseLetStatement()
+                return
+
+            if self.matchLexeme(keywords['IF']):
+                return
+            if self.matchLexeme(keywords['EACH']):
+                return
+            if self.matchLexeme(keywords['ECHO']):
+                return
+            if self.matchLexeme(keywords['CDATA']):
+                return
+            if self.matchLexeme('}'):
+                return
+
+
+        raise UnexpectedToken(self.currentToken,
+            expected="""statement, "if", "each", "let", "{", "comment",
+                "echo", "cdata", "yield" or Markup""" )
+
+    def parseLetStatement(self):
+        if self.matchLexeme(keywords['LET']):
+            while self.next():
+                if self.matchLexeme(keywords['IN']):
+                    while self.next():
+                        if self.matchLexeme(keywords['END']):
+                            logging.debug("end LET block")
+                            return
+
+            raise UnexpectedToken(self.currentToken,
+                expected = """ LET .. IN .. END """)
+
+    
+class EmbeddingParser(Parser):
     pass
 
 
-class EmbeddingParser(AbstractParser):
-    pass
-
-
-class MarkupParser(AbstractParser):
+class MarkupParser(Parser):
     pass
 
 
