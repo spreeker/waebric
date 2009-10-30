@@ -8,7 +8,7 @@ def maybe(*choices): return group(*choices) + '?'
 
 Whitespace = r'[ \f\t]*'
 
-Name = r'[a-zA-Z_]\w*'
+Name = r'[a-zA-Z_][\w-]*'
 
 Decnumber = r'[1-9]\d*'
 Pointfloat = group(r'\d+\.\d*', r'\.\d+')
@@ -189,7 +189,6 @@ def generate_tokens(readline):
                     continue
                 elif initial == '/' and token[:2] == '/*':
                     if token[-1] == '\n':                  # multiline comment
-                        #print "multiline comment"
                         contline = line
                         commentstart = (lnum, start)
                         contcomment = line[start:]
@@ -202,7 +201,6 @@ def generate_tokens(readline):
                         start = start + 1
                         postembed = True
                     if token[-1] == '\n':                  # continued string
-                        #print "multiline string"
                         strstart = (lnum, start)
                         contstr = line[start:]
                         contline = line

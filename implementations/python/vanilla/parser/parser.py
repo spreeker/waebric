@@ -211,13 +211,10 @@ class FunctionParser(Parser):
         ## parse formals
         ## parser statements.
         while(self.next()):
-            if self.matchLexeme(keywords['END']):
-                return
-            if self.peek(x=1,lexeme=keywords['LET']): #should be moved.
-                statement = StatementParser(self)
-                statement.parseStatement()
+            statement = StatementParser(self)
+            statement.parseStatement()
 
-        raise UnexpectedToken(self.currentToken,)
+        raise UnexpectedToken(self.currentToken, expected="""end""")
 
 
 class ExpressionParser(Parser):
@@ -231,29 +228,39 @@ class PredicateParser(Parser):
 class StatementParser(Parser):
 
     def parseStatement(self):
-        while(self.next()):
+        while self.next():
             if self.matchLexeme(keywords['LET']):
-                logging.debug("parse LET .. IN .. END block")
                 self.parseLetStatement()
                 return
-
             if self.matchLexeme(keywords['IF']):
                 return
-            if self.matchLexeme(keywords['EACH']):
+            elif self.matchLexeme(keywords['EACH']):
                 return
-            if self.matchLexeme(keywords['ECHO']):
+            elif self.matchLexeme(keywords['ECHO']):
                 return
-            if self.matchLexeme(keywords['CDATA']):
+            elif self.matchLexeme(keywords['CDATA']):
                 return
-            if self.matchLexeme('}'):
+            elif self.matchLexeme('}'): #?
                 return
-
+            elif self.matchLexeme('{'): #?
+                return
+            elif self.matchLexeme(keywords['COMMENT']):
+                return
+            elif self.matchLexeme(keywords['YIELD']):
+                return
+            elif self.matchTokensort(NAME):
+                ##markup
+                ##markup can be an expresion, functioncall.
+                return
+            else:
+                break
 
         raise UnexpectedToken(self.currentToken,
             expected="""statement, "if", "each", "let", "{", "comment",
                 "echo", "cdata", "yield" or Markup""" )
 
     def parseLetStatement(self):
+        logging.debug("parse LET .. IN .. END block")
         if self.matchLexeme(keywords['LET']):
             while self.next():
                 if self.matchLexeme(keywords['IN']):
@@ -265,12 +272,20 @@ class StatementParser(Parser):
             raise UnexpectedToken(self.currentToken,
                 expected = """ LET .. IN .. END """)
 
-    
+    def fakeStatement(self):
+        logging.debug("FAKE statement")
+        while self.next():
+                if self.matchLexeme(';'):
+                        return
+
 class EmbeddingParser(Parser):
     pass
 
 
 class MarkupParser(Parser):
+    """
+    this is one of the more ambigious parts.
+    """
     pass
 
 
