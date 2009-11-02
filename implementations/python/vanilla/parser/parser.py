@@ -300,16 +300,22 @@ class StatementParser(Parser):
                 if self.peek(lexeme='('):
                     markup.parseMarkup()
                     pass
-                if self.currentToken( )
+                if self.matchTokensort(EMBEDDING)
                     pass
+                #if self.matchLexeme
+                ##TODO
+
     def isMarkup(self):
         """
+        NEEDED??
         current token is markup if:
         next = name
         next = ()
         next = atributes
         """
         pass
+
+
 class EmbeddingParser(Parser):
     pass
 
