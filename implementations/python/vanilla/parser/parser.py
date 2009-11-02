@@ -4,7 +4,7 @@ import tokenize
 from token import *
 
 DEBUG = True
-SHOWTOKENS = False
+SHOWTOKENS = True
 SHOWPARSER = True
 
 if DEBUG:
@@ -76,7 +76,7 @@ class Parser(object):
             if not self.currentToken[0] == tokensort:
                 raise UnexpectedToken(self.currentToken)
 
-    def peek(self, x=1, tokensort=None, lexeme=None):
+    def peek(self, x=1, tokensort="", lexeme=""):
         """ lookahead x tokens in advance, returns true if tokensort of lexeme
             matches
         """
@@ -89,11 +89,16 @@ class Parser(object):
             except StopIteration:
                 return False
 
+        if "(" in lexeme:
+            logging.debug("I GET HERE")
+
         peekToken = self.peekedTokens[x-1]
         if tokensort:
             if not peekToken[0] == tokensort:
                 return False
         if lexeme:
+            logging.debug("peek lexeme")
+            logToken(*peekToken) 
             if not peekToken[1] == lexeme:
                 return False
         return True
@@ -154,14 +159,11 @@ class ModuleParser(Parser):
         while(self.next()):
             if self.matchLexeme(keywords['IMPORT']):
                 imports = ImportParser(self.tokens)
-                logging.debug("parsing IMPORT")
             elif self.matchLexeme(keywords['DEF']):
                 function = FunctionParser(self)
-                logging.debug("parsing Function")
                 function.parseFunction()
             elif self.matchLexeme(keywords['SITE']):
                 site = SiteParser(self)
-                logging.debug("parsing SITE")
                 site.parseSite()
             elif self.matchTokensort(ENDMARKER):
                 return
@@ -200,7 +202,7 @@ class SiteParser(Parser):
                 return
 
         # if site is not ending with an end we might end up here.
-        raise UnexpectedToken(self.currentToken, )
+        raise UnexpectedToken(self.currentToken, expected="missing site ending END")
 
 
 class FunctionParser(Parser):
@@ -213,8 +215,9 @@ class FunctionParser(Parser):
         while(self.next()):
             statement = StatementParser(self)
             statement.parseStatement()
-
-        raise UnexpectedToken(self.currentToken, expected="""end""")
+            
+        raise UnexpectedToken(self.currentToken,
+                expected="""Missing function ending END""")
 
 
 class ExpressionParser(Parser):
@@ -228,32 +231,30 @@ class PredicateParser(Parser):
 class StatementParser(Parser):
 
     def parseStatement(self):
-        while self.next():
-            if self.matchLexeme(keywords['LET']):
-                self.parseLetStatement()
-                return
-            if self.matchLexeme(keywords['IF']):
-                return
-            elif self.matchLexeme(keywords['EACH']):
-                return
-            elif self.matchLexeme(keywords['ECHO']):
-                return
-            elif self.matchLexeme(keywords['CDATA']):
-                return
-            elif self.matchLexeme('}'): #?
-                return
-            elif self.matchLexeme('{'): #?
-                return
-            elif self.matchLexeme(keywords['COMMENT']):
-                return
-            elif self.matchLexeme(keywords['YIELD']):
-                return
-            elif self.matchTokensort(NAME):
-                ##markup
-                ##markup can be an expresion, functioncall.
-                return
-            else:
-                break
+        if self.matchLexeme(keywords['LET']):
+            self.parseLetStatement()
+            return
+        if self.matchLexeme(keywords['IF']):
+            return
+        elif self.matchLexeme(keywords['EACH']):
+            return
+        elif self.matchLexeme(keywords['ECHO']):
+            return
+        elif self.matchLexeme(keywords['CDATA']):
+            return
+        elif self.matchLexeme('}'): #? should be removed.
+            return
+        elif self.matchLexeme('{'): #? starts a new staments block
+            return
+        elif self.matchLexeme(keywords['COMMENT']):
+            return
+        elif self.matchLexeme(keywords['YIELD']):
+            return
+        elif self.matchTokensort(NAME):
+            logToken(*self.currentToken)
+            markup = MarkupParser(self)
+            markup.parseMarkup()
+            return
 
         raise UnexpectedToken(self.currentToken,
             expected="""statement, "if", "each", "let", "{", "comment",
@@ -263,14 +264,17 @@ class StatementParser(Parser):
         logging.debug("parse LET .. IN .. END block")
         if self.matchLexeme(keywords['LET']):
             while self.next():
+                # parse assignment markup.
                 if self.matchLexeme(keywords['IN']):
+                    #parse statements.
                     while self.next():
                         if self.matchLexeme(keywords['END']):
                             logging.debug("end LET block")
                             return
-
+                    raise UnexpectedToken(self.currentToken,
+                        expected="missing END of LET .. IN .. END block")
             raise UnexpectedToken(self.currentToken,
-                expected = """ LET .. IN .. END """)
+                expected = """LET .. IN .. END, missing IN """)
 
     def fakeStatement(self):
         logging.debug("FAKE statement")
@@ -284,10 +288,75 @@ class EmbeddingParser(Parser):
 
 class MarkupParser(Parser):
     """
-    this is one of the more ambigious parts.
+    p     markup
+    p p   markup variable
+    p p() markup - markup
+    p p p()
     """
-    pass
 
+    def parseMarkup(self):
+        """Differentiate between p and p()"""
+        self.parseDesignator()
+        logging.debug("parse markup")
+        #while loop for markup until ';'
+        if self.peek(lexeme="("):
+            logging.debug("parsing designator")
+            self.parseArguments()
+            return # AST markup call
+        logging.debug(self.peekedTokens)
+        return  #AST markup tag.
+
+    def parseDesignator(self):
+        """ p attributes* markup """
+        self.matchTokensort(NAME)
+        #AST create designator.
+        self.peek()
+        while self.peekedTokens[0][1] in "#$@:%.":
+            self.parseAttributes()
+        return
+
+    def parseAttributes(self):
+        """ # . $ : @ % @ """
+        attributes = []
+
+        while self.next():
+            if self.matchLexeme('#'):
+                self.next(tokensort=NAME)
+                attributes.append(('#', self.currentToken))
+            elif self.matchLexeme('.'):
+                self.next(tokensort=NAME)
+            elif self.matchLexeme('$'):
+                self.next(tokensort=NAME)
+                pass
+            elif self.matchLexeme('@'):
+                self.next(tokensort=NUMBER)
+                #TODO %
+                pass
+            elif self.matchLexeme(':'):
+                self.next(tokensort=NAME)
+                pass
+            else:
+                raise UnexpectedToken(self.currentToken,
+                    expected=" Attribute, # . : @ % ")
+
+
+    def parseArguments(self):
+        """ ( Arguments,* ) """
+        self.next( lexeme='(')
+        while self.next():
+            if self.matchLexeme(')'):
+                return
+            elif self.matchTokensort(NAME):
+                #AST, name argument.
+                self.parseArgument()
+                self.next(lexeme=',')
+
+    def parseArgument(self):
+        """ name = expression || expression"""
+        # check if there is an =. 
+        # check if there 
+        #recursife call back to expression parser
+        pass
 
 def parse(source):
     tokens = tokenize.generate_tokens(source)
