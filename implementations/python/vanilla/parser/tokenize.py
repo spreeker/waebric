@@ -206,9 +206,11 @@ def generate_tokens(readline):
                         contline = line
                         break
                     elif token[-1] == '<':                 # embedding
-                        pos = pos - 1 # Enable recognizeing start point embed.
                         token = token[:-1]
+                        if token[0] == '>':
+                            token = token[1:]
                         yield(PRESTRING, token, spos, (lnum, pos), line)
+                        pos = pos - 1 # Enable recognizeing start point embed.
                     elif initial in ">":
                         yield (POSTSTRING, token[1:], spos, (lnum, pos), line)
                     else:                                  # ordinary string
