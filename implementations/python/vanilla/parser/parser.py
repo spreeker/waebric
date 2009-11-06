@@ -33,10 +33,10 @@ class UnexpectedToken(Exception):
     def __init__(self, token, expected=""):
         self.token = token
         self.expected = expected
-        logging.debug("raised exception %s")
-        logToken(*token)
-        tokenize.printtoken(*token)
-        logging.debug("expected: %s" % expected)
+        #logging.debug("raised exception %s")
+        #logToken(*token)
+        #tokenize.printtoken(*token)
+        #logging.debug("expected: %s" % expected)
 
     def __str__(self):
         return tokenize.tokentostring(*self.token)
@@ -44,11 +44,11 @@ class UnexpectedToken(Exception):
 
 class Parser(object):
 
-    tokens = []
-    peekedTokens = []
-    currentToken = []
-
     def __init__(self, Parser=None):
+        self.tokens = []
+        self.peekedTokens = []
+        self.currentToken = []
+
         if Parser:
             self.tokens = Parser.tokens
             self.peekedTokens = Parser.peekedTokens
@@ -67,17 +67,17 @@ class Parser(object):
         """ return boolen if current token matches tokensort """
         return self.currentToken[0] == tokensort
 
-    def check(self, name, syntax, tokensort=None, lexeme=None):
+    def check(self, expected="", tokensort=None, lexeme=None):
         """ check if current token is tokensort of lexeme """
         if lexeme:
            if not self.currentToken[1] == lexeme:
-                raise UnexpectedToken(self.currentToken)
+                raise UnexpectedToken(self.currentToken, expected=expected)
         if tokensort:
             if not self.currentToken[0] == tokensort:
-                raise UnexpectedToken(self.currentToken)
+                raise UnexpectedToken(self.currentToken, expected=expected)
 
     def peek(self, x=1, tokensort="", lexeme=""):
-        """ lookahead x tokens in advance, returns true 
+        """ lookahead x tokens in advance, returns true
             if tokensort and or lexeme matches peekedtoken.
         """
         d = x - len(self.peekedTokens)
@@ -112,7 +112,7 @@ class Parser(object):
                 raise StopIteration
 
         if tokensort or lexeme:
-            self.check(name, syntax, tokensort, lexeme)
+            self.check("", tokensort, lexeme)
 
         if DEBUG and SHOWTOKENS:
             logToken(*self.currentToken)
@@ -202,6 +202,7 @@ class SiteParser(Parser):
 class FunctionParser(Parser):
 
     def parseFunction(self):
+        self.check(expected="function defenition, def", lexeme=keywords['DEF'])
         self.next(tokensort=NAME)
         ## parse identifier
 
@@ -209,11 +210,13 @@ class FunctionParser(Parser):
 
         ## parser statements.
         while(self.next()):
+            if self.matchLexeme(keywords['END']):
+                return
             statement = StatementParser(self)
             statement.parseStatement()
 
         raise UnexpectedToken(self.currentToken,
-                expected="""Missing function ending END""")
+                expected="""END, Missing function ending END""")
 
 
 class ExpressionParser(Parser):
@@ -268,11 +271,11 @@ class StatementParser(Parser):
             while self.next():
                 #TODO parse assignment markup.
                 if self.matchLexeme(keywords['IN']):
-                    #TODO parse statements.
                     while self.next():
                         if self.matchLexeme(keywords['END']):
                             logging.debug("end LET block")
                             return
+                        self.parseStatement()
                     raise UnexpectedToken(self.currentToken,
                         expected="missing END of LET .. IN .. END block")
             raise UnexpectedToken(self.currentToken,
@@ -284,26 +287,17 @@ class StatementParser(Parser):
         p p;    markup variable
         p p();  markup - markup
         p p p();
-        p "embedding < >"
+        p "embedding < >";
         """
         markup = MarkupParser(self)
-        markup.parseMarkup()
 
-        if self.peek(lexeme=';'):
-            #AST markup statement
-            self.next() # skip ;
-            return
-        # expression, markup(), embedding.
-        else:
-            while self.next():
-                #AST
-                if self.peek(lexeme='('):
-                    markup.parseMarkup()
-                    pass
-                if self.matchTokensort(EMBEDDING)
-                    pass
-                #if self.matchLexeme
-                ##TODO
+        while self.next():
+            markup.parseMarkup()
+            if self.peek(lexeme=';'):
+                self.next() # skip ;
+                return
+        raise UnexpectedToken(self.currentToken,
+                expected =  "Statement ;")
 
     def isMarkup(self):
         """
@@ -331,32 +325,26 @@ class MarkupParser(Parser):
     def parseMarkup(self):
         """Differentiate between p and p()"""
         self.parseDesignator()
-        while self.next():
-            if self.peek(lexeme="("):
-                self.parseArguments()
-
-        if self.peek(lexeme=";"):
-                self.next() # skip ;
-        else:
-           raise UnexpectedToken(self.currentToken,
-                expected="semicolon missing ;")
-
-        return  #AST markup tag.
+        if self.peek(lexeme="("):
+            self.parseArguments()
 
     def parseDesignator(self):
         """ p attributes* markup """
         self.matchTokensort(NAME)
         #AST create designator.
         self.peek()
-        while self.peekedTokens[0][1] in "#$@:%.":
-            self.parseAttributes()
-        return
+        #look for first character possible attribute
+ 
+        if self.peekedTokens:
+                if self.peekedTokens[0][1][0] in "#$@:%.":
+                    self.parseAttributes()
 
     def parseAttributes(self):
         """ # . $ : @ % @ """
         attributes = []
-
-        while self.next():
+        self.peek()
+        while self.peekedTokens[0][1] in "#$@:%.":
+            self.next()
             if self.matchLexeme('#'):
                 self.next(tokensort=NAME)
                 attributes.append(('#', self.currentToken))
@@ -364,14 +352,11 @@ class MarkupParser(Parser):
                 self.next(tokensort=NAME)
             elif self.matchLexeme('$'):
                 self.next(tokensort=NAME)
-                pass
             elif self.matchLexeme('@'):
                 self.next(tokensort=NUMBER)
                 #TODO %
-                pass
             elif self.matchLexeme(':'):
                 self.next(tokensort=NAME)
-                pass
             else:
                 raise UnexpectedToken(self.currentToken,
                     expected=" Attribute, # . : @ % ")
