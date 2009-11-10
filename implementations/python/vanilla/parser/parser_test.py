@@ -89,19 +89,26 @@ class TestParserClasses(unittest.TestCase):
         p.tokens = generate_tokens(gen_line(source))
         self.assertRaises(UnexpectedToken, p.parseFunction)
 
+    def test_site(self):
+
+        def _parse_site(source):
+            p = SiteParser()
+            p.tokens = generate_tokens(gen_line(source))
+            p.next()
+            p.parseSite()
+
+        source = "site dir/dir2/file.ext: startfunction(); end"
+        _parse_site(source)
+
+        badsource = "site nameBLEH"
+        self.assertRaises(UnexpectedToken, _parse_site, badsource)
+        #todo more cases?
+
     def test_markup(self):
+        def _parse_markup(self):
+        
         pass
-##    def test_site(self):
-#        """
-#\        source = """
-#site
-#   site/abonnementen.html: abonnementen();
-#end
-#        """
-#        p = SiteParser()
-#        p.tokens = generate_tokens(gen_line(source))
-#        p.next()
-#        p.parseSite()
+
     def test_statement(self):
         pass
 

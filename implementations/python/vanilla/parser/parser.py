@@ -1,5 +1,7 @@
 import logging
 import tokenize
+import re
+from decorator import decorator
 
 from token import *
 
@@ -23,9 +25,25 @@ keywords = {'IF':'if', 'ELSE':'else',
             }
 
 
-def logToken(type, token, (srow, scol), (erow, ecol), line):
-    logging.debug("%d,%d-%d,%d:\t%s\t%s" % \
-        (srow, scol, erow, ecol, tok_name[type], repr(token)))
+## debug tools.
+
+def strToken(type, token, (srow, scol), (erow, ecol), line):
+    return "%d,%d-%d,%d:\t%s\t%s" % \
+        (srow, scol, erow, ecol, tok_name[type], repr(token))
+
+def logToken(*token):
+    logging.debug(strToken(*token))
+
+
+def _trace(f, *args, **kw):
+    logging.debug("calling %s with args %s, %s" % \
+            (f.__name__, args, kw ))
+    result = f(*args, **kw)
+    logging.debug("exit %s" % f.__name__)
+    return result
+
+def trace(f):
+    return decorator(_trace, f)
 
 
 class UnexpectedToken(Exception):
@@ -33,13 +51,14 @@ class UnexpectedToken(Exception):
     def __init__(self, token, expected=""):
         self.token = token
         self.expected = expected
-        #logging.debug("raised exception %s")
-        #logToken(*token)
-        #tokenize.printtoken(*token)
-        #logging.debug("expected: %s" % expected)
+        logging.debug("raised exception on:")
+        logToken(*token)
+        tokenize.printtoken(*token)
+        logging.debug("expected: %s" % expected)
 
     def __str__(self):
-        return tokenize.tokentostring(*self.token)
+        return "%s expected: %s" % (tokenize.tokentostring(*self.token),
+            self.expected)
 
 
 class Parser(object):
@@ -77,8 +96,8 @@ class Parser(object):
                 raise UnexpectedToken(self.currentToken, expected=expected)
 
     def peek(self, x=1, tokensort="", lexeme=""):
-        """ lookahead x tokens in advance, returns true
-            if tokensort and or lexeme matches peekedtoken.
+        """lookahead x tokens in advance, returns true
+           if tokensort and or lexeme matches peekedtoken.
         """
         d = x - len(self.peekedTokens)
         if d > -1:
@@ -97,7 +116,7 @@ class Parser(object):
                 return False
         return True
 
-    def next(self, name="", syntax="", tokensort=None, lexeme=None):
+    def next(self, expected="", tokensort="", lexeme=""):
         """
         Get the next token, if tokensort or lexeme is defined
         checks if next token matches tokensort of lexeme.
@@ -112,7 +131,8 @@ class Parser(object):
                 raise StopIteration
 
         if tokensort or lexeme:
-            self.check("", tokensort, lexeme)
+            expected = "'%s%s%s'" % (expected, tokensort, lexeme)
+            self.check(expected, tokensort, lexeme)
 
         if DEBUG and SHOWTOKENS:
             logToken(*self.currentToken)
@@ -123,9 +143,7 @@ class Parser(object):
         return self.currentToken
 
     def __repr__(self):
-        """ print parsed ast """
-        pass
-
+        return "%s at '%s'" % ( str(type(self)), self.currentToken[1])
 
 class WaebricParser(Parser):
     """ start the parsing!"""
@@ -182,21 +200,71 @@ class SiteParser(Parser):
     """ Parse Site function defined in module."""
 
     def parseSite(self):
-        # AST
-        self.check("Site Defenition", "Site begin, Mapping, end", lexeme=keywords['SITE'])
+        # AST, mappings.
+        self.check("Site Defenition", lexeme=keywords['SITE'])
         # check mapping
-        self.parseMapping()
-        self.check("Site END", "site begin, mapping, end", lexeme=keywords['END'])
+
+        while self.next():
+            if self.matchLexeme(keywords['END']):
+                return
+            self.parseMapping()
+
+        raise UnexpectedToken(self.currentToken, expected="missing site ending END")
 
     def parseMapping(self):
         """ parse content in between site and end."""
+        # AST new mapping
+        self.parsePath()
+        self.next( lexeme=":" )
+        self.next( tokensort=NAME )
+        p = MarkupParser(self)
+        p.parseMarkup()
+        p.next( lexeme=';')
+        #setmarkup on mapping
 
-        while(self.next()):
-            if self.matchLexeme(keywords['END']):
-                return
+    def parsePath(self):
+        path = ""
+        if self.peek(lexeme="/") or self.peek(x=2,lexeme="/"):
+            path = self.parseDirectory()
+        path = path + self.parseFileName()
+        logging.debug(path)
+        #AST path stuff.
 
-        # if site is not ending with an end we might end up here.
-        raise UnexpectedToken(self.currentToken, expected="missing site ending END")
+    def parseDirectory(self):
+        directory = ""
+        if self.isPathElement():
+            directory += self.currentToken[1]
+
+        while self.next():
+            if self.matchLexeme("/"):
+                if directory:
+                    directory += "/"
+                self.next()
+
+            if self.peek(lexeme="."):
+                return directory #return , we're in a filename
+
+            if self.isPathElement():
+                directory += self.currentToken[1]
+                logging.debug("%s dir" % directory)
+            else:
+                raise UnexpectedToken(self.currentToken, expected="path element")
+        raise UnexpectedToken(self.currentToken, expected="directory path")
+
+    def parseFileName(self):
+        self.check(tokensort=NAME, expected="File Name")
+        name = self.currentToken[1]
+        self.next(lexeme = ".")
+        self.next(tokensort=NAME, expected="File extension") # extension
+        name = "%s.%s" % (name, self.currentToken[1])
+        return name
+
+    def isPathElement(self):
+        print self.currentToken[1]
+        regex = re.compile(r"(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")
+        if regex.match(self.currentToken[1]):
+            return False
+        return True
 
 
 class FunctionParser(Parser):
@@ -322,19 +390,19 @@ class MarkupParser(Parser):
     p p p()
     """
 
+    @trace
     def parseMarkup(self):
         """Differentiate between p and p()"""
         self.parseDesignator()
         if self.peek(lexeme="("):
             self.parseArguments()
-
+    @trace 
     def parseDesignator(self):
         """ p attributes* markup """
-        self.matchTokensort(NAME)
+        self.check(tokensort=NAME)
         #AST create designator.
         self.peek()
-        #look for first character possible attribute
- 
+        #peek first character for possible attribute
         if self.peekedTokens:
                 if self.peekedTokens[0][1][0] in "#$@:%.":
                     self.parseAttributes()
@@ -375,8 +443,8 @@ class MarkupParser(Parser):
 
     def parseArgument(self):
         """ name = expression || expression"""
-        # check if there is an =. 
-        # check if there 
+        # check if there is an =.
+        # check if there
         # recursive call back to expression parser
         pass
 
@@ -390,4 +458,5 @@ if __name__ == '__main__':                     # testing
     import sys
     if len(sys.argv) > 1: parse(open(sys.argv[1]).readline)
     else : parse(sys.stdin.readline)
+
 
