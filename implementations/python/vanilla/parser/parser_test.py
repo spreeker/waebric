@@ -72,6 +72,12 @@ class TestParser(unittest.TestCase):
 
 class TestParserClasses(unittest.TestCase):
 
+    def initialize_parser(self, parserClass, source):
+        p = parserClass()
+        p.tokens = generate_tokens(gen_line(source))
+        p.next()
+        return p
+
     def test_parseFunction(self):
         source = """def test
           p "bla";
@@ -89,6 +95,16 @@ class TestParserClasses(unittest.TestCase):
         p.tokens = generate_tokens(gen_line(source))
         self.assertRaises(UnexpectedToken, p.parseFunction)
 
+    def test_module(self):
+        source = "module menus"
+        p = self.initialize_parser(ModuleParser, source)
+        p.parseModule()
+
+        badsource = "mod fout"
+        p = self.initialize_parser(ModuleParser, badsource)
+        self.assertRaises(UnexpectedToken, p.parseModule)
+
+
     def test_site(self):
 
         def _parse_site(source):
@@ -102,12 +118,20 @@ class TestParserClasses(unittest.TestCase):
 
         badsource = "site nameBLEH"
         self.assertRaises(UnexpectedToken, _parse_site, badsource)
-        #todo more cases?
+        #TODO more cases
 
     def test_markup(self):
-        def _parse_markup(self):
-        
-        pass
+        def _parse_markup(source):
+            p = MarkupParser()
+            p.tokens = generate_tokens(gen_line(source))
+            p.next()
+            p.parseMarkup()
+
+        source = "markup"
+         
+        source = "markup variable"
+
+        source = "markup markup()"
 
     def test_statement(self):
         pass

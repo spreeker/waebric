@@ -1,3 +1,12 @@
+"""
+Parser Module.
+
+convention:
+
+For each parser function the parsed token should be ready and waiting.
+ending with an next call to
+"""
+
 import logging
 import tokenize
 import re
@@ -116,6 +125,9 @@ class Parser(object):
                 return False
         return True
 
+    def hasnext(self):
+        return self.peek()
+
     def next(self, expected="", tokensort="", lexeme=""):
         """
         Get the next token, if tokensort or lexeme is defined
@@ -137,9 +149,6 @@ class Parser(object):
         if DEBUG and SHOWTOKENS:
             logToken(*self.currentToken)
 
-        if self.matchTokensort(NEWLINE) or self.matchTokensort(NL):
-            return self.next(name,syntax,tokensort,lexeme)
-
         return self.currentToken
 
     def __repr__(self):
@@ -152,18 +161,20 @@ class WaebricParser(Parser):
         logging.debug('start parsing tokens')
         logging.debug("--------------------")
         module = ModuleParser(self)
+        module.next()
         module.parseModule()
 
 
 class ModuleParser(Parser):
-    """ Parse module stmt defined in module """
+    """ Parse module statement defined in module """
 
     def parseModule(self):
         """parse module statements """
-        self.next('module', 'Module ModuleID', lexeme=keywords['MODULE'] )
+        self.check('Module ModuleID', lexeme=keywords['MODULE'] )
 
         #create a new ast module.
         #parse the module identifier.
+        self.next()
         moduleId = self.parseModuleId()
 
         # while there are more tokens
@@ -187,14 +198,14 @@ class ModuleParser(Parser):
         """Parse the module identifier """
         # AST new module id.
         moduleID = []
-        self.next("Module Identifier", "head:[azAZ] body:[azAZ09]", tokensort=NAME)
+        self.check("Module Identifier", tokensort=NAME)
         moduleID.append(self.currentToken)
-        while(self.next()):
-            if self.peek(x=1, lexeme="."):
-                self.next("Module Identifier", "head:[azAZ] body:[azAZ09]", tokensort=NAME)
-                moduleID.append(self.currentToken)
-            else:
-                return
+
+        while(self.peek(lexeme='.')):
+            self.next() #skip .
+            self.next("Module Identifier", tokensort=NAME)
+            moduleID.append(self.currentToken)
+
 
 class SiteParser(Parser):
     """ Parse Site function defined in module."""
@@ -246,7 +257,6 @@ class SiteParser(Parser):
 
             if self.isPathElement():
                 directory += self.currentToken[1]
-                logging.debug("%s dir" % directory)
             else:
                 raise UnexpectedToken(self.currentToken, expected="path element")
         raise UnexpectedToken(self.currentToken, expected="directory path")
@@ -260,7 +270,6 @@ class SiteParser(Parser):
         return name
 
     def isPathElement(self):
-        print self.currentToken[1]
         regex = re.compile(r"(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")
         if regex.match(self.currentToken[1]):
             return False
@@ -296,7 +305,62 @@ class ExpressionParser(Parser):
     List,
     Record,
     """
-    pass
+    def parseExpression(self):
+        expression = None
+        if self.matchLexeme("'"):
+            self.next("symbol name", tokensort=NAME)
+            expression = self.currentToken[1]
+            #symbol.
+        elif self.matchTokensort(STRING):
+            expression = self.currentToken[1]
+            #data string
+        elif self.matchTokensort(NUMBER):
+            expression = self.currentToken[1]
+            #number stuff
+        elif self.matchLexeme("["):
+            expression = "[" + self.parseList()
+        elif self.matchLexeme("{"):
+            self.parseRecord()
+            expression = "{" + self.parseRecord():
+
+        elif peek(lexeme=".") and peek(x=2, tokensort=NAME):
+            while peek(lexeme=".") and peek(x=2, tokensort=NAME):
+                self.next(lexeme=".") #skip.
+                self.next(expected="NAME", tokensort="NAME")
+                #ast. stuff.
+        elif peek(lexeme="+"):
+            #parse a + expression left and right.
+            #ast set left.
+            self.next() # skip +
+            #ast set right.
+            self.next(expected="right of + expr", tokensort=NAME)
+
+        return expression
+
+    def parseList(self):
+        self.check("List opening '[' ", lexeme="[")
+
+        while self.next():
+            if self.matchLexeme(']'):
+                #end list return.
+                return
+            self.parseExpression()
+            #ast add expression.
+            if not self.peek(lexeme=']'):
+                self.next("comma ','", lexeme=",")
+
+    def parseRecord(self):
+        self.check("Record opening '{'", lexeme="{")
+
+        while self.next():
+            if self.matchLexeme('}'):
+                return
+            self.matchTokensort(NAME)
+            self.next(lexeme=":")
+            #record add expression
+            self.parseExpression()
+
+            
 
 
 class PredicateParser(Parser):
@@ -379,8 +443,22 @@ class StatementParser(Parser):
 
 
 class EmbeddingParser(Parser):
-    pass
+    @trace
+    def parseEmbedding(self):
+        self.check('embedding " < > " ', tokensort=PRESTRING)
 
+        while not self.peek(tokensort=POSTSTRING):
+            self.next()
+            if self.matchTokensort(EMBSTRING):
+                #AST.
+            elif self.matchTokensort(PRESTRING):
+                #AST
+            else:
+                raise UnexpectedToken(self.currentToken,
+                    expected = "Embedded string Error")
+        self.next("tail of embedded string", tokensort=POSTSTRING)
+        #AST
+        self.next()
 
 class MarkupParser(Parser):
     """
@@ -396,7 +474,7 @@ class MarkupParser(Parser):
         self.parseDesignator()
         if self.peek(lexeme="("):
             self.parseArguments()
-    @trace 
+    @trace
     def parseDesignator(self):
         """ p attributes* markup """
         self.check(tokensort=NAME)
@@ -407,6 +485,7 @@ class MarkupParser(Parser):
                 if self.peekedTokens[0][1][0] in "#$@:%.":
                     self.parseAttributes()
 
+    @trace
     def parseAttributes(self):
         """ # . $ : @ % @ """
         attributes = []
