@@ -129,10 +129,12 @@ class TestParserClasses(unittest.TestCase):
             p.parseMarkup()
 
         source = "markup"
-
+        _parse_markup(source)
         source = "markup variable"
-
+        _parse_markup(source)
         source = "markup markup()"
+        _parse_markup(source)
+
     def test_statement(self):
         pass
 
@@ -160,8 +162,11 @@ class TestExpression(unittest.TestCase):
         self._parse_expression(sourceList)
 
     def test_record(self):
-        sourceRecord = '{ key : "value" , key2 : "value2" }'
+        sourceRecord = '{ key : "value" , key2 : "value2" } '
         self._parse_expression(sourceRecord)
+
+        sourceRecord = '{ key : "value" , key2 : value2 } '
+        self.assertRaises(UnexpectedToken, self._parse_expression, sourceRecord)
 
     def test_number(self):
         sourceNumber = "66"

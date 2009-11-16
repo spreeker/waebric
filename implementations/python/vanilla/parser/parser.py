@@ -304,8 +304,8 @@ class ExpressionParser(Parser):
     Variable,
     List,
     Record,
+    expression + expression
     """
-
     @trace
     def parseExpression(self):
         expression = None
@@ -323,7 +323,6 @@ class ExpressionParser(Parser):
             expression = self.parseList()
         elif self.matchLexeme("{"):
             expression = self.parseRecord()
-
         elif self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
             while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
                 self.next(lexeme=".") #skip.
@@ -343,40 +342,49 @@ class ExpressionParser(Parser):
         self.next()
         return expression
 
-    @trace
     def parseList(self):
         self.check("List opening '[' ", lexeme="[")
-        self.next()
         #ast stuff.
-        result = "["
-        while self.hasnext():
-            if self.matchLexeme(']'):
-                #end list return.
-                return result + " ]"
-            result = result + self.currentToken[1]
-            self.parseExpression()
-            #ast add expression.
-            if not self.matchLexeme(']'):
-                self.check(expected="comma ", lexeme=",")
-                self.next()
-                result = result + ','
+        expression = "["
 
+        while self.next():
+            if self.matchLexeme(']'):
+                logging.debug(expression)
+                return expression + " ]"
+
+            expression = expression + self.currentToken[1]
+            self.parseExpression()
+            #AST add expression.
+
+            if self.matchLexeme(']'):
+                logging.debug(expression)
+                return expression + " ]"
+
+            self.check(expected="comma ", lexeme=",")
+            self.next()
+            expression = expression + ','
     @trace
     def parseRecord(self):
-        self.check("Record opening '{'", lexeme="{")
-        result = "{"
+        self.check("Record opening", lexeme="{")
+        expression = "{"
         while self.next():
             if self.matchLexeme('}'):
-                return result + "}"
-            self.matchTokensort(NAME)
-            self.next(lexeme=":")
-            #record add expression
-            self.parseExpression()
-            result = result + self.currentToken[1]
-            if not self.peek(lexeme='}'):
-                result = result + ','
-                self.next("comma ", lexeme=",")
+                logging.debug(expression)
+                return expression + "}"
 
+            self.matchTokensort(NAME)
+            expression = expression + self.currentToken[1]
+            self.next(lexeme=":")
+            self.next()
+            expression = expression + ':' + self.parseExpression()
+
+            if self.matchLexeme('}'):
+                logging.debug(expression)
+                return expression + "}"
+
+            expression = expression + ','
+            self.check("comma", lexeme=",")
+            logging.debug("exp" + expression)
 
 class PredicateParser(Parser):
     pass
@@ -391,7 +399,7 @@ class StatementParser(Parser):
         if self.matchLexeme(keywords['IF']):
             return
         elif self.matchLexeme(keywords['EACH']):
-            return
+            self.parseEachStatement()
         elif self.matchLexeme(keywords['ECHO']):
             return
         elif self.matchLexeme(keywords['CDATA']):
@@ -406,14 +414,12 @@ class StatementParser(Parser):
             return
         elif self.matchTokensort(NAME):
             self.parseMarkupStatements()
-            return
 
         raise UnexpectedToken(self.currentToken,
             expected="""statement, "if", "each", "let", "{", "comment",
                 "echo", "cdata", "yield" or Markup""" )
-
+    @trace
     def parseLetStatement(self):
-        logging.debug("parse LET .. IN .. END block")
         if self.matchLexeme(keywords['LET']):
             while self.next():
                 #TODO parse assignment markup.
@@ -428,6 +434,17 @@ class StatementParser(Parser):
             raise UnexpectedToken(self.currentToken,
                 expected = """LET .. IN .. END, missing IN """)
 
+    @trace
+    def parserEachtStatement(self):
+        self.matchLexeme(keywords['EACH'])
+        self.next(lexeme='(')
+        self.next("Var", tokensort=NAME)
+        self.next(lexeme=':')
+        self.next()
+        self.parseExpression()
+
+
+    @trace
     def parseMarkupStatements(self):
         """
         p;      markup
