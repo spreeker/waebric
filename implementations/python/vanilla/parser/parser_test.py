@@ -5,6 +5,7 @@ from parser import ModuleParser
 from parser import SiteParser
 from parser import FunctionParser
 from parser import EmbeddingParser
+from parser import ExpressionParser
 from parser import MarkupParser
 from parser import UnexpectedToken
 from tokenize import generate_tokens
@@ -128,17 +129,57 @@ class TestParserClasses(unittest.TestCase):
             p.parseMarkup()
 
         source = "markup"
-         
+
         source = "markup variable"
 
         source = "markup markup()"
-
     def test_statement(self):
         pass
 
     def test_let_statement(self):
         pass
 
+
+
+class TestExpression(unittest.TestCase):
+
+    def _parse_expression(self,source):
+        p = ExpressionParser()
+        p.tokens = generate_tokens(gen_line(source))
+        p.next()
+        p.parseExpression()
+
+    def test_symbol(self):
+        sourceSymbol = "'symbol"
+        self._parse_expression(sourceSymbol)
+        sourceSymbol = "symbol"
+        self.assertRaises(UnexpectedToken,self._parse_expression,sourceSymbol)
+
+    def test_list(self):
+        sourceList = '[ "i1", "i2" ]'
+        self._parse_expression(sourceList)
+
+    def test_record(self):
+        sourceRecord = '{ key : "value" , key2 : "value2" }'
+        self._parse_expression(sourceRecord)
+
+    def test_number(self):
+        sourceNumber = "66"
+        self._parse_expression(sourceNumber)
+
+    def test_string(self):
+        sourceString = '"Hallo, dit is een string expressie!"'
+        self._parse_expression(sourceString)
+
+    def test_dotnames(self):
+        sourceDotName = 'een.tweee.drie'
+        self._parse_expression(sourceDotName)
+
+    def test_plus(self):
+        sourcePlus = '"a" + "b"'
+        self._parse_expression(sourcePlus)
+        sourcePlus = 'a + "b"'
+        self.assertRaises(UnexpectedToken, self._parse_expression, sourcePlus)
 
 if __name__ == '__main__':
     unittest.main()

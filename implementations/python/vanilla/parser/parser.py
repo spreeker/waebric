@@ -299,12 +299,14 @@ class FunctionParser(Parser):
 class ExpressionParser(Parser):
     """
     Symbol expression,
-    Natural number,
     Text,
+    Natural number,
     Variable,
     List,
     Record,
     """
+
+    @trace
     def parseExpression(self):
         expression = None
         if self.matchLexeme("'"):
@@ -318,49 +320,62 @@ class ExpressionParser(Parser):
             expression = self.currentToken[1]
             #number stuff
         elif self.matchLexeme("["):
-            expression = "[" + self.parseList()
+            expression = self.parseList()
         elif self.matchLexeme("{"):
-            self.parseRecord()
-            expression = "{" + self.parseRecord():
+            expression = self.parseRecord()
 
-        elif peek(lexeme=".") and peek(x=2, tokensort=NAME):
-            while peek(lexeme=".") and peek(x=2, tokensort=NAME):
+        elif self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
+            while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
                 self.next(lexeme=".") #skip.
-                self.next(expected="NAME", tokensort="NAME")
+                self.next(expected="NAME", tokensort=NAME)
                 #ast. stuff.
-        elif peek(lexeme="+"):
+        elif self.peek(lexeme="+") and expression:
             #parse a + expression left and right.
-            #ast set left.
+            #ast set left = currently parsed expression
             self.next() # skip +
+            expression = expression + '+' + self.currentToken[1]
+            self.parseExpression()
             #ast set right.
-            self.next(expected="right of + expr", tokensort=NAME)
-
+        logging.debug(expression)
+        if not expression:
+            raise UnexpectedToken(self.currentToken,
+                expected="Expression: symbol, string, number, list, record, name.data")
+        self.next()
         return expression
 
+    @trace
     def parseList(self):
         self.check("List opening '[' ", lexeme="[")
-
-        while self.next():
+        self.next()
+        #ast stuff.
+        result = "["
+        while self.hasnext():
             if self.matchLexeme(']'):
                 #end list return.
-                return
+                return result + " ]"
+            result = result + self.currentToken[1]
             self.parseExpression()
             #ast add expression.
-            if not self.peek(lexeme=']'):
-                self.next("comma ','", lexeme=",")
+            if not self.matchLexeme(']'):
+                self.check(expected="comma ", lexeme=",")
+                self.next()
+                result = result + ','
 
+    @trace
     def parseRecord(self):
         self.check("Record opening '{'", lexeme="{")
-
+        result = "{"
         while self.next():
             if self.matchLexeme('}'):
-                return
+                return result + "}"
             self.matchTokensort(NAME)
             self.next(lexeme=":")
             #record add expression
             self.parseExpression()
-
-            
+            result = result + self.currentToken[1]
+            if not self.peek(lexeme='}'):
+                result = result + ','
+                self.next("comma ", lexeme=",")
 
 
 class PredicateParser(Parser):
@@ -451,8 +466,10 @@ class EmbeddingParser(Parser):
             self.next()
             if self.matchTokensort(EMBSTRING):
                 #AST.
+                pass
             elif self.matchTokensort(PRESTRING):
                 #AST
+                pass
             else:
                 raise UnexpectedToken(self.currentToken,
                     expected = "Embedded string Error")
