@@ -1,13 +1,6 @@
 import unittest
 
-from parser import Parser
-from parser import ModuleParser
-from parser import SiteParser
-from parser import FunctionParser
-from parser import EmbeddingParser
-from parser import ExpressionParser
-from parser import MarkupParser
-from parser import UnexpectedToken
+from parser import * 
 from tokenize import generate_tokens
 
 from token import *
@@ -121,19 +114,26 @@ class TestParserClasses(unittest.TestCase):
         self.assertRaises(UnexpectedToken, _parse_site, badsource)
         #TODO more cases
 
-    def test_markup(self):
-        def _parse_markup(source):
-            p = MarkupParser()
-            p.tokens = generate_tokens(gen_line(source))
-            p.next()
-            p.parseMarkup()
+class TestMarkup(unittest.TestCase):
+ 
+    def _parse_markup(self,source):
+        p = StatementParser()
+        p.tokens = generate_tokens(gen_line(source))
+        p.next()
+        p.parseStatement()
 
-        source = "markup"
-        _parse_markup(source)
-        source = "markup variable"
-        _parse_markup(source)
-        source = "markup markup()"
-        _parse_markup(source)
+    def test_markup(self):
+        source = "markup ;"
+        self._parse_markup(source)
+        source = "markup variable ;"
+        self._parse_markup(source)
+        source = "markup markup() ;"
+        self._parse_markup(source)
+        source = 'markup function( a = "b" ) ;'
+        self._parse_markup(source)
+        source = 'markup markup function("beee") ;'
+        self._parse_markup(source)
+
 
     def test_statement(self):
         pass

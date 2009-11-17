@@ -71,11 +71,12 @@ class UnexpectedToken(Exception):
 
 
 class Parser(object):
+    tokens = []
+    peekedTokens = []
+    currentToken = []
+
 
     def __init__(self, Parser=None):
-        self.tokens = []
-        self.peekedTokens = []
-        self.currentToken = []
 
         if Parser:
             self.tokens = Parser.tokens
@@ -392,6 +393,7 @@ class PredicateParser(Parser):
 
 class StatementParser(Parser):
 
+    @trace
     def parseStatement(self):
         if self.matchLexeme(keywords['LET']):
             self.parseLetStatement()
@@ -453,11 +455,11 @@ class StatementParser(Parser):
         p p p();
         p "embedding < >";
         """
-        markup = MarkupParser(self)
 
-        while self.next():
+        markup = MarkupParser(self)
+        while self.hasnext():
             markup.parseMarkup()
-            if self.peek(lexeme=';'):
+            if self.matchLexeme(';'):
                 self.next() # skip ;
                 return
         raise UnexpectedToken(self.currentToken,
@@ -507,25 +509,24 @@ class MarkupParser(Parser):
         """Differentiate between p and p()"""
         self.parseDesignator()
         if self.peek(lexeme="("):
+            self.next()
             self.parseArguments()
     @trace
     def parseDesignator(self):
         """ p attributes* markup """
         self.check(tokensort=NAME)
         #AST create designator.
-        self.peek()
         #peek first character for possible attribute
-        if self.peekedTokens:
-                if self.peekedTokens[0][1][0] in "#$@:%.":
-                    self.parseAttributes()
+        self.next()
+        if self.currentToken[1][0] in "#$@:%.":
+                self.parseAttributes()
 
     @trace
     def parseAttributes(self):
         """ # . $ : @ % @ """
         attributes = []
-        self.peek()
-        while self.peekedTokens[0][1] in "#$@:%.":
-            self.next()
+
+        while self.currentToken[0][1] in "#$@:%.":
             if self.matchLexeme('#'):
                 self.next(tokensort=NAME)
                 attributes.append(('#', self.currentToken))
@@ -535,31 +536,42 @@ class MarkupParser(Parser):
                 self.next(tokensort=NAME)
             elif self.matchLexeme('@'):
                 self.next(tokensort=NUMBER)
-                #TODO %
             elif self.matchLexeme(':'):
                 self.next(tokensort=NAME)
             else:
                 raise UnexpectedToken(self.currentToken,
                     expected=" Attribute, # . : @ % ")
+            self.next()
 
-
+    @trace
     def parseArguments(self):
         """ ( Arguments,* ) """
-        self.next( lexeme='(')
+        self.matchLexeme('(')
         while self.next():
             if self.matchLexeme(')'):
+                self.next()
                 return
-            elif self.matchTokensort(NAME):
-                #AST, name argument.
-                self.parseArgument()
+
+            self.parseArgument()
+
+            if not self.peek(lexeme=')'):
                 self.next(lexeme=',')
 
+    @trace
     def parseArgument(self):
         """ name = expression || expression"""
-        # check if there is an =.
-        # check if there
-        # recursive call back to expression parser
-        pass
+        arguement = ""
+
+        if self.peek(x=2,lexeme='='):
+            self.next("Varname",tokensort=NAME)
+            argument = self.currentToken[1]
+            self.next() # skip =
+        else:
+            #normal argument
+            pass
+
+        p = ExpressionParser(self)
+        argument = argument + p.parseExpression()
 
 def parse(source):
     tokens = tokenize.generate_tokens(source)
@@ -571,5 +583,4 @@ if __name__ == '__main__':                     # testing
     import sys
     if len(sys.argv) > 1: parse(open(sys.argv[1]).readline)
     else : parse(sys.stdin.readline)
-
 
