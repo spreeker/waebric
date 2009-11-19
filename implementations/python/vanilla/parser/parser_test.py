@@ -1,6 +1,6 @@
 import unittest
 
-from parser import * 
+from parser import *
 from tokenize import generate_tokens
 
 from token import *
@@ -15,7 +15,7 @@ class TestParser(unittest.TestCase):
     def test_matchLexeme(self):
         source = "def test 10"
         p = Parser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         self.assertEqual(p.matchLexeme("def"), True)
         self.assertEqual(p.matchLexeme("site"), False)
@@ -23,7 +23,7 @@ class TestParser(unittest.TestCase):
     def test_matchTokensort(self):
         source = "def test 10"
         p = Parser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         self.assertEqual(p.matchTokensort(NAME), True)
         self.assertEqual(p.matchTokensort(NUMBER), False)
@@ -36,7 +36,7 @@ class TestParser(unittest.TestCase):
     def test_check(self):
         source = "def test 10"
         p = Parser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
 
         self.assertRaises(UnexpectedToken,
@@ -45,7 +45,7 @@ class TestParser(unittest.TestCase):
     def test_peek(self):
         source = "def test 10 site"
         p = Parser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         self.assertEqual(p.peek(x=2, tokensort=NUMBER), True)
         self.assertEqual(p.peek(x=1, lexeme='test'), True)
@@ -58,7 +58,7 @@ class TestParser(unittest.TestCase):
     def test_next(self):
         source = "def test 10 site"
         p = Parser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         self.assertEqual(p.matchLexeme('def'), True)
         p.next()
@@ -68,7 +68,7 @@ class TestParserClasses(unittest.TestCase):
 
     def initialize_parser(self, parserClass, source):
         p = parserClass()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         return p
 
@@ -78,7 +78,7 @@ class TestParserClasses(unittest.TestCase):
           p p p();
         end"""
         p = FunctionParser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         p.parseFunction()
 
@@ -104,7 +104,7 @@ class TestParserClasses(unittest.TestCase):
 
         def _parse_site(source):
             p = SiteParser()
-            p.tokens = generate_tokens(gen_line(source))
+            p.setTokens(generate_tokens(gen_line(source)))
             p.next()
             p.parseSite()
 
@@ -119,7 +119,7 @@ class TestMarkup(unittest.TestCase):
  
     def _parse_markup(self,source):
         p = StatementParser()
-        p.tokens = generate_tokens(gen_line(source))
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         p.parseStatement()
 
@@ -148,9 +148,7 @@ class TestExpression(unittest.TestCase):
 
     def _parse_expression(self,source):
         p = ExpressionParser()
-        p.tokens = generate_tokens(gen_line(source))
-        p.currentToken = ""
-        p.peekedTokens = []
+        p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         p.parseExpression()
 

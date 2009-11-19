@@ -42,10 +42,10 @@ def logToken(*token):
     logging.debug(strToken(*token))
 
 def _trace(f, *args, **kw):
-    logging.debug("calling %s with args %s, %s" % \
+    logging.info("calling %s with args %s, %s" % \
             (f.__name__, args, kw ))
     result = f(*args, **kw)
-    logging.debug("exit %s" % f.__name__)
+    logging.info("exit %s" % f.__name__)
     return result
 
 def trace(f):
@@ -59,67 +59,64 @@ class UnexpectedToken(Exception):
         self.expected = expected
         logging.debug("raised exception on:")
         logToken(*token)
-        tokenize.printtoken(*token)
+        #tokenize.printtoken(*token)
         logging.debug("expected: %s" % expected)
 
     def __str__(self):
         return "%s expected: %s" % (tokenize.tokentostring(*self.token),
             self.expected)
 
-#class ParsingState(type):
-#    tokens = []
-#    peekedTokens = []
-#    currentToken = []
+#global variables to keep state
+tokens = []
+peekedTokens = []
+currentToken = []
 
 class Parser(object):
 
-    tokens = [] #generator
+    def __init__(self, tokens=None):
+       if DEBUG and SHOWPARSER:
+           logging.debug(type(self))
 
-    peekedTokens = []
-    currentToken = []
-
-    def __init__(self, Parser=None):
-
-        if Parser:
-            self.tokens = Parser.tokens
-            self.peekedTokens = Parser.peekedTokens
-            self.currentToken = Parser.currentToken
-
-            if DEBUG and SHOWPARSER:
-                logging.debug(type(self))
+    def setTokens(self, newtokens):
+        global tokens
+        global peekedTokens
+        global currentToken
+        tokens = newtokens
+        peekedTokens = []
+        currentToken = []
 
     def matchLexeme(self, lexeme):
         """ return boolean if current token matches lexeme """
-        if self.currentToken[1]:
-            return self.currentToken[1] == lexeme
+        if currentToken[1]:
+            return currentToken[1] == lexeme
         return False
 
     def matchTokensort(self, tokensort):
         """ return boolean if current token matches tokensort """
-        return self.currentToken[0] == tokensort
+        return currentToken[0] == tokensort
 
     def check(self, expected="", tokensort=None, lexeme=None):
         """ check if current token is tokensort of lexeme """
         if lexeme:
-           if not self.currentToken[1] == lexeme:
-                raise UnexpectedToken(self.currentToken, expected=expected)
+           if not currentToken[1] == lexeme:
+                raise UnexpectedToken(currentToken, expected=expected)
         if tokensort:
-            if not self.currentToken[0] == tokensort:
-                raise UnexpectedToken(self.currentToken, expected=expected)
+            if not currentToken[0] == tokensort:
+                raise UnexpectedToken(currentToken, expected=expected)
 
     def peek(self, x=1, tokensort="", lexeme=""):
         """lookahead x tokens in advance, returns true
            if tokensort and or lexeme matches peekedtoken.
         """
-        d = x - len(self.peekedTokens)
+        d = x - len(peekedTokens)
         if d > -1:
             try:
                 for i in range(d+1):
-                    self.peekedTokens.append(self.tokens.next())
+                    peekedTokens.append(tokens.next())
             except StopIteration:
                 return False
 
-        peekToken = self.peekedTokens[x-1]
+        peekToken = peekedTokens[x-1]
         if tokensort:
             if not peekToken[0] == tokensort:
                 return False
@@ -136,11 +133,14 @@ class Parser(object):
         Get the next token, if tokensort or lexeme is defined
         checks if next token matches tokensort of lexeme.
         """
-        if self.peekedTokens:
-            self.currentToken = self.peekedTokens.pop(0)
+        global peekedTokens
+        global currentToken
+
+        if peekedTokens:
+            currentToken = peekedTokens.pop(0)
         else:
             try:
-                self.currentToken = self.tokens.next()
+                currentToken = tokens.next()
             except StopIteration:
                 logging.debug(" no next token available ")
                 raise StopIteration
@@ -150,12 +150,12 @@ class Parser(object):
             self.check(expected, tokensort, lexeme)
 
         if DEBUG and SHOWTOKENS:
-            logToken(*self.currentToken)
+            logToken(*currentToken)
 
-        return self.currentToken
+        return currentToken
 
     def __repr__(self):
-        return "%s at '%s'" % ( str(type(self)), self.currentToken[1])
+        return "%s at '%s'" % ( str(type(self)), currentToken[1])
 
 class WaebricParser(Parser):
     """ start the parsing!"""
@@ -195,7 +195,7 @@ class ModuleParser(Parser):
             elif self.matchTokensort(ENDMARKER):
                 return
             else:
-               raise UnexpectedToken(self.currentToken,
+               raise UnexpectedToken(currentToken,
             expected="import, def, site, newline" )
 
     def parseModuleId(self):
@@ -203,38 +203,41 @@ class ModuleParser(Parser):
         # AST new module id.
         moduleID = []
         self.check("Module Identifier", tokensort=NAME)
-        moduleID.append(self.currentToken)
+        moduleID.append(currentToken)
 
         while(self.peek(lexeme='.')):
             self.next() #skip .
             self.next("Module Identifier", tokensort=NAME)
-            moduleID.append(self.currentToken)
+            moduleID.append(currentToken)
 
 
 class SiteParser(Parser):
     """ Parse Site function defined in module."""
-
+    @trace
     def parseSite(self):
         # AST, mappings.
         self.check("Site Defenition", lexeme=keywords['SITE'])
         # check mapping
 
         while self.next():
-            if self.matchLexeme(keywords['END']):
-                return
             self.parseMapping()
 
-        raise UnexpectedToken(self.currentToken, expected="missing site ending END")
+            if self.matchLexeme(keywords['END']):
+                return
 
+        raise UnexpectedToken(currentToken, expected="missing site ending END")
+    @trace
     def parseMapping(self):
         """ parse content in between site and end."""
         # AST new mapping
         self.parsePath()
         self.next( lexeme=":" )
         self.next( tokensort=NAME )
+        #self.next()
         p = MarkupParser(self)
         p.parseMarkup()
-        p.next( lexeme=';')
+        p.next()
+        #p.next( lexeme=';')
         #setmarkup on mapping
 
     def parsePath(self):
@@ -248,7 +251,7 @@ class SiteParser(Parser):
     def parseDirectory(self):
         directory = ""
         if self.isPathElement():
-            directory += self.currentToken[1]
+            directory += currentToken[1]
 
         while self.next():
             if self.matchLexeme("/"):
@@ -260,22 +263,22 @@ class SiteParser(Parser):
                 return directory #return , we're in a filename
 
             if self.isPathElement():
-                directory += self.currentToken[1]
+                directory += currentToken[1]
             else:
-                raise UnexpectedToken(self.currentToken, expected="path element")
-        raise UnexpectedToken(self.currentToken, expected="directory path")
+                raise UnexpectedToken(currentToken, expected="path element")
+        raise UnexpectedToken(currentToken, expected="directory path")
 
     def parseFileName(self):
         self.check(tokensort=NAME, expected="File Name")
-        name = self.currentToken[1]
+        name = currentToken[1]
         self.next(lexeme = ".")
         self.next(tokensort=NAME, expected="File extension") # extension
-        name = "%s.%s" % (name, self.currentToken[1])
+        name = "%s.%s" % (name, currentToken[1])
         return name
 
     def isPathElement(self):
         regex = re.compile(r"(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")
-        if regex.match(self.currentToken[1]):
+        if regex.match(currentToken[1]):
             return False
         return True
 
@@ -291,12 +294,13 @@ class FunctionParser(Parser):
 
         ## parser statements.
         while(self.next()):
-            if self.matchLexeme(keywords['END']):
-                return
             statement = StatementParser(self)
             statement.parseStatement()
 
-        raise UnexpectedToken(self.currentToken,
+            if self.matchLexeme(keywords['END']):
+                return
+
+        raise UnexpectedToken(currentToken,
                 expected="""END, Missing function ending END""")
 
 
@@ -315,36 +319,38 @@ class ExpressionParser(Parser):
         expression = None
         if self.matchLexeme("'"):
             self.next("symbol name", tokensort=NAME)
-            expression = self.currentToken[1]
+            expression = currentToken[1]
             #symbol.
         elif self.matchTokensort(STRING):
-            expression = self.currentToken[1]
+            expression = currentToken[1]
             #data string
         elif self.matchTokensort(NUMBER):
-            expression = self.currentToken[1]
+            expression = currentToken[1]
             #number stuff
         elif self.matchLexeme("["):
             expression = self.parseList()
         elif self.matchLexeme("{"):
             expression = self.parseRecord()
         elif self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
-            expression = self.currentToken[1]
+            expression = currentToken[1]
             while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
                 self.next(lexeme=".") #skip.
                 self.next(expected="NAME", tokensort=NAME)
-                expression = expression + '.' + self.currentToken[1]
+                expression = expression + '.' + currentToken[1]
                 #ast. stuff.
         elif self.peek(lexeme="+") and expression:
             #parse a + expression left and right.
             #ast set left = currently parsed expression
+            left = currentToken[1]
             self.next() # skip +
-            expression = expression + '+' + self.currentToken[1]
-            self.parseExpression()
+            right = self.parseExpression()
+            expression = left + '+' + right
             #ast set right.
         logging.debug(expression)
         if not expression:
-            raise UnexpectedToken(self.currentToken,
+            raise UnexpectedToken(currentToken,
                 expected="Expression: symbol, string, number, list, record, name.field")
+
         self.next()
         return expression
 
@@ -358,7 +364,7 @@ class ExpressionParser(Parser):
                 logging.debug(expression)
                 return expression + " ]"
 
-            expression = expression + self.currentToken[1]
+            expression = expression + currentToken[1]
             self.parseExpression()
             #AST add expression.
 
@@ -379,7 +385,7 @@ class ExpressionParser(Parser):
                 return expression + "}"
 
             self.matchTokensort(NAME)
-            expression = expression + self.currentToken[1]
+            expression = expression + currentToken[1]
             self.next(lexeme=":")
             self.next()
             expression = expression + ':' + self.parseExpression()
@@ -421,8 +427,9 @@ class StatementParser(Parser):
             return
         elif self.matchTokensort(NAME):
             self.parseMarkupStatements()
+            return
 
-        raise UnexpectedToken(self.currentToken,
+        raise UnexpectedToken(currentToken,
             expected="""statement, "if", "each", "let", "{", "comment",
                 "echo", "cdata", "yield" or Markup""" )
     @trace
@@ -436,9 +443,9 @@ class StatementParser(Parser):
                             logging.debug("end LET block")
                             return
                         self.parseStatement()
-                    raise UnexpectedToken(self.currentToken,
+                    raise UnexpectedToken(currentToken,
                         expected="missing END of LET .. IN .. END block")
-            raise UnexpectedToken(self.currentToken,
+            raise UnexpectedToken(currentToken,
                 expected = """LET .. IN .. END, missing IN """)
 
     @trace
@@ -458,16 +465,21 @@ class StatementParser(Parser):
         p p;    markup variable
         p p();  markup - markup
         p p p();
+        p "data"
         p "embedding < >";
         """
 
         markup = MarkupParser(self)
         while self.hasnext():
             markup.parseMarkup()
+            if self.matchTokensort(STRING):
+                self.next()
+            #TODO embedding.
+            #if self.matchTokensort(
             if self.matchLexeme(';'):
                 self.next() # skip ;
                 return
-        raise UnexpectedToken(self.currentToken,
+        raise UnexpectedToken(currentToken,
                 expected =  "Statement ;")
 
     def isMarkup(self):
@@ -495,7 +507,7 @@ class EmbeddingParser(Parser):
                 #AST
                 pass
             else:
-                raise UnexpectedToken(self.currentToken,
+                raise UnexpectedToken(currentToken,
                     expected = "Embedded string Error")
         self.next("tail of embedded string", tokensort=POSTSTRING)
         #AST
@@ -513,9 +525,9 @@ class MarkupParser(Parser):
     def parseMarkup(self):
         """Differentiate between p and p()"""
         self.parseDesignator()
-        if self.peek(lexeme="("):
-            self.next()
+        if self.matchLexeme('('):
             self.parseArguments()
+
     @trace
     def parseDesignator(self):
         """ p attributes* markup """
@@ -523,7 +535,7 @@ class MarkupParser(Parser):
         #AST create designator.
         #peek first character for possible attribute
         self.next()
-        if self.currentToken[1][0] in "#$@:%.":
+        if currentToken[1][0] in "#$@:%.":
                 self.parseAttributes()
 
     @trace
@@ -531,10 +543,10 @@ class MarkupParser(Parser):
         """ # . $ : @ % @ """
         attributes = []
 
-        while self.currentToken[0][1] in "#$@:%.":
+        while currentToken[0][1] in "#$@:%.":
             if self.matchLexeme('#'):
                 self.next(tokensort=NAME)
-                attributes.append(('#', self.currentToken))
+                attributes.append(('#', currentToken))
             elif self.matchLexeme('.'):
                 self.next(tokensort=NAME)
             elif self.matchLexeme('$'):
@@ -544,7 +556,7 @@ class MarkupParser(Parser):
             elif self.matchLexeme(':'):
                 self.next(tokensort=NAME)
             else:
-                raise UnexpectedToken(self.currentToken,
+                raise UnexpectedToken(currentToken,
                     expected=" Attribute, # . : @ % ")
             self.next()
 
@@ -552,14 +564,15 @@ class MarkupParser(Parser):
     def parseArguments(self):
         """ ( Arguments,* ) """
         self.matchLexeme('(')
-        while self.next():
+        self.next()
+        while self.hasnext():
             if self.matchLexeme(')'):
                 self.next()
                 return
 
             self.parseArgument()
 
-            if not self.peek(lexeme=')'):
+            if not self.matchLexeme(lexeme=')'):
                 self.next(lexeme=',')
 
     @trace
@@ -567,12 +580,13 @@ class MarkupParser(Parser):
         """ name = expression
             expression
         """
-        arguement = ""
+        argument = ""
 
-        if self.peek(x=2,lexeme='='):
-            self.next("Varname",tokensort=NAME)
-            argument = self.currentToken[1]
+        if self.peek(lexeme='='):
+            self.check("Varname",tokensort=NAME)
+            argument = currentToken[1]
             self.next() # skip =
+            self.next()
         else:
             #normal argument
             pass
@@ -581,9 +595,9 @@ class MarkupParser(Parser):
         argument = argument + p.parseExpression()
 
 def parse(source):
+    global tokens
     tokens = tokenize.generate_tokens(source)
     parser = WaebricParser()
-    parser.tokens = tokens
     parser.parse()
 
 if __name__ == '__main__':                     # testing
