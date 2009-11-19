@@ -3,8 +3,8 @@ Parser Module.
 
 convention:
 
-For each parser function the parsed token should be ready and waiting.
-ending with an next call to
+For each parser function the first token should be ready and waiting.
+so each parser function should read ahead for the next parser function.
 """
 
 import logging
@@ -19,7 +19,7 @@ SHOWTOKENS = True
 SHOWPARSER = True
 
 if DEBUG:
-    LOG_FILENAME = 'parser logging.out'
+    LOG_FILENAME = 'parser.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
 
 
@@ -33,16 +33,13 @@ keywords = {'IF':'if', 'ELSE':'else',
             'LIST':'list', 'RECORD':'record', 'STRING':'string',
             }
 
-
 ## debug tools.
-
 def strToken(type, token, (srow, scol), (erow, ecol), line):
     return "%d,%d-%d,%d:\t%s\t%s" % \
         (srow, scol, erow, ecol, tok_name[type], repr(token))
 
 def logToken(*token):
     logging.debug(strToken(*token))
-
 
 def _trace(f, *args, **kw):
     logging.debug("calling %s with args %s, %s" % \
@@ -69,12 +66,17 @@ class UnexpectedToken(Exception):
         return "%s expected: %s" % (tokenize.tokentostring(*self.token),
             self.expected)
 
+#class ParsingState(type):
+#    tokens = []
+#    peekedTokens = []
+#    currentToken = []
 
 class Parser(object):
-    tokens = []
+
+    tokens = [] #generator
+
     peekedTokens = []
     currentToken = []
-
 
     def __init__(self, Parser=None):
 
@@ -93,7 +95,7 @@ class Parser(object):
         return False
 
     def matchTokensort(self, tokensort):
-        """ return boolen if current token matches tokensort """
+        """ return boolean if current token matches tokensort """
         return self.currentToken[0] == tokensort
 
     def check(self, expected="", tokensort=None, lexeme=None):
@@ -157,6 +159,7 @@ class Parser(object):
 
 class WaebricParser(Parser):
     """ start the parsing!"""
+
     def parse(self):
         logging.debug("--------------------")
         logging.debug('start parsing tokens')
@@ -278,7 +281,7 @@ class SiteParser(Parser):
 
 
 class FunctionParser(Parser):
-
+    @trace
     def parseFunction(self):
         self.check(expected="function defenition, def", lexeme=keywords['DEF'])
         self.next(tokensort=NAME)
@@ -325,9 +328,11 @@ class ExpressionParser(Parser):
         elif self.matchLexeme("{"):
             expression = self.parseRecord()
         elif self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
+            expression = self.currentToken[1]
             while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
                 self.next(lexeme=".") #skip.
                 self.next(expected="NAME", tokensort=NAME)
+                expression = expression + '.' + self.currentToken[1]
                 #ast. stuff.
         elif self.peek(lexeme="+") and expression:
             #parse a + expression left and right.
@@ -339,7 +344,7 @@ class ExpressionParser(Parser):
         logging.debug(expression)
         if not expression:
             raise UnexpectedToken(self.currentToken,
-                expected="Expression: symbol, string, number, list, record, name.data")
+                expected="Expression: symbol, string, number, list, record, name.field")
         self.next()
         return expression
 
@@ -514,7 +519,7 @@ class MarkupParser(Parser):
     @trace
     def parseDesignator(self):
         """ p attributes* markup """
-        self.check(tokensort=NAME)
+        self.check("NAME",tokensort=NAME)
         #AST create designator.
         #peek first character for possible attribute
         self.next()
@@ -559,7 +564,9 @@ class MarkupParser(Parser):
 
     @trace
     def parseArgument(self):
-        """ name = expression || expression"""
+        """ name = expression
+            expression
+        """
         arguement = ""
 
         if self.peek(x=2,lexeme='='):
