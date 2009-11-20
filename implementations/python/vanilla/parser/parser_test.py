@@ -25,9 +25,10 @@ class TestParser(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        self.assertEqual(p.matchTokensort(NAME), True)
+        self.assertEqual(p.matchTokensort(KEYWORD), True)
         self.assertEqual(p.matchTokensort(NUMBER), False)
         p.next()
+        self.assertEqual(p.matchTokensort(NAME), True)
         p.next()
         self.assertEqual(p.matchTokensort(NAME), False)
         self.assertEqual(p.matchTokensort(NUMBER), True)
@@ -115,8 +116,31 @@ class TestParserClasses(unittest.TestCase):
         self.assertRaises(UnexpectedToken, _parse_site, badsource)
         #TODO more cases
 
+class TestPredicateParser(unittest.TestCase):
+
+    def _parserPredicate(self, source):
+        p = PredicateParser()
+        p.setTokens(generate_tokens(gen_line(source)))
+        p.next()
+        p.parsePredicate()
+
+    def test_predicate_type(self):
+        source = "variable.list? "
+        self._parserPredicate(source)
+        source = "variable.record? "
+        self._parserPredicate(source)
+
+    def test_predicate_or(self):
+        source = "10 || 20 "
+        self._parserPredicate(source)
+
+    def test_predicate_and(self):
+        source = "var &&  var"
+        self._parserPredicate(source)
+
+
 class TestMarkup(unittest.TestCase):
- 
+
     def _parse_markup(self,source):
         p = StatementParser()
         p.setTokens(generate_tokens(gen_line(source)))
@@ -136,10 +160,39 @@ class TestMarkup(unittest.TestCase):
         self._parse_markup(source)
 
 
-    def test_statement(self):
+class TestStatementParser(unittest.TestCase):
+
+    def _parse_statement(self, source):
+        p = StatementParser()
+        p.setTokens(generate_tokens(gen_line(source)))
+        p.next()
+        p.parseStatement()
+
+    def test_if_(self):
+        source = "if  ( bla )  h1 name; "
+        self._parse_statement(source)
+        source = """
+        if ( a = "b" ) { h2 markup "data"; markup; }
+        else { "other stuff"; }
+        """
+        self._parse_statement(source)
+
+    def test_each(self):
+        source = "each ( var : expression ) m var;"
         pass
 
-    def test_let_statement(self):
+    def test_cdata(self):
+        pass
+
+
+    def test_yield(self):
+        source = "yield;"
+        pass
+
+    def test_comment(self):
+        pass
+
+    def test_let_(self):
         pass
 
 
@@ -155,8 +208,6 @@ class TestExpression(unittest.TestCase):
     def test_symbol(self):
         sourceSymbol = "'symbol"
         self._parse_expression(sourceSymbol)
-        sourceSymbol = "symbol"
-        self.assertRaises(UnexpectedToken,self._parse_expression,sourceSymbol)
 
     def test_list(self):
         sourceList = '[ "i1", "i2" ]'
@@ -166,7 +217,7 @@ class TestExpression(unittest.TestCase):
         sourceRecord = '{ key : "value" , key2 : "value2" } '
         self._parse_expression(sourceRecord)
 
-        sourceRecord = '{ key : "value" , key2 : value2 } '
+        sourceRecord = '{ key : "value" , key2 :  } '
         self.assertRaises(UnexpectedToken, self._parse_expression, sourceRecord)
 
     def test_number(self):
@@ -184,7 +235,7 @@ class TestExpression(unittest.TestCase):
     def test_plus(self):
         sourcePlus = '"a" + "b"'
         self._parse_expression(sourcePlus)
-        sourcePlus = 'a + "b"'
+        sourcePlus = ' + "b"'
         self.assertRaises(UnexpectedToken, self._parse_expression, sourcePlus)
 
 if __name__ == '__main__':

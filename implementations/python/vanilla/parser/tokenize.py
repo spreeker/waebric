@@ -1,6 +1,7 @@
 
 import string, re
 from token import *
+from keywords import keywords
 
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def any(*choices): return group(*choices) + '*'
@@ -226,7 +227,11 @@ def generate_tokens(readline):
                         yield (EMBSTRING, token, spos, epos, line)
                         pos = pos - 1 # Enables recognizing post embed string
                 elif initial in namechars:                 # ordinary name
-                    yield (NAME, token, spos, epos, line)
+                    #keyword check?
+                    if keywords.has_key(token.upper()):
+                        yield (KEYWORD, token, spos, epos, line)
+                    else:
+                        yield (NAME, token, spos, epos, line)
                 else:
                     if initial in '([{': parenlev = parenlev + 1
                     elif initial in ')]}': parenlev = parenlev - 1

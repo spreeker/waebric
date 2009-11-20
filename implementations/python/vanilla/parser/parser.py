@@ -11,27 +11,18 @@ import logging
 import tokenize
 import re
 from decorator import decorator
+from keywords import keywords
 
 from token import *
 
 DEBUG = True
 SHOWTOKENS = True
-SHOWPARSER = True
+SHOWPARSER =  True
 
 if DEBUG:
     LOG_FILENAME = 'parser.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
 
-
-keywords = {'IF':'if', 'ELSE':'else',
-            'EACH':'each', 'LET':'let', 'IN':'in', 'COMMENT':'comment',
-            'ECHO':'echo', 'CDATA':'cdata', 'YIELD':'yield',
-
-            'MODULE':'module', 'IMPORT':'import', 'DEF':'def', 'END':'end',
-            'SITE':'site',
-
-            'LIST':'list', 'RECORD':'record', 'STRING':'string',
-            }
 
 ## debug tools.
 def strToken(type, token, (srow, scol), (erow, ecol), line):
@@ -164,7 +155,7 @@ class WaebricParser(Parser):
         logging.debug("--------------------")
         logging.debug('start parsing tokens')
         logging.debug("--------------------")
-        module = ModuleParser(self)
+        module = ModuleParser()
         module.next()
         module.parseModule()
 
@@ -234,12 +225,13 @@ class SiteParser(Parser):
         self.next( lexeme=":" )
         self.next( tokensort=NAME )
         #self.next()
-        p = MarkupParser(self)
+        p = MarkupParser()
         p.parseMarkup()
         p.next()
         #p.next( lexeme=';')
         #setmarkup on mapping
 
+    @trace
     def parsePath(self):
         path = ""
         if self.peek(lexeme="/") or self.peek(x=2,lexeme="/"):
@@ -248,6 +240,7 @@ class SiteParser(Parser):
         logging.debug(path)
         #AST path stuff.
 
+    @trace
     def parseDirectory(self):
         directory = ""
         if self.isPathElement():
@@ -268,6 +261,7 @@ class SiteParser(Parser):
                 raise UnexpectedToken(currentToken, expected="path element")
         raise UnexpectedToken(currentToken, expected="directory path")
 
+    @trace
     def parseFileName(self):
         self.check(tokensort=NAME, expected="File Name")
         name = currentToken[1]
@@ -276,6 +270,7 @@ class SiteParser(Parser):
         name = "%s.%s" % (name, currentToken[1])
         return name
 
+    @trace
     def isPathElement(self):
         regex = re.compile(r"(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")
         if regex.match(currentToken[1]):
@@ -321,6 +316,9 @@ class ExpressionParser(Parser):
             self.next("symbol name", tokensort=NAME)
             expression = currentToken[1]
             #symbol.
+        elif self.matchTokensort(NAME):
+            #Variable
+            expression = currentToken[1]
         elif self.matchTokensort(STRING):
             expression = currentToken[1]
             #data string
@@ -399,7 +397,51 @@ class ExpressionParser(Parser):
             logging.debug("exp" + expression)
 
 class PredicateParser(Parser):
-    pass
+
+    @trace
+    def parsePredicate(self):
+        predicate = None
+        if self.matchLexeme('!'):
+            self.next() #skip !.
+            predicate = '!' + self.parsePredicate()
+        else:
+            #normal ast predicate
+            pass
+
+        p = ExpressionParser()
+        predicate = p.parseExpression()
+
+        if self.matchLexeme("."): # var.type?
+            self.next("list?, record?, string?", tokensort=KEYWORD)
+            if self.matchLexeme(keywords['LIST']):
+                ptype = "LIST"
+            if self.matchLexeme(keywords['RECORD']):
+                ptype = "RECORD"
+            if self.matchLexeme(keywords['STRING']):
+                ptype = "STRING"
+            self.next()
+            self.matchLexeme('?')
+            predicate = "%s.%s?" % (predicate,ptype)
+            self.next()
+        elif self.matchLexeme('&') and self.peek(lexeme='&'):
+            self.next()
+            self.next()
+            right = self.parsePredicate()
+            #and
+            predicate = "%s && %s" % (predicate, right)
+        elif self.matchLexeme('|') and self.peek(lexeme='|'):
+            self.next()
+            self.next()
+            right =  self.parsePredicate()
+            predicate = "%s || %s" % (predicate, right)
+            self.next()
+
+        if not predicate:
+            raise UnexpectedToken(currentToken,
+                        "pasing predicate failed && || type? variable")
+
+        logging.debug(predicate)
+        return predicate
 
 
 class StatementParser(Parser):
@@ -420,10 +462,12 @@ class StatementParser(Parser):
         elif self.matchLexeme('}'): #? should be removed.
             return
         elif self.matchLexeme('{'): #? starts a new staments block
+
             return
         elif self.matchLexeme(keywords['COMMENT']):
             return
         elif self.matchLexeme(keywords['YIELD']):
+            self.next(lexeme=";")
             return
         elif self.matchTokensort(NAME):
             self.parseMarkupStatements()
