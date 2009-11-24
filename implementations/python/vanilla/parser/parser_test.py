@@ -169,7 +169,7 @@ class TestStatementParser(unittest.TestCase):
         p.parseStatement()
 
     def test_if_(self):
-        source = "if  ( bla )  h1 name; "
+        source = "if  ( bla )  h1 name;"
         self._parse_statement(source)
         source = """
         if ( a = "b" ) { h2 markup "data"; markup; }
@@ -179,21 +179,24 @@ class TestStatementParser(unittest.TestCase):
 
     def test_each(self):
         source = "each ( var : expression ) m var;"
-        pass
+        self._parse_statement(source)
+
 
     def test_cdata(self):
-        pass
-
+        source = "cdata expression;"
+        self._parse_statement(source)
 
     def test_yield(self):
         source = "yield;"
-        pass
+        self._parse_statement(source)
 
     def test_comment(self):
-        pass
+        source = 'comment "commentString";'
+        self._parse_statement(source)
 
     def test_let_(self):
-        pass
+        source = "let x = bla.bla.bla in statement x; end"
+        self._parse_statement(source)
 
 
 

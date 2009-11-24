@@ -316,9 +316,6 @@ class ExpressionParser(Parser):
             self.next("symbol name", tokensort=NAME)
             expression = currentToken[1]
             #symbol.
-        elif self.matchTokensort(NAME):
-            #Variable
-            expression = currentToken[1]
         elif self.matchTokensort(STRING):
             expression = currentToken[1]
             #data string
@@ -329,13 +326,6 @@ class ExpressionParser(Parser):
             expression = self.parseList()
         elif self.matchLexeme("{"):
             expression = self.parseRecord()
-        elif self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
-            expression = currentToken[1]
-            while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
-                self.next(lexeme=".") #skip.
-                self.next(expected="NAME", tokensort=NAME)
-                expression = expression + '.' + currentToken[1]
-                #ast. stuff.
         elif self.peek(lexeme="+") and expression:
             #parse a + expression left and right.
             #ast set left = currently parsed expression
@@ -344,6 +334,17 @@ class ExpressionParser(Parser):
             right = self.parseExpression()
             expression = left + '+' + right
             #ast set right.
+        elif self.matchTokensort(NAME):
+            #Variable
+            expression = currentToken[1]
+            if self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
+                expression = currentToken[1]
+                while self.peek(lexeme=".") and self.peek(x=2, tokensort=NAME):
+                    self.next(lexeme=".") #skip.
+                    self.next(expected="NAME", tokensort=NAME)
+                    expression = expression + '.' + currentToken[1]
+                    #ast. stuff.
+
         logging.debug(expression)
         if not expression:
             raise UnexpectedToken(currentToken,
@@ -448,31 +449,48 @@ class StatementParser(Parser):
 
     @trace
     def parseStatement(self):
+        statement = ""
         if self.matchLexeme(keywords['LET']):
             self.parseLetStatement()
-            return
+            return "LET"
         if self.matchLexeme(keywords['IF']):
-            return
+            ifstm = self.parseIfStatement()
+            return ifstm
         elif self.matchLexeme(keywords['EACH']):
             self.parseEachStatement()
+            return "EACH"
         elif self.matchLexeme(keywords['ECHO']):
-            return
+            statement = 'echo'
+            if self.peek(tokensort=PRESTRING):
+                p = EmbeddingParser()
+                emb = p.parseEmbedding()
+                return "%s %s" % (statement, emb)
+            self.next( tokensort=STRING )
+            statement = '%s %s' % (statement, currentToken[1])
+            return statement
         elif self.matchLexeme(keywords['CDATA']):
-            return
-        elif self.matchLexeme('}'): #? should be removed.
-            return
+            statement = 'cdata'
+            self.next()
+            p = ExpressionParser()
+            exp = p.parseExpression()
+            statement = '%s %s' % (statement, exp)
+            return statement
         elif self.matchLexeme('{'): #? starts a new staments block
-
-            return
+            block = self.matchStatementBlock()
+            return block
         elif self.matchLexeme(keywords['COMMENT']):
-            return
+            statement = 'comment'
+            self.next( tokensort=STRING )
+            statement = '%s %s' % (statement, currentToken[1])
+            return statement
         elif self.matchLexeme(keywords['YIELD']):
             self.next(lexeme=";")
-            return
+            return "YIELD"
         elif self.matchTokensort(NAME):
             self.parseMarkupStatements()
+            return "NAME"
+        elif self.matchTokensort( ENDMARKER ):
             return
-
         raise UnexpectedToken(currentToken,
             expected="""statement, "if", "each", "let", "{", "comment",
                 "echo", "cdata", "yield" or Markup""" )
@@ -480,27 +498,85 @@ class StatementParser(Parser):
     def parseLetStatement(self):
         if self.matchLexeme(keywords['LET']):
             while self.next():
-                #TODO parse assignment markup.
+                self.parseAssignment()
                 if self.matchLexeme(keywords['IN']):
                     while self.next():
+                        self.parseStatement()
                         if self.matchLexeme(keywords['END']):
                             logging.debug("end LET block")
                             return
-                        self.parseStatement()
                     raise UnexpectedToken(currentToken,
                         expected="missing END of LET .. IN .. END block")
             raise UnexpectedToken(currentToken,
                 expected = """LET .. IN .. END, missing IN """)
 
     @trace
-    def parserEachtStatement(self):
-        self.matchLexeme(keywords['EACH'])
+    def parseAssignment(self):
+        if self.peek( lexeme = '(' ):
+            return self.parseFunctionAssignment()
+        else:
+            return self.parseVariableAssignment()
+
+    @trace
+    def parseFunctionAssignment(self):
+        return "dont know syntax"
+
+    @trace
+    def parseVariableAssignment(self):
+        """ var = expression """
+        self.check( tokensort=NAME )
+        var = currentToken[1]
+        self.next( lexeme = "=" )
+        self.next()
+        p = ExpressionParser()
+        exp = p.parseExpression()
+        if self.matchLexeme( ',' ):
+            return "%s = %s" % ( var, self.parseVariableAssignment())
+        return exp
+
+    @trace
+    def parseEachStatement(self):
+        self.check(lexeme = keywords['EACH'])
         self.next(lexeme='(')
         self.next("Var", tokensort=NAME)
+        name = currentToken[1]
         self.next(lexeme=':')
         self.next()
-        self.parseExpression()
+        p = ExpressionParser()
+        exp = p.parseExpression()
+        self.check(lexeme = ')' )
+        self.next()
+        stm = self.parseStatement()
+        return "each ( %s : %s ) %s" % (name, exp,stm)
 
+    @trace
+    def parseIfStatement(self):
+        self.check(lexeme = keywords['IF'])
+        self.next( lexeme = '(' )
+        self.next()
+        p = PredicateParser()
+        predicate = p.parsePredicate()
+        p.check( lexeme = ')' )
+        self.next()
+        p = StatementParser()
+        stm = p.parseStatement()
+        statement = "if %s {%s}" % (stm,predicate)
+        if self.matchLexeme(keywords['ELSE']):
+            self.next()
+            stm = p.parseStatement()
+            statement = "%s else %s" % (statement, stm)
+
+        return statement
+
+    @trace
+    def parseStatementBlock(self):
+        self.check(lexeme='{')
+        block = ""
+        while not self.matchLexeme('}'):
+            statement = self.parseStatement()
+            block = "%s%s" % (block, statement)
+        self.next()
+        return block
 
     @trace
     def parseMarkupStatements(self):
@@ -515,10 +591,12 @@ class StatementParser(Parser):
 
         markup = MarkupParser(self)
         while self.hasnext():
-            markup.parseMarkup()
+            m = markup.parseMarkup()
             if self.matchTokensort(STRING):
                 self.next()
-            #TODO embedding.
+            if self.matchTokensort(PRESTRING):
+                p = EmbeddingParser()
+                emb = p.parseEmbedding()
             #if self.matchTokensort(
             if self.matchLexeme(';'):
                 self.next() # skip ;
@@ -526,36 +604,29 @@ class StatementParser(Parser):
         raise UnexpectedToken(currentToken,
                 expected =  "Statement ;")
 
-    def isMarkup(self):
-        """
-        NEEDED??
-        current token is markup if:
-        next = name
-        next = ()
-        next = atributes
-        """
-        pass
-
 
 class EmbeddingParser(Parser):
+
     @trace
     def parseEmbedding(self):
         self.check('embedding " < > " ', tokensort=PRESTRING)
-
+        emb = ""
         while not self.peek(tokensort=POSTSTRING):
+            emb = "%s %s" % ( emb, currentToken[1])
             self.next()
             if self.matchTokensort(EMBSTRING):
-                #AST.
-                pass
+                emb = "%s %s" % ( emb, currentToken[1])
             elif self.matchTokensort(PRESTRING):
-                #AST
-                pass
+                emb = "%s %s" % ( emb, currentToken[1])
             else:
                 raise UnexpectedToken(currentToken,
                     expected = "Embedded string Error")
+
         self.next("tail of embedded string", tokensort=POSTSTRING)
+        emb = "%s %s" % ( emb, currentToken[1])
         #AST
         self.next()
+        return emb
 
 class MarkupParser(Parser):
     """
@@ -637,6 +708,7 @@ class MarkupParser(Parser):
 
         p = ExpressionParser(self)
         argument = argument + p.parseExpression()
+
 
 def parse(source):
     global tokens
