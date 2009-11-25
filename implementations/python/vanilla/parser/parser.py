@@ -276,7 +276,7 @@ def parseFunction(parser):
     parser.next(tokensort=NAME)
     parser.next()
     ## parse formals
-    parseMarkup(parser)
+    parseArguments(parser)
     ## parser statements.
 
     while(parser.hasnext()):
