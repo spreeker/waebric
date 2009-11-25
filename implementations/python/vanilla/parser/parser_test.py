@@ -74,7 +74,7 @@ class TestParserClasses(unittest.TestCase):
         return p
 
     def test_parseFunction(self):
-        source = """def test
+        source = """def test(argument)
           p "bla";
           p p p();
         end"""
@@ -83,13 +83,6 @@ class TestParserClasses(unittest.TestCase):
         p.next()
         p.parseFunction()
 
-        #source = """def test
-        #  p "bla";
-        #  p p p();
-        #"""
-        #p.tokens = generate_tokens(gen_line(source))
-        #p.next()
-        #self.assertRaises(UnexpectedToken, p.parseFunction)
 
     def test_module(self):
         source = "module menus"

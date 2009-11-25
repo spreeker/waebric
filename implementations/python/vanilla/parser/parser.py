@@ -282,14 +282,16 @@ class FunctionParser(Parser):
     @trace
     def parseFunction(self):
         self.check(expected="function defenition, def", lexeme=keywords['DEF'])
-        self.next(tokensort=NAME)
         ## parse identifier
-
+        self.next(tokensort=NAME)
+        self.next()
         ## parse formals
-
+        p = MarkupParser()
+        p.parseArguments()
         ## parser statements.
-        while(self.next()):
-            statement = StatementParser(self)
+        statement = StatementParser(self)
+
+        while(self.hasnext()):
             statement.parseStatement()
 
             if self.matchLexeme(keywords['END']):
@@ -715,6 +717,7 @@ def parse(source):
     tokens = tokenize.generate_tokens(source)
     parser = WaebricParser()
     parser.parse()
+
 
 if __name__ == '__main__':                     # testing
     import sys
