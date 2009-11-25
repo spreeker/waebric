@@ -67,8 +67,8 @@ class TestParser(unittest.TestCase):
 
 class TestParserClasses(unittest.TestCase):
 
-    def initialize_parser(self, parserClass, source):
-        p = parserClass()
+    def initialize_parser(self, source):
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         return p
@@ -78,44 +78,38 @@ class TestParserClasses(unittest.TestCase):
           p "bla";
           p p p();
         end"""
-        p = FunctionParser()
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        p.parseFunction()
+        parseFunction(p)
 
 
     def test_module(self):
         source = "module menus"
-        p = self.initialize_parser(ModuleParser, source)
-        p.parseModule()
+        p = self.initialize_parser(source)
+        parseModule(p)
 
         badsource = "mod fout"
-        p = self.initialize_parser(ModuleParser, badsource)
-        self.assertRaises(UnexpectedToken, p.parseModule)
+        p = self.initialize_parser(badsource)
+        self.assertRaises(UnexpectedToken, parseModule, p)
 
 
     def test_site(self):
-
-        def _parse_site(source):
-            p = SiteParser()
-            p.setTokens(generate_tokens(gen_line(source)))
-            p.next()
-            p.parseSite()
-
         source = "site dir/dir2/file.ext: startfunction(); end"
-        _parse_site(source)
+        p = self.initialize_parser(source)
+        parseSite(p)
 
         badsource = "site nameBLEH"
-        self.assertRaises(UnexpectedToken, _parse_site, badsource)
-        #TODO more cases
+        p = self.initialize_parser(badsource)
+        self.assertRaises(UnexpectedToken, parseSite, p)
 
 class TestPredicateParser(unittest.TestCase):
 
     def _parserPredicate(self, source):
-        p = PredicateParser()
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        p.parsePredicate()
+        parsePredicate(p)
 
     def test_predicate_type(self):
         source = "variable.list? "
@@ -135,10 +129,10 @@ class TestPredicateParser(unittest.TestCase):
 class TestMarkup(unittest.TestCase):
 
     def _parse_markup(self,source):
-        p = StatementParser()
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        p.parseStatement()
+        parseStatement(p)
 
     def test_markup(self):
         source = "markup ;"
@@ -156,10 +150,10 @@ class TestMarkup(unittest.TestCase):
 class TestStatementParser(unittest.TestCase):
 
     def _parse_statement(self, source):
-        p = StatementParser()
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        p.parseStatement()
+        parseStatement(p)
 
     def test_if_(self):
         source = "if  ( bla )  h1 name;"
@@ -196,10 +190,10 @@ class TestStatementParser(unittest.TestCase):
 class TestExpression(unittest.TestCase):
 
     def _parse_expression(self,source):
-        p = ExpressionParser()
+        p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        p.parseExpression()
+        parseExpression(p)
 
     def test_symbol(self):
         sourceSymbol = "'symbol"
