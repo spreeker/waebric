@@ -1,18 +1,21 @@
 """
 Parser Module.
 
+Waebric Parser Module. Builds the ast tree of waebric source.
+
 convention:
 
-For each parser function the first token should be ready and waiting.
-so each parser function should read ahead for the next parser function.
+For each parser function the first token should be ready.
+Therefore each parser function should read ahead the first token for the next
+parser function.
 """
 
 import logging
 import tokenize
 import re
+
 from decorator import decorator
 from keywords import keywords
-
 from token import *
 
 DEBUG = True
@@ -22,7 +25,6 @@ SHOWPARSER =  True
 if DEBUG:
     LOG_FILENAME = 'parser.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
-
 
 ## debug tools.
 def strToken(type, token, (srow, scol), (erow, ecol), line):
@@ -43,26 +45,33 @@ def trace(f):
     return decorator(_trace, f)
 
 
-class UnexpectedToken(Exception):
+class SyntaxError(Exception):
+    """Base class for exceptions raised by the parser."""
 
     def __init__(self, token, expected=""):
         self.token = token
         self.expected = expected
-        logging.debug("raised exception on:")
-        logToken(*token)
-        #tokenize.printtoken(*token)
-        logging.debug("expected: %s" % expected)
+        self.line = token[-1]
+        self.lineno = token[3][0]
+        self.offset = token[3][1]
+
+        if DEBUG:
+            logging.debug("raised exception on:")
+            logToken(*token)
+            #tokenize.printtoken(*token)
+            logging.debug("expected: %s" % expected)
 
     def __str__(self):
-        return "%s expected: %s" % (tokenize.tokentostring(*self.token),
-            self.expected)
+        return "%s at pos (%d, %d) in %r \n expected: %s" % (self.__class__.__name__,
+                                             self.lineno,
+                                             self.offset,
+                                             self.line,
+                                             self.expected)
 
-#global variables to keep state
-#tokens = []
-#peekedTokens = []
-#currentToken = []
 
 class Parser(object):
+
+    ast = []
 
     tokens = []
     peekedTokens = []
@@ -91,10 +100,10 @@ class Parser(object):
         """ check if current token is tokensort of lexeme """
         if lexeme:
            if not self.currentToken[1] == lexeme:
-                raise UnexpectedToken(self.currentToken, expected=expected)
+                raise SyntaxError(self.currentToken, expected=expected)
         if tokensort:
             if not self.currentToken[0] == tokensort:
-                raise UnexpectedToken(self.currentToken, expected=expected)
+                raise SyntaxError(self.currentToken, expected=expected)
 
     def peek(self, x=1, tokensort="", lexeme=""):
         """lookahead x tokens in advance, returns true
@@ -177,7 +186,7 @@ def parseModule(parser):
         elif parser.matchTokensort(ENDMARKER):
             return
         else:
-           raise UnexpectedToken(parser.currentToken,
+           raise SyntaxError(parser.currentToken,
         expected="import, def, site, newline" )
 
 @trace
@@ -211,7 +220,7 @@ def parseSite(parser):
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return
-    raise UnexpectedToken(currentToken, expected="missing site ending END")
+    raise SyntaxError(currentToken, expected="missing site ending END")
 
 @trace
 def parseMapping(parser):
@@ -249,8 +258,8 @@ def parseDirectory(parser):
         if isPathElement(parser):
             directory += parser.currentToken[1]
         else:
-            raise UnexpectedToken(parser.currentToken, expected="path element")
-    raise UnexpectedToken(parser.currentToken, expected="directory path")
+            raise SyntaxError(parser.currentToken, expected="path element")
+    raise SyntaxError(parser.currentToken, expected="directory path")
 
 @trace
 def parseFileName(parser):
@@ -286,7 +295,7 @@ def parseFunction(parser):
             parser.next()
             return
 
-    raise UnexpectedToken(parser.currentToken,
+    raise SyntaxError(parser.currentToken,
             expected="""END, Missing function ending END""")
 
 
@@ -337,7 +346,7 @@ def parseExpression(parser):
 
     logging.debug(expression)
     if not expression:
-        raise UnexpectedToken(parser.currentToken,
+        raise SyntaxError(parser.currentToken,
             expected="Expression: symbol, string, number, list, record, name.field")
 
     parser.next()
@@ -426,7 +435,7 @@ def parsePredicate(parser):
         parser.next()
 
     if not predicate:
-        raise UnexpectedToken(currentToken,
+        raise SyntaxError(currentToken,
                     "pasing predicate failed && || type? variable")
 
     logging.debug(predicate)
@@ -476,7 +485,7 @@ def parseStatement(parser):
         return "NAME"
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
-    raise UnexpectedToken(parser.currentToken,
+    raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
 @trace
@@ -490,9 +499,9 @@ def parseLetStatement(parser):
                     if parser.matchLexeme(keywords['END']):
                         logging.debug("end LET block")
                         return
-                raise UnexpectedToken(parser.currentToken,
+                raise SyntaxError(parser.currentToken,
                     expected="missing END of LET .. IN .. END block")
-        raise UnexpectedToken(parser.currentToken,
+        raise SyntaxError(parser.currentToken,
             expected = """LET .. IN .. END, missing IN """)
 
 @trace
@@ -579,7 +588,7 @@ def parseMarkupStatements(parser):
         if parser.matchLexeme(';'):
             parser.next() # skip ;
             return
-    raise UnexpectedToken(parser.currentToken,
+    raise SyntaxError(parser.currentToken,
             expected =  "Statement ;")
 
 @trace
@@ -594,7 +603,7 @@ def parseEmbedding(parser):
         elif parser.matchTokensort(PRESTRING):
             emb = "%s %s" % ( emb, parser.currentToken[1])
         else:
-            raise UnexpectedToken(parser.currentToken,
+            raise SyntaxError(parser.currentToken,
                 expected = "Embedded string Error")
 
     parser.next("tail of embedded string", tokensort=POSTSTRING)
@@ -644,7 +653,7 @@ def parseAttributes(parser):
         elif parser.matchLexeme(':'):
             parser.next(tokensort=NAME)
         else:
-            raise UnexpectedToken(currentToken,
+            raise SyntaxError(currentToken,
                 expected=" Attribute, # . : @ % ")
         parser.next()
 

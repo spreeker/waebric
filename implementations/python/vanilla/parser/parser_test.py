@@ -40,7 +40,7 @@ class TestParser(unittest.TestCase):
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
 
-        self.assertRaises(UnexpectedToken,
+        self.assertRaises(SyntaxError,
         p.check,tokensort=NUMBER, lexeme='def')
 
     def test_peek(self):
@@ -91,7 +91,7 @@ class TestParserClasses(unittest.TestCase):
 
         badsource = "mod fout"
         p = self.initialize_parser(badsource)
-        self.assertRaises(UnexpectedToken, parseModule, p)
+        self.assertRaises(SyntaxError, parseModule, p)
 
 
     def test_site(self):
@@ -101,7 +101,7 @@ class TestParserClasses(unittest.TestCase):
 
         badsource = "site nameBLEH"
         p = self.initialize_parser(badsource)
-        self.assertRaises(UnexpectedToken, parseSite, p)
+        self.assertRaises(SyntaxError, parseSite, p)
 
 class TestPredicateParser(unittest.TestCase):
 
@@ -208,7 +208,7 @@ class TestExpression(unittest.TestCase):
         self._parse_expression(sourceRecord)
 
         sourceRecord = '{ key : "value" , key2 :  } '
-        self.assertRaises(UnexpectedToken, self._parse_expression, sourceRecord)
+        self.assertRaises(SyntaxError, self._parse_expression, sourceRecord)
 
     def test_number(self):
         sourceNumber = "66"
@@ -226,7 +226,7 @@ class TestExpression(unittest.TestCase):
         sourcePlus = '"a" + "b"'
         self._parse_expression(sourcePlus)
         sourcePlus = ' + "b"'
-        self.assertRaises(UnexpectedToken, self._parse_expression, sourcePlus)
+        self.assertRaises(SyntaxError, self._parse_expression, sourcePlus)
 
 if __name__ == '__main__':
     unittest.main()
