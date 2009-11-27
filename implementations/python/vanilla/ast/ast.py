@@ -17,35 +17,71 @@ nodes = {}
 
 class Node:
     """Abstract base class for ast nodes."""
-    def getChildren(self):
-        pass # implemented by subclasses
     def __iter__(self):
         for n in self.getChildren():
             yield n
-    def asList(self): # for backwards compatibility
-        return self.getChildren()
+
+    def getChildren(self):
+        pass # implemented by subclasses
+
     def getChildNodes(self):
         pass # implemented by subclasses
 
 class EmptyNode(Node):
     pass
 
-
-class And(Node):
-    def __init__(self, nodes, lineno=None):
-        self.nodes = nodes
-        self.lineno = lineno
+#simple terminal nodes.
+class Name(Node):
+    def __init__(self,name):
+        self.name = name
 
     def getChildren(self):
-        return tuple(flatten(self.nodes))
+        pass # implemented by subclasses
 
     def getChildNodes(self):
-        nodelist = []
-        nodelist.extend(flatten_nodes(self.nodes))
-        return tuple(nodelist)
+        pass # implemented by subclasses
+
 
     def __repr__(self):
-        return "And(%s)" % (repr(self.nodes),)
+        return "NAME(%s)" % self.name
+
+
+class NatNum(Node):
+    """ Natural Number"""
+    def __init__(self, number):
+        self.number = int(number)
+
+    def getChildren(self):
+        pass # implemented by subclasses
+
+    def getChildNodes(self):
+        pass # implemented by subclasses
+
+
+    def __repr__(self):
+        return "NATNUM(%d)" % self.number
+
+class Text(Node):
+    def __init__(self, string):
+        self.string = string
+
+    def getChildren(self):
+        pass # implemented by subclasses
+
+    def getChildNodes(self):
+        pass # implemented by subclasses
+
+    def __repr__(self):
+        return "STRING(%s)" % self.string
+
+
+class Formals(Node):
+
+    def getChildren(self):
+        pass # implemented by subclasses
+
+    def getChildNodes(self):
+        pass # implemented by subclasses
 
 
 class CallFunc(Node):
@@ -129,7 +165,7 @@ class If(Node):
         return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
 
 class Name(Node):
-    def __init__(self, name, lineno=None):
+    def __init__(self, name):
         self.name = name
         self.lineno = lineno
 
@@ -141,77 +177,6 @@ class Name(Node):
 
     def __repr__(self):
         return "Name(%s)" % (repr(self.name),)
-
-class Not(Node):
-    def __init__(self, expr, lineno=None):
-        self.expr = expr
-        self.lineno = lineno
-
-    def getChildren(self):
-        return self.expr,
-
-    def getChildNodes(self):
-        return self.expr,
-
-    def __repr__(self):
-        return "Not(%s)" % (repr(self.expr),)
-
-class Or(Node):
-    def __init__(self, nodes, lineno=None):
-        self.nodes = nodes
-        self.lineno = lineno
-
-    def getChildren(self):
-        return tuple(flatten(self.nodes))
-
-    def getChildNodes(self):
-        nodelist = []
-        nodelist.extend(flatten_nodes(self.nodes))
-        return tuple(nodelist)
-
-    def __repr__(self):
-        return "Or(%s)" % (repr(self.nodes),)
-
-
-class With(Node):
-    def __init__(self, expr, vars, body, lineno=None):
-        self.expr = expr
-        self.vars = vars
-        self.body = body
-        self.lineno = lineno
-
-    def getChildren(self):
-        children = []
-        children.append(self.expr)
-        children.append(self.vars)
-        children.append(self.body)
-        return tuple(children)
-
-    def getChildNodes(self):
-        nodelist = []
-        nodelist.append(self.expr)
-        if self.vars is not None:
-            nodelist.append(self.vars)
-        nodelist.append(self.body)
-        return tuple(nodelist)
-
-    def __repr__(self):
-        return "With(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
-
-
-class Yield(Node):
-    def __init__(self, value, lineno=None):
-        self.value = value
-        self.lineno = lineno
-
-    def getChildren(self):
-        return self.value,
-
-    def getChildNodes(self):
-        return self.value,
-
-    def __repr__(self):
-        return "Yield(%s)" % (repr(self.value),)
 
 for name, obj in globals().items():
     if isinstance(obj, type) and issubclass(obj, Node):
