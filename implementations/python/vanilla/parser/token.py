@@ -50,7 +50,7 @@ KEYWORD = 17
 
 OP = 40
 ERRORTOKEN = 50
-N_TOKENS = 17
+N_TOKENS = 18
 
 tok_name = {}
 for _name, _value in globals().items():

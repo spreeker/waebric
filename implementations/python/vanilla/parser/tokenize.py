@@ -41,8 +41,8 @@ Special = group(r'\r?\n', r"[:;.,@/']")
 Funny = group( Bracket, Special, Operator )
 
 PseudoExtras = group(r'\\\r?\n', Comment, )
-PseudoToken = Whitespace + group(PseudoExtras, Number, Funny , Name,
-                ContStr, ContComment, ContEmb)
+PseudoToken = Whitespace + group(PseudoExtras, Number, Name,
+                ContStr, ContComment, ContEmb, Funny)
 
 pseudoprog = re.compile( PseudoToken )
 
@@ -197,7 +197,7 @@ def generate_tokens(readline):
                     else :                                 # ordinary comment
                         yield( COMMENT, token, spos, epos, line)
                         continue
-                elif initial in "\"" or initial in ">":
+                elif initial in '"' or initial in ">":
                     if initial in ">":
                         start = start + 1
                         postembed = True
