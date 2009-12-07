@@ -56,8 +56,6 @@ def tokentostring(type, token, (srow, scol), (erow, ecol), line): # for testing
         (srow, scol, erow, ecol, tok_name[type], repr(token))
 
 
-class TokenError(Exception): pass
-
 def tokenize(readline, tokeneater=printtoken):
     """
     The tokenize() function accepts two parameters: one representing the
@@ -107,7 +105,7 @@ def generate_tokens(readline):
 
         if contstr:                            # continued string
             if not line:
-                raise TokenError, ("EOF in multi-line string", strstart)
+                raise TokenError("EOF in multi-line string", strstart)
 
             endmatch = pre_string.match(line) # pre string of an embedding
             if not endmatch:
@@ -133,7 +131,7 @@ def generate_tokens(readline):
                 continue
         elif contcomment:                       # continued comment
             if not line:
-                raise TokenError, ("EOF in multi-line comment", commentstart)
+                raise TokenError("EOF in multi-line comment", commentstart)
             endmatch = endcomment.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
@@ -147,7 +145,7 @@ def generate_tokens(readline):
                 continue
         elif contemb:                            # continued embedding
             if not line:
-                raise TokenError, ("EOF in multi-line embedded string", commentstart)
+                raise TokenError("EOF in multi-line embedded string", commentstart)
             endmatch = endembed.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
@@ -169,7 +167,7 @@ def generate_tokens(readline):
 
         else :                                # continued statement
             if not line:
-                raise TokenError, ("EOF in multi-line statement", (lnum, 0))
+                raise TokenError("EOF in multi-line statement", (lnum, 0))
 
         while pos < max:
             pseudomatch = pseudoprog.match(line, pos)

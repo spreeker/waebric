@@ -1,72 +1,36 @@
 """
 Parser Module.
 
-Waebric Parser Module. Builds the ast tree of waebric source.
+Waebric Parser Module.
+
+-uses tokenize generator to tokenize source.
+-recursive decent parser for waebric source.
+-parser class keeps state of currentToken,peekedTokens.
+-Builds ast tree of waebric source.
+
+In error.py there are variables:
+DEBUG,SHOWTOKENS,SHOWPARSER magic which enable detailed
+logging in parser.log
+
+-trace decorator enables logging function calls
+with the @trace decorator in parser.log.
 
 convention:
 
 For each parser function the first token should be ready.
-Therefore each parser function should read ahead the first token for the next
-parser function.
+Therefore each parser function should read ahead the first 
+token for the next parser function.
 """
 
 import logging
 import tokenize
 import re
 
-from decorator import decorator
+from error import SyntaxError
+from error import trace,logToken
+from error import DEBUG, SHOWTOKENS, SHOWPARSER
 from keywords import keywords
 from token import *
-
-DEBUG = True
-SHOWTOKENS = True
-SHOWPARSER =  True
-
-if DEBUG:
-    LOG_FILENAME = 'parser.log'
-    logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
-
-## debug tools.
-def strToken(type, token, (srow, scol), (erow, ecol), line):
-    return "%d,%d-%d,%d:\t%s\t%s" % \
-        (srow, scol, erow, ecol, tok_name[type], repr(token))
-
-def logToken(*token):
-    logging.debug(strToken(*token))
-
-def _trace(f, *args, **kw):
-    logging.info("calling %s with args %s, %s" % \
-            (f.__name__, args, kw ))
-    result = f(*args, **kw)
-    logging.info("exit %s" % f.__name__)
-    return result
-
-def trace(f):
-    return decorator(_trace, f)
-
-
-class SyntaxError(Exception):
-    """Base class for exceptions raised by the parser."""
-
-    def __init__(self, token, expected=""):
-        self.token = token
-        self.expected = expected
-        self.line = token[-1]
-        self.lineno = token[3][0]
-        self.offset = token[3][1]
-
-        if DEBUG:
-            logging.debug("raised exception on:")
-            logToken(*token)
-            #tokenize.printtoken(*token)
-            logging.debug("expected: %s" % expected)
-
-    def __str__(self):
-        return "%s at pos (%d, %d) in %r \n expected: %s" % (self.__class__.__name__,
-                                             self.lineno,
-                                             self.offset,
-                                             self.line,
-                                             self.expected)
 
 
 class Parser(object):
@@ -82,6 +46,7 @@ class Parser(object):
            logging.debug(type(self))
 
     def setTokens(self, newtokens):
+        # needed test for test code.
         self.tokens = newtokens
         self.peekedTokens = []
         self.currentToken = []
@@ -132,7 +97,7 @@ class Parser(object):
     def next(self, expected="", tokensort="", lexeme=""):
         """
         Get the next token, if tokensort or lexeme is defined
-        checks if next token matches tokensort of lexeme.
+        checks if next token matches tokensort or lexeme.
         """
 
         if self.peekedTokens:
@@ -166,13 +131,13 @@ def parseWaebrick(parser):
 
 @trace
 def parseModule(parser):
-    """parse module statements """
+    """parse module statements"""
     parser.check('Module ModuleID', lexeme=keywords['MODULE'] )
 
     #create a new ast module.
     #parse the module identifier.
     parser.next()
-    parseModuleId(parser)
+    id = parseModuleId(parser)
 
     # while there are more tokens
     # parse for Site , Function and Import statements
@@ -180,7 +145,7 @@ def parseModule(parser):
         if parser.matchLexeme(keywords['IMPORT']):
             parseImport(parser)
         elif parser.matchLexeme(keywords['DEF']):
-            parseFunction(parser)
+            function = parseFunction(parser)
         elif parser.matchLexeme(keywords['SITE']):
             parseSite(parser)
         elif parser.matchTokensort(ENDMARKER):
@@ -188,6 +153,7 @@ def parseModule(parser):
         else:
            raise SyntaxError(parser.currentToken,
         expected="import, def, site, newline" )
+
 
 @trace
 def parseModuleId(parser):
@@ -201,6 +167,7 @@ def parseModuleId(parser):
         parser.next() #skip .
         parser.next("Module Identifier", tokensort=NAME)
         moduleID.append(currentToken)
+
     parser.next()
 
 @trace

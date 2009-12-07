@@ -1,28 +1,55 @@
+import logging
 
+from decorator import decorator
+from token import *
+
+DEBUG = True
+SHOWTOKENS = True
+SHOWPARSER =  True
+
+if DEBUG:
+    LOG_FILENAME = 'parser.log'
+    logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
+
+def strToken(type, token, (srow, scol), (erow, ecol), line):
+    return "%d,%d-%d,%d:\t%s\t%s" % \
+        (srow, scol, erow, ecol, tok_name[type], repr(token))
+
+def logToken(*token):
+    logging.debug(strToken(*token))
+
+def _trace(f, *args, **kw):
+    logging.info("calling %s with args %s, %s" % \
+            (f.__name__, args, kw ))
+    result = f(*args, **kw)
+    logging.info("exit %s" % f.__name__)
+    return result
+
+def trace(f):
+    return decorator(_trace, f)
 
 class SyntaxError(Exception):
     """Base class for exceptions raised by the parser."""
 
-    def __init__(self, msg, lineno=0, offset=0, text=None, filename=None):
-        self.msg = msg
-        self.lineno = lineno
-        self.offset = offset
-        self.text = text
-        self.filename = filename
-        self.print_file_and_line = False
+    def __init__(self, token, expected=""):
+        self.token = token
+        self.expected = expected
+        self.line = token[-1]
+        self.lineno = token[3][0]
+        self.offset = token[3][1]
 
-    def wrap_info(self, space, filename):
-        return space.newtuple([space.wrap(self.msg),
-                               space.newtuple([space.wrap(filename),
-                                               space.wrap(self.lineno),
-                                               space.wrap(self.offset),
-                                               space.wrap(self.text)])])
+        if DEBUG:
+            logging.debug("raised exception on:")
+            logToken(*token)
+            #tokenize.printtoken(*token)
+            logging.debug("expected: %s" % expected)
 
     def __str__(self):
-        return "%s at pos (%d, %d) in %r" % (self.__class__.__name__,
+        return "%s at pos (%d, %d) in %r \n expected: %s" % (self.__class__.__name__,
                                              self.lineno,
                                              self.offset,
-                                             self.text)
+                                             self.line,
+                                             self.expected)
 
 
 class ASTError(Exception):
