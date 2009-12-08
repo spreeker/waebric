@@ -362,10 +362,7 @@ def parsePredicate(parser):
     predicate = None
     if parser.matchLexeme('!'):
         parser.next() #skip !.
-        predicate = '!' + parser.parsePredicate()
-    else:
-        #normal ast predicate
-        pass
+        predicate = Not(parser.parsePredicate())
 
     predicate = parseExpression(parser)
 
@@ -379,19 +376,19 @@ def parsePredicate(parser):
             ptype = "STRING"
         parser.next()
         parser.check('type?', lexeme='?')
-        predicate = "%s.%s?" % (predicate,ptype)
+        predicate = Is_a(predicate,ptype)
         parser.next()
     elif parser.matchLexeme('&') and parser.peek(lexeme='&'):
-        parser.next()
+        parser.next() #skip &&
         parser.next()
         right = parsePredicate(parser)
         #and
-        predicate = "%s && %s" % (predicate, right)
+        predicate = And(predicate, right)
     elif parser.matchLexeme('|') and parser.peek(lexeme='|'):
-        parser.next()
+        parser.next() #skip ||
         parser.next()
         right =  parsePredicate(parser)
-        predicate = "%s || %s" % (predicate, right)
+        predicate = Or(predicate, right)
         parser.next()
 
     if not predicate:
