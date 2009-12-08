@@ -36,10 +36,10 @@ class Name(Node):
         self.name = name
 
     def getChildren(self):
-        pass # implemented by subclasses
+        pass
 
     def getChildNodes(self):
-        pass # implemented by subclasses
+        pass
 
 
     def __repr__(self):
