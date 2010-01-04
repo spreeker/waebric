@@ -10,6 +10,7 @@ class Module(Node):
         self.id = id
         self.functions = []
         self.sites = []
+        self.imports = []
 
     def addFunction(self, function):
         self.functions.append(function)
@@ -30,17 +31,15 @@ class Function(Node):
     def addStatement(self, statement):
         self.statements.append(statement)
 
+class Import(Node):
 
-class Site(Node):
-    pass
+    def __init__(self, moduleId):
+        self.moduleId = moduleId
 
 class Path(Node):
     def __init__(self, dir, fileName):
         self.dir = dir
         self.fileName = fileName
-
-class Import(Node):
-    pass
 
 class Mapping(Node):
     def __init__(self, path,markup):
@@ -52,5 +51,9 @@ class Mappings(Node):
         self.mappings = []
     def addMapping(self,mapping):
         self.mappings.append(mapping)
+
+class Site(Node):
+    def __init__(self,mappings):
+        self.mappings = mappings
 
 

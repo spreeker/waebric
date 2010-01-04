@@ -127,7 +127,7 @@ def parseWaebrick(parser):
     logging.debug('start parsing tokens')
     logging.debug("--------------------")
     parser.next()
-    parseModule(parser)
+    ast = parseModule(parser)
 
 @trace
 def parseModule(parser):
@@ -457,7 +457,7 @@ def parseLetStatement(parser):
 
 @trace
 def parseAssignment(parser):
-    if parser.peek( lexeme = '(' ):
+    if parser.peek(lexeme = '('):
         return parseFunctionAssignment(parser)
     else:
         return parseVariableAssignment(parser)
@@ -611,14 +611,16 @@ def parseAttributes(parser):
 @trace
 def parseArguments(parser):
     """ ( Arguments,* ) """
+    #ast stuff.
+    arguments = []
     parser.matchLexeme('(')
     parser.next()
     while parser.hasnext():
         if parser.matchLexeme(')'):
             parser.next()
-            return
+            return arguments
 
-        parseArgument(parser)
+        arguments.append(parseArgument(parser))
 
         if not parser.matchLexeme(lexeme=')'):
             parser.next(lexeme=',')
@@ -628,19 +630,19 @@ def parseArgument(parser):
     """ name = expression
         expression
     """
-    argument = ""
 
-    if parser.peek(lexeme='='):
-        parser.check("Varname",tokensort=NAME)
-        argument = parser.currentToken[1]
+    parser.check("Varname",tokensort=NAME)
+    argument = parser.currentToken[1]
+
+    if parser.matchLexeme('='):
         parser.next() # skip =
-        parser.next()
+        exp = parseExpression(parser)
+        return #TODO AST assignment?!?
     else:
         #normal argument
-        pass
+        return argument
 
     argument = argument + parseExpression(parser)
-
 
 def parse(source):
     parser = Parser()

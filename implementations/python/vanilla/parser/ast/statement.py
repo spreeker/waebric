@@ -20,59 +20,6 @@ class TailText(Node):
 class Predicate(Node):
     pass
 
-class And(Node):
-    def __init__(self, nodes, lineno=None):
-        self.nodes = nodes
-        self.lineno = lineno
-
-    def getChildren(self):
-        return tuple(flatten(self.nodes))
-
-    def getChildNodes(self):
-        nodelist = []
-        nodelist.extend(flatten_nodes(self.nodes))
-        return tuple(nodelist)
-
-    def __repr__(self):
-        return "And(%s)" % (repr(self.nodes),)
-
-
-class Not(Node):
-    def __init__(self, expr, lineno=None):
-        self.expr = expr
-        self.lineno = lineno
-
-    def getChildren(self):
-        return self.expr,
-
-    def getChildNodes(self):
-        return self.expr,
-
-    def __repr__(self):
-        return "Not(%s)" % (repr(self.expr),)
-
-class Or(Node):
-    def __init__(self, nodes, lineno=None):
-        self.nodes = nodes
-        self.lineno = lineno
-
-    def getChildren(self):
-        return tuple(flatten(self.nodes))
-
-    def getChildNodes(self):
-        nodelist = []
-        nodelist.extend(flatten_nodes(self.nodes))
-        return tuple(nodelist)
-
-    def __repr__(self):
-        return "Or(%s)" % (repr(self.nodes),)
-
-
-
-
-class Type(Node):
-    pass
-
 
 class Assignment(Node):
     pass
@@ -95,11 +42,10 @@ class Yield(Node):
         return "Yield(%s)" % (repr(self.value),)
 
 class Let(Node):
-    def __init__(self, expr, vars, body, lineno=None):
+    def __init__(self, expr, vars, body):
         self.expr = expr
         self.vars = vars
         self.body = body
-        self.lineno = lineno
 
     def getChildren(self):
         children = []
@@ -118,5 +64,28 @@ class Let(Node):
 
     def __repr__(self):
         return "With(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
+
+
+class If(Node):
+    def __init__(self, tests, else_, lineno=None):
+        self.tests = tests
+        self.else_ = else_
+        self.lineno = lineno
+
+    def getChildren(self):
+        children = []
+        children.extend(flatten(self.tests))
+        children.append(self.else_)
+        return tuple(children)
+
+    def getChildNodes(self):
+        nodelist = []
+        nodelist.extend(flatten_nodes(self.tests))
+        if self.else_ is not None:
+            nodelist.append(self.else_)
+        return tuple(nodelist)
+
+    def __repr__(self):
+        return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
 
 

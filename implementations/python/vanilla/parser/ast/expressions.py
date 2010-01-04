@@ -24,9 +24,6 @@ class RecordExpression(Node):
     def addRecord(self, key, expression):
         self.dict[key] = expression
 
-class FieldExpression(Node):
-    pass
-
 class CatExpression(Node):
     def __init__(self, left, right):
         self.left = left
