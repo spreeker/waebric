@@ -17,15 +17,19 @@ class TailText(Node):
     pass
 
 
-class Predicate(Node):
-    pass
-
-
 class Assignment(Node):
-    pass
+    """ Name "(" {Name ","}* ")"  "=" Statement -> Assignment """
+     def __init__(self, name, statement):
+        self.variables = []
+        self.name = name
+        self.statement = statement
+
+     def addVariable(self, variable):
+        self.variables.append(variable)
 
 class Statement(Node):
-    pass
+    def __init__(self):
+        self.markups = []
 
 class Yield(Node):
     def __init__(self, value, lineno=None):
@@ -87,5 +91,8 @@ class If(Node):
 
     def __repr__(self):
         return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
+
+class Echo(Statement):
+    pass
 
 

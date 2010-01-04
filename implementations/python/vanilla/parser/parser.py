@@ -12,8 +12,8 @@ In error.py there are variables:
 DEBUG,SHOWTOKENS,SHOWPARSER magic which enable detailed
 logging in parser.log
 
--trace decorator enables logging function calls
-with the @trace decorator in parser.log.
+-@trace decorator enables logging function calls
+in parser.log.
 
 convention:
 
@@ -29,9 +29,18 @@ import re
 from error import SyntaxError
 from error import trace,logToken
 from error import DEBUG, SHOWTOKENS, SHOWPARSER
+
 from keywords import keywords
 from token import *
 
+from ast.module import Module, Function, Path, Site, Import
+from ast.expression import TextExpression, NumberExpression
+from ast.expression import ListExpression, RecordExpression
+from ast.expression import CatExpression,
+from ast.markup import Designator, Arguments, Attributes, Markup
+from ast.predicate import Not, And, Or, Is_a
+from ast.statement import Yield, Let, If, Assignment
+from ast.statement import Embedding, PreText, MidText, TailText
 
 class Parser(object):
 
@@ -40,10 +49,6 @@ class Parser(object):
     tokens = []
     peekedTokens = []
     currentToken = []
-
-    def __init__(self, tokens=None):
-       if DEBUG and SHOWPARSER:
-           logging.debug(type(self))
 
     def setTokens(self, newtokens):
         # needed test for test code.
@@ -268,7 +273,7 @@ def parseFunction(parser):
             return function
 
     raise SyntaxError(parser.currentToken,
-            expected="""END, Missing function ending END""")
+            expected="END, Missing function ending END")
 
 
 """
@@ -362,7 +367,7 @@ def parsePredicate(parser):
     predicate = None
     if parser.matchLexeme('!'):
         parser.next() #skip !.
-        predicate = Not(parser.parsePredicate())
+        return Not(parser.parsePredicate())
 
     predicate = parseExpression(parser)
 
@@ -376,7 +381,7 @@ def parsePredicate(parser):
             ptype = "STRING"
         parser.next()
         parser.check('type?', lexeme='?')
-        predicate = Is_a(predicate,ptype)
+        predicate = Is_a(predicate, ptype)
         parser.next()
     elif parser.matchLexeme('&') and parser.peek(lexeme='&'):
         parser.next() #skip &&
@@ -400,7 +405,6 @@ def parsePredicate(parser):
 
 @trace
 def parseStatement(parser):
-    statement = ""
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
     if parser.matchLexeme(keywords['IF']):
@@ -408,6 +412,7 @@ def parseStatement(parser):
     elif parser.matchLexeme(keywords['EACH']):
         return parseEachStatement(parser)
     elif parser.matchLexeme(keywords['ECHO']):
+        #TODO
         statement = 'echo'
         if parser.peek(tokensort=PRESTRING):
             emb = parseEmbedding(parser)
@@ -464,19 +469,28 @@ def parseAssignment(parser):
 
 @trace
 def parseFunctionAssignment(parser):
-    return "dont know syntax"
+    #parse name
+    parser.check( tokensort=NAME )
+    name = parser.currentToken[1]
+    #Parse "(" { Name "," }* ")" "="
+    parser.next( lexeme = (
+    arguments = parseArguments(parser)
+    parser.next( lexeme = "=" )
+    expression = parseExpression(parser)
+    assignment = Assignment(name, expression)
+    assignment.addVariable(arguments) #WARNING parseArguments allows to much?!
+    return assignment
 
 @trace
 def parseVariableAssignment(parser):
     """ var = expression """
     parser.check( tokensort=NAME )
-    var = parser.currentToken[1]
+    name = parser.currentToken[1]
     parser.next( lexeme = "=" )
     parser.next()
-    exp = parseExpression(parser)
-    if parser.matchLexeme( ',' ):
-        return "%s = %s" % ( var, parseVariableAssignment(parser))
-    return exp
+    expression = parseExpression(parser)
+    assignment = Assignment(name, expression)
+    return assignment
 
 @trace
 def parseEachStatement(parser):
