@@ -7,7 +7,7 @@ from ast import Node
 #markup.
 
 class Designator(Node):
-    def __init(self, name, attributes=[]):
+    def __init__(self, name, attributes=[]):
         self.name = name
         self.attributes = attributes
 

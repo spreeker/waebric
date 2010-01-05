@@ -34,7 +34,7 @@ class KeyValuePair(Node):
 
 
 class Field(Node):
-    def __init__(self, expresion, field):
+    def __init__(self, expression, field):
         self.expression = expression
         self.field = field
 

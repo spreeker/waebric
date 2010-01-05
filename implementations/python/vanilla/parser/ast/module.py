@@ -23,7 +23,7 @@ class Module(Node):
 
 
 class Function(Node):
-    def __init__(name,arguments):
+    def __init__(self, name, arguments):
         self.name = name
         self.arguments = arguments
         self.statements = []
@@ -32,7 +32,6 @@ class Function(Node):
         self.statements.append(statement)
 
 class Import(Node):
-
     def __init__(self, moduleId):
         self.moduleId = moduleId
 
@@ -45,15 +44,5 @@ class Mapping(Node):
     def __init__(self, path,markup):
         self.path = path
         self.markup = markup
-
-class Mappings(Node):
-    def __init__(self):
-        self.mappings = []
-    def addMapping(self,mapping):
-        self.mappings.append(mapping)
-
-class Site(Node):
-    def __init__(self,mappings):
-        self.mappings = mappings
 
 

@@ -34,14 +34,15 @@ from keywords import keywords
 from token import *
 
 from ast.ast import Name, NatNum, Text
-from ast.module import Module, Function, Path, Site, Import
+from ast.module import Module, Function, Path, Import
+from ast.module import Mapping
 from ast.expressions import TextExpression, NumberExpression
 from ast.expressions import ListExpression, RecordExpression
-from ast.expressions import CatExpression
+from ast.expressions import CatExpression, Field
 from ast.markup import Designator, Attributes, Markup
 from ast.predicate import Not, And, Or, Is_a
-from ast.statement import Yield, Let, If, Assignment
-from ast.statement import Embedding
+from ast.statement import Yield, Let, If, Assignment, Each
+from ast.statement import Embedding, Comment, Cdata
 
 class Parser(object):
 
@@ -181,16 +182,16 @@ def parseModuleId(parser):
 def parseImport(parser):
     parser.check(lexeme=keywords['IMPORT'])
     parser.next()
-    return parseModuleId(parser)
+    return Import(parseModuleId(parser))
 
 @trace
 def parseSite(parser):
     # AST, mappings.
     parser.check("Site Defenition", lexeme=keywords['SITE'])
     # check mapping
-    mappings = Mappings()
+    mappings = []
     while parser.hasnext():
-        mappings.addMapping(parseMapping(parser))
+        mappings.append(parseMapping(parser))
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return mappings
