@@ -13,12 +13,12 @@ class Embedding(Node):
 
 class Assignment(Node):
     """ Name "(" {Name ","}* ")"  "=" Statement -> Assignment """
-     def __init__(self, name, statement):
+    def __init__(self, name, statement):
         self.variables = []
         self.name = name
         self.statement = statement
 
-     def addVariable(self, variable):
+    def addVariable(self, variable):
         self.variables.append(variable)
 
 class Statement(Node):
@@ -82,7 +82,7 @@ class If(Statement):
         return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
 
 class Echo(Statement):
-    def __init__(self,embedding=None,expression=None)
+    def __init__(self,embedding=None,expression=None):
         expression = None
         embedding = None
 
@@ -95,5 +95,11 @@ class Comment(Statement):
     def __init__(self, comment):
         self.comment = comment
 
+
+class Each(Statement):
+    def __init__(self,name, expression, statement):
+        self.name = name
+        self.expression = expression
+        self.statement = statement
 
 

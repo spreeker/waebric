@@ -15,7 +15,7 @@ class ListExpression(Node):
     def __init__(self):
         self.expressionList = []
 
-    def addExpression(self,expression)
+    def addExpression(self,expression):
         self.expressionList.append(expression)
 
 class RecordExpression(Node):

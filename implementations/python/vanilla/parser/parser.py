@@ -33,14 +33,15 @@ from error import DEBUG, SHOWTOKENS, SHOWPARSER
 from keywords import keywords
 from token import *
 
+from ast.ast import Name, NatNum, Text
 from ast.module import Module, Function, Path, Site, Import
-from ast.expression import TextExpression, NumberExpression
-from ast.expression import ListExpression, RecordExpression
-from ast.expression import CatExpression,
-from ast.markup import Designator, Arguments, Attributes, Markup
+from ast.expressions import TextExpression, NumberExpression
+from ast.expressions import ListExpression, RecordExpression
+from ast.expressions import CatExpression
+from ast.markup import Designator, Attributes, Markup
 from ast.predicate import Not, And, Or, Is_a
 from ast.statement import Yield, Let, If, Assignment
-from ast.statement import Embedding, PreText, MidText, TailText
+from ast.statement import Embedding
 
 class Parser(object):
 
@@ -428,7 +429,7 @@ def parseStatement(parser):
         return Comment(parser.currentToken[1])
     elif parser.matchLexeme(keywords['YIELD']):
         parser.next(lexeme=";")
-        return YIELD()
+        return Yield()
     elif parser.matchTokensort(NAME):
         return parseMarkupStatements(parser)
     elif parser.matchTokensort( ENDMARKER ): #needed?
@@ -496,7 +497,7 @@ def parseEachStatement(parser):
     parser.check(lexeme = ')' )
     parser.next()
     stm = parseStatement(parser)
-    return "each ( %s : %s ) %s" % (name, exp,stm)
+    return Each(name, exp, stm)
 
 @trace
 def parseIfStatement(parser):
@@ -532,7 +533,7 @@ def parseMarkupStatements(parser):
     p p;    markup variable
     p p();  markup - markup
     p p p();
-    p "data"
+    p "data";
     p "embedding < >";
     """
 
@@ -575,9 +576,12 @@ p p p()
 @trace
 def parseMarkup(parser):
     """Differentiate between p and p()"""
-    parseDesignator(parser)
+    designator = parseDesignator(parser)
+    markup = Markup(designator)
     if parser.matchLexeme('('):
-        parseArguments(parser)
+        arguments = parseArguments(parser)
+        markup.arguments = arguments
+    return markup
 
 @trace
 def parseDesignator(parser):
@@ -605,7 +609,7 @@ def parseAttributes(parser):
             raise SyntaxError(currentToken,
                 expected=" Attribute, # . : @ % ")
 
-        attribute = Attribute(sumbol, parser.currentToken[1])
+        attribute = Attribute(symbol, parser.currentToken[1])
         attributes.add(attribute)
         parser.next()
         return attributes

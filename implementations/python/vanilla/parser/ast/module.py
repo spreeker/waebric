@@ -15,11 +15,11 @@ class Module(Node):
     def addFunction(self, function):
         self.functions.append(function)
 
-    def addSite(self, site)
+    def addSite(self, site):
         self.sites.append(site)
 
-    def addImport(self, import):
-        self.imports.append(import)
+    def addImport(self, import_):
+        self.imports.append(import_)
 
 
 class Function(Node):
