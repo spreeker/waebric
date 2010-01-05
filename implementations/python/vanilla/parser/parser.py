@@ -412,33 +412,25 @@ def parseStatement(parser):
     elif parser.matchLexeme(keywords['EACH']):
         return parseEachStatement(parser)
     elif parser.matchLexeme(keywords['ECHO']):
-        #TODO
-        statement = 'echo'
         if parser.peek(tokensort=PRESTRING):
-            emb = parseEmbedding(parser)
-            return "%s %s" % (statement, emb)
-        parser.next( tokensort=STRING )
-        statement = '%s %s' % (statement, parser.currentToken[1])
-        return statement
+            embedding = parseEmbedding(parser)
+            return Echo(embedding,None)
+        expression = parseExpression(parser)
+        return Echo(None, expression)
     elif parser.matchLexeme(keywords['CDATA']):
-        statement = 'cdata'
         parser.next()
-        exp = parseExpression(parser)
-        statement = '%s %s' % (statement, exp)
-        return statement
+        expression = parseExpression(parser)
+        return Cdata(expression)
     elif parser.matchLexeme('{'): #? starts a new staments block
         return  matchStatementBlock(parser)
     elif parser.matchLexeme(keywords['COMMENT']):
-        statement = 'comment'
         parser.next( tokensort=STRING )
-        statement = '%s %s' % (statement, parser.currentToken[1])
-        return statement
+        return Comment(parser.currentToken[1])
     elif parser.matchLexeme(keywords['YIELD']):
         parser.next(lexeme=";")
-        return "YIELD"
+        return YIELD()
     elif parser.matchTokensort(NAME):
-        parseMarkupStatements(parser)
-        return "NAME"
+        return parseMarkupStatements(parser)
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
     raise SyntaxError(parser.currentToken,
@@ -447,16 +439,17 @@ def parseStatement(parser):
 @trace
 def parseLetStatement(parser):
     if parser.matchLexeme(keywords['LET']):
+        assignments = []
         while parser.next():
-            parseAssignment(parser)
+            assignments.append(parseAssignment(parser))
             if parser.matchLexeme(keywords['IN']):
+                body = []
                 while parser.next():
-                    parseStatement(parser)
+                    body.append(parseStatement(parser))
                     if parser.matchLexeme(keywords['END']):
-                        logging.debug("end LET block")
-                        return
+                        return Let(assignments,body)
                 raise SyntaxError(parser.currentToken,
-                    expected="missing END of LET .. IN .. END block")
+                    expected="missing END of LET .. IN .. END statement")
         raise SyntaxError(parser.currentToken,
             expected = """LET .. IN .. END, missing IN """)
 
@@ -473,7 +466,6 @@ def parseFunctionAssignment(parser):
     parser.check( tokensort=NAME )
     name = parser.currentToken[1]
     #Parse "(" { Name "," }* ")" "="
-    parser.next( lexeme = (
     arguments = parseArguments(parser)
     parser.next( lexeme = "=" )
     expression = parseExpression(parser)
@@ -559,21 +551,18 @@ def parseMarkupStatements(parser):
 @trace
 def parseEmbedding(parser):
     parser.check('embedding " < > " ', tokensort=PRESTRING)
-    emb = ""
+    emb = Embedding()
     while not parser.peek(tokensort=POSTSTRING):
-        emb = "%s %s" % ( emb, parser.currentToken[1])
-        parser.next()
         if parser.matchTokensort(EMBSTRING):
-            emb = "%s %s" % ( emb, parser.currentToken[1])
+            emb.midtext.append(parser.currentToken[1])
         elif parser.matchTokensort(PRESTRING):
-            emb = "%s %s" % ( emb, parser.currentToken[1])
+            emb.pretext.append(parser.currentToken[1])
         else:
             raise SyntaxError(parser.currentToken,
                 expected = "Embedded string Error")
 
     parser.next("tail of embedded string", tokensort=POSTSTRING)
-    emb = "%s %s" % ( emb, parser.currentToken[1])
-    #AST
+    emb.tailtext.append(parser.currentToken[1])
     parser.next()
     return emb
 
@@ -594,33 +583,32 @@ def parseMarkup(parser):
 def parseDesignator(parser):
     """ p attributes* markup """
     parser.check("NAME",tokensort=NAME)
-    #AST create designator.
-    #peek first character for possible attribute
+    designator = Designator(parser.currentToken[1])
     parser.next()
     if parser.currentToken[1][0] in "#$@:%.":
-            parseAttributes(parser)
+            attributes = parseAttributes(parser)
+            Designator.attributes = attributes
+    return Designator
 
 @trace
 def parseAttributes(parser):
     """ # . $ : @ % @ """
-    attributes = []
+    attributes = Attributes()
 
     while currentToken[0][1] in "#$@:%.":
-        if parser.matchLexeme('#'):
-            parser.next(tokensort=NAME)
-            attributes.append(('#', currentToken))
-        elif parser.matchLexeme('.'):
-            parser.next(tokensort=NAME)
-        elif parser.matchLexeme('$'):
+        symbol = currentToken[0][1]
+        if not parser.matchLexeme('@'):
             parser.next(tokensort=NAME)
         elif parser.matchLexeme('@'):
             parser.next(tokensort=NUMBER)
-        elif parser.matchLexeme(':'):
-            parser.next(tokensort=NAME)
         else:
             raise SyntaxError(currentToken,
                 expected=" Attribute, # . : @ % ")
+
+        attribute = Attribute(sumbol, parser.currentToken[1])
+        attributes.add(attribute)
         parser.next()
+        return attributes
 
 @trace
 def parseArguments(parser):
@@ -647,16 +635,13 @@ def parseArgument(parser):
 
     parser.check("Varname",tokensort=NAME)
     argument = parser.currentToken[1]
-
+    parser.next()
     if parser.matchLexeme('='):
         parser.next() # skip =
         exp = parseExpression(parser)
-        return #TODO AST assignment?!?
+        return Assignment(argument, exp)
     else:
-        #normal argument
-        return argument
-
-    argument = argument + parseExpression(parser)
+        return Name(argument)
 
 def parse(source):
     parser = Parser()

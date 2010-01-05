@@ -5,16 +5,10 @@ Abstract Syntax Tree Statement Nodes
 from ast import Node
 
 class Embedding(Node):
-    pass
-
-class PreText(Node):
-    pass
-
-class MidText(Node):
-    pass
-
-class TailText(Node):
-    pass
+    def __init__(self):
+        pretext = []
+        midtext = []
+        tailtext= []
 
 
 class Assignment(Node):
@@ -31,24 +25,20 @@ class Statement(Node):
     def __init__(self):
         self.markups = []
 
-class Yield(Node):
-    def __init__(self, value, lineno=None):
-        self.value = value
-        self.lineno = lineno
+class Yield(Statement):
 
     def getChildren(self):
-        return self.value,
+        return []
 
     def getChildNodes(self):
-        return self.value,
+        return []
 
     def __repr__(self):
-        return "Yield(%s)" % (repr(self.value),)
+        return "Yield"
 
-class Let(Node):
-    def __init__(self, expr, vars, body):
-        self.expr = expr
-        self.vars = vars
+class Let(Statement):
+    def __init__(self, assignments, body):
+        self.assignments = assignments
         self.body = body
 
     def getChildren(self):
@@ -70,11 +60,10 @@ class Let(Node):
         return "With(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
 
 
-class If(Node):
-    def __init__(self, tests, else_, lineno=None):
+class If(Statement):
+    def __init__(self, tests, else_ = None,):
         self.tests = tests
         self.else_ = else_
-        self.lineno = lineno
 
     def getChildren(self):
         children = []
@@ -93,6 +82,18 @@ class If(Node):
         return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
 
 class Echo(Statement):
-    pass
+    def __init__(self,embedding=None,expression=None)
+        expression = None
+        embedding = None
+
+
+class Cdata(Statement):
+    def __init__(self, expression):
+        self.expression = expression
+
+class Comment(Statement):
+    def __init__(self, comment):
+        self.comment = comment
+
 
 
