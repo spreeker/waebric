@@ -21,9 +21,11 @@ class Assignment(Node):
     def addVariable(self, variable):
         self.variables.append(variable)
 
+
 class Statement(Node):
     def __init__(self):
         self.markups = []
+
 
 class Yield(Statement):
 
@@ -35,6 +37,7 @@ class Yield(Statement):
 
     def __repr__(self):
         return "Yield"
+
 
 class Let(Statement):
     def __init__(self, assignments, body):
@@ -57,7 +60,7 @@ class Let(Statement):
         return tuple(nodelist)
 
     def __repr__(self):
-        return "With(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
+        return "LET(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
 
 
 class If(Statement):
@@ -81,25 +84,40 @@ class If(Statement):
     def __repr__(self):
         return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
 
+
 class Echo(Statement):
     def __init__(self,embedding=None,expression=None):
         expression = None
         embedding = None
+
+    def __repr__(self):
+        return "ECHO( %s%s )" (repr(self.expression),repr(self.embedding))
 
 
 class Cdata(Statement):
     def __init__(self, expression):
         self.expression = expression
 
+    def __repr__(self):
+        return "Cdata( %s )" % repr(self.expression)
+
+
 class Comment(Statement):
     def __init__(self, comment):
         self.comment = comment
 
+    def __repr__(self):
+        return "Comment( %s )" % self.comment
 
 class Each(Statement):
     def __init__(self,name, expression, statement):
         self.name = name
         self.expression = expression
         self.statement = statement
+
+    def __repr__(self):
+
+        return "Each( %s in %s do %s)" % (
+                name,  repr(statement), repr(expression))
 
 

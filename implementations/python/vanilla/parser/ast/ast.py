@@ -28,34 +28,8 @@ class Node:
     def getChildNodes(self):
         pass # implemented by subclasses
 
-
-class NatNum(Node):
-    """ Natural Number"""
-    def __init__(self, number):
-        self.number = int(number)
-
-    def getChildren(self):
-        return self.number
-
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
-        return "NATNUM(%d)" % self.number
-
-
-class Text(Node):
-    def __init__(self, string):
-        self.string = string
-
-    def getChildren(self):
-        return self.string
-
-    def getChildNodes(self):
         pass # implemented by subclasses
-
-    def __repr__(self):
-        return "STRING(%s)" % self.string
 
 
 class Name(Node):
@@ -69,7 +43,8 @@ class Name(Node):
         return ()
 
     def __repr__(self):
-        return "Name(%s)" % (repr(self.name),)
+        return "NAME(%s)" % (repr(self.name),)
+
 
 for name, obj in globals().items():
     if isinstance(obj, type) and issubclass(obj, Node):
