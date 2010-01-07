@@ -141,6 +141,8 @@ class TestMarkup(unittest.TestCase):
         self._parse_markup(source)
         source = "markup markup() ;"
         self._parse_markup(source)
+        source = 'markup function( a ) ;'
+        self._parse_markup(source)
         source = 'markup function( a = "b" ) ;'
         self._parse_markup(source)
         source = 'markup markup function("beee") ;'

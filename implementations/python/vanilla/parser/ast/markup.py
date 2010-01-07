@@ -30,4 +30,7 @@ class Markup(Node):
     def __init__(self, designator):
         self.designator = designator
         self.arguments = []
+        self.embedding = ""
+        self.variable = ""
+        self.expression = ""
 

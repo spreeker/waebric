@@ -47,7 +47,7 @@ from ast.statement import Embedding, Comment, Cdata
 class Parser(object):
 
     ast = []
-
+    seenEndMarker = False
     tokens = []
     peekedTokens = []
     currentToken = []
@@ -113,8 +113,12 @@ class Parser(object):
             try:
                 self.currentToken = self.tokens.next()
             except StopIteration:
-                logging.debug(" no next token available ")
-                raise StopIteration
+                if self.matchTokensort(ENDMARKER):
+                    self.seenEndMarker = True
+                elif self.seenEndMarker:
+                    logging.debug(" no next token available ")
+                    raise StopIteration
+
 
         if tokensort or lexeme:
             expected = "'%s%s%s'" % (expected, tokensort, lexeme)
@@ -432,7 +436,7 @@ def parseStatement(parser):
         parser.next(lexeme=";")
         return Yield()
     elif parser.matchTokensort(NAME):
-        return parseMarkupStatements(parser)
+        return parseMarkupStatement(parser)
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
     raise SyntaxError(parser.currentToken,
@@ -528,27 +532,34 @@ def parseStatementBlock(parser):
     return block
 
 @trace
-def parseMarkupStatements(parser):
+def parseMarkupStatement(parser):
     """
     p;      markup
     p p;    markup variable
     p p();  markup - markup
-    p p p();
-    p "data";
-    p "embedding < >";
+    p p p(); markup markup markup
+    p "data"; markup expression
+    p "embedding < >"; markup embedding
     """
 
-    while parser.hasnext():
-        m = parseMarkup(parser)
-        if parser.matchTokensort(STRING):
-            parser.next()
-        if parser.matchTokensort(PRESTRING):
-            emb = parseEmbedding(parser)
-        if parser.matchLexeme(';'):
-            parser.next() # skip ;
-            return
-    raise SyntaxError(parser.currentToken,
-            expected =  "Statement ;")
+    while parser.matchTokensort(tokensort=NAME):
+        markup = parseMarkup(parser)
+        if parser.matchTokensort(NAME):
+            if parser.peek(lexeme=';'):
+                markup.variable = parser.currentToken[1]
+                break
+
+    if parser.matchTokensort(PRESTRING):
+        markup.embedding = parseEmbedding(parser)
+    elif not parser.matchLexeme(';'):
+        markup.expression = parseExpression(parser)
+
+    parser.check(lexeme = ';')
+    parser.next() # skip ;
+
+    parser.next() #read ahead.
+
+    return markup
 
 @trace
 def parseEmbedding(parser):
@@ -570,9 +581,7 @@ def parseEmbedding(parser):
 
 """
 p     markup
-p p   markup variable
-p p() markup - markup
-p p p()
+p attributes (arguments) markup
 """
 @trace
 def parseMarkup(parser):
@@ -586,7 +595,7 @@ def parseMarkup(parser):
 
 @trace
 def parseDesignator(parser):
-    """ p attributes* markup """
+    """ p attributes* """
     parser.check("NAME",tokensort=NAME)
     designator = Designator(parser.currentToken[1])
     parser.next()
@@ -620,7 +629,7 @@ def parseArguments(parser):
     """ ( Arguments,* ) """
     #ast stuff.
     arguments = []
-    parser.matchLexeme('(')
+    parser.check(lexeme='(')
     parser.next()
     while parser.hasnext():
         if parser.matchLexeme(')'):
@@ -636,17 +645,20 @@ def parseArguments(parser):
 def parseArgument(parser):
     """ name = expression
         expression
+        name
     """
 
-    parser.check("Varname",tokensort=NAME)
-    argument = parser.currentToken[1]
-    parser.next()
-    if parser.matchLexeme('='):
-        parser.next() # skip =
-        exp = parseExpression(parser)
-        return Assignment(argument, exp)
-    else:
-        return Name(argument)
+    if parser.matchTokensort(tokensort=NAME):
+        argument = parser.currentToken[1]
+        parser.next()
+        if parser.matchLexeme('='):
+            parser.next() # skip =
+            exp = parseExpression(parser)
+            return Assignment(argument, exp)
+        else:
+            return Name(argument)
+    else: #must be expression.
+        return parseExpression(parser)
 
 def parse(source):
     parser = Parser()
