@@ -9,7 +9,7 @@ class Not(Node):
         self.predicate = predicate
 
     def __repr__(self):
-        return "NOT( %s )" % self.predicate
+        return "NOT(%s)" % self.predicate
 
 class And(Node):
     def __init__(self, leftPredicate, rightPredicate):
@@ -17,7 +17,7 @@ class And(Node):
         self.right = rightPredicate
 
     def __repr__(self):
-        return "AND(%s, %s)" % (left, right)
+        return "AND(%s, %s)" % (repr(self.left), repr(self.right))
 
 class Or(Node):
     def __init__(self, leftPredicate, rightPredicate):
@@ -25,7 +25,7 @@ class Or(Node):
         self.right = rightPredicate
 
     def __repr__(self):
-        return "OR( %s , %s)" % ( left, right)
+        return "OR(%s, %s)" % (repr(self.left), repr(self.right))
 
 
 class Is_a(Node):
@@ -34,4 +34,4 @@ class Is_a(Node):
         self.type = type
 
     def __repr__(self):
-        return "IS_A( %s, %s )" % ( self.expression, self.type)
+        return "IS_A(%s, %s)" % ( self.expression, self.type)

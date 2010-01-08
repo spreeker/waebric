@@ -9,11 +9,11 @@ class TextExpression(Node):
         self.text = text
 
     def __repr__(self):
-        return "STRING(%s)" % self.string
+        return "STRING(%s)" % self.text
 
 
 class NumberExpression(Node):
-     def __init__(self, number):
+    def __init__(self, number):
         self.number = int(number)
 
     def __repr__(self):
@@ -29,7 +29,7 @@ class ListExpression(Node):
 
     def __repr__(self):
         items = [repr(expr) for expr in self.expressionList]
-        return "LIST( %s )" % (",".join(items))
+        return "LIST(%s)" % (",".join(items))
 
 
 class RecordExpression(Node):
@@ -39,8 +39,8 @@ class RecordExpression(Node):
         self.dict[key] = expression
 
     def __repr__(self):
-        items = [":".join([repr(key),repr(value)]) for key,value in self.dict]
-        return "RECORD( %s )" % (",".join(items))
+        items = [":".join([repr(key),repr(value)]) for key,value in self.dict.items()]
+        return "RECORD(%s)" % (",".join(items))
 
 
 class CatExpression(Node):
@@ -49,7 +49,7 @@ class CatExpression(Node):
         self.right = right
 
     def __repr__(self):
-        return "ADD( %s, %s )" % (repr(self.left), repr(self.right))
+        return "ADD(%s, %s)" % (repr(self.left), repr(self.right))
 
 
 class Field(Node):
@@ -58,4 +58,4 @@ class Field(Node):
         self.field = field
 
     def __repr__(self):
-       return "FIELD %s in %s" (repr(field), repr(expression))
+       return "FIELD %s in %s" % (repr(self.field), repr(self.expression))

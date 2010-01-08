@@ -4,14 +4,24 @@ Abstract Syntax Tree Statement Nodes
 
 from ast import Node
 
-class Embedding(Node):
+class Statement(Node):
+    pass
+
+class Embedding(Statement):
     def __init__(self):
         pretext = []
         midtext = []
         tailtext= []
 
+    def __repr__(self):
+        output = ""
+        for p,emb in zip(self.pretext,self.midtext):
+            output = "%s%s%s" % (output,self.pretext,repr(self.midtext))
+        output = "%s%s" % (output,self.tailtext)
 
-class Assignment(Node):
+        return output
+
+class Assignment(Statement):
     """ Name "(" {Name ","}* ")"  "=" Statement -> Assignment """
     def __init__(self, name, statement):
         self.variables = []
@@ -21,10 +31,13 @@ class Assignment(Node):
     def addVariable(self, variable):
         self.variables.append(variable)
 
+    def __repr__(self):
+        if self.variables:
+            assvar = "%s(%s)" % (self.name, ",".join(repr(self.variables)))
+        else:
+            assvar = self.name
 
-class Statement(Node):
-    def __init__(self):
-        self.markups = []
+        return "ASSIGNMENT(%s,%s)" % (assvar, repr(self.statement))
 
 
 class Yield(Statement):
@@ -45,40 +58,29 @@ class Let(Statement):
         self.body = body
 
     def getChildren(self):
-        children = []
-        children.append(self.expr)
-        children.append(self.vars)
-        children.append(self.body)
-        return tuple(children)
+        pass
 
     def getChildNodes(self):
-        nodelist = []
-        nodelist.append(self.expr)
-        if self.vars is not None:
-            nodelist.append(self.vars)
-        nodelist.append(self.body)
-        return tuple(nodelist)
+        pass
 
     def __repr__(self):
-        return "LET(%s, %s, %s)" % (repr(self.expr), repr(self.vars), repr(self.body))
+        ass = ",".join([repr(assignment) for assignment in assignments])
+        return "LET(%s, %s)" % (ass, repr(self.body))
 
 
 class If(Statement):
-    def __init__(self, tests, else_ = None,):
-        self.tests = tests
-        self.else_ = else_
+    def __init__(self, predicate, ifstmnt, elsestmnt = None,):
+        self.predicate = predicate
+        self.elsestmnt = elsestmnt
+        self.ifstmnt = ifstmnt
 
     def getChildren(self):
         children = []
-        children.extend(flatten(self.tests))
-        children.append(self.else_)
         return tuple(children)
 
     def getChildNodes(self):
-        nodelist = []
-        nodelist.extend(flatten_nodes(self.tests))
-        if self.else_ is not None:
-            nodelist.append(self.else_)
+        if self.elsestmnt is not None:
+            nodelist.append(self.elsestmnt)
         return tuple(nodelist)
 
     def __repr__(self):
@@ -86,9 +88,9 @@ class If(Statement):
 
 
 class Echo(Statement):
-    def __init__(self,embedding=None,expression=None):
-        expression = None
-        embedding = None
+    def __init__(self,embedding="",expression=""):
+        expression = embedding
+        embedding = expression
 
     def __repr__(self):
         return "ECHO( %s%s )" (repr(self.expression),repr(self.embedding))
@@ -109,15 +111,14 @@ class Comment(Statement):
     def __repr__(self):
         return "Comment( %s )" % self.comment
 
+
 class Each(Statement):
-    def __init__(self,name, expression, statement):
+    def __init__(self, name, expression, statement):
         self.name = name
         self.expression = expression
         self.statement = statement
 
     def __repr__(self):
-
         return "Each( %s in %s do %s)" % (
                 name,  repr(statement), repr(expression))
-
 

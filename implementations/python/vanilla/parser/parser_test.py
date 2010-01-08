@@ -81,13 +81,14 @@ class TestParserClasses(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        parseFunction(p)
+        ast = parseFunction(p)
 
 
     def test_module(self):
         source = "module menus"
         p = self.initialize_parser(source)
-        parseModule(p)
+        ast = parseModule(p)
+        print ast
 
         badsource = "mod fout"
         p = self.initialize_parser(badsource)
@@ -97,7 +98,8 @@ class TestParserClasses(unittest.TestCase):
     def test_site(self):
         source = "site dir/dir2/file.ext: startfunction(); end"
         p = self.initialize_parser(source)
-        parseSite(p)
+        ast = parseSite(p)
+        print ast
 
         badsource = "site nameBLEH"
         p = self.initialize_parser(badsource)
@@ -109,21 +111,26 @@ class TestPredicateParser(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        parsePredicate(p)
+        ast = parsePredicate(p)
+        return ast
 
     def test_predicate_type(self):
         source = "variable.list? "
-        self._parserPredicate(source)
+        ast = self._parserPredicate(source)
+        self.assertEqual(str(ast),"IS_A(NAME('variable'), LIST)")
         source = "variable.record? "
-        self._parserPredicate(source)
+        ast = self._parserPredicate(source)
+        self.assertEqual(str(ast),"IS_A(NAME('variable'), RECORD)")
 
     def test_predicate_or(self):
         source = "10 || 20 "
-        self._parserPredicate(source)
+        ast = self._parserPredicate(source)
+        self.assertEqual(str(ast), "OR(NATNUM(10), NATNUM(20))")
 
     def test_predicate_and(self):
         source = "var &&  var"
-        self._parserPredicate(source)
+        ast = self._parserPredicate(source)
+        self.assertEqual(str(ast),"AND(NAME('var'), NAME('var'))")
 
 
 class TestMarkup(unittest.TestCase):
@@ -132,21 +139,31 @@ class TestMarkup(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        parseStatement(p)
+        return parseStatement(p)
 
     def test_markup(self):
         source = "markup ;"
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),"MARKUP(Designator('markup'))")
         source = "markup variable ;"
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),"MARKUP(Designator('markup')NAME('variable'))")
         source = "markup markup() ;"
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),
+                "MARKUP(Designator('markup')MARKUP(Designator('markup')))")
         source = 'markup function( a ) ;'
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),
+        "MARKUP(Designator('markup')MARKUP(Designator('function')[NAME('a')]))")
         source = 'markup function( a = "b" ) ;'
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),
+        """MARKUP(Designator('markup')MARKUP(Designator('function')[ASSIGNMENT(a,STRING("b"))]))""")
         source = 'markup markup function("beee") ;'
-        self._parse_markup(source)
+        ast = self._parse_markup(source)
+        self.assertEqual(str(ast),
+        """MARKUP(Designator('markup')MARKUP(Designator('markup')MARKUP(Designator('function')[STRING("beee")])))""")
 
 
 class TestStatementParser(unittest.TestCase):
@@ -155,38 +172,44 @@ class TestStatementParser(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        parseStatement(p)
+        return parseStatement(p)
 
     def test_if_(self):
         source = "if  ( bla )  h1 name;"
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
         source = """
         if ( a = "b" ) { h2 markup "data"; markup; }
         else { "other stuff"; }
         """
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
 
     def test_each(self):
         source = "each ( var : expression ) m var;"
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
 
 
     def test_cdata(self):
         source = "cdata expression;"
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
 
     def test_yield(self):
         source = "yield;"
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
 
     def test_comment(self):
         source = 'comment "commentString";'
-        self._parse_statement(source)
+        ast = self._parse_statement(source)
+        print ast
 
     def test_let_(self):
         source = "let x = bla.bla.bla in statement x; end"
-        self._parse_statement(source)
-
+        ast = self._parse_statement(source)
+        print ast
 
 
 class TestExpression(unittest.TestCase):
@@ -195,38 +218,47 @@ class TestExpression(unittest.TestCase):
         p = Parser()
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
-        parseExpression(p)
+        return parseExpression(p)
 
     def test_symbol(self):
         sourceSymbol = "'symbol"
-        self._parse_expression(sourceSymbol)
+        ast = self._parse_expression(sourceSymbol)
+        self.assertEqual(str(ast),"STRING(symbol)")
 
     def test_list(self):
         sourceList = '[ "i1", "i2" ]'
-        self._parse_expression(sourceList)
+        ast = self._parse_expression(sourceList)
+        self.assertEqual(str(ast),"""LIST(STRING("i1"),STRING("i2"))""")
+
 
     def test_record(self):
         sourceRecord = '{ key : "value" , key2 : "value2" } '
-        self._parse_expression(sourceRecord)
+        ast = self._parse_expression(sourceRecord)
+        self.assertEqual(str(ast),"""RECORD('key2':STRING("value2"),'key':STRING("value"))""")
 
         sourceRecord = '{ key : "value" , key2 :  } '
         self.assertRaises(SyntaxError, self._parse_expression, sourceRecord)
 
     def test_number(self):
         sourceNumber = "66"
-        self._parse_expression(sourceNumber)
+        ast = self._parse_expression(sourceNumber)
+        self.assertEqual(str(ast),"NATNUM(66)")
 
     def test_string(self):
         sourceString = '"Hallo, dit is een string expressie!"'
-        self._parse_expression(sourceString)
+        ast = self._parse_expression(sourceString)
+        self.assertEqual(str(ast),'STRING("Hallo, dit is een string expressie!")')
 
     def test_dotnames(self):
         sourceDotName = 'een.tweee.drie'
-        self._parse_expression(sourceDotName)
+        ast = self._parse_expression(sourceDotName)
+        self.assertEqual(str(ast),"FIELD 'drie' in FIELD 'tweee' in NAME('een')")
 
     def test_plus(self):
         sourcePlus = '"a" + "b"'
-        self._parse_expression(sourcePlus)
+        ast = self._parse_expression(sourcePlus)
+        self.assertEqual(str(ast),'ADD(STRING("a"), STRING("b"))')
+
         sourcePlus = ' + "b"'
         self.assertRaises(SyntaxError, self._parse_expression, sourcePlus)
 

@@ -33,7 +33,7 @@ from error import DEBUG, SHOWTOKENS, SHOWPARSER
 from keywords import keywords
 from token import *
 
-from ast.ast import Name, NatNum, Text
+from ast.ast import Name
 from ast.module import Module, Function, Path, Import
 from ast.module import Mapping
 from ast.expressions import TextExpression, NumberExpression
@@ -113,7 +113,7 @@ class Parser(object):
             try:
                 self.currentToken = self.tokens.next()
             except StopIteration:
-                if self.matchTokensort(ENDMARKER):
+                if self.matchTokensort(ENDMARKER) and not self.seenEndMarker:
                     self.seenEndMarker = True
                 elif self.seenEndMarker:
                     logging.debug(" no next token available ")
@@ -310,18 +310,18 @@ def parseExpression(parser):
         expression = Name(parser.currentToken[1])
         #Check for Variable DOT Field expression
         if parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
-            expression = Field(expression, parser.currentToken[1])
             while parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
                 parser.next(lexeme=".") #skip.
                 parser.next(expected="NAME", tokensort=NAME)
                 expression =  Field(expression,parser.currentToken[1])
         #Check for expression PLUS expression
-        if parser.peek(lexeme="+") and expression:
-            #parse a + expression left and right.
-            left = expression
-            parser.next() # skip +
-            right = parseExpression(parser)
-            expression = CatExpression(left,right)
+
+    if parser.peek(lexeme="+") and expression:
+        left = expression
+        parser.next()# skip expr
+        parser.next()# skip +
+        right = parseExpression(parser)
+        expression = CatExpression(left,right)
 
     logging.debug(expression)
 
@@ -335,8 +335,9 @@ def parseExpression(parser):
 def parseList(parser):
     parser.check("List opening '[' ", lexeme="[")
     listExpression = ListExpression()
+    parser.next()
 
-    while parser.next():
+    while parser.hasnext():
         if parser.matchLexeme(']'):
             return listExpression
 
@@ -512,14 +513,14 @@ def parseIfStatement(parser):
     predicate = parsePredicate(parser)
     parser.check( lexeme = ')' )
     parser.next()
-    stm = parseStatement(parser)
-    statement = "if %s {%s}" % (stm,predicate)
+    stm = parseStatement(parser) # BLOCK?
+    ifstm = If(predicate, stm)
     if parser.matchLexeme(keywords['ELSE']):
         parser.next()
-        stm = parseStatement(parser)
-        statement = "%s else %s" % (statement, stm)
+        stm = parseStatement(parser) # BLOCK?
+        ifstm.elsestmnt = stm
 
-    return statement
+    return ifstm
 
 @trace
 def parseStatementBlock(parser):
@@ -541,12 +542,16 @@ def parseMarkupStatement(parser):
     p "data"; markup expression
     p "embedding < >"; markup embedding
     """
-
+    markup = None
     while parser.matchTokensort(tokensort=NAME):
-        markup = parseMarkup(parser)
+        if markup:
+            markup.childs.append(parseMarkup(parser))
+        else:
+            markup = parseMarkup(parser)
+
         if parser.matchTokensort(NAME):
             if parser.peek(lexeme=';'):
-                markup.variable = parser.currentToken[1]
+                markup.variable = Name(parser.currentToken[1])
                 break
 
     if parser.matchTokensort(PRESTRING):
@@ -556,7 +561,6 @@ def parseMarkupStatement(parser):
 
     parser.check(lexeme = ';')
     parser.next() # skip ;
-
     parser.next() #read ahead.
 
     return markup
@@ -601,8 +605,8 @@ def parseDesignator(parser):
     parser.next()
     if parser.currentToken[1][0] in "#$@:%.":
             attributes = parseAttributes(parser)
-            Designator.attributes = attributes
-    return Designator
+            designator.attributes = attributes
+    return designator
 
 @trace
 def parseAttributes(parser):

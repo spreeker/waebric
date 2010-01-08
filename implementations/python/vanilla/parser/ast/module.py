@@ -27,8 +27,7 @@ class Module(Node):
         sites = "\n".join( [repr(site) for site in self.sites])
         imports = "\n".join( [repr(_import) for _import in self.imports])
 
-        output =
-        """MODULE %s ,
+        output = """MODULE %s ,
         SITES %s
         IMPORTS %s
         FUNCTIONS %s
@@ -63,7 +62,7 @@ class Path(Node):
         self.fileName = fileName
 
     def __repr__(self):
-        return PATH(%s, %s) % (self.dir, self.filename)
+        return "PATH(%s/%s)" % (self.dir, self.filename)
 
 class Mapping(Node):
     def __init__(self, path,markup):
@@ -72,5 +71,5 @@ class Mapping(Node):
 
     def __repr__(self):
 
-        return "MAPPING( %s , %s )" % (repr(path), repr(markup))
+        return "MAPPING(%s, %s)" % (repr(path), repr(markup))
 

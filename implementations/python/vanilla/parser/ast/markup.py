@@ -12,7 +12,8 @@ class Designator(Node):
         self.attributes = attributes
 
     def __repr__(self):
-        return "Designator( %s %s)" % (self.name,repr(self.attibutes))
+        attrs = ",".join([repr(attr) for attr in self.attributes])
+        return "Designator(%s%s)" % (repr(self.name),attrs)
 
 class Attribute(Node):
     def __init__(self, symbol, value):
@@ -20,21 +21,22 @@ class Attribute(Node):
         self.value = value
 
     def __repr__(self):
-        return "ATTR( %s, %s )" % (self.symbol, self.value)
+        return "(%s, %s)" % (repr(self.symbol), repr(self.value))
 
 class Attributes(Node):
     def __init__(self):
         attributes = []
 
     def add(self, attribute):
-        attributeis.append(attribute)
+        attributes.append(attribute)
 
     def __repr__(self):
         attrs = ",".join([ repr(attr) for attr in self.attributes ])
-        return "( %s )" % attrs
+        return "ATTRBS( %s )" % attrs
 
 class Markup(Node):
     def __init__(self, designator):
+        self.childs = []
         self.designator = designator
         self.arguments = []
         self.embedding = ""
@@ -45,12 +47,20 @@ class Markup(Node):
 
         extra = ""
         if self.arguments:
-            extra = "( %s )" %  (",".join(arguments))
-        if self.embedding:
-            extra = "%s %s" % ( extra, repr(self.embedding))
+            extra = "%s" %  ((repr(self.arguments)))
+        elif self.embedding:
+            extra = "%s%s" % ( extra, repr(self.embedding))
         elif self.variable:
-            extra = "%s %s" % ( extra, repr(self.variable))
+            extra = "%s%s" % ( extra, repr(self.variable))
         elif self.expression:
-            extra = "%s %s" % ( extra, repr(self.expression))
+            extra = "%s%s" % ( extra, repr(self.expression))
 
-        return "MARKUP( %s %s )" % (repr(self.designator), extra)
+        if self.childs:
+            child = self.childs[0]
+            child.childs = self.childs[1:]
+            output = "MARKUP(%s%s%s)" % (
+                repr(self.designator), extra,
+                repr(child))
+        else:
+            output =  "MARKUP(%s%s)" % (repr(self.designator), extra)
+        return output
