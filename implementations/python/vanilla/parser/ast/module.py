@@ -30,8 +30,7 @@ class Module(Node):
         output = """MODULE %s ,
         SITES %s
         IMPORTS %s
-        FUNCTIONS %s
-        """ % ( self.id, sites, imports, functions)
+        FUNCTIONS %s """ % ( self.id, sites, imports, functions)
 
         return output
 
@@ -45,9 +44,9 @@ class Function(Node):
         self.statements.append(statement)
 
     def __repr__(self):
-        return "FUNCTION %s ( %s ) { %s } \n" % (self.name,
+        return "FUNCTION %s (%s) { %s } \n" % (self.name,
             ",".join([repr(arg) for arg in self.arguments]),
-            "\n".join([repr(stm) for stm in self.statement]))
+            ",".join([repr(stm) for stm in self.statements]))
 
 class Import(Node):
     def __init__(self, moduleId):

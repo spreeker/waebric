@@ -82,14 +82,16 @@ class TestParserClasses(unittest.TestCase):
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         ast = parseFunction(p)
-
+        self.assertEqual(str(ast),"""FUNCTION test (NAME('argument')) { MARKUP(Designator('p')STRING("bla")),MARKUP(Designator('p')MARKUP(Designator('p')MARKUP(Designator('p')))) } \n""")
 
     def test_module(self):
         source = "module menus"
         p = self.initialize_parser(source)
         ast = parseModule(p)
-        print ast
-
+        self.assertEqual(str(ast),"""MODULE ['menus'] ,
+        SITES 
+        IMPORTS 
+        FUNCTIONS  """)
 
         badsource = "mod fout"
         p = self.initialize_parser(badsource)

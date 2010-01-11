@@ -144,7 +144,6 @@ def parseWaebrick(parser):
 def parseModule(parser):
     """parse module statements"""
     parser.check('Module ModuleID', lexeme=keywords['MODULE'] )
-
     #create a new ast module.
     #parse the module identifier.
     parser.next()
@@ -154,17 +153,18 @@ def parseModule(parser):
     # parse for Site , Function and Import statements
     while(parser.hasnext()):
         if parser.matchLexeme(keywords['IMPORT']):
-            modules.addImport(parseImport(parser))
+            module.addImport(parseImport(parser))
         elif parser.matchLexeme(keywords['DEF']):
-            modules.addFunction(parseFunction(parser))
+            module.addFunction(parseFunction(parser))
         elif parser.matchLexeme(keywords['SITE']):
-            modules.addSite(parseSite(parser))
+            module.addSite(parseSite(parser))
         elif parser.matchTokensort(ENDMARKER):
             return
         else:
            raise SyntaxError(parser.currentToken,
         expected="import, def, site, newline" )
 
+    return module
 
 @trace
 def parseModuleId(parser):
@@ -172,12 +172,12 @@ def parseModuleId(parser):
     # AST new module id.
     moduleID = []
     parser.check("Module Identifier", tokensort=NAME)
-    moduleID.append(parser.currentToken)
+    moduleID.append(parser.currentToken[1])
 
     while(parser.peek(lexeme='.')):
         parser.next() #skip .
         parser.next("Module Identifier", tokensort=NAME)
-        moduleID.append(currentToken)
+        moduleID.append(currentToken[1])
 
     parser.next()
     return moduleID
