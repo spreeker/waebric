@@ -64,12 +64,12 @@ class Let(Statement):
         pass
 
     def __repr__(self):
-        ass = ",".join([repr(assignment) for assignment in assignments])
+        ass = ",".join([repr(assignment) for assignment in self.assignments])
         return "LET(%s, %s)" % (ass, repr(self.body))
 
 
 class If(Statement):
-    def __init__(self, predicate, ifstmnt, elsestmnt = None,):
+    def __init__(self, predicate, ifstmnt, elsestmnt="",):
         self.predicate = predicate
         self.elsestmnt = elsestmnt
         self.ifstmnt = ifstmnt
@@ -84,8 +84,11 @@ class If(Statement):
         return tuple(nodelist)
 
     def __repr__(self):
-        return "If(%s, %s)" % (repr(self.tests), repr(self.else_))
-
+        extra = ""
+        if self.elsestmnt:
+            extra = "\nELSE %s" % repr(self.elsestmnt)
+        return "If(%s,\n %s %s)" % (repr(self.predicate),
+            repr(self.ifstmnt), extra)
 
 class Echo(Statement):
     def __init__(self,embedding="",expression=""):
@@ -93,7 +96,7 @@ class Echo(Statement):
         embedding = expression
 
     def __repr__(self):
-        return "ECHO( %s%s )" (repr(self.expression),repr(self.embedding))
+        return "ECHO(%s%s)" (repr(self.expression),repr(self.embedding))
 
 
 class Cdata(Statement):
@@ -101,7 +104,7 @@ class Cdata(Statement):
         self.expression = expression
 
     def __repr__(self):
-        return "Cdata( %s )" % repr(self.expression)
+        return "Cdata(%s)" % repr(self.expression)
 
 
 class Comment(Statement):
@@ -109,7 +112,7 @@ class Comment(Statement):
         self.comment = comment
 
     def __repr__(self):
-        return "Comment( %s )" % self.comment
+        return "Comment(%s)" % self.comment
 
 
 class Each(Statement):
@@ -119,6 +122,15 @@ class Each(Statement):
         self.statement = statement
 
     def __repr__(self):
-        return "Each( %s in %s do %s)" % (
-                name,  repr(statement), repr(expression))
+        return "Each(%s in %s do %s)" % (
+                self.name,  repr(self.statement), repr(self.expression))
+
+
+class Block(Statement):
+    def __init__(self):
+       self.statements = []
+
+    def __repr__(self):
+        statements = "\n".join([repr(stm) for stm in self.statements])
+        return "Block(%s)" % (statements)
 

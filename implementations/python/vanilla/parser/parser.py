@@ -42,7 +42,7 @@ from ast.expressions import CatExpression, Field
 from ast.markup import Designator, Attributes, Markup
 from ast.predicate import Not, And, Or, Is_a
 from ast.statement import Yield, Let, If, Assignment, Each
-from ast.statement import Embedding, Comment, Cdata
+from ast.statement import Embedding, Comment, Cdata, Block
 
 class Parser(object):
 
@@ -297,10 +297,13 @@ def parseExpression(parser):
     if parser.matchLexeme("'"): #symbol.
         parser.next("symbol name", tokensort=NAME)
         expression = TextExpression(parser.currentToken[1])
+        parser.next()
     elif parser.matchTokensort(STRING): #data string
         expression = TextExpression(parser.currentToken[1])
+        parser.next()
     elif parser.matchTokensort(NUMBER): #number stuff
         expression = NumberExpression(parser.currentToken[1])
+        parser.next()
     elif parser.matchLexeme("["):
         expression = parseList(parser)
     elif parser.matchLexeme("{"):
@@ -314,11 +317,10 @@ def parseExpression(parser):
                 parser.next(lexeme=".") #skip.
                 parser.next(expected="NAME", tokensort=NAME)
                 expression =  Field(expression,parser.currentToken[1])
-        #Check for expression PLUS expression
-
-    if parser.peek(lexeme="+") and expression:
+        parser.next()
+    #Check for expression PLUS expression
+    if parser.matchLexeme("+") and expression:
         left = expression
-        parser.next()# skip expr
         parser.next()# skip +
         right = parseExpression(parser)
         expression = CatExpression(left,right)
@@ -329,7 +331,6 @@ def parseExpression(parser):
         raise SyntaxError(parser.currentToken,
             expected="Expression: symbol, string, number, list, record, name.field")
 
-    parser.next()
     return expression
 
 def parseList(parser):
@@ -344,6 +345,7 @@ def parseList(parser):
         listExpression.addExpression(parseExpression(parser))
 
         if parser.matchLexeme(']'):
+            parser.next()
             return listExpression
 
         parser.check(expected="comma ", lexeme=",")
@@ -365,6 +367,7 @@ def parseRecord(parser):
         record.addRecord(key,expression)
 
         if parser.matchLexeme('}'):
+            parser.next()
             return record
 
         parser.check("comma", lexeme=",")
@@ -414,7 +417,7 @@ def parsePredicate(parser):
 def parseStatement(parser):
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
-    if parser.matchLexeme(keywords['IF']):
+    elif parser.matchLexeme(keywords['IF']):
         return parseIfStatement(parser)
     elif parser.matchLexeme(keywords['EACH']):
         return parseEachStatement(parser)
@@ -429,7 +432,7 @@ def parseStatement(parser):
         expression = parseExpression(parser)
         return Cdata(expression)
     elif parser.matchLexeme('{'): #? starts a new staments block
-        return  matchStatementBlock(parser)
+        return  parseStatementBlock(parser)
     elif parser.matchLexeme(keywords['COMMENT']):
         parser.next( tokensort=STRING )
         return Comment(parser.currentToken[1])
@@ -438,27 +441,30 @@ def parseStatement(parser):
         return Yield()
     elif parser.matchTokensort(NAME):
         return parseMarkupStatement(parser)
-    elif parser.matchTokensort( ENDMARKER ): #needed?
-        return
+    #elif parser.matchTokensort( ENDMARKER ): #needed?
+    #    return
     raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
 @trace
 def parseLetStatement(parser):
-    if parser.matchLexeme(keywords['LET']):
-        assignments = []
-        while parser.next():
-            assignments.append(parseAssignment(parser))
-            if parser.matchLexeme(keywords['IN']):
-                body = []
-                while parser.next():
-                    body.append(parseStatement(parser))
-                    if parser.matchLexeme(keywords['END']):
-                        return Let(assignments,body)
-                raise SyntaxError(parser.currentToken,
-                    expected="missing END of LET .. IN .. END statement")
-        raise SyntaxError(parser.currentToken,
-            expected = """LET .. IN .. END, missing IN """)
+    parser.check(lexeme=keywords['LET'])
+    assignments = []
+    parser.next()
+    while parser.hasnext():
+        assignments.append(parseAssignment(parser))
+        if parser.matchLexeme(keywords['IN']):
+            parser.next()
+            body = []
+            while parser.hasnext():
+                body.append(parseStatement(parser))
+                if parser.matchLexeme(keywords['END']):
+                    logging.debug('i get here!!')
+                    return Let(assignments,body)
+            raise SyntaxError(parser.currentToken,
+                expected="missing END of LET statement")
+    raise SyntaxError(parser.currentToken,
+        expected = """LET .. IN .. END, missing IN """)
 
 @trace
 def parseAssignment(parser):
@@ -508,27 +514,29 @@ def parseEachStatement(parser):
 @trace
 def parseIfStatement(parser):
     parser.check(lexeme = keywords['IF'])
-    parser.next( lexeme = '(' )
+    parser.next(lexeme = '(')
     parser.next()
     predicate = parsePredicate(parser)
-    parser.check( lexeme = ')' )
+    parser.check(lexeme = ')')
     parser.next()
-    stm = parseStatement(parser) # BLOCK?
+    stm = parseStatement(parser)
     ifstm = If(predicate, stm)
+    logging.debug(parser.currentToken[1])
+    logging.debug('**********************')
     if parser.matchLexeme(keywords['ELSE']):
         parser.next()
-        stm = parseStatement(parser) # BLOCK?
-        ifstm.elsestmnt = stm
+        elsestm = parseStatement(parser)
+        ifstm.elsestmnt = elsestm
 
     return ifstm
 
 @trace
 def parseStatementBlock(parser):
     parser.check(lexeme='{')
-    block = ""
+    parser.next()
+    block = Block()
     while not parser.matchLexeme('}'):
-        statement = parseStatement(parser)
-        block = "%s%s" % (block, statement)
+        block.statements.append(parseStatement(parser))
     parser.next()
     return block
 
@@ -560,7 +568,6 @@ def parseMarkupStatement(parser):
         markup.expression = parseExpression(parser)
 
     parser.check(lexeme = ';')
-    parser.next() # skip ;
     parser.next() #read ahead.
 
     return markup

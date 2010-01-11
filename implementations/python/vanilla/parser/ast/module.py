@@ -62,7 +62,7 @@ class Path(Node):
         self.fileName = fileName
 
     def __repr__(self):
-        return "PATH(%s/%s)" % (self.dir, self.filename)
+        return "PATH(%s/%s)" % (self.dir, self.fileName)
 
 class Mapping(Node):
     def __init__(self, path,markup):
@@ -71,5 +71,5 @@ class Mapping(Node):
 
     def __repr__(self):
 
-        return "MAPPING(%s, %s)" % (repr(path), repr(markup))
+        return "MAPPING(%s, %s)" % (repr(self.path), repr(self.markup))
 

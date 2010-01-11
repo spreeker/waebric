@@ -90,6 +90,7 @@ class TestParserClasses(unittest.TestCase):
         ast = parseModule(p)
         print ast
 
+
         badsource = "mod fout"
         p = self.initialize_parser(badsource)
         self.assertRaises(SyntaxError, parseModule, p)
@@ -99,11 +100,12 @@ class TestParserClasses(unittest.TestCase):
         source = "site dir/dir2/file.ext: startfunction(); end"
         p = self.initialize_parser(source)
         ast = parseSite(p)
-        print ast
+        self.assertEqual(str(ast), "[MAPPING(PATH(sitedir/dir2//file.ext), MARKUP(Designator('startfunction')))]")
 
         badsource = "site nameBLEH"
         p = self.initialize_parser(badsource)
         self.assertRaises(SyntaxError, parseSite, p)
+
 
 class TestPredicateParser(unittest.TestCase):
 
@@ -174,42 +176,47 @@ class TestStatementParser(unittest.TestCase):
         p.next()
         return parseStatement(p)
 
-    def test_if_(self):
-        source = "if  ( bla )  h1 name;"
+    def test_if(self):
+        source = "if ( bla )  h1 name;"
         ast = self._parse_statement(source)
-        print ast
-        source = """
-        if ( a = "b" ) { h2 markup "data"; markup; }
-        else { "other stuff"; }
+        self.assertEqual(str(ast),"""If(NAME('bla'),
+ MARKUP(Designator('h1')NAME('name')) )""")
+
+        source = """if ( "b" ) { h2 markup "data"; markup; }
+        else { markup "other stuff"; }
         """
         ast = self._parse_statement(source)
-        print ast
+        rast = """If(STRING("b"),
+ Block(MARKUP(Designator('h2')STRING("data")MARKUP(Designator('markup')))
+MARKUP(Designator('markup'))) 
+ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
+
+        self.assertEqual(str(ast),rast)
 
     def test_each(self):
         source = "each ( var : expression ) m var;"
         ast = self._parse_statement(source)
-        print ast
-
+        self.assertEqual(str(ast),"Each(var in MARKUP(Designator('m')NAME('var')) do NAME('expression'))")
 
     def test_cdata(self):
         source = "cdata expression;"
         ast = self._parse_statement(source)
-        print ast
+        self.assertEqual(str(ast),"Cdata(NAME('expression'))")
 
     def test_yield(self):
         source = "yield;"
         ast = self._parse_statement(source)
-        print ast
+        self.assertEqual(str(ast),"Yield")
 
     def test_comment(self):
         source = 'comment "commentString";'
         ast = self._parse_statement(source)
-        print ast
+        self.assertEqual(str(ast),'Comment("commentString")')
 
-    def test_let_(self):
+    def test_let(self):
         source = "let x = bla.bla.bla in statement x; end"
         ast = self._parse_statement(source)
-        print ast
+        self.assertEqual(str(ast),"LET(ASSIGNMENT(x,FIELD 'bla' in FIELD 'bla' in NAME('bla')), [MARKUP(Designator('statement')NAME('x'))])")
 
 
 class TestExpression(unittest.TestCase):
@@ -229,7 +236,6 @@ class TestExpression(unittest.TestCase):
         sourceList = '[ "i1", "i2" ]'
         ast = self._parse_expression(sourceList)
         self.assertEqual(str(ast),"""LIST(STRING("i1"),STRING("i2"))""")
-
 
     def test_record(self):
         sourceRecord = '{ key : "value" , key2 : "value2" } '

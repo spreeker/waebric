@@ -239,7 +239,7 @@ def generate_tokens(readline):
                            (lnum, pos), (lnum, pos+1), line)
                 pos = pos + 1
 
-        yield (ENDMARKER, '', (lnum, 0), (lnum, 0), '')
+    yield (ENDMARKER, '', (lnum, 0), (lnum, 0), '')
 
 
 if __name__ == '__main__':                     # testing
