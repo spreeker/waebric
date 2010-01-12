@@ -9,9 +9,9 @@ class Statement(Node):
 
 class Embedding(Statement):
     def __init__(self):
-        pretext = []
-        midtext = []
-        tailtext= []
+        self.pretext = []
+        self.midtext = []
+        self.tailtext= []
 
     def __repr__(self):
         output = ""

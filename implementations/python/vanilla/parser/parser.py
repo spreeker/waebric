@@ -41,8 +41,8 @@ from ast.expressions import ListExpression, RecordExpression
 from ast.expressions import CatExpression, Field
 from ast.markup import Designator, Attributes, Markup
 from ast.predicate import Not, And, Or, Is_a
-from ast.statement import Yield, Let, If, Assignment, Each
-from ast.statement import Embedding, Comment, Cdata, Block
+from ast.statement import Yield, Let, If, Assignment, Each, Block
+from ast.statement import Embedding, Comment, Cdata, Echo
 
 class Parser(object):
 
@@ -72,10 +72,10 @@ class Parser(object):
         """ check if current token is tokensort of lexeme """
         if lexeme:
            if not self.currentToken[1] == lexeme:
-                raise SyntaxError(self.currentToken, expected=expected)
+                raise SyntaxError(self.currentToken, expected=lexeme)
         if tokensort:
             if not self.currentToken[0] == tokensort:
-                raise SyntaxError(self.currentToken, expected=expected)
+                raise SyntaxError(self.currentToken, expected=tokensort)
 
     def peek(self, x=1, tokensort="", lexeme=""):
         """lookahead x tokens in advance, returns true
@@ -119,6 +119,8 @@ class Parser(object):
                     logging.debug(" no next token available ")
                     raise StopIteration
 
+        if self.currentToken[0] == COMMENT:
+            return self.next()
 
         if tokensort or lexeme:
             expected = "'%s%s%s'" % (expected, tokensort, lexeme)
@@ -130,7 +132,10 @@ class Parser(object):
         return self.currentToken
 
     def __repr__(self):
-        return "%s at '%s'" % ( str(type(self)), self.currentToken[1])
+        token = self.currentToken
+        if self.currentToken:
+            token = self.currentToken[1]
+        return "parsing: '%s'" % (token)
 
 @trace
 def parseWaebrick(parser):
@@ -139,6 +144,7 @@ def parseWaebrick(parser):
     logging.debug("--------------------")
     parser.next()
     ast = parseModule(parser)
+    return ast
 
 @trace
 def parseModule(parser):
@@ -196,6 +202,8 @@ def parseSite(parser):
     mappings = []
     while parser.hasnext():
         mappings.append(parseMapping(parser))
+        logging.debug('=======================')
+        logging.debug(parser.currentToken[1])
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return mappings
@@ -209,7 +217,6 @@ def parseMapping(parser):
     parser.check( lexeme=":" )
     parser.next()
     markup = parseMarkup(parser)
-    parser.next(';')
     return Mapping(path, markup)
 
 @trace
@@ -424,8 +431,11 @@ def parseStatement(parser):
     elif parser.matchLexeme(keywords['ECHO']):
         if parser.peek(tokensort=PRESTRING):
             embedding = parseEmbedding(parser)
+            parser.next() #skip ;
             return Echo(embedding,None)
+        parser.next()
         expression = parseExpression(parser)
+        parser.next() # skip ;
         return Echo(None, expression)
     elif parser.matchLexeme(keywords['CDATA']):
         parser.next()
@@ -478,6 +488,7 @@ def parseFunctionAssignment(parser):
     #parse name
     parser.check( tokensort=NAME )
     name = parser.currentToken[1]
+    parser.next()
     #Parse "(" { Name "," }* ")" "="
     arguments = parseArguments(parser)
     parser.next( lexeme = "=" )
@@ -537,7 +548,8 @@ def parseStatementBlock(parser):
     block = Block()
     while not parser.matchLexeme('}'):
         block.statements.append(parseStatement(parser))
-    parser.next()
+
+    parser.next() # skip }
     return block
 
 @trace
@@ -565,12 +577,17 @@ def parseMarkupStatement(parser):
     if parser.matchTokensort(PRESTRING):
         markup.embedding = parseEmbedding(parser)
     elif not parser.matchLexeme(';'):
-        markup.expression = parseExpression(parser)
+        if parser.matchLexeme('{') and not parser.peek(2, lexeme=':'):
+            pass
+        else:
+            markup.expression = parseExpression(parser)
 
-    parser.check(lexeme = ';')
-    parser.next() #read ahead.
-
-    return markup
+    if parser.matchLexeme('{'):
+        return markup
+    else:
+        parser.check(lexeme = ';')
+        parser.next() #read ahead.
+        return markup
 
 @trace
 def parseEmbedding(parser):
@@ -579,8 +596,10 @@ def parseEmbedding(parser):
     while not parser.peek(tokensort=POSTSTRING):
         if parser.matchTokensort(EMBSTRING):
             emb.midtext.append(parser.currentToken[1])
+            parser.next()
         elif parser.matchTokensort(PRESTRING):
             emb.pretext.append(parser.currentToken[1])
+            parser.next()
         else:
             raise SyntaxError(parser.currentToken,
                 expected = "Embedded string Error")
@@ -650,7 +669,8 @@ def parseArguments(parser):
         arguments.append(parseArgument(parser))
 
         if not parser.matchLexeme(lexeme=')'):
-            parser.next(lexeme=',')
+            parser.check(lexeme=',')
+            parser.next()
 
 @trace
 def parseArgument(parser):
@@ -675,10 +695,11 @@ def parse(source):
     parser = Parser()
     tokens = tokenize.generate_tokens(source)
     parser.setTokens(tokens)
-    parseWaebrick(parser)
+    ast = parseWaebrick(parser)
+    return ast
 
 if __name__ == '__main__':                     # testing
     import sys
-    if len(sys.argv) > 1: parse(open(sys.argv[1]).readline)
-    else : parse(sys.stdin.readline)
+    if len(sys.argv) > 1: print parse(open(sys.argv[1]).readline)
+    else : print parse(sys.stdin.readline)
 

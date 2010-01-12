@@ -1,8 +1,17 @@
+"""
+Test code for Parser module.
+
+This module contains:
+-basic parser function tests
+-basic parser AST tests. Output of the printed ast
+tree is compared with previous results.
+
+"""
+
 import unittest
 
 from parser import *
 from tokenize import generate_tokens
-
 from token import *
 
 def gen_line(lines):
