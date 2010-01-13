@@ -22,6 +22,7 @@ def _trace(f, *args, **kw):
     logging.info("calling %s with args %s, %s" % \
             (f.__name__, args, kw ))
     result = f(*args, **kw)
+    logging.info(str(result))
     logging.info("exit %s" % f.__name__)
     return result
 

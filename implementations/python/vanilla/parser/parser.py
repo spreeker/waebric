@@ -39,7 +39,7 @@ from ast.module import Mapping
 from ast.expressions import TextExpression, NumberExpression
 from ast.expressions import ListExpression, RecordExpression
 from ast.expressions import CatExpression, Field
-from ast.markup import Designator, Attributes, Markup
+from ast.markup import Designator, Attribute, Markup
 from ast.predicate import Not, And, Or, Is_a
 from ast.statement import Yield, Let, If, Assignment, Each, Block
 from ast.statement import Embedding, Comment, Cdata, Echo
@@ -491,8 +491,9 @@ def parseFunctionAssignment(parser):
     parser.next()
     #Parse "(" { Name "," }* ")" "="
     arguments = parseArguments(parser)
-    parser.next( lexeme = "=" )
-    expression = parseExpression(parser)
+    parser.check( lexeme = "=" )
+    parser.next()
+    expression = parseStatement(parser)
     assignment = Assignment(name, expression)
     assignment.addVariable(arguments) #WARNING parseArguments allows to much?!
     return assignment
@@ -504,7 +505,7 @@ def parseVariableAssignment(parser):
     name = parser.currentToken[1]
     parser.next( lexeme = "=" )
     parser.next()
-    expression = parseExpression(parser)
+    expression = parseStatement(parser)
     assignment = Assignment(name, expression)
     return assignment
 
@@ -553,6 +554,27 @@ def parseStatementBlock(parser):
     return block
 
 @trace
+def checkForLastExpression(parser):
+    """
+    check if parser is at the last expression item in a
+    markup chain.
+    if it is, parsing should be done by expression parser.
+    except if it is a makup call.
+    This is a helper function wich returns True if it
+    is an expression.
+    """
+    peek = 1;
+    #peeks are cheap, they are cached.
+    while(parser.peek(peek, tokensort=NAME)):
+        peek = peek + 1
+        if parser.peek(lexeme=';')
+                return True
+        if parser.peek(peek,lexeme='.'):
+            #could be field of last expression.
+            peek = peek+1
+    return False
+
+@trace
 def parseMarkupStatement(parser):
     """
     p;      markup
@@ -561,33 +583,26 @@ def parseMarkupStatement(parser):
     p p p(); markup markup markup
     p "data"; markup expression
     p "embedding < >"; markup embedding
+    p.class%100@200('bla') expression.field.subfield
+            markup expression
     """
     markup = None
+
     while parser.matchTokensort(tokensort=NAME):
         if markup:
             markup.childs.append(parseMarkup(parser))
         else:
             markup = parseMarkup(parser)
-
-        if parser.matchTokensort(NAME):
-            if parser.peek(lexeme=';'):
-                markup.variable = Name(parser.currentToken[1])
-                break
-
-    if parser.matchTokensort(PRESTRING):
-        markup.embedding = parseEmbedding(parser)
-    elif not parser.matchLexeme(';'):
-        if parser.matchLexeme('{') and not parser.peek(2, lexeme=':'):
-            pass
-        else:
+        #check if next name could be final expression
+        if checkForLastExpression(parser):
             markup.expression = parseExpression(parser)
 
-    if parser.matchLexeme('{'):
-        return markup
-    else:
-        parser.check(lexeme = ';')
-        parser.next() #read ahead.
-        return markup
+    if not markup.expression and parser.matchTokensort(PRESTRING):
+        markup.embedding = parseEmbedding(parser)
+
+    parser.check(lexeme = ';')
+    parser.next() #read ahead.
+    return markup
 
 @trace
 def parseEmbedding(parser):
@@ -637,22 +652,18 @@ def parseDesignator(parser):
 @trace
 def parseAttributes(parser):
     """ # . $ : @ % @ """
-    attributes = Attributes()
-
-    while currentToken[0][1] in "#$@:%.":
-        symbol = currentToken[0][1]
-        if not parser.matchLexeme('@'):
-            parser.next(tokensort=NAME)
-        elif parser.matchLexeme('@'):
-            parser.next(tokensort=NUMBER)
+    attributes = []
+    while parser.currentToken[1] in "#$@:%.":
+        symbol = parser.currentToken[1]
+        if symbol not in "@%":
+            parser.next(expected="Attribute NAME", tokensort=NAME)
         else:
-            raise SyntaxError(currentToken,
-                expected=" Attribute, # . : @ % ")
-
-        attribute = Attribute(symbol, parser.currentToken[1])
-        attributes.add(attribute)
+            parser.next(expected="Attribute NUMBER", tokensort=NUMBER)
+        #AST
+        attributes.append(Attribute(symbol, parser.currentToken[1]))
         parser.next()
-        return attributes
+
+    return attributes
 
 @trace
 def parseArguments(parser):

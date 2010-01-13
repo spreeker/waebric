@@ -33,11 +33,12 @@ class Assignment(Statement):
 
     def __repr__(self):
         if self.variables:
-            assvar = "%s(%s)" % (self.name, ",".join(repr(self.variables)))
+            var = ",".join([repr(var) for var in self.variables])
+            assvar = "%s(%s)" % (self.name, var)
         else:
             assvar = self.name
 
-        return "ASSIGNMENT(%s,%s)" % (assvar, repr(self.statement))
+        return "ASSIGNMENT(%s,%s)" % (repr(assvar), repr(self.statement))
 
 
 class Yield(Statement):

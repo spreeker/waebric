@@ -23,24 +23,12 @@ class Attribute(Node):
     def __repr__(self):
         return "(%s, %s)" % (repr(self.symbol), repr(self.value))
 
-class Attributes(Node):
-    def __init__(self):
-        attributes = []
-
-    def add(self, attribute):
-        attributes.append(attribute)
-
-    def __repr__(self):
-        attrs = ",".join([ repr(attr) for attr in self.attributes ])
-        return "ATTRBS( %s )" % attrs
-
 class Markup(Node):
     def __init__(self, designator):
         self.childs = []
         self.designator = designator
         self.arguments = []
         self.embedding = ""
-        self.variable = ""
         self.expression = ""
 
     def __repr__(self):
@@ -49,11 +37,9 @@ class Markup(Node):
         if self.arguments:
             extra = "%s" %  ((repr(self.arguments)))
         elif self.embedding:
-            extra = "%s%s" % ( extra, repr(self.embedding))
-        elif self.variable:
-            extra = "%s%s" % ( extra, repr(self.variable))
+            extra = "%s%s" % (extra, repr(self.embedding))
         elif self.expression:
-            extra = "%s%s" % ( extra, repr(self.expression))
+            extra = "%s%s" % (extra, repr(self.expression))
 
         if self.childs:
             child = self.childs[0]

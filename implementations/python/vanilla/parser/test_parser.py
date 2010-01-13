@@ -225,10 +225,25 @@ ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
         self.assertEqual(str(ast),'Comment("commentString")')
 
     def test_let(self):
-        source = "let x = bla.bla.bla in statement x; end"
+        source = "let x = markup.class bla.bla.bla; in statement x; end"
         ast = self._parse_statement(source)
         self.assertEqual(str(ast),"LET(ASSIGNMENT(x,FIELD 'bla' in FIELD 'bla' in NAME('bla')), [MARKUP(Designator('statement')NAME('x'))])")
 
+    def test_let_regression(self):
+        source = """let
+       td(img, alt) = td img(width="160",height="160", alt=alt,src=img);
+     in
+      tr {
+          td("images/lavakaft_13-34.jpg", "lava 13-34");
+          td("images/lavakaft_14-1.jpg", "lava 14-1");
+          td("images/lavakaft_14-2.jpg", "lava 14-2");
+      }
+     end"""
+        ast = self._parse_statement(source)
+        astrslt = """LET(ASSIGNMENT("td([NAME('img'), NAME('alt')])",MARKUP(Designator('td')MARKUP(Designator('img')[ASSIGNMENT('width',STRING("160")), ASSIGNMENT('height',STRING("160")), ASSIGNMENT('alt',NAME('alt')), ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')), Block(MARKUP(Designator('td')[STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])
+MARKUP(Designator('td')[STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])
+MARKUP(Designator('td')[STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")]))])"""
+        self.assertEqual(str(ast), astrslt)
 
 class TestExpression(unittest.TestCase):
 
