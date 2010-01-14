@@ -8,8 +8,8 @@ Waebric Parser Module.
 -parser class keeps state of currentToken,peekedTokens.
 -Builds ast tree of waebric source.
 
-In error.py there are variables:
-DEBUG,SHOWTOKENS,SHOWPARSER magic which enable detailed
+In error.py there are magic variables:
+DEBUG,SHOWTOKENS,SHOWPARSER which enable detailed
 logging in parser.log
 
 -@trace decorator enables logging function calls
@@ -46,9 +46,8 @@ from ast.statement import Embedding, Comment, Cdata, Echo
 
 class Parser(object):
 
-    ast = []
     seenEndMarker = False
-    tokens = []
+    tokens = [] #token generator.
     peekedTokens = []
     currentToken = []
 
@@ -69,7 +68,10 @@ class Parser(object):
         return self.currentToken[0] == tokensort
 
     def check(self, expected="", tokensort=None, lexeme=None):
-        """ check if current token is tokensort of lexeme """
+        """
+        Check if current token is tokensort of lexeme,
+        Raises SyntaxError when there is no match.
+         """
         if lexeme:
            if not self.currentToken[1] == lexeme:
                 raise SyntaxError(self.currentToken, expected=lexeme)
@@ -288,7 +290,6 @@ def parseFunction(parser):
     raise SyntaxError(parser.currentToken,
             expected="END, Missing function ending END")
 
-
 """
 Symbol expression,
 Text,
@@ -340,6 +341,7 @@ def parseExpression(parser):
 
     return expression
 
+@trace
 def parseList(parser):
     parser.check("List opening '[' ", lexeme="[")
     listExpression = ListExpression()
@@ -469,7 +471,7 @@ def parseLetStatement(parser):
             while parser.hasnext():
                 body.append(parseStatement(parser))
                 if parser.matchLexeme(keywords['END']):
-                    logging.debug('i get here!!')
+                    parser.next() #skip end.
                     return Let(assignments,body)
             raise SyntaxError(parser.currentToken,
                 expected="missing END of LET statement")
@@ -563,17 +565,25 @@ def checkForLastExpression(parser):
     This is a helper function wich returns True if it
     is an expression.
     """
+    if parser.matchTokensort(STRING):
+        return True
+    elif parser.matchTokensort(NUMBER):
+        return True
+    elif parser.matchLexeme("'"):
+        return True
+
     peek = 1;
-    #peeks are cheap, they are cached.
     while(parser.peek(peek, tokensort=NAME)):
         peek = peek + 1
-        if parser.peek(lexeme=';')
-                return True
-        if parser.peek(peek,lexeme='.'):
+        if parser.peek(lexeme=';'):
+            return True
+        elif parser.peek(peek,lexeme='.'):
             #could be field of last expression.
             peek = peek+1
-    return False
+        else:
+            return False
 
+    return False
 @trace
 def parseMarkupStatement(parser):
     """
@@ -599,6 +609,8 @@ def parseMarkupStatement(parser):
 
     if not markup.expression and parser.matchTokensort(PRESTRING):
         markup.embedding = parseEmbedding(parser)
+    if parser.matchLexeme('{'):
+        return parseStatementBlock(parser)
 
     parser.check(lexeme = ';')
     parser.next() #read ahead.
@@ -689,7 +701,6 @@ def parseArgument(parser):
         expression
         name
     """
-
     if parser.matchTokensort(tokensort=NAME):
         argument = parser.currentToken[1]
         parser.next()
@@ -713,4 +724,3 @@ if __name__ == '__main__':                     # testing
     import sys
     if len(sys.argv) > 1: print parse(open(sys.argv[1]).readline)
     else : print parse(sys.stdin.readline)
-

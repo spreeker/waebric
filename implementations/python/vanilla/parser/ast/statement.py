@@ -93,11 +93,11 @@ class If(Statement):
 
 class Echo(Statement):
     def __init__(self,embedding="",expression=""):
-        expression = embedding
-        embedding = expression
+        self.expression = embedding
+        self.embedding = expression
 
     def __repr__(self):
-        return "ECHO(%s%s)" (repr(self.expression),repr(self.embedding))
+        return "ECHO(%s%s)" % (str(self.expression),str(self.embedding))
 
 
 class Cdata(Statement):
