@@ -172,7 +172,7 @@ class TestMarkup(unittest.TestCase):
         source = 'markup function( a = "b" ) ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        """MARKUP(Designator('markup')MARKUP(Designator('function')[ASSIGNMENT(a,STRING("b"))]))""")
+        """MARKUP(Designator('markup')MARKUP(Designator('function')[ASSIGNMENT('a',STRING("b"))]))""")
         source = 'markup markup function("beee") ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
@@ -227,7 +227,7 @@ ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
     def test_let(self):
         source = "let x = markup.class bla.bla.bla; in statement x; end"
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),"LET(ASSIGNMENT(x,FIELD 'bla' in FIELD 'bla' in NAME('bla')), [MARKUP(Designator('statement')NAME('x'))])")
+        self.assertEqual(str(ast),"LET(ASSIGNMENT('x',MARKUP(Designator('markup'('.', 'class'))FIELD 'bla' in FIELD 'bla' in NAME('bla'))), [MARKUP(Designator('statement')NAME('x'))])")
 
     def test_let_regression(self):
         source = """let
@@ -240,10 +240,9 @@ ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
       }
      end"""
         ast = self._parse_statement(source)
-        astrslt = """LET(ASSIGNMENT("td([NAME('img'), NAME('alt')])",MARKUP(Designator('td')MARKUP(Designator('img')[ASSIGNMENT('width',STRING("160")), ASSIGNMENT('height',STRING("160")), ASSIGNMENT('alt',NAME('alt')), ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')), Block(MARKUP(Designator('td')[STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])
-MARKUP(Designator('td')[STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])
-MARKUP(Designator('td')[STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")]))])"""
+        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')[ASSIGNMENT(\'width\',STRING("160")), ASSIGNMENT(\'height\',STRING("160")), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')[STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])\nMARKUP(Designator(\'td\')[STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])\nMARKUP(Designator(\'td\')[STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")])))])"""
         self.assertEqual(str(ast), astrslt)
+
 
 class TestExpression(unittest.TestCase):
 

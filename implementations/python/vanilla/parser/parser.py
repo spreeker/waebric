@@ -20,6 +20,11 @@ convention:
 For each parser function the first token should be ready.
 Therefore each parser function should read ahead the first
 token for the next parser function.
+
+parser.currenToken object contains the current token of the
+tokenize generator and is a lits containing:
+[tokensort, token, 
+
 """
 
 import logging
@@ -83,6 +88,7 @@ class Parser(object):
         """lookahead x tokens in advance, returns true
            if tokensort and or lexeme matches peekedtoken.
         """
+ 
         d = x - len(self.peekedTokens)
         if d > -1:
             try:
@@ -218,7 +224,9 @@ def parseMapping(parser):
     path = parsePath(parser)
     parser.check( lexeme=":" )
     parser.next()
-    markup = parseMarkup(parser)
+    markup = parseMarkup(parser) #markupcall. not a statement
+    parser.check(lexeme=";")
+    parser.next()
     return Mapping(path, markup)
 
 @trace
@@ -466,12 +474,13 @@ def parseLetStatement(parser):
     while parser.hasnext():
         assignments.append(parseAssignment(parser))
         if parser.matchLexeme(keywords['IN']):
-            parser.next()
             body = []
             while parser.hasnext():
+                parser.next()
                 body.append(parseStatement(parser))
                 if parser.matchLexeme(keywords['END']):
                     parser.next() #skip end.
+                    parser.next() #read ahead
                     return Let(assignments,body)
             raise SyntaxError(parser.currentToken,
                 expected="missing END of LET statement")
@@ -571,19 +580,20 @@ def checkForLastExpression(parser):
         return True
     elif parser.matchLexeme("'"):
         return True
-
-    peek = 1;
-    while(parser.peek(peek, tokensort=NAME)):
-        peek = peek + 1
+    elif parser.matchTokensort(NAME):
         if parser.peek(lexeme=';'):
             return True
-        elif parser.peek(peek,lexeme='.'):
+        peek = 1;
+        while(parser.peek(peek, lexeme='.')):
             #could be field of last expression.
-            peek = peek+1
-        else:
-            return False
+            peek = peek + 1
+            if parser.peek(peek,tokensort=NAME):
+                peek = peek + 1
 
+        if parser.peek(peek,lexeme=';'):
+            return True
     return False
+
 @trace
 def parseMarkupStatement(parser):
     """
@@ -595,13 +605,14 @@ def parseMarkupStatement(parser):
     p "embedding < >"; markup embedding
     p.class%100@200('bla') expression.field.subfield
             markup expression
+    p { }   markup block
     """
     markup = None
 
     while parser.matchTokensort(tokensort=NAME):
-        if markup:
+        try:
             markup.childs.append(parseMarkup(parser))
-        else:
+        except AttributeError:
             markup = parseMarkup(parser)
         #check if next name could be final expression
         if checkForLastExpression(parser):
@@ -609,8 +620,10 @@ def parseMarkupStatement(parser):
 
     if not markup.expression and parser.matchTokensort(PRESTRING):
         markup.embedding = parseEmbedding(parser)
+
     if parser.matchLexeme('{'):
-        return parseStatementBlock(parser)
+        markup.childs.append(parseStatementBlock(parser))
+        return markup
 
     parser.check(lexeme = ';')
     parser.next() #read ahead.
