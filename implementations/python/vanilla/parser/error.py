@@ -12,18 +12,31 @@ if DEBUG:
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
 
 def strToken(type, token, (srow, scol), (erow, ecol), line):
-    return "%d,%d-%d,%d:\t%s\t%s" % \
-        (srow, scol, erow, ecol, tok_name[type], repr(token))
+    global tabs
+    space = " " * tabs
+    return "%s%d,%d-%d,%d:\t%s\t%s" % \
+        (space,srow, scol, erow, ecol, tok_name[type], repr(token))
 
 def logToken(*token):
-    logging.debug(strToken(*token))
+    logging.info(strToken(*token))
+
+def indentedLog(data):
+    global tabs
+    space = " " * tabs
+    logging.info("%s%s" % (space,data))
+
+tabs = 0
 
 def _trace(f, *args, **kw):
-    logging.info("calling %s with args %s, %s" % \
-            (f.__name__, args, kw ))
+    global tabs
+    space = tabs * " "
+    logging.info("%d%scalling %s with args %s, %s" % \
+            (tabs,space,f.__name__, args, kw ))
+    tabs += 1
     result = f(*args, **kw)
-    logging.info(str(result))
-    logging.info("exit %s" % f.__name__)
+    #logging.info(str(result))
+    logging.info("%d%sexit %s" % (tabs,space,f.__name__))
+    tabs -= 1
     return result
 
 def trace(f):

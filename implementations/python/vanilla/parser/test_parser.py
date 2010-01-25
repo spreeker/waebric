@@ -42,7 +42,6 @@ class TestParser(unittest.TestCase):
         self.assertEqual(p.matchTokensort(NAME), False)
         self.assertEqual(p.matchTokensort(NUMBER), True)
 
-
     def test_check(self):
         source = "def test 10"
         p = Parser()
@@ -292,6 +291,20 @@ class TestExpression(unittest.TestCase):
 
         sourcePlus = ' + "b"'
         self.assertRaises(SyntaxError, self._parse_expression, sourcePlus)
+
+class RegressionTests(unittest.TestCase):
+
+    def test_let_in_block(self):
+        source = open('tests/blocks.wae').readline
+        ast = parse(source)
+        expectedAST = """MODULE ['block'] ,
+        SITES [MAPPING(PATH(sitesite//block.html), MARKUP(Designator('function')))]
+        IMPORTS 
+        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')[ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')[STRING("34.jpg")])))])))))) } 
+ """
+        self.assertEqual(expectedAST,repr(ast))
+
+
 
 if __name__ == '__main__':
     unittest.main()

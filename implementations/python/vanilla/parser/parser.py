@@ -32,7 +32,7 @@ import tokenize
 import re
 
 from error import SyntaxError
-from error import trace,logToken
+from error import trace,logToken, indentedLog
 from error import DEBUG, SHOWTOKENS, SHOWPARSER
 
 from keywords import keywords
@@ -307,7 +307,7 @@ List,
 Record,
 expression + expression
 """
-@trace
+#@trace
 def parseExpression(parser):
     expression = None
     if parser.matchLexeme("'"): #symbol.
@@ -341,7 +341,7 @@ def parseExpression(parser):
         right = parseExpression(parser)
         expression = CatExpression(left,right)
 
-    logging.debug(expression)
+    indentedLog(expression)
 
     if not expression:
         raise SyntaxError(parser.currentToken,
@@ -461,8 +461,8 @@ def parseStatement(parser):
         return Yield()
     elif parser.matchTokensort(NAME):
         return parseMarkupStatement(parser)
-    #elif parser.matchTokensort( ENDMARKER ): #needed?
-    #    return
+    elif parser.matchTokensort( ENDMARKER ): #needed?
+        return
     raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
@@ -480,7 +480,8 @@ def parseLetStatement(parser):
                 body.append(parseStatement(parser))
                 if parser.matchLexeme(keywords['END']):
                     parser.next() #skip end.
-                    parser.next() #read ahead
+                    #indentedLog('****** LET *******')
+                    #parser.next() #read ahead
                     return Let(assignments,body)
             raise SyntaxError(parser.currentToken,
                 expected="missing END of LET statement")
@@ -564,7 +565,7 @@ def parseStatementBlock(parser):
     parser.next() # skip }
     return block
 
-@trace
+#@trace
 def checkForLastExpression(parser):
     """
     check if parser is at the last expression item in a
@@ -622,7 +623,7 @@ def parseMarkupStatement(parser):
         markup.embedding = parseEmbedding(parser)
 
     if parser.matchLexeme('{'):
-        markup.childs.append(parseStatementBlock(parser))
+        markup.childs.append(parseStatement(parser))
         return markup
 
     parser.check(lexeme = ';')
@@ -690,7 +691,7 @@ def parseAttributes(parser):
 
     return attributes
 
-@trace
+#@trace
 def parseArguments(parser):
     """ ( Arguments,* ) """
     #ast stuff.
@@ -708,7 +709,7 @@ def parseArguments(parser):
             parser.check(lexeme=',')
             parser.next()
 
-@trace
+#@trace
 def parseArgument(parser):
     """ name = expression
         expression

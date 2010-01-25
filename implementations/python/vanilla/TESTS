@@ -1,3 +1,6 @@
+#NOTE since there are relative paths used in tests
+#execution sould be done with TESTS in local path like this:
+#$./TESTS
 export PYTHONPATH=$PYTHONPATH:~/waebric/implementations/python/vanilla:
 python parser/test_tokenizer.py
 python parser/test_parser.py
