@@ -23,7 +23,7 @@ token for the next parser function.
 
 parser.currenToken object contains the current token of the
 tokenize generator and is a lits containing:
-[tokensort, token, 
+[tokentype, token, (startrow, startcolumn),(endrow,endcolumn),line]
 
 """
 
@@ -38,16 +38,13 @@ from error import DEBUG, SHOWTOKENS, SHOWPARSER
 from keywords import keywords
 from token import *
 
-from ast.ast import Name
-from ast.module import Module, Function, Path, Import
-from ast.module import Mapping
-from ast.expressions import TextExpression, NumberExpression
-from ast.expressions import ListExpression, RecordExpression
-from ast.expressions import CatExpression, Field
-from ast.markup import Designator, Attribute, Markup
-from ast.predicate import Not, And, Or, Is_a
-from ast.statement import Yield, Let, If, Assignment, Each, Block
-from ast.statement import Embedding, Comment, Cdata, Echo
+from ast import Name
+from ast import Module, Function, Path, Import, Mapping
+from ast import Text, Number, List, Record, Cat, Field
+from ast import Designator, Attribute, Markup
+from ast import Not, And, Or, Is_a
+from ast import Yield, Let, If, Assignment, Each, Block
+from ast import Embedding, Comment, Cdata, Echo
 
 class Parser(object):
 
@@ -210,8 +207,6 @@ def parseSite(parser):
     mappings = []
     while parser.hasnext():
         mappings.append(parseMapping(parser))
-        logging.debug('=======================')
-        logging.debug(parser.currentToken[1])
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return mappings
@@ -312,13 +307,13 @@ def parseExpression(parser):
     expression = None
     if parser.matchLexeme("'"): #symbol.
         parser.next("symbol name", tokensort=NAME)
-        expression = TextExpression(parser.currentToken[1])
+        expression = Text(parser.currentToken[1])
         parser.next()
     elif parser.matchTokensort(STRING): #data string
-        expression = TextExpression(parser.currentToken[1])
+        expression = Text(parser.currentToken[1])
         parser.next()
     elif parser.matchTokensort(NUMBER): #number stuff
-        expression = NumberExpression(parser.currentToken[1])
+        expression = Number(parser.currentToken[1])
         parser.next()
     elif parser.matchLexeme("["):
         expression = parseList(parser)
@@ -339,7 +334,7 @@ def parseExpression(parser):
         left = expression
         parser.next()# skip +
         right = parseExpression(parser)
-        expression = CatExpression(left,right)
+        expression = Cat(left,right)
 
     indentedLog(expression)
 
@@ -352,7 +347,7 @@ def parseExpression(parser):
 @trace
 def parseList(parser):
     parser.check("List opening '[' ", lexeme="[")
-    listExpression = ListExpression()
+    listExpression = List()
     parser.next()
 
     while parser.hasnext():
@@ -371,7 +366,7 @@ def parseList(parser):
 @trace
 def parseRecord(parser):
     parser.check("Record opening", lexeme="{")
-    record = RecordExpression()
+    record = Record()
     while parser.next():
         if parser.matchLexeme('}'):
             return record
