@@ -1,6 +1,22 @@
 """
-Abstract Syntax Tree Expression Nodes
+Abstract Syntax Node Defenitions
 """
+
+def flatten(seq):
+    l = []
+    for elt in seq:
+        t = type(elt)
+        if t is tuple or t is list:
+            for elt2 in flatten(elt):
+                l.append(elt2)
+        else:
+            l.append(elt)
+    return l
+
+def flatten_nodes(seq):
+    return [n for n in flatten(seq) if isinstance(n, Node)]
+
+nodes = {}
 
 class Node:
     """Abstract base class for ast nodes."""
@@ -20,6 +36,7 @@ class Node:
     def __repr__(self):
         pass # implemented by subclasses
 
+
 #Module Nodes.
 class Module(Node):
 
@@ -37,6 +54,21 @@ class Module(Node):
 
     def addImport(self, import_):
         self.imports.append(import_)
+
+    def getChildren(self):
+        #return getChildNodes(self)
+        children = []
+        children.append(flatten_nodes(self.imports))
+        children.append(flatten_nodes(self.sites))
+        children.append(flatten_nodes(self.functions))
+        return tuple(children)
+
+    def getChildNodes(self):
+        nodelist = []
+        nodelist.extend(flatten_nodes(self.imports))
+        nodelist.extend(flatten_nodes(self.sites))
+        nodelist.extend(flatten_nodes(self.functions))
+        return tuple(nodelist)
 
     def __repr__(self):
 
