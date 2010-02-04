@@ -540,8 +540,8 @@ def parseIfStatement(parser):
     parser.next()
     stm = parseStatement(parser)
     ifstm = If(predicate, stm)
-    logging.debug(parser.currentToken[1])
-    logging.debug('**********************')
+    #logging.debug(parser.currentToken[1])
+    #logging.debug('**********************')
     if parser.matchLexeme(keywords['ELSE']):
         parser.next()
         elsestm = parseStatement(parser)

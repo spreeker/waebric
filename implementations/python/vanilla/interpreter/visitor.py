@@ -1,149 +1,110 @@
-"""
-Visitor module contains visitor methods for each
-ast type. Createing html output.
-"""
+
+class ASTVisitor:
+    """Performs a depth-first walk of the AST
+
+    The ASTVisitor will walk the AST, performing either a preorder or
+    postorder traversal depending on which method is called.
+
+    methods:
+    preorder(tree, visitor)
+    postorder(tree, visitor)
+        tree: an instance of ast.Node
+        visitor: an instance with visitXXX methods
+
+    The ASTVisitor is responsible for walking over the tree in the
+    correct order.  For each node, it checks the visitor argument for
+    a method named 'visitNodeType' where NodeType is the name of the
+    node's class, e.g. Class.  If the method exists, it is called
+    with the node as its sole argument.
+
+    The visitor method for a particular node type can control how
+    child nodes are visited during a preorder walk.  (It can't control
+    the order during a postorder walk, because it is called _after_
+    the walk has occurred.)  The ASTVisitor modifies the visitor
+    argument by adding a visit method to the visitor; this method can
+    be used to visit a child node of arbitrary type.
+    """
+
+    VERBOSE = 0
+
+    def __init__(self):
+        self.node = None
+        self._cache = {}
+
+    def default(self, node, *args):
+        for child in node.getChildNodes():
+            self.dispatch(child, *args)
+
+    def dispatch(self, node, *args):
+        self.node = node
+        klass = node.__class__
+        meth = self._cache.get(klass, None)
+        if meth is None:
+            className = klass.__name__
+            meth = getattr(self.visitor, 'visit' + className, self.default)
+            self._cache[klass] = meth
+##        if self.VERBOSE > 0:
+##            className = klass.__name__
+##            if self.VERBOSE == 1:
+##                if meth == 0:
+##                    print "dispatch", className
+##            else:
+##                print "dispatch", className, (meth and meth.__name__ or '')
+        return meth(node, *args)
+
+    def preorder(self, tree, visitor, *args):
+        """Do preorder walk of tree using visitor"""
+        self.visitor = visitor
+        visitor.visit = self.dispatch
+        self.dispatch(tree, *args) # XXX *args make sense?
+
+class ExampleASTVisitor(ASTVisitor):
+    """Prints examples of the nodes that aren't visited
+
+    This visitor-driver is only useful for development, when it's
+    helpful to develop a visitor incrementally, and get feedback on what
+    you still have to do.
+    """
+    examples = {}
+
+    def dispatch(self, node, *args):
+        self.node = node
+        meth = self._cache.get(node.__class__, None)
+        className = node.__class__.__name__
+        if meth is None:
+            meth = getattr(self.visitor, 'visit' + className, 0)
+            self._cache[node.__class__] = meth
+        if self.VERBOSE > 1:
+            print "dispatch", className, (meth and meth.__name__ or '')
+        if meth:
+            meth(node, *args)
+        elif self.VERBOSE > 0:
+            klass = node.__class__
+            if not self.examples.has_key(klass):
+                self.examples[klass] = klass
+                print
+                print self.visitor
+                print klass
+                for attr in dir(node):
+                    if attr[0] != '_':
+                        print "\t", "%-12.12s" % attr, getattr(node, attr)
+                print
+            return self.default(node, *args)
 
 
-def moduleVisitor(env,dom):
-    pass
+_walker = ASTVisitor
+def walk(tree, visitor, walker=None, verbose=None):
+    if walker is None:
+        walker = _walker()
+    if verbose is not None:
+        walker.VERBOSE = verbose
+    walker.preorder(tree, visitor)
+    return walker.visitor
 
-def functionVisitor(env,dom):
-    pass
+def dumpNode(node):
+    print node.__class__
+    for attr in dir(node):
+        if attr[0] != '_':
+            print "\t", "%-10.10s" % attr, getattr(node, attr)
 
-def mainVisitor(env,dom):
-    pass
 
-def mapping visitor
-    pass
-
-def dependenciesVisitor(env,dom):
-    pass
-
-def statementVisitor(env, dom):
-    pass
-
-def ifStatementVisitor(env, dom):
-    pass
-
-def EachStatementVisitor(env, dom):
-    pass
-
-def LetStatementVisitor(env, dom):
-    pass
-
-def BlockStatementVisitor(env, dom):
-    pass
-
-def CommentStatementVisitor(env, dom):
-    pass
-
-def EchoStatementVisitor(env, dom):
-    pass
-
-def EchoEmbeddingVisitor(env, dom):
-    pass
-
-def DataExpressionVisitor(env, dom):
-    pass
-
-def MarkupStatementVisitor(env, dom):
-    pass
-
-def MarkupMarkupStatementVisitor(env, dom):
-    pass
-
-def MarkupEmbeddingStatementVisitor(env, dom):
-    pass
-
-def MarkupStatementStatementVisitor(env, dom):
-    pass
-
-def MarkupExpressionStatementVisitor(env, dom):
-    pass
-
-def ExpressionVisitor(env, dom):
-    pass
-
-def VarExpressionVisitor(env, dom):
-    pass
-
-def SymbolExpressionVisitor(env, dom):
-    pass
-
-def NatExpressionVisitor(env, dom):
-    pass
-
-def TextExpressionVisitor(env, dom):
-    pass
-
-def FieldExpressionVisitor(env, dom):
-    pass
-
-def CatExpressionVisitor(env, dom):
-    pass
-
-def ListExpressionVisitor(env, dom):
-    pass
-
-def RecordExpressionVisitor(env, dom):
-    pass
-
-def EmbeddingVisitor(env, dom):
-    pass
-
-def EmbedVisitor(env, dom):
-    pass
-
-def ExpressionEmbeddingVisitor(env, dom);
-    pass
-
-def AssignmentVisitor(env, dom):
-    pass
-
-def VariableBindingVisitor(env, dom):
-    pass
-
-def FunctionBindingVisitor(env, dom):
-    pass
-
-def MarkupVisitor(env, dom):
-    pass
-
-def MarkupCallVisitor(env, dom):
-    pass
-
-def MarkupXHTMLTagVisitor(env, dom):
-    pass
-
-def MarkupTagVisitor(env, dom):
-    pass
-
-def AttributeVisitor(env, dom):
-    pass
-
-def IdAttributeVisitor(env, dom):
-    pass
-
-def ClassAttributeVisitor(env, dom):
-    pass
-
-def NameAttributeVisitor(env, dom):
-    pass
-
-def TypeAttributeVisitor(env, dom):
-    pass
-
-def WidthHeightAttributeVisitor(env, dom):
-    pass
-
-def WidthAttributeVisitor(env, dom):
-    pass
-
-def ArgumentVisitor(env, dom):
-    pass
-
-def ArgumentExpressionVisitor(env, dom):
-    pass
-
-def KeyValueVisitor(env, dom):
-    pass

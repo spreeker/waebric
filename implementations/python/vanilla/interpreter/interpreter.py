@@ -4,13 +4,19 @@ Waebric interpreter.
 Generates output of Astract Syntac Tree of waebrick parse Tree.
 Visit each node in module and create XHTML output.
 
-each functions should recieve specific ast classes
-and Environment variable
+This waebric interpreter uses a variant on the
+visitor pattern that takes advantage of Python’s
+introspection features to eliminate the need for much of the visitor’s
+infrastructure.
+
+for each AST node the should be an
+visitNodeClass function.
 """
 
 from parser import parser
-
 from xml.etree import cElementTree as ET
+
+from document import Document
 
 
 def interprete(module):
@@ -47,13 +53,13 @@ class Environment(object):
         self.sites = []
         self.modules = [] # AST module nodes.
 
-        self.output = ""
+        self.doc = Document()
 
     def __repr__(self):
         vars = "".join(["%s:%s" % (var, value) for var in self.variables.items()])
         functions = "".join(self.functions.keys())
 
-        return "Variables %s, \n Functions %s \n self.output" % (vars,functions)
+        return "Variables %s, \n Functions %s \n " % (vars,functions)
 
 
 class UndefinedFunction(exception):
