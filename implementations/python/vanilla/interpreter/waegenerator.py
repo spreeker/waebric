@@ -1,56 +1,68 @@
+from document import Document
+from parser.parser import parse
+from visitor import walk
 
-
+from parser.error import trace
 
 class WaeGenerator:
 
+    def __init__(self, source):
+       self._setup_htm_doc()
+       tree = parse(source)
+       walk(tree, self)
+
+    def _setup_htm_doc(self):
+        self.doc = Document()
+
     # Module nodes.
+    @trace
     def visitModule(self,node):
-        pass
+        for child in node.getChildNodes():
+            self.visit(child)
 
+    @trace
     def visitFunction(self, node):
-        pass
+        print dir(node)
 
-    def visitPath(self,node)
-        pass
+    @trace
+    def visitPath(self, node):
+        print dir(node)
 
-    def visitImport(self,node):
-        pass
+    @trace
+    def visitImport(self, node):
+        print dir(node)
 
     def visitMapping(self, node):
-        pass
+        print dir(node)
 
     # variables.
     def visitName(self, node):
-        pass
-
-    # Expression nodes.
-    def visitText(self, node):
-        pass
+        print dir(node)
 
     def visitNumber(self, node):
-        pass
+        print dir(node)
 
     def visitList(self, node):
-        pass
+        print dir(node)
 
     def visitRecord(self, node):
-        pass
+        print dir(node)
 
     def visitCat(self, node):
         pass
 
-    def visitField(self,node):
+    def visitField(self, node):
         pass
 
     #Markup nodes
-    def visitDesignator(self,node):
+    def visitDesignator(self, node):
         pass
 
     def visitAttribute(self, node):
         pass
 
     def visitMarkup(self, node):
-        pass
+        dir(node)
 
     #Statements nodes
     def visitIf(self, node):
@@ -83,7 +95,6 @@ class WaeGenerator:
     def visitYield(self, node):
         pass
 
-
     #Predicate nodes
     def visitNot(self, node):
         pass
@@ -97,4 +108,11 @@ class WaeGenerator:
     def visitIs_a(self, node):
         pass
 
+
+if __name__ == '__main__':                     # testing
+    import sys
+    if len(sys.argv) > 1:
+        sourceFile = open(sys.argv[1])
+        source = sourceFile.readline
+        waebrick = WaeGenerator(source)
 
