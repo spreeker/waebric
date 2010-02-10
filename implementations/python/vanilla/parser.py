@@ -142,7 +142,7 @@ class Parser(object):
             token = self.currentToken[1]
         return "parsing: '%s'" % (token)
 
-@trace
+#@trace
 def parseWaebrick(parser):
     logging.debug("--------------------")
     logging.debug('start parsing tokens')
@@ -151,7 +151,7 @@ def parseWaebrick(parser):
     ast = parseModule(parser)
     return ast
 
-@trace
+#@trace
 def parseModule(parser):
     """parse module statements"""
     parser.check('Module ModuleID', lexeme=keywords['MODULE'] )
@@ -177,7 +177,7 @@ def parseModule(parser):
 
     return module
 
-@trace
+#@trace
 def parseModuleId(parser):
     """Parse the module identifier """
     # AST new module id.
@@ -193,13 +193,13 @@ def parseModuleId(parser):
     parser.next()
     return moduleID
 
-@trace
+#@trace
 def parseImport(parser):
     parser.check(lexeme=keywords['IMPORT'])
     parser.next()
     return Import(parseModuleId(parser))
 
-@trace
+#@trace
 def parseSite(parser):
     # AST, mappings.
     parser.check("Site Defenition", lexeme=keywords['SITE'])
@@ -212,7 +212,7 @@ def parseSite(parser):
             return mappings
     raise SyntaxError(currentToken, expected="missing site ending END")
 
-@trace
+#@trace
 def parseMapping(parser):
     """ parse content in between site and end."""
     # AST new mapping
@@ -224,7 +224,7 @@ def parseMapping(parser):
     parser.next()
     return Mapping(path, markup)
 
-@trace
+#@trace
 def parsePath(parser):
     path = ""
     if parser.peek(lexeme="/") or parser.peek(x=2,lexeme="/"):
@@ -233,7 +233,7 @@ def parsePath(parser):
     #logging.debug(dir+path)
     return Path(dir, fileName)
 
-@trace
+#@trace
 def parseDirectory(parser):
     directory = ""
     if isPathElement(parser):
@@ -254,7 +254,7 @@ def parseDirectory(parser):
             raise SyntaxError(parser.currentToken, expected="path element")
     raise SyntaxError(parser.currentToken, expected="directory path")
 
-@trace
+#@trace
 def parseFileName(parser):
     parser.check(tokensort=NAME, expected="File Name")
     name = parser.currentToken[1]
@@ -264,14 +264,14 @@ def parseFileName(parser):
     parser.next()
     return name
 
-@trace
+#@trace
 def isPathElement(parser):
     regex = re.compile(r"(.* .*)|(.*\t.*)|(.*\n.*)|(.*\r.*)|(.*/.*)|(.*\\..*)|(.*\\\\.*)")
     if regex.match(parser.currentToken[1]):
         return False
     return True
 
-@trace
+#@trace
 def parseFunction(parser):
     parser.check(expected="function defenition, def", lexeme=keywords['DEF'])
     ## parse identifier
@@ -344,7 +344,7 @@ def parseExpression(parser):
 
     return expression
 
-@trace
+#@trace
 def parseList(parser):
     parser.check("List opening '[' ", lexeme="[")
     listExpression = List()
@@ -363,7 +363,7 @@ def parseList(parser):
         parser.check(expected="comma ", lexeme=",")
         parser.next()
 
-@trace
+#@trace
 def parseRecord(parser):
     parser.check("Record opening", lexeme="{")
     record = Record()
@@ -384,7 +384,7 @@ def parseRecord(parser):
 
         parser.check("comma", lexeme=",")
 
-@trace
+#@trace
 def parsePredicate(parser):
     predicate = None
     if parser.matchLexeme('!'):
@@ -425,7 +425,7 @@ def parsePredicate(parser):
     logging.debug(predicate)
     return predicate
 
-@trace
+#@trace
 def parseStatement(parser):
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
@@ -461,7 +461,7 @@ def parseStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
-@trace
+#@trace
 def parseLetStatement(parser):
     parser.check(lexeme=keywords['LET'])
     assignments = []
@@ -483,14 +483,14 @@ def parseLetStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected = """LET .. IN .. END, missing IN """)
 
-@trace
+#@trace
 def parseAssignment(parser):
     if parser.peek(lexeme = '('):
         return parseFunctionAssignment(parser)
     else:
         return parseVariableAssignment(parser)
 
-@trace
+#@trace
 def parseFunctionAssignment(parser):
     #parse name
     parser.check( tokensort=NAME )
@@ -505,7 +505,7 @@ def parseFunctionAssignment(parser):
     assignment.addVariable(arguments) #WARNING parseArguments allows to much?!
     return assignment
 
-@trace
+#@trace
 def parseVariableAssignment(parser):
     """ var = expression """
     parser.check( tokensort=NAME )
@@ -516,7 +516,7 @@ def parseVariableAssignment(parser):
     assignment = Assignment(name, expression)
     return assignment
 
-@trace
+#@trace
 def parseEachStatement(parser):
     parser.check(lexeme = keywords['EACH'])
     parser.next(lexeme='(')
@@ -530,7 +530,7 @@ def parseEachStatement(parser):
     stm = parseStatement(parser)
     return Each(name, exp, stm)
 
-@trace
+#@trace
 def parseIfStatement(parser):
     parser.check(lexeme = keywords['IF'])
     parser.next(lexeme = '(')
@@ -549,7 +549,7 @@ def parseIfStatement(parser):
 
     return ifstm
 
-@trace
+#@trace
 def parseStatementBlock(parser):
     parser.check(lexeme='{')
     parser.next()
@@ -590,7 +590,7 @@ def checkForLastExpression(parser):
             return True
     return False
 
-@trace
+#@trace
 def parseMarkupStatement(parser):
     """
     p;      markup
@@ -625,7 +625,7 @@ def parseMarkupStatement(parser):
     parser.next() #read ahead.
     return markup
 
-@trace
+#@trace
 def parseEmbedding(parser):
     parser.check('embedding " < > " ', tokensort=PRESTRING)
     emb = Embedding()
@@ -649,7 +649,7 @@ def parseEmbedding(parser):
 p     markup
 p attributes (arguments) markup
 """
-@trace
+#@trace
 def parseMarkup(parser):
     """Differentiate between p and p()"""
     designator = parseDesignator(parser)
@@ -659,7 +659,7 @@ def parseMarkup(parser):
         markup.arguments = arguments
     return markup
 
-@trace
+#@trace
 def parseDesignator(parser):
     """ p attributes* """
     parser.check("NAME",tokensort=NAME)
@@ -670,7 +670,7 @@ def parseDesignator(parser):
             designator.attributes = attributes
     return designator
 
-@trace
+#@trace
 def parseAttributes(parser):
     """ # . $ : @ % @ """
     attributes = []

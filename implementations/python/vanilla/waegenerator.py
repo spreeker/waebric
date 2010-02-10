@@ -7,16 +7,17 @@ from parser.error import trace
 class WaeGenerator:
 
     def __init__(self, source):
-       self._setup_htm_doc()
-       tree = parse(source)
-       walk(tree, self)
-
-    def _setup_htm_doc(self):
+        tree = parse(source)
         self.doc = Document()
+        walk(tree, self, verbose=1)
 
     # Module nodes.
     @trace
     def visitModule(self,node):
+
+        #visit dependencies and imports.
+
+        #visit function defenitions.
         for child in node.getChildNodes():
             self.visit(child)
 

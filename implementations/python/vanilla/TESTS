@@ -2,5 +2,5 @@
 #execution sould be done with TESTS in local path like this:
 #$./TESTS
 export PYTHONPATH=$PYTHONPATH:~/waebric/implementations/python/vanilla:
-python parser/test_tokenizer.py
-python parser/test_parser.py
+python test_tokenizer.py
+python test_parser.py

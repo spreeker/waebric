@@ -1,6 +1,7 @@
 """
 Abstract Syntax Node Defenitions
 """
+from error import trace
 
 def flatten(seq):
     l = []
@@ -53,6 +54,7 @@ class Module(Node):
     def addImport(self, import_):
         self.imports.append(import_)
 
+    @trace
     def getChildren(self):
         #return getChildNodes(self)
         children = []
@@ -61,6 +63,7 @@ class Module(Node):
         children.append(flatten_nodes(self.functions))
         return tuple(children)
 
+    @trace
     def getChildNodes(self):
         nodelist = []
         nodelist.extend(flatten_nodes(self.imports))

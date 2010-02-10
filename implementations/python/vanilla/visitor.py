@@ -43,13 +43,13 @@ class ASTVisitor:
             className = klass.__name__
             meth = getattr(self.visitor, 'visit' + className, self.default)
             self._cache[klass] = meth
-##        if self.VERBOSE > 0:
-##            className = klass.__name__
-##            if self.VERBOSE == 1:
-##                if meth == 0:
-##                    print "dispatch", className
-##            else:
-##                print "dispatch", className, (meth and meth.__name__ or '')
+        if self.VERBOSE > 0:
+            className = klass.__name__
+            if self.VERBOSE == 1:
+                if meth == 0:
+                    print "dispatch", className
+            else:
+                print "dispatch", className, (meth and meth.__name__ or '')
         return meth(node, *args)
 
     def preorder(self, tree, visitor, *args):
@@ -57,40 +57,6 @@ class ASTVisitor:
         self.visitor = visitor
         visitor.visit = self.dispatch
         self.dispatch(tree, *args) # XXX *args make sense?
-
-class ExampleASTVisitor(ASTVisitor):
-    """Prints examples of the nodes that aren't visited
-
-    This visitor-driver is only useful for development, when it's
-    helpful to develop a visitor incrementally, and get feedback on what
-    you still have to do.
-    """
-    examples = {}
-
-    def dispatch(self, node, *args):
-        self.node = node
-        meth = self._cache.get(node.__class__, None)
-        className = node.__class__.__name__
-        if meth is None:
-            meth = getattr(self.visitor, 'visit' + className, 0)
-            self._cache[node.__class__] = meth
-        if self.VERBOSE > 1:
-            print "dispatch", className, (meth and meth.__name__ or '')
-        if meth:
-            meth(node, *args)
-        elif self.VERBOSE > 0:
-            klass = node.__class__
-            if not self.examples.has_key(klass):
-                self.examples[klass] = klass
-                print
-                print self.visitor
-                print klass
-                for attr in dir(node):
-                    if attr[0] != '_':
-                        print "\t", "%-12.12s" % attr, getattr(node, attr)
-                print
-            return self.default(node, *args)
-
 
 _walker = ASTVisitor
 def walk(tree, visitor, walker=None, verbose=None):
@@ -106,5 +72,4 @@ def dumpNode(node):
     for attr in dir(node):
         if attr[0] != '_':
             print "\t", "%-10.10s" % attr, getattr(node, attr)
-
 
