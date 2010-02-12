@@ -5,25 +5,38 @@ from visitor import walk
 from parser.error import trace
 
 class WaeGenerator:
-
+    """
+    Defines htm code generator for waebric.
+    """
     def __init__(self, source):
         tree = parse(source)
         self.doc = Document()
         walk(tree, self, verbose=1)
+
+        self.functions = {}
 
     # Module nodes.
     @trace
     def visitModule(self,node):
 
         #visit dependencies and imports.
+        for _import in self.imports:
+            self.visit(_import)
 
         #visit function defenitions.
-        for child in node.getChildNodes():
+        for function in self.functions():
             self.visit(child)
+
+        # do something with the sites?
+        # and/or main function.
 
     @trace
     def visitFunction(self, node):
-        print dir(node)
+        #do a check?
+        self.functions[node.name] = node
+
+        for statement in node.statements:
+            self.visit(statement)
 
     @trace
     def visitPath(self, node):
@@ -31,6 +44,7 @@ class WaeGenerator:
 
     @trace
     def visitImport(self, node):
+        # try to load up module in this environment?
         print dir(node)
 
     def visitMapping(self, node):

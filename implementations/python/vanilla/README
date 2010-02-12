@@ -1,15 +1,20 @@
-Testing and using different parts of the python
-waebrick implementation:
 
-Quickoverview.
+run all tests:
 
-./TEST, runs all tests
-python parser/parser.py waebric.wae, prints parser ast.
-python parser/tokenize.py waebric.wae, prints tokenized source.
+	$./TEST
 
-#run specific tests
-python parser/test_parser CLASS.testFunction, lookup
-in the source/stacktrace which function to test.
+print an ast:
 
-For more details view comments in source code.
+	$python parser.py waebric.wae
+
+print tokenized source:
+
+	$python tokenize.py waebric.wae, prints tokenized source.
+
+run specific tests
+
+	$python parser/test_parser CLASS.testFunction
+
+	lookup in the source/stacktrace which function to test.
+
 

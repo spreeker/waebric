@@ -8,7 +8,7 @@ SHOWTOKENS = True
 SHOWPARSER =  True
 
 if DEBUG:
-    LOG_FILENAME = 'parser.log'
+    LOG_FILENAME = 'debug.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
 
 def strToken(type, token, (srow, scol), (erow, ecol), line):
