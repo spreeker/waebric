@@ -11,9 +11,12 @@ This visitor checks for:
     Duplicate definitions
     Arity Mismatches
 """
+from visitor import walk
+from parser import parse
 
+from xhtmltag import XHTMLTag
 
-class waeChecker:
+class WaeChecker:
     """ check ast for errors """
 
     def __init__(self, source):
@@ -22,34 +25,57 @@ class waeChecker:
         scopes = {}
         names = {}
 
+        errors = []
+
+        walk(treek, self, verbose=1)
+
+        for error in self.errors:
+            print error
+
     def visitFunction(self, node):
         """check function defenition. """
 
         if self.functions.has_key(node.name):
-            # ERROR !!
+            self.errors.append("function %s already defined" % node.name )
 
-        self.functions[node.name] = node.arguments
+        self.functions[node.name] = len(node.arguments)
 
         for child in node.childNodes():
             self.visit(child)
 
-    def visitName(self, node):
+    def visitAssignment(self, node):
         """ check variable name """
 
-        self.names[node.name] = ""
-
+        self.names[node.name] = node.statement
 
     def visitImport(self, node):
         try:
             open("%s.wae" % node.moduleId)
-
         except:
             #raise error module does not excist.
             #pass error import is skipped.
-            pass
+            self.errors.append("could not open module %s" % node.moduleId)
 
     def visitMarkup(self, node):
-        # figure out if it is a function call.
-        # check if function excists and arity.
+
+        if self.functions.has_key(node.designator):
+            #it is a function.
+            if not function[node.designator] == len(node.arguments):
+                #arity is not ok
+                self.errors.append("arity mismatch %s" % node.designator)
+        else:
+            # check if it is a valid xhtml tag.
+            if not node.designator.upper() in XHTMLTag:
+                self.errors.append("invalid tag used! %s"  % node.designator)
+
         for child in node.childNodes():
             self.visit(child)
+
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        sourceFile = open(sys.argv[1])
+        source = sourceFile.readline
+        check = WaeChecker(source)
+

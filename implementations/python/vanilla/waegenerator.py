@@ -1,7 +1,7 @@
 from document import Document
 from parser.parser import parse
 from visitor import walk
-
+from xhtmltag import XHTMLTag
 from parser.error import trace
 
 class WaeGenerator:
