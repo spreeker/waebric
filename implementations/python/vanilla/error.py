@@ -30,7 +30,8 @@ tabs = 0
 def _trace(f, *args, **kw):
     global tabs
     space = tabs * " "
-    logging.info("%d%scalling %s with args %s, %s" % \
+    #smallargs = "".join([o.__class__.__name__ for o in args])
+    logging.info("%d%scalling %s with args \n%s, %s\n" % \
             (tabs,space,f.__name__, args, kw ))
     tabs += 1
     result = f(*args, **kw)

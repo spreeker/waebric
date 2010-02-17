@@ -25,17 +25,28 @@ class ASTVisitor:
     be used to visit a child node of arbitrary type.
     """
 
-    VERBOSE = 0
+    VERBOSE = 1
 
     def __init__(self):
         self.node = None
         self._cache = {}
 
     def default(self, node, *args):
-        for child in node.getChildNodes():
-            self.dispatch(child, *args)
+        klass = node.__class__
+        parent = klass.__name__
 
+        for child in node.getChildNodes():
+            klass = child.__class__
+            className = klass.__name__
+            print className ,"from parent", parent
+
+            self.dispatch(child, *args)
+        
     def dispatch(self, node, *args):
+        klass = node.__class__
+        className = klass.__name__
+        print className
+
         self.node = node
         klass = node.__class__
         meth = self._cache.get(klass, None)

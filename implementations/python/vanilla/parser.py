@@ -435,13 +435,16 @@ def parseStatement(parser):
         return parseEachStatement(parser)
     elif parser.matchLexeme(keywords['ECHO']):
         if parser.peek(tokensort=PRESTRING):
-            embedding = parseEmbedding(parser)
+            parser.next()
+            emb = parseEmbedding(parser)
             parser.next() #skip ;
-            return Echo(embedding,None)
-        parser.next()
-        expression = parseExpression(parser)
-        parser.next() # skip ;
-        return Echo(None, expression)
+            return Echo(embedding=emb)
+        else :
+            parser.next()
+            expr = parseExpression(parser)
+            parser.next() # skip ;
+            return Echo(expression=expr)
+
     elif parser.matchLexeme(keywords['CDATA']):
         parser.next()
         expression = parseExpression(parser)

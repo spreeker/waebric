@@ -13,7 +13,7 @@ This visitor checks for:
 """
 from visitor import walk
 from parser import parse
-
+from error import trace
 from xhtmltag import XHTMLTag
 
 class WaeChecker:
@@ -21,17 +21,17 @@ class WaeChecker:
 
     def __init__(self, source):
         tree = parse(source)
-        functions = {}
-        scopes = {}
-        names = {}
+        self.functions = {}
+        self.scopes = {}
+        self.names = {}
 
-        errors = []
+        self.errors = []
 
-        walk(treek, self, verbose=1)
+        walk(tree, self, verbose=1)
 
         for error in self.errors:
             print error
-
+    @trace
     def visitFunction(self, node):
         """check function defenition. """
 
@@ -40,14 +40,19 @@ class WaeChecker:
 
         self.functions[node.name] = len(node.arguments)
 
-        for child in node.childNodes():
+        for child in node.getChildNodes():
             self.visit(child)
 
+    @trace
     def visitAssignment(self, node):
         """ check variable name """
 
         self.names[node.name] = node.statement
 
+        for child in node.getChildNodes():
+            self.visit(child)
+
+    @trace
     def visitImport(self, node):
         try:
             open("%s.wae" % node.moduleId)
@@ -56,6 +61,7 @@ class WaeChecker:
             #pass error import is skipped.
             self.errors.append("could not open module %s" % node.moduleId)
 
+    @trace
     def visitMarkup(self, node):
 
         if self.functions.has_key(node.designator):
@@ -65,10 +71,10 @@ class WaeChecker:
                 self.errors.append("arity mismatch %s" % node.designator)
         else:
             # check if it is a valid xhtml tag.
-            if not node.designator.upper() in XHTMLTag:
+            if not node.designator.name.upper() in XHTMLTag:
                 self.errors.append("invalid tag used! %s"  % node.designator)
 
-        for child in node.childNodes():
+        for child in node.getChildNodes():
             self.visit(child)
 
 

@@ -22,7 +22,7 @@ nodes = {}
 class Node:
     """Abstract base class for ast nodes."""
     def __iter__(self):
-        for n in self.getChildren():
+        for n in self.getChildNodes():
             yield n
 
     def getChildren(self):
@@ -85,6 +85,7 @@ class Module(Node):
         return output
 
 class Function(Node):
+
     def __init__(self, name, arguments):
         self.name = name
         self.arguments = arguments
@@ -102,7 +103,8 @@ class Function(Node):
 
     def getChildNodes(self):
         nodelist = []
-        nodelist.append(self.statements)
+        nodelist.extend(flatten_nodes(self.statements))
+
         return tuple(nodelist)
 
     def __repr__(self):
@@ -138,7 +140,7 @@ class Path(Node):
         return "PATH(%s/%s)" % (self.dir, self.fileName)
 
 class Mapping(Node):
-    def __init__(self, path,markup):
+    def __init__(self, path, markup):
         self.path = path
         self.markup = markup
 
@@ -176,6 +178,7 @@ class Text(Node):
         return self.text
 
     def getChildNodes(self):
+        print "DO I GET HERE>??"
         return ()
 
     def __repr__(self):
@@ -303,6 +306,7 @@ class Attribute(Node):
 
 
 class Markup(Node):
+
     def __init__(self, designator):
         self.childs = []
         self.designator = designator
@@ -409,6 +413,7 @@ class Statement(Node):
     pass
 
 class Embedding(Statement):
+
     def __init__(self):
         self.pretext = []
         self.midtext = []
@@ -421,7 +426,6 @@ class Embedding(Statement):
         children.extend(flatten(midtext))
         children.extend(flatten(tailtext))
         return tuple(children)
-        return self.expression, self.type
 
     def getChildNodes(self):
         return ()
@@ -510,9 +514,11 @@ class If(Statement):
             repr(self.ifstmnt), extra)
 
 class Echo(Statement):
-    def __init__(self,embedding="",expression=""):
-        self.expression = embedding
-        self.embedding = expression
+
+    def __init__(self, embedding=None, expression=None):
+        self.expression = expression 
+        self.embedding = embedding 
+        self.VERBOSE = 1
 
     def getChildren(self):
         if self.expression:
@@ -520,12 +526,16 @@ class Echo(Statement):
         return self.embedding
 
     def getChildNodes(self):
+        assert isinstance(self.expression,Node), "expression is not NODE!"
+        print self.expression
+
         if self.expression:
-            return self.expression
-        return self.embedding
+            return tuple(self.expression)
+        #else:
+        #    return self.embedding
 
     def __repr__(self):
-        return "ECHO(%s%s)" % (str(self.expression),str(self.embedding))
+        return "ECHO(%s%s)" % (repr(self.expression),repr(self.embedding))
 
 
 class Cdata(Statement):
