@@ -312,7 +312,7 @@ class Markup(Node):
         self.designator = designator
         self.arguments = []
         self.embedding = ""
-        self.expression = ""
+        self.expression = "" #variable
 
     def getChildren(self):
         children = []
@@ -327,7 +327,11 @@ class Markup(Node):
 
     def getChildNodes(self):
         nodelist = []
-        nodelist.extend(flatten(self.childs))
+        nodelist.extend(flatten_nodes(self.childs))
+        if self.embedding:
+            nodelist.extend(flatten_nodes(self.embedding))
+        if self.expression:
+            nodelist.extend(flatten_nodes(self.expression))
         return tuple(nodelist)
 
     def __repr__(self):
@@ -447,6 +451,19 @@ class Assignment(Statement):
 
     def addVariable(self, variable):
         self.variables.append(variable)
+
+    def getChildren(self):
+        children = []
+        children.append(self.name)
+        children.extend(flatten(self.variables))
+        children.append(self.statement)
+        return tuple(children)
+
+    def getChildNodes(self):
+        nodelist = []
+        nodelist.extend(flatten_nodes(self.variables))
+        nodelist.extend(flatten_nodes(self.statement))
+        return tuple(nodelist)
 
     def __repr__(self):
         if self.variables:
