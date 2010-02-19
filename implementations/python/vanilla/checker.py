@@ -46,7 +46,7 @@ class WaeChecker:
     @trace
     def visitAssignment(self, node):
         """ check variable name """
-
+        #function assignment!! XXX
         self.names[node.name] = node.statement
 
         for child in node.getChildNodes():
@@ -76,6 +76,12 @@ class WaeChecker:
 
         for child in node.getChildNodes():
             self.visit(child)
+
+    @trace
+    def visitName(self, node):
+        # NOT DONE YET.
+        if not node.name in self.names:
+            self.errors.append("variable not found!! %s" % node.name)
 
 
 if __name__ == '__main__':
