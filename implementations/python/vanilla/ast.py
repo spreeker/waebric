@@ -86,7 +86,7 @@ class Module(Node):
 
 class Function(Node):
 
-    def __init__(self, name, arguments):
+    def __init__(self, name, arguments=[]):
         self.name = name
         self.arguments = arguments
         self.statements = []
@@ -270,6 +270,7 @@ class Field(Node):
 #MARKUP Nodes.
 
 class Designator(Node):
+
     def __init__(self, name, attributes=[]):
         self.name = name
         self.attributes = attributes
@@ -327,7 +328,7 @@ class Markup(Node):
 
     def getChildNodes(self):
         nodelist = []
-        nodelist.extend(flatten_nodes(self.childs))
+        nodelist.extend(flatten_nodes(self.childs[1:]))
         if self.embedding:
             nodelist.extend(flatten_nodes(self.embedding))
         if self.expression:
@@ -338,11 +339,11 @@ class Markup(Node):
 
         extra = ""
         if self.arguments:
-            extra = "%s" %  ((repr(self.arguments)))
+            extra = "ARGS%s" %  ((repr(self.arguments)))
         elif self.embedding:
-            extra = "%s%s" % (extra, repr(self.embedding))
+            extra = "EMB%s%s" % (extra, repr(self.embedding))
         elif self.expression:
-            extra = "%s%s" % (extra, repr(self.expression))
+            extra = "EXP%s%s" % (extra, repr(self.expression))
 
         if self.childs:
             child = self.childs[0]
@@ -351,7 +352,7 @@ class Markup(Node):
                 repr(self.designator), extra,
                 repr(child))
         else:
-            output =  "MARKUP(%s%s)" % (repr(self.designator), extra)
+            output = "MARKUP(%s%s)" % (repr(self.designator), extra)
         return output
 
 #PREDICATE Nodes.

@@ -279,10 +279,13 @@ def parseFunction(parser):
     name = parser.currentToken[1]
     parser.next()
     ## parse formals
-    arguments = parseArguments(parser)
-    function = Function(name,arguments)
-    ## parser statements.
+    if parser.matchLexeme('('):
+        arguments = parseArguments(parser)
+        function = Function(name,arguments)
+    else:
+        function = Function(name)
 
+    ## parser statements.
     while(parser.hasnext()):
         function.addStatement(parseStatement(parser))
 

@@ -11,6 +11,7 @@ This visitor checks for:
     Duplicate definitions
     Arity Mismatches
 """
+
 from visitor import walk
 from parser import parse
 from error import trace
@@ -63,16 +64,18 @@ class WaeChecker:
 
     @trace
     def visitMarkup(self, node):
-
-        if self.functions.has_key(node.designator):
+        print node.designator.name
+        print '--'
+        if self.functions.has_key(node.designator.name):
             #it is a function.
+            print "valid function call"
             if not function[node.designator] == len(node.arguments):
                 #arity is not ok
                 self.errors.append("arity mismatch %s" % node.designator)
         else:
             # check if it is a valid xhtml tag.
             if not node.designator.name.upper() in XHTMLTag:
-                self.errors.append("invalid tag used! %s"  % node.designator)
+                self.errors.append("invalid tag/function used/called! %s"  % node.designator)
 
         for child in node.getChildNodes():
             self.visit(child)
