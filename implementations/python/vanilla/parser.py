@@ -188,16 +188,18 @@ def parseModuleId(parser):
     while(parser.peek(lexeme='.')):
         parser.next() #skip .
         parser.next("Module Identifier", tokensort=NAME)
-        moduleID.append(currentToken[1])
+        moduleID.append(parser.currentToken[1])
 
     parser.next()
+    moduleID = "/".join(moduleID)
     return moduleID
 
 #@trace
 def parseImport(parser):
     parser.check(lexeme=keywords['IMPORT'])
+    lineo = parser.currentToken[2]
     parser.next()
-    return Import(parseModuleId(parser))
+    return Import(parseModuleId(parser), lineo=lineo)
 
 #@trace
 def parseSite(parser):

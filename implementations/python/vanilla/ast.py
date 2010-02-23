@@ -354,18 +354,17 @@ class Markup(Node):
 
         extra = ""
         if self.arguments:
-            extra = "ARGS%s" %  ((repr(self.arguments)))
+            extra = "ARGS %s" %  ((repr(self.arguments)))
         elif self.embedding:
-            extra = "EMB%s%s" % (extra, repr(self.embedding))
+            extra = "EMB %s%s" % (extra, repr(self.embedding))
         elif self.expression:
-            extra = "EXP%s%s" % (extra, repr(self.expression))
+            extra = "EXP %s%s" % (extra, repr(self.expression))
 
         if self.childs:
             child = self.childs[0]
             child.childs = self.childs[1:]
             output = "MARKUP(%s%s%s)" % (
-                repr(self.designator), extra,
-                repr(child))
+                repr(self.designator), repr(child), extra)
         else:
             output = "MARKUP(%s%s)" % (repr(self.designator), extra)
         return output
