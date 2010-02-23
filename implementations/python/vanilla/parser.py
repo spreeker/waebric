@@ -274,6 +274,7 @@ def isPathElement(parser):
 #@trace
 def parseFunction(parser):
     parser.check(expected="function defenition, def", lexeme=keywords['DEF'])
+    lineo = parser.currentToken[2]
     ## parse identifier
     parser.next(tokensort=NAME)
     name = parser.currentToken[1]
@@ -281,9 +282,9 @@ def parseFunction(parser):
     ## parse formals
     if parser.matchLexeme('('):
         arguments = parseArguments(parser)
-        function = Function(name,arguments)
+        function = Function(name,arguments, lineo=lineo)
     else:
-        function = Function(name)
+        function = Function(name, lineo=lineo)
 
     ## parser statements.
     while(parser.hasnext()):
@@ -310,13 +311,13 @@ def parseExpression(parser):
     expression = None
     if parser.matchLexeme("'"): #symbol.
         parser.next("symbol name", tokensort=NAME)
-        expression = Text(parser.currentToken[1])
+        expression = Text(parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     elif parser.matchTokensort(STRING): #data string
-        expression = Text(parser.currentToken[1])
+        expression = Text(parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     elif parser.matchTokensort(NUMBER): #number stuff
-        expression = Number(parser.currentToken[1])
+        expression = Number(parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     elif parser.matchLexeme("["):
         expression = parseList(parser)
@@ -330,14 +331,14 @@ def parseExpression(parser):
             while parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
                 parser.next(lexeme=".") #skip.
                 parser.next(expected="NAME", tokensort=NAME)
-                expression =  Field(expression,parser.currentToken[1])
+                expression =  Field(expression,parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     #Check for expression PLUS expression
     if parser.matchLexeme("+") and expression:
         left = expression
         parser.next()# skip +
         right = parseExpression(parser)
-        expression = Cat(left,right)
+        expression = Cat(left, right, lineo=parser.currentToken[2])
 
     indentedLog(expression)
 
@@ -350,7 +351,7 @@ def parseExpression(parser):
 #@trace
 def parseList(parser):
     parser.check("List opening '[' ", lexeme="[")
-    listExpression = List()
+    listExpression = List(lineo=parser.currentToken[2])
     parser.next()
 
     while parser.hasnext():
@@ -369,7 +370,7 @@ def parseList(parser):
 #@trace
 def parseRecord(parser):
     parser.check("Record opening", lexeme="{")
-    record = Record()
+    record = Record(lineo=parser.currentToken[2])
     while parser.next():
         if parser.matchLexeme('}'):
             return record
@@ -406,19 +407,19 @@ def parsePredicate(parser):
             ptype = "STRING"
         parser.next()
         parser.check('type?', lexeme='?')
-        predicate = Is_a(predicate, ptype)
+        predicate = Is_a(predicate, ptype, lineo=parser.currentToken[2])
         parser.next()
     elif parser.matchLexeme('&') and parser.peek(lexeme='&'):
         parser.next() #skip &&
         parser.next()
         right = parsePredicate(parser)
         #and
-        predicate = And(predicate, right)
+        predicate = And(predicate, right, lineo=parser.currentToken[2])
     elif parser.matchLexeme('|') and parser.peek(lexeme='|'):
         parser.next() #skip ||
         parser.next()
         right =  parsePredicate(parser)
-        predicate = Or(predicate, right)
+        predicate = Or(predicate, right, lineo=parser.currentToken[2])
         parser.next()
 
     if not predicate:
@@ -446,7 +447,7 @@ def parseStatement(parser):
             parser.next()
             expr = parseExpression(parser)
             parser.next() # skip ;
-            return Echo(expression=expr)
+            return Echo(expression=expr, lineo=parser.currentToken[2])
 
     elif parser.matchLexeme(keywords['CDATA']):
         parser.next()
@@ -456,7 +457,7 @@ def parseStatement(parser):
         return  parseStatementBlock(parser)
     elif parser.matchLexeme(keywords['COMMENT']):
         parser.next( tokensort=STRING )
-        return Comment(parser.currentToken[1])
+        return Comment(parser.currentToken[1], lineo=parser.currentToken[2])
     elif parser.matchLexeme(keywords['YIELD']):
         parser.next(lexeme=";")
         return Yield()
@@ -472,6 +473,7 @@ def parseLetStatement(parser):
     parser.check(lexeme=keywords['LET'])
     assignments = []
     parser.next()
+    lineo = parser.currentToken[2]
     while parser.hasnext():
         assignments.append(parseAssignment(parser))
         if parser.matchLexeme(keywords['IN']):
@@ -483,7 +485,7 @@ def parseLetStatement(parser):
                     parser.next() #skip end.
                     #indentedLog('****** LET *******')
                     #parser.next() #read ahead
-                    return Let(assignments,body)
+                    return Let(assignments,body, lineo=lineo)
             raise SyntaxError(parser.currentToken,
                 expected="missing END of LET statement")
     raise SyntaxError(parser.currentToken,
@@ -501,13 +503,14 @@ def parseFunctionAssignment(parser):
     #parse name
     parser.check( tokensort=NAME )
     name = parser.currentToken[1]
+    lineo = parser.currentToken[2]
     parser.next()
     #Parse "(" { Name "," }* ")" "="
     arguments = parseArguments(parser)
     parser.check( lexeme = "=" )
     parser.next()
     expression = parseStatement(parser)
-    assignment = Assignment(name, expression)
+    assignment = Assignment(name, expression, lineo=lineo)
     assignment.addVariable(arguments) #WARNING parseArguments allows to much?!
     return assignment
 
@@ -516,15 +519,17 @@ def parseVariableAssignment(parser):
     """ var = expression """
     parser.check( tokensort=NAME )
     name = parser.currentToken[1]
+    lineo = parser.currentToken[2]
     parser.next( lexeme = "=" )
     parser.next()
     expression = parseStatement(parser)
-    assignment = Assignment(name, expression)
+    assignment = Assignment(name, expression, lineo=lineo)
     return assignment
 
 #@trace
 def parseEachStatement(parser):
     parser.check(lexeme = keywords['EACH'])
+    lineo = parser.currentToken[2]
     parser.next(lexeme='(')
     parser.next("Var", tokensort=NAME)
     name = parser.currentToken[1]
@@ -534,20 +539,19 @@ def parseEachStatement(parser):
     parser.check(lexeme = ')' )
     parser.next()
     stm = parseStatement(parser)
-    return Each(name, exp, stm)
+    return Each(name, exp, stm, lineo=lineo)
 
 #@trace
 def parseIfStatement(parser):
     parser.check(lexeme = keywords['IF'])
+    lineo = parser.currentToken[2]
     parser.next(lexeme = '(')
     parser.next()
     predicate = parsePredicate(parser)
     parser.check(lexeme = ')')
     parser.next()
     stm = parseStatement(parser)
-    ifstm = If(predicate, stm)
-    #logging.debug(parser.currentToken[1])
-    #logging.debug('**********************')
+    ifstm = If(predicate, stm, lineo=lineo)
     if parser.matchLexeme(keywords['ELSE']):
         parser.next()
         elsestm = parseStatement(parser)
@@ -558,8 +562,10 @@ def parseIfStatement(parser):
 #@trace
 def parseStatementBlock(parser):
     parser.check(lexeme='{')
+    lineo = parser.currentToken[2]
+
     parser.next()
-    block = Block()
+    block = Block(lineo=lineo)
     while not parser.matchLexeme('}'):
         block.statements.append(parseStatement(parser))
 
@@ -658,8 +664,10 @@ p attributes (arguments) markup
 #@trace
 def parseMarkup(parser):
     """Differentiate between p and p()"""
+    lineo = parser.currentToken[2]
     designator = parseDesignator(parser)
-    markup = Markup(designator)
+    markup = Markup(designator, lineo=lineo)
+
     if parser.matchLexeme('('):
         arguments = parseArguments(parser)
         markup.arguments = arguments
@@ -669,7 +677,8 @@ def parseMarkup(parser):
 def parseDesignator(parser):
     """ p attributes* """
     parser.check("NAME",tokensort=NAME)
-    designator = Designator(parser.currentToken[1])
+    lineo = parser.currentToken[2]
+    designator = Designator(parser.currentToken[1], lineo=lineo)
     parser.next()
     if parser.currentToken[1][0] in "#$@:%.":
             attributes = parseAttributes(parser)
@@ -682,12 +691,13 @@ def parseAttributes(parser):
     attributes = []
     while parser.currentToken[1] in "#$@:%.":
         symbol = parser.currentToken[1]
+        lineo = parser.currentToken[2]
         if symbol not in "@%":
             parser.next(expected="Attribute NAME", tokensort=NAME)
         else:
             parser.next(expected="Attribute NUMBER", tokensort=NUMBER)
         #AST
-        attributes.append(Attribute(symbol, parser.currentToken[1]))
+        attributes.append(Attribute(symbol, parser.currentToken[1], lineo=lineo))
         parser.next()
 
     return attributes
@@ -718,13 +728,14 @@ def parseArgument(parser):
     """
     if parser.matchTokensort(tokensort=NAME):
         argument = parser.currentToken[1]
+        lineo = parser.currentToken[2]
         parser.next()
         if parser.matchLexeme('='):
             parser.next() # skip =
             exp = parseExpression(parser)
-            return Assignment(argument, exp)
+            return Assignment(argument, exp, lineo=lineo)
         else:
-            return Name(argument)
+            return Name(argument, lineo=lineo)
     else: #must be expression.
         return parseExpression(parser)
 

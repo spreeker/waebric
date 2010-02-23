@@ -28,18 +28,18 @@ class WaeChecker:
 
         self.errors = []
 
-        walk(tree, self, verbose=1)
+        walk(tree, self)
 
         for error in self.errors:
             print error
+
     @trace
-    def visitFunction(self, node):
-        """check function defenition. """
-
-        if self.functions.has_key(node.name):
-            self.errors.append("function %s already defined" % node.name )
-
-        self.functions[node.name] = len(node.arguments)
+    def visitModule(self,node):
+        for f in node.functions:
+            if self.functions.has_key(f.name):
+                self.errors.append("%s function %s already defined" % (f.lineo, f.name) )
+            else:
+                self.functions[f.name] = len(f.arguments)
 
         for child in node.getChildNodes():
             self.visit(child)
@@ -57,25 +57,30 @@ class WaeChecker:
     def visitImport(self, node):
         try:
             open("%s.wae" % node.moduleId)
+            #parse it and merge it.
         except:
-            #raise error module does not excist.
-            #pass error import is skipped.
-            self.errors.append("could not open module %s" % node.moduleId)
+            self.errors.append("%s could not open module %s" % (node.lineo, node.moduleId))
 
     @trace
     def visitMarkup(self, node):
-        print node.designator.name
-        print '--'
         if self.functions.has_key(node.designator.name):
             #it is a function.
             print "valid function call"
-            if not function[node.designator] == len(node.arguments):
+            if not self.functions[node.designator.name] == len(node.arguments):
                 #arity is not ok
-                self.errors.append("arity mismatch %s" % node.designator)
+                self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
+        elif node.arguments: #it has arguments. so it must be an function call?
+            print "invalid function call"
+            self.errors.append("arguments given to non existent function %s" % (
+                node.lineo,
+                node.designator.name))
+            self.errors.append("args = %s "% node.arguments)
         else:
-            # check if it is a valid xhtml tag.
+            # check if markup is a valid xhtml tag.
             if not node.designator.name.upper() in XHTMLTag:
-                self.errors.append("invalid tag/function used/called! %s"  % node.designator)
+                self.errors.append("%s invalid tag/function used/called! %s" % (
+                    node.lineo,
+                    node.designator))
 
         for child in node.getChildNodes():
             self.visit(child)

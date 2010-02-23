@@ -21,6 +21,7 @@ nodes = {}
 
 class Node:
     """Abstract base class for ast nodes."""
+
     def __iter__(self):
         for n in self.getChildNodes():
             yield n
@@ -39,11 +40,11 @@ class Node:
 class Module(Node):
 
     def __init__(self, id, lineo=None):
+        self.lineno = lineo
         self.id = id
         self.functions = []
         self.sites = []
         self.imports = []
-        self.lineno = lineo
 
     def addFunction(self, function):
         self.functions.append(function)
@@ -86,7 +87,8 @@ class Module(Node):
 
 class Function(Node):
 
-    def __init__(self, name, arguments=[]):
+    def __init__(self, name, arguments=[], lineo=None):
+        self.lineo = lineo
         self.name = name
         self.arguments = arguments
         self.statements = []
@@ -113,7 +115,8 @@ class Function(Node):
             ",".join([repr(stm) for stm in self.statements]))
 
 class Import(Node):
-    def __init__(self, moduleId):
+    def __init__(self, moduleId, lineo=None):
+        self.lineo = lineo
         self.moduleId = moduleId
 
     def getChildren(self):
@@ -126,7 +129,8 @@ class Import(Node):
         return  "IMPORT %s" % self.moduleId
 
 class Path(Node):
-    def __init__(self, dir, fileName):
+    def __init__(self, dir, fileName, lineo=None):
+        self.lineo = lineo
         self.dir = dir
         self.fileName = fileName
 
@@ -140,7 +144,8 @@ class Path(Node):
         return "PATH(%s/%s)" % (self.dir, self.fileName)
 
 class Mapping(Node):
-    def __init__(self, path, markup):
+    def __init__(self, path, markup, lineo=None):
+        self.lineo = lineo
         self.path = path
         self.markup = markup
 
@@ -154,9 +159,10 @@ class Mapping(Node):
 
         return "MAPPING(%s, %s)" % (repr(self.path), repr(self.markup))
 
-#ID 
+#ID
 class Name(Node):
-    def __init__(self, name):
+    def __init__(self, name, lineo=None):
+        self.lineo = lineo
         self.name = name
 
     def getChildren(self):
@@ -169,9 +175,9 @@ class Name(Node):
         return "NAME(%s)" % (repr(self.name),)
 
 #EXPRESSION NODES
-
 class Text(Node):
-    def __init__(self, text):
+    def __init__(self, text, lineo=None):
+        self.lineo = lineo
         self.text = text
 
     def getChildren(self):
@@ -186,7 +192,8 @@ class Text(Node):
 
 
 class Number(Node):
-    def __init__(self, number):
+    def __init__(self, number, lineo=None):
+        self.lineo = lineo
         self.number = int(number)
 
     def getChildren(self):
@@ -200,7 +207,8 @@ class Number(Node):
 
 
 class List(Node):
-    def __init__(self):
+    def __init__(self, lineo=None):
+        self.lineo = lineo
         self.expressionList = []
 
     def addExpression(self,expression):
@@ -220,8 +228,10 @@ class List(Node):
 
 
 class Record(Node):
-    def __init__(self):
+    def __init__(self, lineo=None):
+        self.lineo = lineo
         self.keyExpressions = {}
+
     def addRecord(self, key, expression):
         self.keyExpressions[key] = expression
 
@@ -239,7 +249,8 @@ class Record(Node):
 
 
 class Cat(Node):
-    def __init__(self, left, right):
+    def __init__(self, left, right, lineo=None):
+        self.lineo = lineo
         self.left = left
         self.right = right
 
@@ -254,7 +265,8 @@ class Cat(Node):
 
 
 class Field(Node):
-    def __init__(self, expression, field):
+    def __init__(self, expression, field, lineo=None):
+        self.lineo = lineo
         self.expression = expression
         self.field = field
 
@@ -271,7 +283,8 @@ class Field(Node):
 
 class Designator(Node):
 
-    def __init__(self, name, attributes=[]):
+    def __init__(self, name, attributes=[], lineo=None):
+        self.lineo = lineo
         self.name = name
         self.attributes = attributes
 
@@ -292,7 +305,8 @@ class Designator(Node):
 
 
 class Attribute(Node):
-    def __init__(self, symbol, value):
+    def __init__(self, symbol, value, lineo=None):
+        self.lineo = lineo
         self.symbol = symbol
         self.value = value
 
@@ -308,7 +322,8 @@ class Attribute(Node):
 
 class Markup(Node):
 
-    def __init__(self, designator):
+    def __init__(self, designator, lineo=None):
+        self.lineo = lineo
         self.childs = []
         self.designator = designator
         self.arguments = []
@@ -357,7 +372,8 @@ class Markup(Node):
 
 #PREDICATE Nodes.
 class Not(Node):
-    def __init__(self, predicate):
+    def __init__(self, predicate, lineo=None):
+        self.lineo = lineo
         self.predicate = predicate
 
     def getChildren(self):
@@ -370,7 +386,8 @@ class Not(Node):
         return "NOT(%s)" % self.predicate
 
 class And(Node):
-    def __init__(self, leftPredicate, rightPredicate):
+    def __init__(self, leftPredicate, rightPredicate, lineo=None):
+        self.lineo = lineo
         self.left = leftPredicate
         self.right = rightPredicate
 
@@ -385,7 +402,8 @@ class And(Node):
         return "AND(%s, %s)" % (repr(self.left), repr(self.right))
 
 class Or(Node):
-    def __init__(self, leftPredicate, rightPredicate):
+    def __init__(self, leftPredicate, rightPredicate, lineo=None):
+        self.lineo = lineo
         self.left = leftPredicate
         self.right = rightPredicate
 
@@ -400,7 +418,8 @@ class Or(Node):
 
 
 class Is_a(Node):
-    def __init__(self, expression, type):
+    def __init__(self, expression, type, lineo=None):
+        self.lineo = lineo
         self.expression = expression
         self.type = type
 
@@ -419,7 +438,8 @@ class Statement(Node):
 
 class Embedding(Statement):
 
-    def __init__(self):
+    def __init__(self, lineo=None):
+        self.lineo = lineo
         self.pretext = []
         self.midtext = []
         self.tailtext= []
@@ -445,7 +465,8 @@ class Embedding(Statement):
 
 class Assignment(Statement):
     """ Name "(" {Name ","}* ")"  "=" Statement -> Assignment """
-    def __init__(self, name, statement):
+    def __init__(self, name, statement, lineo=None):
+        self.lineo = lineo
         self.variables = []
         self.name = name
         self.statement = statement
@@ -478,6 +499,9 @@ class Assignment(Statement):
 
 class Yield(Statement):
 
+    def __init__(lineo=None):
+        self.lineo = lineo
+
     def getChildren(self):
         return ()
 
@@ -489,7 +513,8 @@ class Yield(Statement):
 
 
 class Let(Statement):
-    def __init__(self, assignments, body):
+    def __init__(self, assignments, body, lineo=None):
+        self.lineo = lineo
         self.assignments = assignments
         self.body = body
 
@@ -510,7 +535,8 @@ class Let(Statement):
 
 
 class If(Statement):
-    def __init__(self, predicate, ifstmnt, elsestmnt="",):
+    def __init__(self, predicate, ifstmnt, elsestmnt="", lineo=None):
+        self.lineo = lineo
         self.predicate = predicate
         self.elsestmnt = elsestmnt
         self.ifstmnt = ifstmnt
@@ -533,9 +559,10 @@ class If(Statement):
 
 class Echo(Statement):
 
-    def __init__(self, embedding=None, expression=None):
-        self.expression = expression 
-        self.embedding = embedding 
+    def __init__(self, embedding=None, expression=None, lineo=None):
+        self.lineo = lineo
+        self.expression = expression
+        self.embedding = embedding
         self.VERBOSE = 1
 
     def getChildren(self):
@@ -557,7 +584,8 @@ class Echo(Statement):
 
 
 class Cdata(Statement):
-    def __init__(self, expression):
+    def __init__(self, expression, lineo=None):
+        self.lineo = lineo
         self.expression = expression
 
     def getChildren(self):
@@ -575,7 +603,8 @@ class Cdata(Statement):
 
 
 class Comment(Statement):
-    def __init__(self, comment):
+    def __init__(self, comment, lineo=None):
+        self.lineo = lineo
         self.comment = comment
 
     def getChildren(self):
@@ -590,7 +619,8 @@ class Comment(Statement):
 
 class Each(Statement):
 
-    def __init__(self, name, expression, statement):
+    def __init__(self, name, expression, statement, lineo=None):
+        self.lineo = lineo
         self.name = name
         self.expression = expression
         self.statement = statement
@@ -607,8 +637,9 @@ class Each(Statement):
 
 
 class Block(Statement):
-    def __init__(self):
-       self.statements = []
+    def __init__(self, lineo=None):
+        self.lineo = lineo
+        self.statements = []
 
     def getChildren(self):
         tuple(flatten(self.statements))
