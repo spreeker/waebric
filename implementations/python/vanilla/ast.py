@@ -343,11 +343,11 @@ class Markup(Node):
 
     def getChildNodes(self):
         nodelist = []
-        nodelist.extend(flatten_nodes(self.childs[1:]))
-        if self.embedding:
-            nodelist.extend(flatten_nodes(self.embedding))
-        if self.expression:
-            nodelist.extend(flatten_nodes(self.expression))
+        nodelist.extend(flatten_nodes(self.childs))
+        if self.embedding is not "":
+            nodelist.append(self.embedding)
+        if self.expression is not "":
+            nodelist.append(self.expression)
         return tuple(nodelist)
 
     def __repr__(self):
@@ -360,14 +360,12 @@ class Markup(Node):
         elif self.expression:
             extra = "EXP %s%s" % (extra, repr(self.expression))
 
-        if self.childs:
-            child = self.childs[0]
-            child.childs = self.childs[1:]
-            output = "MARKUP(%s%s%s)" % (
-                repr(self.designator), repr(child), extra)
-        else:
-            output = "MARKUP(%s%s)" % (repr(self.designator), extra)
+        childOutput = "".join([repr(child) for child in self.childs])
+
+        output = "MARKUP(%s%s%s)" % (repr(self.designator), extra, childOutput)
+
         return output
+
 
 #PREDICATE Nodes.
 class Not(Node):
@@ -498,7 +496,7 @@ class Assignment(Statement):
 
 class Yield(Statement):
 
-    def __init__(lineo=None):
+    def __init__(self,lineo=None):
         self.lineo = lineo
 
     def getChildren(self):

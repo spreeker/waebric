@@ -90,13 +90,14 @@ class TestParserClasses(unittest.TestCase):
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         ast = parseFunction(p)
-        self.assertEqual(str(ast),"""FUNCTION test (NAME('argument')) { MARKUP(Designator('p')STRING("bla")),MARKUP(Designator('p')MARKUP(Designator('p')MARKUP(Designator('p')))) } \n""")
+        expast = """FUNCTION test (NAME('argument')) { MARKUP(Designator('p')EXP STRING("bla")),MARKUP(Designator('p')MARKUP(Designator('p')MARKUP(Designator('p')))) } \n"""
+        self.assertEqual(str(ast),expast)
 
     def test_module(self):
         source = "module menus"
         p = self.initialize_parser(source)
         ast = parseModule(p)
-        self.assertEqual(str(ast),"""MODULE ['menus'] ,
+        self.assertEqual(str(ast),"""MODULE menus ,
         SITES 
         IMPORTS 
         FUNCTIONS  """)
@@ -159,7 +160,7 @@ class TestMarkup(unittest.TestCase):
         self.assertEqual(str(ast),"MARKUP(Designator('markup'))")
         source = "markup variable ;"
         ast = self._parse_markup(source)
-        self.assertEqual(str(ast),"MARKUP(Designator('markup')NAME('variable'))")
+        self.assertEqual(str(ast),"MARKUP(Designator('markup')EXP NAME('variable'))")
         source = "markup markup() ;"
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
@@ -167,15 +168,15 @@ class TestMarkup(unittest.TestCase):
         source = 'markup function( a ) ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        "MARKUP(Designator('markup')MARKUP(Designator('function')[NAME('a')]))")
+        "MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [NAME('a')]))")
         source = 'markup function( a = "b" ) ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        """MARKUP(Designator('markup')MARKUP(Designator('function')[ASSIGNMENT('a',STRING("b"))]))""")
+        """MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [ASSIGNMENT('a',STRING("b"))]))""")
         source = 'markup markup function("beee") ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        """MARKUP(Designator('markup')MARKUP(Designator('markup')MARKUP(Designator('function')[STRING("beee")])))""")
+        """MARKUP(Designator('markup')MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [STRING("beee")])))""")
 
 
 class TestStatementParser(unittest.TestCase):
@@ -190,23 +191,23 @@ class TestStatementParser(unittest.TestCase):
         source = "if ( bla )  h1 name;"
         ast = self._parse_statement(source)
         self.assertEqual(str(ast),"""If(NAME('bla'),
- MARKUP(Designator('h1')NAME('name')) )""")
+ MARKUP(Designator('h1')EXP NAME('name')) )""")
 
         source = """if ( "b" ) { h2 markup "data"; markup; }
         else { markup "other stuff"; }
         """
         ast = self._parse_statement(source)
         rast = """If(STRING("b"),
- Block(MARKUP(Designator('h2')STRING("data")MARKUP(Designator('markup')))
+ Block(MARKUP(Designator('h2')MARKUP(Designator('markup')EXP STRING("data")))
 MARKUP(Designator('markup'))) 
-ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
+ELSE Block(MARKUP(Designator('markup')EXP STRING("other stuff"))))"""
 
         self.assertEqual(str(ast),rast)
 
     def test_each(self):
         source = "each ( var : expression ) m var;"
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),"Each(var in MARKUP(Designator('m')NAME('var')) do NAME('expression'))")
+        self.assertEqual(str(ast),"Each(var in MARKUP(Designator('m')EXP NAME('var')) do NAME('expression'))")
 
     def test_cdata(self):
         source = "cdata expression;"
@@ -226,7 +227,7 @@ ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
     def test_let(self):
         source = "let x = markup.class bla.bla.bla; in statement x; end"
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),"LET(ASSIGNMENT('x',MARKUP(Designator('markup'('.', 'class'))FIELD 'bla' in FIELD 'bla' in NAME('bla'))), [MARKUP(Designator('statement')NAME('x'))])")
+        self.assertEqual(str(ast),"LET(ASSIGNMENT('x',MARKUP(Designator('markup'('.', 'class'))EXP FIELD 'bla' in FIELD 'bla' in NAME('bla'))), [MARKUP(Designator('statement')EXP NAME('x'))])")
 
     def test_let_regression(self):
         source = """let
@@ -239,7 +240,8 @@ ELSE Block(MARKUP(Designator('markup')STRING("other stuff"))))"""
       }
      end"""
         ast = self._parse_statement(source)
-        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')[ASSIGNMENT(\'width\',STRING("160")), ASSIGNMENT(\'height\',STRING("160")), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')[STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])\nMARKUP(Designator(\'td\')[STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])\nMARKUP(Designator(\'td\')[STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")])))])"""
+        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')ARGS [ASSIGNMENT(\'width\',STRING("160")), ASSIGNMENT(\'height\',STRING("160")), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])\nMARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])\nMARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")])))])"""
+
         self.assertEqual(str(ast), astrslt)
 
 
@@ -297,10 +299,10 @@ class RegressionTests(unittest.TestCase):
     def test_let_in_block(self):
         source = open('tests/blocks.wae').readline
         ast = parse(source)
-        expectedAST = """MODULE ['block'] ,
+        expectedAST = """MODULE block ,
         SITES [MAPPING(PATH(sitesite//block.html), MARKUP(Designator('function')))]
         IMPORTS 
-        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')[ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')[STRING("34.jpg")])))])))))) } 
+        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')ARGS [ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')ARGS [STRING("34.jpg")])))])))))) } 
  """
         self.assertEqual(expectedAST,repr(ast))
 

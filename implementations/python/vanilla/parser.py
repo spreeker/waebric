@@ -604,7 +604,7 @@ def checkForLastExpression(parser):
             return True
     return False
 
-#@trace
+@trace
 def parseMarkupStatement(parser):
     """
     p;      markup
@@ -617,27 +617,26 @@ def parseMarkupStatement(parser):
             markup expression
     p { }   markup block
     """
-    markup = None
+    markupRoot = parseMarkup(parser)
+    markup = markupRoot 
+    while parser.matchTokensort(tokensort=NAME) and not checkForLastExpression(parser): 
+        m = parseMarkup(parser)
+        markup.childs.append(m)
+        markup = m 
 
-    while parser.matchTokensort(tokensort=NAME):
-        try:
-            markup.childs.append(parseMarkup(parser))
-        except AttributeError:
-            markup = parseMarkup(parser)
-        #check if next name could be final expression
-        if checkForLastExpression(parser):
-            markup.expression = parseExpression(parser)
+    if checkForLastExpression(parser):
+        markup.expression = parseExpression(parser)
 
     if not markup.expression and parser.matchTokensort(PRESTRING):
         markup.embedding = parseEmbedding(parser)
 
     if parser.matchLexeme('{'):
         markup.childs.append(parseStatement(parser))
-        return markup
+        return markupRoot
 
     parser.check(lexeme = ';')
     parser.next() #read ahead.
-    return markup
+    return markupRoot
 
 #@trace
 def parseEmbedding(parser):
@@ -663,7 +662,7 @@ def parseEmbedding(parser):
 p     markup
 p attributes (arguments) markup
 """
-#@trace
+@trace
 def parseMarkup(parser):
     """Differentiate between p and p()"""
     lineo = parser.currentToken[2]

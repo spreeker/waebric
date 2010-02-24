@@ -1,3 +1,4 @@
+from error import trace
 
 class ASTVisitor:
     """Performs a depth-first walk of the AST
