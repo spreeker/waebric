@@ -11,10 +11,11 @@ This visitor checks for:
     Duplicate definitions
     Arity Mismatches
 
-NOTE
+TODO
 
-Varible checking could be more thorow. Now scoping is
+-Varible checking could be more thorow. Now scoping is
 not correctly handled.
+-Let blocks.
 
 """
 
@@ -46,7 +47,7 @@ class WaeChecker:
             if self.functions.has_key(f.name):
                 self.errors.append("%s function %s already defined" % (f.lineo, f.name) )
             else:
-                self.functions[f.name] = f#len(f.arguments)
+                self.functions[f.name] = f
 
         #note when executing visiting is different!
         for child in node.getChildNodes():
@@ -81,7 +82,6 @@ class WaeChecker:
 
         elif node.arguments: #it has arguments. so it must be an function call
                              #but there is no function defenition.
-            print "invalid function call"
             self.errors.append("arguments given to not defined function %s" % (
                 node.lineo,
                 node.designator.name))
@@ -104,6 +104,7 @@ class WaeChecker:
         if not node.name in self.names:
             self.errors.append("variable not found!! %s" % node.name)
 
+    #TODO visit LET.
 
 if __name__ == '__main__':
     import sys

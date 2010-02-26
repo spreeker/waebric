@@ -8,31 +8,50 @@ class WaeGenerator:
     """
     Defines htm code generator for waebric.
     """
+    mainModule = True
+
     def __init__(self, source):
         tree = parse(source)
         self.doc = Document()
         walk(tree, self, verbose=1)
-
+        self.errors = []
         self.functions = {}
+        self.mappings = []
 
     # Module nodes.
     @trace
     def visitModule(self,node):
 
-        #visit dependencies and imports.
-        for _import in self.imports:
+        for f in node.functions:
+            if self.functions.has_key(f.name):
+                self.errors.append("%s function %s already defined" % (f.lineo, f.name) )
+            else:
+                self.functions[f.name] = f
+
+        #visit imports.
+        for _import in node.imports:
             self.visit(_import)
 
-        #visit function defenitions.
-        for function in self.functions():
-            self.visit(child)
+        #visit mappings.
+        for mapping in node.sites():
+            self.visit(mapping)
 
-        # do something with the sites?
-        # and/or main function.
+        if not mainModule:
+            return
+
+        mainModule = False
+
+        #visit main and site defenitions.
+        for mapping in self.mapping():
+            self.visit(mapping)
+
+        if self.functions.has_key('main'):
+            self.visit(self.functions['main'])
 
     @trace
     def visitFunction(self, node):
         #do a check?
+        #arguments of markup parent are supposed to be set.
         self.functions[node.name] = node
 
         for statement in node.statements:
@@ -44,16 +63,29 @@ class WaeGenerator:
 
     @trace
     def visitImport(self, node):
-        # try to load up module in this environment?
-        print dir(node)
+        try:
+            _import = open("%s.wae" % node.moduleId)
+        except:
+            self.errors.append("%s could not open module %s" % (node.lineo, node.moduleId))
+
+        source = _import.readline
+        importTree = parse(source)
+        self.visit(tree)
 
     def visitMapping(self, node):
-        print dir(node)
+        # new document
+        self.doc = Document()
+        # visit markup call
+        self.visit(node.markup)
+        # craete new document
+        path = '%s/%s' % (node.path.dir, node.path.fileName)
+        self.doc.writeOutput(path)
 
     # variables.
     def visitName(self, node):
         print dir(node)
 
+    #expressions
     def visitNumber(self, node):
         print dir(node)
 
