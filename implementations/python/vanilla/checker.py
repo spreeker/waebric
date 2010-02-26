@@ -10,12 +10,19 @@ This visitor checks for:
     Non-existing modules
     Duplicate definitions
     Arity Mismatches
+
+NOTE
+
+Varible checking could be more thorow. Now scoping is
+not correctly handled.
+
 """
 
 from visitor import walk
 from parser import parse
 from error import trace
 from xhtmltag import XHTMLTag
+import logging
 
 class WaeChecker:
     """ check ast for errors """
@@ -39,15 +46,15 @@ class WaeChecker:
             if self.functions.has_key(f.name):
                 self.errors.append("%s function %s already defined" % (f.lineo, f.name) )
             else:
-                self.functions[f.name] = len(f.arguments)
+                self.functions[f.name] = f#len(f.arguments)
 
+        #note when executing visiting is different!
         for child in node.getChildNodes():
             self.visit(child)
 
     @trace
     def visitAssignment(self, node):
         """ check variable name """
-        #function assignment!! XXX
         self.names[node.name] = node.statement
 
         for child in node.getChildNodes():
@@ -64,17 +71,22 @@ class WaeChecker:
     @trace
     def visitMarkup(self, node):
         if self.functions.has_key(node.designator.name):
-            #it is a function.
-            print "valid function call"
-            if not self.functions[node.designator.name] == len(node.arguments):
-                #arity is not ok
+            #print "valid function call"
+            f = self.functions[node.designator.name]
+            if not len(f.arguments) == len(node.arguments):
                 self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
-        elif node.arguments: #it has arguments. so it must be an function call?
+            else:
+                for name,exp in zip(f.arguments, node.arguments):
+                    self.names[name.name] = exp
+
+        elif node.arguments: #it has arguments. so it must be an function call
+                             #but there is no function defenition.
             print "invalid function call"
-            self.errors.append("arguments given to non existent function %s" % (
+            self.errors.append("arguments given to not defined function %s" % (
                 node.lineo,
                 node.designator.name))
             self.errors.append("args = %s "% node.arguments)
+
         else:
             # check if markup is a valid xhtml tag.
             if not node.designator.name.upper() in XHTMLTag:
@@ -82,12 +94,13 @@ class WaeChecker:
                     node.lineo,
                     node.designator))
 
+        #print node.getChildNodes()
+        logging.debug("CHILDNODES: %s" % repr(node.getChildNodes()))
         for child in node.getChildNodes():
             self.visit(child)
 
     @trace
     def visitName(self, node):
-        # NOT DONE YET.
         if not node.name in self.names:
             self.errors.append("variable not found!! %s" % node.name)
 
