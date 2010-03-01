@@ -100,6 +100,14 @@ class WaeChecker:
             self.visit(child)
 
     @trace
+    def visitFunction(self,node):
+        for arg in node.arguments:
+            self.names[arg.name] = 'undef' #set default argument value.
+
+        for child in node.getChildNodes():
+            self.visit(child)
+
+    @trace
     def visitName(self, node):
         if not node.name in self.names:
             self.errors.append("variable not found!! %s" % node.name)

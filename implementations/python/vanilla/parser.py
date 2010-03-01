@@ -205,13 +205,16 @@ def parseImport(parser):
 def parseSite(parser):
     # AST, mappings.
     parser.check("Site Defenition", lexeme=keywords['SITE'])
+    parser.next()
     # check mapping
     mappings = []
     while parser.hasnext():
         mappings.append(parseMapping(parser))
+        logging.debug(parser.currentToken)
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return mappings
+
     raise SyntaxError(currentToken, expected="missing site ending END")
 
 #@trace
@@ -222,18 +225,19 @@ def parseMapping(parser):
     parser.check( lexeme=":" )
     parser.next()
     markup = parseMarkup(parser) #markupcall. not a statement
-    parser.check(lexeme=";")
-    parser.next()
+    #parser.check(lexeme=";")# XXX no smicolon!
+    #parser.next()
     return Mapping(path, markup)
 
 #@trace
 def parsePath(parser):
     path = ""
+    _dir = ""
     if parser.peek(lexeme="/") or parser.peek(x=2,lexeme="/"):
-        dir = parseDirectory(parser)
+        _dir = parseDirectory(parser)
     fileName = parseFileName(parser)
     #logging.debug(dir+path)
-    return Path(dir, fileName)
+    return Path(_dir, fileName)
 
 #@trace
 def parseDirectory(parser):
@@ -618,11 +622,11 @@ def parseMarkupStatement(parser):
     p { }   markup block
     """
     markupRoot = parseMarkup(parser)
-    markup = markupRoot 
-    while parser.matchTokensort(tokensort=NAME) and not checkForLastExpression(parser): 
+    markup = markupRoot
+    while parser.matchTokensort(tokensort=NAME) and not checkForLastExpression(parser):
         m = parseMarkup(parser)
         markup.childs.append(m)
-        markup = m 
+        markup = m
 
     if checkForLastExpression(parser):
         markup.expression = parseExpression(parser)
@@ -634,8 +638,12 @@ def parseMarkupStatement(parser):
         markup.childs.append(parseStatement(parser))
         return markupRoot
 
+    if parser.matchTokensort(KEYWORD):
+        markup.childs.append(parseStatement(parser))
+        return markupRoot
+
     parser.check(lexeme = ';')
-    parser.next() #read ahead.
+    parser.next() #read ahead. skip ;
     return markupRoot
 
 #@trace

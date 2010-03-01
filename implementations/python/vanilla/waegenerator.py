@@ -1,8 +1,10 @@
 from document import Document
-from parser.parser import parse
+from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
-from parser.error import trace
+from error import trace
+
+import logging
 
 class WaeGenerator:
     """
@@ -13,17 +15,20 @@ class WaeGenerator:
     def __init__(self, source):
         tree = parse(source)
         self.doc = Document()
-        walk(tree, self, verbose=1)
         self.errors = []
         self.functions = {}
-        self.mappings = []
+        self.sites =[]
+        self.imports = ()
+        self.names = {}
+        self.mainModule = True
+        walk(tree, self)
 
     # Module nodes.
     @trace
     def visitModule(self,node):
 
         for f in node.functions:
-            if self.functions.has_key(f.name):
+            if f.name in self.functions:
                 self.errors.append("%s function %s already defined" % (f.lineo, f.name) )
             else:
                 self.functions[f.name] = f
@@ -32,27 +37,30 @@ class WaeGenerator:
         for _import in node.imports:
             self.visit(_import)
 
-        #visit mappings.
-        for mapping in node.sites():
-            self.visit(mapping)
+        for site in node.sites:
+            for mapping in site:
+               self.sites.append(mapping)
 
-        if not mainModule:
+        if not self.mainModule: #do not execute imported module.
             return
 
-        mainModule = False
+        self.mainModule = False
 
         #visit main and site defenitions.
-        for mapping in self.mapping():
+        for mapping in self.sites:
             self.visit(mapping)
 
         if self.functions.has_key('main'):
             self.visit(self.functions['main'])
 
+        #visit mapping takes care of printing.
+        #self.document
+
     @trace
     def visitFunction(self, node):
-        #do a check?
-        #arguments of markup parent are supposed to be set.
-        self.functions[node.name] = node
+        for arg in node.arguments:
+            if not arg.name in self.names:
+                self.names[arg.name] = 'undef'
 
         for statement in node.statements:
             self.visit(statement)
@@ -63,6 +71,8 @@ class WaeGenerator:
 
     @trace
     def visitImport(self, node):
+        if node.moduleId in self.imports:
+            return #already parsed!
         try:
             _import = open("%s.wae" % node.moduleId)
         except:
@@ -71,19 +81,26 @@ class WaeGenerator:
         source = _import.readline
         importTree = parse(source)
         self.visit(tree)
+        self.imports = self.imports + (node.moduleId,)
 
+    @trace
     def visitMapping(self, node):
         # new document
         self.doc = Document()
         # visit markup call
         self.visit(node.markup)
-        # craete new document
-        path = '%s/%s' % (node.path.dir, node.path.fileName)
+        # create new document
+        if node.path.dir:
+            path = "/".join((node.path.dir, node.path.fileName))
+        else:
+            path = node.path.fileName
+
         self.doc.writeOutput(path)
 
     # variables.
     def visitName(self, node):
-        print dir(node)
+        data = self.names[node.name]
+        self.doc.addText(data)
 
     #expressions
     def visitNumber(self, node):
@@ -109,7 +126,29 @@ class WaeGenerator:
         pass
 
     def visitMarkup(self, node):
-        dir(node)
+        if node.designator.name in self.functions:
+            f = self.functions[node.designator.name]
+            if not len(f.arguments) == len(node.arguments):
+                self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
+            else:
+                for name,exp in zip(f.arguments, node.arguments):
+                    self.names[name.name] = exp
+            self.visit(f)
+        else:
+            # check if markup is a valid xhtml tag.
+            if not node.designator.name.upper() in XHTMLTag:
+                self.errors.append("%s invalid tag/function used/called! %s" % (
+                    node.lineo,
+                    node.designator))
+
+            self.doc.addElement(node.designator.name)
+
+        #print node.getChildNodes()
+        #logging.debug("CHILDNODES: %s" % repr(node.getChildNodes()))
+        for child in node.getChildNodes():
+            self.visit(child)
+
+
 
     #Statements nodes
     def visitIf(self, node):
@@ -122,15 +161,22 @@ class WaeGenerator:
         pass
 
     def visitBlock(self, node):
-        pass
+        lastElement = self.doc.lastElement
+
+        for child in node.getChildNodes():
+            self.visit(child)
+
+        self.doc.lastElement = lastElement
 
     def visitComment(self, node):
         pass
 
     def visitEcho(self, node):
+        # write echo statement to document
         pass
 
     def visitCdata(self, node):
+        # wrote cdata to document
         pass
 
     def visitEmbedding(self, node):
@@ -140,6 +186,8 @@ class WaeGenerator:
         pass
 
     def visitYield(self, node):
+        #keep current state, continue at previous state
+        #finish on return left state.
         pass
 
     #Predicate nodes
