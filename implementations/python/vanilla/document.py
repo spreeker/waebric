@@ -16,31 +16,34 @@ class Document(object):
     """building output waebric xhtml document """
 
     def __init__(self):
-        #self.modulePath = modulePath
-        #root = ET.Element('html')
-        self.tree = ET.ElementTree()
-
-        self.yieldlist = []
         self.lastElement = None
-        self.lastValue = ""
+        self.trees = []
+        self.yieldlist = []
+        #self.lastValue = ""
+        self.pretext = ""
 
     def addElement(self, name):
         if self.lastElement is None:
             self.lastElement = Element(name)
-            self.tree._setroot(self.lastElement)
+            self.tree = ET.ElementTree(self.lastElement)
+            self.trees.append(self.tree)
         else:
-            newElement = Element(name)
-            SubElement(self.lastElement, newElement)
-            self.lastElement = newElement
+            self.lastElement = SubElement(self.lastElement, name)
 
     def addText(self, string):
-        #self.lastElement.text = "%s%s" % (self.lastElement.text, string)
-        self.lastElement.text = string
+        if self.lastElement is None:
+            self.trees.append(string)
+        else:
+            self.lastElement.text = string
 
     def writeOutput(self, filename):
-        #filename = "%s.htm" % filename
-        #file = open(filename, 'w')
-        #DTD = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">"""
-        self.tree.write(filename)
-        file.close()
+        _file = open(filename, 'w')
+        DTD = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">"""
+        _file.write(DTD)
+        for tree in self.trees:
+            if isinstance(tree, ET.ElementTree):
+                self.tree.write(_file)
+            else: #could be data string.
+                _file.write(tree)
+        _file.close()
 

@@ -90,7 +90,7 @@ class TestParserClasses(unittest.TestCase):
         p.setTokens(generate_tokens(gen_line(source)))
         p.next()
         ast = parseFunction(p)
-        expast = """FUNCTION test (NAME('argument')) { MARKUP(Designator('p')EXP STRING("bla")),MARKUP(Designator('p')MARKUP(Designator('p')MARKUP(Designator('p')))) } \n"""
+        expast = """FUNCTION test (NAME('argument')) { MARKUP(Designator('p')EXP STRING(bla)),MARKUP(Designator('p')MARKUP(Designator('p')MARKUP(Designator('p')))) } \n"""
         self.assertEqual(str(ast),expast)
 
     def test_module(self):
@@ -108,10 +108,10 @@ class TestParserClasses(unittest.TestCase):
 
 
     def test_site(self):
-        source = "site dir/dir2/file.ext: startfunction(); end"
+        source = "site dir/dir2/file.ext: startfunction() end"
         p = self.initialize_parser(source)
         ast = parseSite(p)
-        self.assertEqual(str(ast), "[MAPPING(PATH(sitedir/dir2//file.ext), MARKUP(Designator('startfunction')))]")
+        self.assertEqual(str(ast), "[MAPPING(PATH(dir/dir2//file.ext), MARKUP(Designator('startfunction')))]")
 
         badsource = "site nameBLEH"
         p = self.initialize_parser(badsource)
@@ -172,11 +172,11 @@ class TestMarkup(unittest.TestCase):
         source = 'markup function( a = "b" ) ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        """MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [ASSIGNMENT('a',STRING("b"))]))""")
+        """MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [ASSIGNMENT('a',STRING(b))]))""")
         source = 'markup markup function("beee") ;'
         ast = self._parse_markup(source)
         self.assertEqual(str(ast),
-        """MARKUP(Designator('markup')MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [STRING("beee")])))""")
+        """MARKUP(Designator('markup')MARKUP(Designator('markup')MARKUP(Designator('function')ARGS [STRING(beee)])))""")
 
 
 class TestStatementParser(unittest.TestCase):
@@ -197,10 +197,10 @@ class TestStatementParser(unittest.TestCase):
         else { markup "other stuff"; }
         """
         ast = self._parse_statement(source)
-        rast = """If(STRING("b"),
- Block(MARKUP(Designator('h2')MARKUP(Designator('markup')EXP STRING("data")))
+        rast = """If(STRING(b),
+ Block(MARKUP(Designator('h2')MARKUP(Designator('markup')EXP STRING(data)))
 MARKUP(Designator('markup'))) 
-ELSE Block(MARKUP(Designator('markup')EXP STRING("other stuff"))))"""
+ELSE Block(MARKUP(Designator('markup')EXP STRING(other stuff))))"""
 
         self.assertEqual(str(ast),rast)
 
@@ -222,7 +222,7 @@ ELSE Block(MARKUP(Designator('markup')EXP STRING("other stuff"))))"""
     def test_comment(self):
         source = 'comment "commentString";'
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),'Comment("commentString")')
+        self.assertEqual(str(ast),'Comment(commentString)')
 
     def test_let(self):
         source = "let x = markup.class bla.bla.bla; in statement x; end"
@@ -240,8 +240,19 @@ ELSE Block(MARKUP(Designator('markup')EXP STRING("other stuff"))))"""
       }
      end"""
         ast = self._parse_statement(source)
-        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')ARGS [ASSIGNMENT(\'width\',STRING("160")), ASSIGNMENT(\'height\',STRING("160")), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_13-34.jpg"), STRING("lava 13-34")])\nMARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_14-1.jpg"), STRING("lava 14-1")])\nMARKUP(Designator(\'td\')ARGS [STRING("images/lavakaft_14-2.jpg"), STRING("lava 14-2")])))])"""
+        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')ARGS [ASSIGNMENT(\'width\',STRING(160)), ASSIGNMENT(\'height\',STRING(160)), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_13-34.jpg), STRING(lava 13-34)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-1.jpg), STRING(lava 14-1)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-2.jpg), STRING(lava 14-2)])))])"""
 
+        self.assertEqual(str(ast), astrslt)
+
+    def test_let_regression2(self):
+        source = """let
+            var = "success";
+        in
+		    echo var;
+	    end"""
+
+        ast = self._parse_statement(source)
+        astrslt = """LET(ASSIGNMENT('var',STRING(success)), [ECHO(NAME('var'))])"""
         self.assertEqual(str(ast), astrslt)
 
 
@@ -261,12 +272,12 @@ class TestExpression(unittest.TestCase):
     def test_list(self):
         sourceList = '[ "i1", "i2" ]'
         ast = self._parse_expression(sourceList)
-        self.assertEqual(str(ast),"""LIST(STRING("i1"),STRING("i2"))""")
+        self.assertEqual(str(ast),"""LIST(STRING(i1),STRING(i2))""")
 
     def test_record(self):
         sourceRecord = '{ key : "value" , key2 : "value2" } '
         ast = self._parse_expression(sourceRecord)
-        self.assertEqual(str(ast),"""RECORD('key2':STRING("value2"),'key':STRING("value"))""")
+        self.assertEqual(str(ast),"""RECORD('key2':STRING(value2),'key':STRING(value))""")
 
         sourceRecord = '{ key : "value" , key2 :  } '
         self.assertRaises(SyntaxError, self._parse_expression, sourceRecord)
@@ -279,7 +290,7 @@ class TestExpression(unittest.TestCase):
     def test_string(self):
         sourceString = '"Hallo, dit is een string expressie!"'
         ast = self._parse_expression(sourceString)
-        self.assertEqual(str(ast),'STRING("Hallo, dit is een string expressie!")')
+        self.assertEqual(str(ast),'STRING(Hallo, dit is een string expressie!)')
 
     def test_dotnames(self):
         sourceDotName = 'een.tweee.drie'
@@ -289,7 +300,7 @@ class TestExpression(unittest.TestCase):
     def test_plus(self):
         sourcePlus = '"a" + "b"'
         ast = self._parse_expression(sourcePlus)
-        self.assertEqual(str(ast),'ADD(STRING("a"), STRING("b"))')
+        self.assertEqual(str(ast),'ADD(STRING(a), STRING(b))')
 
         sourcePlus = ' + "b"'
         self.assertRaises(SyntaxError, self._parse_expression, sourcePlus)
@@ -300,9 +311,9 @@ class RegressionTests(unittest.TestCase):
         source = open('tests/blocks.wae').readline
         ast = parse(source)
         expectedAST = """MODULE block ,
-        SITES [MAPPING(PATH(sitesite//block.html), MARKUP(Designator('function')))]
+        SITES [MAPPING(PATH(site//block.html), MARKUP(Designator('function')))]
         IMPORTS 
-        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')ARGS [ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')ARGS [STRING("34.jpg")])))])))))) } 
+        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')ARGS [ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')ARGS [STRING(34.jpg)])))])))))) } 
  """
         self.assertEqual(expectedAST,repr(ast))
 

@@ -79,13 +79,17 @@ class Parser(object):
                 raise SyntaxError(self.currentToken, expected=lexeme)
         if tokensort:
             if not self.currentToken[0] == tokensort:
-                raise SyntaxError(self.currentToken, expected=tokensort)
+                expected = "%s for %s GOT %s %s" % (
+                    tok_name[tokensort], expected,
+                    tok_name[self.currentToken[0]],
+                    self.currentToken[1])
+                raise SyntaxError(self.currentToken, expected=expected)
 
     def peek(self, x=1, tokensort="", lexeme=""):
         """lookahead x tokens in advance, returns true
            if tokensort and or lexeme matches peekedtoken.
         """
- 
+
         d = x - len(self.peekedTokens)
         if d > -1:
             try:
@@ -201,7 +205,7 @@ def parseImport(parser):
     parser.next()
     return Import(parseModuleId(parser), lineo=lineo)
 
-#@trace
+@trace
 def parseSite(parser):
     # AST, mappings.
     parser.check("Site Defenition", lexeme=keywords['SITE'])
@@ -215,9 +219,9 @@ def parseSite(parser):
             parser.next()
             return mappings
 
-    raise SyntaxError(currentToken, expected="missing site ending END")
+    raise SyntaxError(parser.currentToken, expected="missing site ending END")
 
-#@trace
+@trace
 def parseMapping(parser):
     """ parse content in between site and end."""
     # AST new mapping
@@ -229,7 +233,7 @@ def parseMapping(parser):
     #parser.next()
     return Mapping(path, markup)
 
-#@trace
+@trace
 def parsePath(parser):
     path = ""
     _dir = ""
@@ -239,7 +243,7 @@ def parsePath(parser):
     #logging.debug(dir+path)
     return Path(_dir, fileName)
 
-#@trace
+@trace
 def parseDirectory(parser):
     directory = ""
     if isPathElement(parser):
@@ -517,7 +521,8 @@ def parseFunctionAssignment(parser):
     parser.next()
     expression = parseStatement(parser)
     assignment = Assignment(name, expression, lineo=lineo)
-    assignment.addVariable(arguments) #WARNING parseArguments allows to much?!
+    assignment.variables = arguments
+    assignment.function = True
     return assignment
 
 #@trace
@@ -528,7 +533,12 @@ def parseVariableAssignment(parser):
     lineo = parser.currentToken[2]
     parser.next( lexeme = "=" )
     parser.next()
-    expression = parseStatement(parser)
+    if parser.matchTokensort(NAME):
+        expression = parseStatement(parser)
+    else:
+        expression = parseExpression(parser)
+        parser.next() #skip ;
+
     assignment = Assignment(name, expression, lineo=lineo)
     return assignment
 

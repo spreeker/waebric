@@ -141,7 +141,8 @@ class Path(Node):
         return ()
 
     def __repr__(self):
-        return "PATH(%s/%s)" % (self.dir, self.fileName)
+        path = "%s/%s" % (self.dir,self.fileName) if self.dir else self.fileName
+        return "PATH(%s)" % path
 
 class Mapping(Node):
     def __init__(self, path, markup, lineo=None):
@@ -184,7 +185,6 @@ class Text(Node):
         return self.text
 
     def getChildNodes(self):
-        print "DO I GET HERE>??"
         return ()
 
     def __repr__(self):
@@ -467,9 +467,7 @@ class Assignment(Statement):
         self.variables = []
         self.name = name
         self.statement = statement
-
-    def addVariable(self, variable):
-        self.variables.append(variable)
+        self.function = False
 
     def getChildren(self):
         children = []
@@ -556,11 +554,10 @@ class If(Statement):
 
 class Echo(Statement):
 
-    def __init__(self, embedding=None, expression=None, lineo=None):
+    def __init__(self, embedding="", expression="", lineo=None):
         self.lineo = lineo
         self.expression = expression
         self.embedding = embedding
-        self.VERBOSE = 1
 
     def getChildren(self):
         if self.expression:
@@ -569,15 +566,14 @@ class Echo(Statement):
 
     def getChildNodes(self):
         assert isinstance(self.expression,Node), "expression is not NODE!"
-        print self.expression
 
         if self.expression:
             return tuple(self.expression)
-        #else:
-        #    return self.embedding
+        else:
+            return self.embedding
 
     def __repr__(self):
-        return "ECHO(%s%s)" % (repr(self.expression),repr(self.embedding))
+        return "ECHO(%s)" % (repr(self.expression) if self.expression else repr(self.embedding))
 
 
 class Cdata(Statement):

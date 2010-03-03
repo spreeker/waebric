@@ -3,7 +3,7 @@ from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
 from error import trace
-
+from ast import Statement, Node
 import logging
 
 class WaeGenerator:
@@ -22,6 +22,9 @@ class WaeGenerator:
         self.names = {}
         self.mainModule = True
         walk(tree, self)
+
+        for error in self.errors:
+            print error
 
     # Module nodes.
     @trace
@@ -50,11 +53,10 @@ class WaeGenerator:
         for mapping in self.sites:
             self.visit(mapping)
 
-        if self.functions.has_key('main'):
+        if 'main' in self.functions:
             self.visit(self.functions['main'])
-
-        #visit mapping takes care of printing.
-        #self.document
+            defaultOutput = "%s.htm" % node.id
+            self.doc.writeOutput(defaultOutput)
 
     @trace
     def visitFunction(self, node):
@@ -99,8 +101,17 @@ class WaeGenerator:
 
     # variables.
     def visitName(self, node):
-        data = self.names[node.name]
-        self.doc.addText(data)
+        data = self.names.get(node.name,'undef')
+        print node
+        print data
+        if isinstance(data, Node):
+            print Node
+            self.visit(data)
+        else:
+            self.doc.addText(data)
+
+    def visitText(self, node):
+        self.doc.addText(node.text)
 
     #expressions
     def visitNumber(self, node):
@@ -125,14 +136,21 @@ class WaeGenerator:
     def visitAttribute(self, node):
         pass
 
+    @trace
     def visitMarkup(self, node):
+        lastElement = self.doc.lastElement
+
         if node.designator.name in self.functions:
             f = self.functions[node.designator.name]
-            if not len(f.arguments) == len(node.arguments):
-                self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
-            else:
-                for name,exp in zip(f.arguments, node.arguments):
-                    self.names[name.name] = exp
+            print 'node',node
+            print 'f', f
+            if hasattr(f,'arguments'):
+                if not len(f.arguments) == len(node.arguments):
+                    self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
+                else:
+                    for name,exp in zip(f.arguments, node.arguments):
+                        print exp
+                        self.names[name.name] = exp
             self.visit(f)
         else:
             # check if markup is a valid xhtml tag.
@@ -143,12 +161,10 @@ class WaeGenerator:
 
             self.doc.addElement(node.designator.name)
 
-        #print node.getChildNodes()
-        #logging.debug("CHILDNODES: %s" % repr(node.getChildNodes()))
         for child in node.getChildNodes():
             self.visit(child)
 
-
+        self.doc.lastElement = lastElement
 
     #Statements nodes
     def visitIf(self, node):
@@ -158,22 +174,33 @@ class WaeGenerator:
         pass
 
     def visitLet(self, node):
-        pass
+        currentNames = self.names.copy()
+        currentFunctions = self.functions.copy()
+
+        for assignment in node.assignments:
+            self.visit(assignment)
+
+        for child in node.body:
+            self.visit(child)
+
+        self.names = currentNames
+        self.functions = currentFunctions
 
     def visitBlock(self, node):
         lastElement = self.doc.lastElement
-
         for child in node.getChildNodes():
             self.visit(child)
-
         self.doc.lastElement = lastElement
 
     def visitComment(self, node):
         pass
 
+    @trace
     def visitEcho(self, node):
         # write echo statement to document
-        pass
+        if node.expression is not None:
+            self.visit(node.expression)
+        #TODO Embedding.
 
     def visitCdata(self, node):
         # wrote cdata to document
@@ -182,11 +209,19 @@ class WaeGenerator:
     def visitEmbedding(self, node):
         pass
 
+    @trace
     def visitAssignment(self, node):
-        pass
+        if node.function: # function assignment.
+            self.functions[node.name] = node.statement
+            node.statement.arguments = node.variables
+            #for arg in node.variables:
+            #    self.names[arg] = 'undef'
+        else:
+            self.names[node.name] = node.statement
 
     def visitYield(self, node):
-        #keep current state, continue at previous state
+        #keep current state,
+        #continue at previous state
         #finish on return left state.
         pass
 

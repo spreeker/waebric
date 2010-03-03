@@ -213,7 +213,7 @@ def generate_tokens(readline):
                     elif initial in ">":
                         yield (POSTSTRING, token[1:], spos, (lnum, pos), line)
                     else:                                  # ordinary string
-                        yield (STRING, token, spos, epos, line)
+                        yield (STRING, token[1:-1], spos, epos, line)
                 elif initial in "<":
                     if token[-1] == '\n':                  # multiline embed
                         #print "multiline embed"

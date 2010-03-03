@@ -4,7 +4,7 @@ from decorator import decorator
 from token import *
 
 DEBUG = True
-SHOWTOKENS = True
+SHOWTOKENS = False
 SHOWPARSER =  True
 
 if DEBUG:
