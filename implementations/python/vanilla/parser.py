@@ -478,7 +478,7 @@ def parseStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
-#@trace
+@trace
 def parseLetStatement(parser):
     parser.check(lexeme=keywords['LET'])
     assignments = []
@@ -487,9 +487,9 @@ def parseLetStatement(parser):
     while parser.hasnext():
         assignments.append(parseAssignment(parser))
         if parser.matchLexeme(keywords['IN']):
+            parser.next()
             body = []
             while parser.hasnext():
-                parser.next()
                 body.append(parseStatement(parser))
                 if parser.matchLexeme(keywords['END']):
                     parser.next() #skip end.
@@ -622,6 +622,7 @@ def checkForLastExpression(parser):
 def parseMarkupStatement(parser):
     """
     p;      markup
+    p();    call
     p p;    markup variable
     p p();  markup - markup
     p p p(); markup markup markup
@@ -721,7 +722,7 @@ def parseAttributes(parser):
 
     return attributes
 
-#@trace
+@trace
 def parseArguments(parser):
     """ ( Arguments,* ) """
     #ast stuff.
@@ -739,7 +740,7 @@ def parseArguments(parser):
             parser.check(lexeme=',')
             parser.next()
 
-#@trace
+@trace
 def parseArgument(parser):
     """ name = expression
         expression

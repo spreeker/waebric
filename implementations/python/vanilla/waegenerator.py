@@ -3,7 +3,7 @@ from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
 from error import trace
-from ast import Statement, Node
+from ast import Node, Markup
 import logging
 
 class WaeGenerator:
@@ -173,6 +173,7 @@ class WaeGenerator:
     def visitEach(self, node):
         pass
 
+    @trace
     def visitLet(self, node):
         currentNames = self.names.copy()
         currentFunctions = self.functions.copy()
@@ -212,6 +213,10 @@ class WaeGenerator:
     @trace
     def visitAssignment(self, node):
         if node.function: # function assignment.
+            if isinstance(node.statement, Markup) and \
+                node.statement.designator.name in self.functions: #function 2 function call
+                node.statement = self.functions[node.statement.designator.name]
+
             self.functions[node.name] = node.statement
             node.statement.arguments = node.variables
             #for arg in node.variables:

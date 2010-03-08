@@ -240,7 +240,10 @@ ELSE Block(MARKUP(Designator('markup')EXP STRING(other stuff))))"""
       }
      end"""
         ast = self._parse_statement(source)
-        astrslt = """LET(ASSIGNMENT("td([NAME(\'img\'), NAME(\'alt\')])",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')ARGS [ASSIGNMENT(\'width\',STRING(160)), ASSIGNMENT(\'height\',STRING(160)), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_13-34.jpg), STRING(lava 13-34)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-1.jpg), STRING(lava 14-1)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-2.jpg), STRING(lava 14-2)])))])"""
+        astrslt = """LET(ASSIGNMENT("td(NAME(\'img\'),NAME(\'alt\'))",MARKUP(Designator(\'td\')MARKUP(Designator(\'img\')ARGS [ASSIGNMENT(\'width\',STRING(160)), ASSIGNMENT(\'height\',STRING(160)), ASSIGNMENT(\'alt\',NAME(\'alt\')), ASSIGNMENT(\'src\',NAME(\'img\'))]))), [MARKUP(Designator(\'tr\')Block(MARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_13-34.jpg), STRING(lava 13-34)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-1.jpg), STRING(lava 14-1)])\nMARKUP(Designator(\'td\')ARGS [STRING(images/lavakaft_14-2.jpg), STRING(lava 14-2)])))])"""
+        #print
+        #print ast
+        #print astrslt
 
         self.assertEqual(str(ast), astrslt)
 
@@ -313,8 +316,11 @@ class RegressionTests(unittest.TestCase):
         expectedAST = """MODULE block ,
         SITES [MAPPING(PATH(site//block.html), MARKUP(Designator('function')))]
         IMPORTS 
-        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td([NAME('img')])",MARKUP(Designator('td')MARKUP(Designator('img')ARGS [ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')ARGS [STRING(34.jpg)])))])))))) } 
+        FUNCTIONS FUNCTION function () { MARKUP(Designator('layout')MARKUP(Designator('single-column')Block(MARKUP(Designator('table')Block(LET(ASSIGNMENT("td(NAME('img'))",MARKUP(Designator('td')MARKUP(Designator('img')ARGS [ASSIGNMENT('src',NAME('img'))]))), [MARKUP(Designator('tr')Block(MARKUP(Designator('td')ARGS [STRING(34.jpg)])))])))))) } 
  """
+        #print ast
+        #print expectedAST
+
         self.assertEqual(expectedAST,repr(ast))
 
 
