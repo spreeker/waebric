@@ -3,8 +3,12 @@ from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
 from error import trace
-from ast import Node, Markup
+from ast import Node, Markup,  Name, Text, Number
+from ast import Assignment
+import error
+
 import logging
+import sys, getopt
 
 class WaeGenerator:
     """
@@ -12,15 +16,16 @@ class WaeGenerator:
     """
     mainModule = True
 
-    def __init__(self, source):
-        tree = parse(source)
-        self.doc = Document()
+    def __init__(self, source, output=""):
+        self.path = "/".join(source.name.split('/')[:-1]) #source file path, to find imports
+        tree = parse(source.readline)
+        self.doc = Document(output)
         self.errors = []
         self.functions = {}
         self.sites =[]
         self.imports = ()
         self.names = {}
-        self.mainModule = True
+        self.output = output
         walk(tree, self)
 
         for error in self.errors:
@@ -28,7 +33,7 @@ class WaeGenerator:
 
     # Module nodes.
     @trace
-    def visitModule(self,node):
+    def visitModule(self, node):
 
         for f in node.functions:
             if f.name in self.functions:
@@ -44,16 +49,15 @@ class WaeGenerator:
             for mapping in site:
                self.sites.append(mapping)
 
-        if not self.mainModule: #do not execute imported module.
+        if hasattr(node, '_import'): #do not execute imported module.
             return
-
-        self.mainModule = False
 
         #visit main and site defenitions.
         for mapping in self.sites:
             self.visit(mapping)
 
         if 'main' in self.functions:
+            self.doc.addElement('html')
             self.visit(self.functions['main'])
             defaultOutput = "%s.htm" % node.id
             self.doc.writeOutput(defaultOutput)
@@ -67,25 +71,28 @@ class WaeGenerator:
         for statement in node.statements:
             self.visit(statement)
 
-    @trace
+    #@trace
     def visitPath(self, node):
         print dir(node)
 
-    @trace
+    #@trace
     def visitImport(self, node):
         if node.moduleId in self.imports:
             return #already parsed!
         try:
-            _import = open("%s.wae" % node.moduleId)
+            waefile = '%s/%s' % (self.path,node.moduleId) if self.path else "%s" % node.moduleId
+            _import = open("%s.wae" % waefile)
         except:
             self.errors.append("%s could not open module %s" % (node.lineo, node.moduleId))
+            return
 
+        self.imports = self.imports + (node.moduleId,)
         source = _import.readline
         importTree = parse(source)
-        self.visit(tree)
-        self.imports = self.imports + (node.moduleId,)
+        importTree._import = True
+        self.visit(importTree)
 
-    @trace
+    #@trace
     def visitMapping(self, node):
         # new document
         self.doc = Document()
@@ -100,22 +107,21 @@ class WaeGenerator:
         self.doc.writeOutput(path)
 
     # variables.
+    @trace
     def visitName(self, node):
         data = self.names.get(node.name,'undef')
-        print node
-        print data
         if isinstance(data, Node):
-            print Node
             self.visit(data)
         else:
             self.doc.addText(data)
 
+    #expressions
+    @trace
     def visitText(self, node):
         self.doc.addText(node.text)
 
-    #expressions
     def visitNumber(self, node):
-        print dir(node)
+        self.doc.addText(str(node.number))
 
     def visitList(self, node):
         print dir(node)
@@ -123,18 +129,32 @@ class WaeGenerator:
     def visitRecord(self, node):
         print dir(node)
 
+    @trace
     def visitCat(self, node):
-        pass
+
+        self.visit(node.left)
+        self.visit(node.right)
 
     def visitField(self, node):
         pass
 
     #Markup nodes
     def visitDesignator(self, node):
+        #handle attributes.
         pass
 
     def visitAttribute(self, node):
         pass
+
+    def getValue(self, statement):
+        if isinstance(statement, Name ):
+            return self.getValue(self.names[statement.name])
+        elif isinstance(statement, Text):
+            return statement.text
+        elif isinstance(statement, Number):
+            return str(statement.number)
+
+        return "non_value"
 
     @trace
     def visitMarkup(self, node):
@@ -142,24 +162,27 @@ class WaeGenerator:
 
         if node.designator.name in self.functions:
             f = self.functions[node.designator.name]
-            print 'node',node
-            print 'f', f
             if hasattr(f,'arguments'):
                 if not len(f.arguments) == len(node.arguments):
                     self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
                 else:
                     for name,exp in zip(f.arguments, node.arguments):
-                        print exp
                         self.names[name.name] = exp
             self.visit(f)
         else:
+            self.doc.addElement(node.designator.name)
             # check if markup is a valid xhtml tag.
             if not node.designator.name.upper() in XHTMLTag:
+                print "%s invalid tag/function used/called! %"
                 self.errors.append("%s invalid tag/function used/called! %s" % (
                     node.lineo,
                     node.designator))
-
-            self.doc.addElement(node.designator.name)
+            #check for extra arguments to add to element as attributes.
+            for arg in node.arguments:
+                if isinstance(arg,Assignment):
+                    self.doc.addAttribute(arg.name,self.getValue(arg.statement))
+                else:
+                    self.doc.addAttribute('value', self.getValue(arg))
 
         for child in node.getChildNodes():
             self.visit(child)
@@ -173,7 +196,7 @@ class WaeGenerator:
     def visitEach(self, node):
         pass
 
-    @trace
+    #@trace
     def visitLet(self, node):
         currentNames = self.names.copy()
         currentFunctions = self.functions.copy()
@@ -210,7 +233,7 @@ class WaeGenerator:
     def visitEmbedding(self, node):
         pass
 
-    @trace
+    #@trace
     def visitAssignment(self, node):
         if node.function: # function assignment.
             if isinstance(node.statement, Markup) and \
@@ -244,10 +267,61 @@ class WaeGenerator:
         pass
 
 
-if __name__ == '__main__':                     # testing
-    import sys
-    if len(sys.argv) > 1:
-        sourceFile = open(sys.argv[1])
-        source = sourceFile.readline
-        waebrick = WaeGenerator(source)
+def usage():
+    usage = """
+compile waebric sourcefile.
 
+    python waegenerator.py OPTIONS sourcefile
+
+OPTIONS:
+
+-h
+    show help
+
+-o ouput= [output dir]
+    directory where to output compiled waebric source
+    NOTE no trailing slash.
+
+-d --debug
+    show debug information, and write debug information to debug.log
+    tip: tail -f that file to show realtime progress.
+    """
+    print usage
+
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv, "ho:d", ["help", "output=", "debug"])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(2)
+
+    output = None
+    showresult = False
+
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif opt in ('-d', "--debug"):
+           error.DEBUG = True
+           error.SHOWTOKENS = True
+        elif opt in ("-o", "--output"):
+            output = arg
+
+    if args:
+        source = args[0]
+        sourceFile = open(source)
+        if output:
+            waebric = WaeGenerator(sourceFile, output)
+        else:
+            waebric = WaeGenerator(sourceFile)
+        if error.DEBUG:
+            sourceFile = open(source)
+            print sourceFile.read()
+
+    else:
+        usage()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -205,7 +205,7 @@ def parseImport(parser):
     parser.next()
     return Import(parseModuleId(parser), lineo=lineo)
 
-@trace
+#@trace
 def parseSite(parser):
     # AST, mappings.
     parser.check("Site Defenition", lexeme=keywords['SITE'])
@@ -221,7 +221,7 @@ def parseSite(parser):
 
     raise SyntaxError(parser.currentToken, expected="missing site ending END")
 
-@trace
+#@trace
 def parseMapping(parser):
     """ parse content in between site and end."""
     # AST new mapping
@@ -233,7 +233,7 @@ def parseMapping(parser):
     #parser.next()
     return Mapping(path, markup)
 
-@trace
+#@trace
 def parsePath(parser):
     path = ""
     _dir = ""
@@ -243,7 +243,7 @@ def parsePath(parser):
     #logging.debug(dir+path)
     return Path(_dir, fileName)
 
-@trace
+#@trace
 def parseDirectory(parser):
     directory = ""
     if isPathElement(parser):
@@ -298,11 +298,14 @@ def parseFunction(parser):
 
     ## parser statements.
     while(parser.hasnext()):
-        function.addStatement(parseStatement(parser))
-
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return function
+
+        function.addStatement(parseStatement(parser))
+
+    if parser.matchLexeme(keywords['END']): #empty function!
+        return function
 
     raise SyntaxError(parser.currentToken,
             expected="END, Missing function ending END")

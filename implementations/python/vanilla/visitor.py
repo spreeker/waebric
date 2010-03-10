@@ -46,7 +46,7 @@ class ASTVisitor:
     def dispatch(self, node, *args):
         klass = node.__class__
         className = klass.__name__
-        print className
+        #print className
 
         self.node = node
         klass = node.__class__

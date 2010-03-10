@@ -3,9 +3,9 @@ import logging
 from decorator import decorator
 from token import *
 
-DEBUG = True
-SHOWTOKENS = True 
-SHOWPARSER =  True
+DEBUG = False
+SHOWTOKENS = False
+SHOWPARSER = False
 
 if DEBUG:
     LOG_FILENAME = 'debug.log'
@@ -56,7 +56,6 @@ class SyntaxError(Exception):
         if DEBUG:
             logging.debug("raised exception on:")
             logToken(*token)
-            #tokenize.printtoken(*token)
             logging.debug("expected: %s" % expected)
 
     def __str__(self):
