@@ -139,9 +139,26 @@ class WaeGenerator:
         pass
 
     #Markup nodes
+    @trace
     def visitDesignator(self, node):
         #handle attributes.
-        pass
+        logging.debug(node.attributes)
+        for attr in node.attributes:
+            symbol = attr.symbol
+            value = attr.value
+
+            if symbol == ".":
+                self.doc.addAttribute('class',value)
+            elif symbol == "#":
+                self.doc.addAttribute('id',value)
+            elif symbol == "$":
+                self.doc.addAttribute('name',value)
+            elif symbol == ":":
+                self.doc.addAttribute('type',value)
+            elif symbol == "@":
+                self.doc.addAttribute('width',value)
+            elif symbol == "%":
+                self.doc.addAttribute('height',value)
 
     def visitAttribute(self, node):
         pass
@@ -154,7 +171,7 @@ class WaeGenerator:
         elif isinstance(statement, Number):
             return str(statement.number)
 
-        return "non_value"
+        return "undef"
 
     @trace
     def visitMarkup(self, node):
@@ -171,6 +188,7 @@ class WaeGenerator:
             self.visit(f)
         else:
             self.doc.addElement(node.designator.name)
+            self.visit(node.designator)
             # check if markup is a valid xhtml tag.
             if not node.designator.name.upper() in XHTMLTag:
                 print "%s invalid tag/function used/called! %"
@@ -306,6 +324,7 @@ def main(argv):
         elif opt in ('-d', "--debug"):
            error.DEBUG = True
            error.SHOWTOKENS = True
+           error.SHOWPARSER = True
         elif opt in ("-o", "--output"):
             output = arg
 

@@ -40,6 +40,8 @@ class Document(object):
             self.lastElement.text = txt
 
     def addAttribute(self,name,value):
+        if self.lastElement.get(name):
+            value = "%s %s" % (self.lastElement.get(name),value)
         self.lastElement.set(name, value)
 
     def writeOutput(self, filename):

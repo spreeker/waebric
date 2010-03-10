@@ -3,9 +3,12 @@ import logging
 from decorator import decorator
 from token import *
 
-DEBUG = False
-SHOWTOKENS = False
-SHOWPARSER = False
+DEBUG = True
+#DEBUG = False
+SHOWTOKENS = True
+#SHOWTOKENS = False
+SHOWPARSER = True
+#SHOWPARSER = False
 
 if DEBUG:
     LOG_FILENAME = 'debug.log'
