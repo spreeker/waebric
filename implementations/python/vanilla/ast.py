@@ -280,7 +280,6 @@ class Field(Node):
        return "FIELD %s in %s" % (repr(self.field), repr(self.expression))
 
 #MARKUP Nodes.
-
 class Designator(Node):
 
     def __init__(self, name, attributes=[], lineo=None):
@@ -533,24 +532,25 @@ class If(Statement):
     def __init__(self, predicate, ifstmnt, elsestmnt="", lineo=None):
         self.lineo = lineo
         self.predicate = predicate
-        self.elsestmnt = elsestmnt
-        self.ifstmnt = ifstmnt
+        self.elseStatement = elsestmnt
+        self.ifStatement = ifstmnt
 
     def getChildren(self):
         children = []
         return tuple(children)
 
     def getChildNodes(self):
-        if self.elsestmnt is not None:
-            nodelist.append(self.elsestmnt)
+        nodelist = []
+        if self.elseStatement:
+            nodelist.append(self.elseStatement)
         return tuple(nodelist)
 
     def __repr__(self):
         extra = ""
-        if self.elsestmnt:
-            extra = "\nELSE %s" % repr(self.elsestmnt)
+        if self.elseStatement:
+            extra = "\nELSE %s" % repr(self.elseStatement)
         return "If(%s,\n %s %s)" % (repr(self.predicate),
-            repr(self.ifstmnt), extra)
+            repr(self.ifStatement), extra)
 
 class Echo(Statement):
 
@@ -626,7 +626,7 @@ class Each(Statement):
 
     def __repr__(self):
         return "Each(%s in %s do %s)" % (
-                self.name,  repr(self.statement), repr(self.expression))
+                self.name,  repr(self.expression), repr(self.statement))
 
 
 class Block(Statement):

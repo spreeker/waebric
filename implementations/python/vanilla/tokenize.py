@@ -117,10 +117,10 @@ def generate_tokens(readline):
                     yield (PRESTRING, contstr + line[:end],
                             strstart, (lnum,end), contline + line)
                 elif postembed:
-                    yield (POSTSTRING, contstr + line[:end],
+                    yield (POSTSTRING, contstr + line[:end-1],
                             strstart, (lnum,end), contline + line)
                 else:
-                    yield (STRING, contstr + line[:end],
+                    yield (STRING, contstr + line[:end-1],
                            strstart, (lnum, end), contline + line)
                 postembed = False
                 contstr = ''
@@ -196,8 +196,8 @@ def generate_tokens(readline):
                         yield( COMMENT, token, spos, epos, line)
                         continue
                 elif initial in '"' or initial in ">":
+                    start = start + 1
                     if initial in ">":
-                        start = start + 1
                         postembed = True
                     if token[-1] == '\n':                  # continued string
                         strstart = (lnum, start)
@@ -205,13 +205,13 @@ def generate_tokens(readline):
                         contline = line
                         break
                     elif token[-1] == '<':                 # embedding
-                        token = token[:-1]
-                        if token[0] == '>':
-                            token = token[1:]
-                        yield(PRESTRING, token, spos, (lnum, pos), line)
+                        #token = token[:-1]
+                        #if token[0] == '>':
+                        #    token = token[1:]
+                        yield(PRESTRING, token[1:-1], spos, (lnum, pos), line)
                         pos = pos - 1 # Enable recognizeing start point embed.
                     elif initial in ">":
-                        yield (POSTSTRING, token[1:], spos, (lnum, pos), line)
+                        yield (POSTSTRING, token[1:-1], spos, (lnum, pos), line)
                     else:                                  # ordinary string
                         yield (STRING, token[1:-1], spos, epos, line)
                 elif initial in "<":

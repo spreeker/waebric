@@ -3,8 +3,8 @@ from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
 from error import trace
-from ast import Node, Markup,  Name, Text, Number
-from ast import Assignment
+from ast import Node, Markup, Name, Text, Number
+from ast import Assignment, List, Record, Field
 import error
 
 import logging
@@ -116,7 +116,6 @@ class WaeGenerator:
             self.doc.addText(data)
 
     #expressions
-    @trace
     def visitText(self, node):
         self.doc.addText(node.text)
 
@@ -129,14 +128,29 @@ class WaeGenerator:
     def visitRecord(self, node):
         print dir(node)
 
-    @trace
     def visitCat(self, node):
 
         self.visit(node.left)
         self.visit(node.right)
 
+    @trace
     def visitField(self, node):
-        pass
+        logging.debug(node.field)
+        logging.debug(node.expression)
+
+        record = node.expression
+        if isinstance(record, Name):
+            record = self.names[record.name]
+            print record
+        if isinstance(record, Record):
+            self.visit(record.keyExpressions.get(node.field,'undef'))
+
+        elif isinstance(record, Node):
+            logging.debug("now some field went wrong..")
+            self.errors.append('%s error in Field expression' % str(node.lineo))
+        else:
+            logging.debug("now some field went wrong..")
+            logging.debug(node)
 
     #Markup nodes
     @trace
@@ -165,7 +179,7 @@ class WaeGenerator:
 
     def getValue(self, statement):
         if isinstance(statement, Name ):
-            return self.getValue(self.names[statement.name])
+            return self.getValue(self.names.get(statement.name,'undef'))
         elif isinstance(statement, Text):
             return statement.text
         elif isinstance(statement, Number):
@@ -182,9 +196,10 @@ class WaeGenerator:
             if hasattr(f,'arguments'):
                 if not len(f.arguments) == len(node.arguments):
                     self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
-                else:
-                    for name,exp in zip(f.arguments, node.arguments):
-                        self.names[name.name] = exp
+                for name,exp in zip(f.arguments, node.arguments):
+                    if isinstance(exp, Name):
+                        exp = self.names[name.name]
+                    self.names[name.name] = exp
             self.visit(f)
         else:
             self.doc.addElement(node.designator.name)
@@ -209,10 +224,47 @@ class WaeGenerator:
 
     #Statements nodes
     def visitIf(self, node):
-        pass
+
+        value = self.getValue(node.predicate)
+        if value == 'undef' or False:
+            if isinstance(node.elseStatement, Node):
+                self.visit(node.elseStatement)
+        else:
+            self.visit(node.ifStatement)
 
     def visitEach(self, node):
-        pass
+        currentNames = self.names.copy()
+        listexp = node.expression
+        if isinstance(listexp, Name):
+            listexp = self.names[listexp.name]
+        if isinstance(listexp, Field):
+            fields = []
+            field = listexp
+            while isinstance(field, Field):
+                fields.append(field.field)
+                field = field.expression
+            if isinstance(field, Name):
+                name = field
+                record = self.names[name.name]
+            if isinstance(record, Record):
+                fields.reverse()
+                for f in fields:
+                    record = record.keyExpressions.get(f,"")
+                    if not isinstance(record, Record):
+                        self.errors.append("%s %s wrong call in records" %(node.lineo, f))
+                        logging.debug("%s %s wrong call in records" %(node.lineo, f))
+                        return
+                listexp = record
+
+        if isinstance(listexp, List):
+            for exp in listexp:
+               if isinstance(exp, Name):
+                   exp = self.names[exp.name]
+               self.names[node.name] = exp
+               self.visit(node.statement)
+        else:
+            self.errors.append("%s Each did not get list argument" % str(node.lineo))
+        self.names = currentNames
 
     #@trace
     def visitLet(self, node):

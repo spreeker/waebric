@@ -54,14 +54,14 @@ class Document(object):
             return
 
         #DTD = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">"""
-        DTD = """<?xml version="1.0" encoding="UTF-8"?>\r\n"""
+        DTD = """<?xml version="1.0" encoding="UTF-8"?>\n"""
         _file.write(DTD)
         for tree in self.trees:
             if isinstance(tree, ET.ElementTree):
                 self.tree.write(_file)
             else: #could be data string.
                 _file.write(tree)
-        _file.write('\r\n')
+        _file.write('\n')
         _file.close()
 
         if error.DEBUG:

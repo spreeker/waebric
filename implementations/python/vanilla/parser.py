@@ -344,7 +344,7 @@ def parseExpression(parser):
             while parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
                 parser.next(lexeme=".") #skip.
                 parser.next(expected="NAME", tokensort=NAME)
-                expression =  Field(expression,parser.currentToken[1], lineo=parser.currentToken[2])
+                expression =  Field(expression, parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     #Check for expression PLUS expression
     if parser.matchLexeme("+") and expression:
@@ -560,7 +560,7 @@ def parseEachStatement(parser):
     stm = parseStatement(parser)
     return Each(name, exp, stm, lineo=lineo)
 
-#@trace
+@trace
 def parseIfStatement(parser):
     parser.check(lexeme = keywords['IF'])
     lineo = parser.currentToken[2]
@@ -570,12 +570,12 @@ def parseIfStatement(parser):
     parser.check(lexeme = ')')
     parser.next()
     stm = parseStatement(parser)
-    ifstm = If(predicate, stm, lineo=lineo)
+    elsestm = ""
     if parser.matchLexeme(keywords['ELSE']):
         parser.next()
         elsestm = parseStatement(parser)
-        ifstm.elsestmnt = elsestm
 
+    ifstm = If(predicate, stm, elsestm, lineo=lineo)
     return ifstm
 
 #@trace
