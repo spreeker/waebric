@@ -42,5 +42,5 @@ for test in testdata:
         tests_ok += 1
 
 print "FAILED ", ", ".join(failed)
-print "%d Tests Succeeded" % tests_ok
+print "%d Tests Succeeded of %d" % (tests_ok, len(testdata))
     #except:

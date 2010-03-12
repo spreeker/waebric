@@ -14,30 +14,24 @@ import error
 class Document(object):
     """building output waebric xhtml document """
 
-    def __init__(self,output):
-        self.lastElement = None
-        self.trees = []
-        self.yieldlist = []
-        #self.lastValue = ""
-        self.pretext = ""
+    def __init__(self, output):
+        self.lastElement = Element('html')
+        self.tree = ET.ElementTree(self.lastElement)
+        self.trees = [self.tree]
+        self.virgin = True
         self.output = output
 
     def addElement(self, name):
-        if self.lastElement is None:
-            self.lastElement = Element(name)
-            self.tree = ET.ElementTree(self.lastElement)
-            self.trees.append(self.tree)
+        if self.virgin:
+            self.lastElement.tag = name
         else:
-            if name.lower() == 'html':
-                return
             self.lastElement = SubElement(self.lastElement, name)
 
     def addText(self, string):
-        if self.lastElement is None:
-            self.trees.append(string)
-        else:
-            txt = "%s%s" % (self.lastElement.text, string) if self.lastElement.text else string
-            self.lastElement.text = txt
+        if self.virgin:
+            self.virgin = False
+        txt = "%s%s" % (self.lastElement.text, string) if self.lastElement.text else string
+        self.lastElement.text = txt
 
     def addAttribute(self,name,value):
         if self.lastElement.get(name):

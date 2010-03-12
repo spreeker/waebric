@@ -42,7 +42,7 @@ class ASTVisitor:
             print className ,"from parent", parent
 
             self.dispatch(child, *args)
-        
+
     def dispatch(self, node, *args):
         klass = node.__class__
         className = klass.__name__

@@ -340,11 +340,13 @@ def parseExpression(parser):
         #Variable
         expression = Name(parser.currentToken[1])
         #Check for Variable DOT Field expression
-        if parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
-            while parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
-                parser.next(lexeme=".") #skip.
-                parser.next(expected="NAME", tokensort=NAME)
-                expression =  Field(expression, parser.currentToken[1], lineo=parser.currentToken[2])
+        fields = []
+        while parser.peek(lexeme=".") and parser.peek(x=2, tokensort=NAME):
+            parser.next(lexeme=".") #skip.
+            parser.next(expected="NAME", tokensort=NAME)
+            fields.append(parser.currentToken[1])
+        if fields:
+            expression = Field(expression, fields, lineo=parser.currentToken[2])
         parser.next()
     #Check for expression PLUS expression
     if parser.matchLexeme("+") and expression:

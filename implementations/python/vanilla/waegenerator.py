@@ -57,7 +57,7 @@ class WaeGenerator:
             self.visit(mapping)
 
         if 'main' in self.functions:
-            self.doc.addElement('html')
+            #self.doc.addElement('html')
             self.visit(self.functions['main'])
             defaultOutput = "%s.htm" % node.id
             self.doc.writeOutput(defaultOutput)
@@ -122,12 +122,15 @@ class WaeGenerator:
     def visitNumber(self, node):
         self.doc.addText(str(node.number))
 
+    @trace
     def visitList(self, node):
         print dir(node)
 
+    @trace
     def visitRecord(self, node):
         print dir(node)
 
+    @trace
     def visitCat(self, node):
 
         self.visit(node.left)
@@ -135,22 +138,15 @@ class WaeGenerator:
 
     @trace
     def visitField(self, node):
-        logging.debug(node.field)
-        logging.debug(node.expression)
+        logging.debug(node.fields)
+        logging.debug(node.name)
+        logging.debug(self.names.get(node.name.name,'not in names'))
+        record = self.names.get(node.name.name)
+        for f in node.fields:
+            record = record.keyExpressions[f]
+        exp = record
+        self.visit(exp)
 
-        record = node.expression
-        if isinstance(record, Name):
-            record = self.names[record.name]
-            print record
-        if isinstance(record, Record):
-            self.visit(record.keyExpressions.get(node.field,'undef'))
-
-        elif isinstance(record, Node):
-            logging.debug("now some field went wrong..")
-            self.errors.append('%s error in Field expression' % str(node.lineo))
-        else:
-            logging.debug("now some field went wrong..")
-            logging.debug(node)
 
     #Markup nodes
     @trace
@@ -185,6 +181,30 @@ class WaeGenerator:
         elif isinstance(statement, Number):
             return str(statement.number)
 
+        elif isinstance(statement, Field):
+            logging.debug("get value of:")
+            logging.debug(statement)
+            record = self.names.get(statement.name.name, 'undef')
+            logging.debug("value should be in")
+            logging.debug(record)
+            for f in statement.fields:
+               logging.debug("lookung up field:")
+               logging.debug(f)
+               if isinstance(record, Record):
+                    record = record.keyExpressions.get(f,'undef')
+                    logging.debug("field value is:")
+                    logging.debug(record)
+               else:
+                    self.errors.append('%s no record found'% str(statement.lineo))
+                    logging.debug('no record found')
+                    break
+            logging.debug("recursive getting value of:")
+            logging.debug(record)
+            return self.getValue(record)
+        elif isinstance(statement, List):
+            if statement.expressionList:
+                return True
+
         return "undef"
 
     @trace
@@ -197,9 +217,12 @@ class WaeGenerator:
                 if not len(f.arguments) == len(node.arguments):
                     self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
                 for name,exp in zip(f.arguments, node.arguments):
+                    logging.debug(name)
+                    logging.debug(exp)
                     if isinstance(exp, Name):
-                        exp = self.names[name.name]
+                        exp = self.names[exp.name]
                     self.names[name.name] = exp
+                    logging.debug('%s is now %s' % (name.name, exp))
             self.visit(f)
         else:
             self.doc.addElement(node.designator.name)
@@ -213,7 +236,7 @@ class WaeGenerator:
             #check for extra arguments to add to element as attributes.
             for arg in node.arguments:
                 if isinstance(arg,Assignment):
-                    self.doc.addAttribute(arg.name,self.getValue(arg.statement))
+                    self.doc.addAttribute(arg.name, self.getValue(arg.statement))
                 else:
                     self.doc.addAttribute('value', self.getValue(arg))
 
@@ -223,39 +246,35 @@ class WaeGenerator:
         self.doc.lastElement = lastElement
 
     #Statements nodes
+    @trace
     def visitIf(self, node):
 
         value = self.getValue(node.predicate)
+        logging.debug(node.predicate)
+        logging.debug('if value ')
+        logging.debug(value)
         if value == 'undef' or False:
             if isinstance(node.elseStatement, Node):
                 self.visit(node.elseStatement)
         else:
             self.visit(node.ifStatement)
 
+    @trace
     def visitEach(self, node):
         currentNames = self.names.copy()
         listexp = node.expression
         if isinstance(listexp, Name):
             listexp = self.names[listexp.name]
         if isinstance(listexp, Field):
-            fields = []
             field = listexp
-            while isinstance(field, Field):
-                fields.append(field.field)
-                field = field.expression
-            if isinstance(field, Name):
-                name = field
-                record = self.names[name.name]
-            if isinstance(record, Record):
-                fields.reverse()
-                for f in fields:
-                    record = record.keyExpressions.get(f,"")
-                    if not isinstance(record, Record):
-                        self.errors.append("%s %s wrong call in records" %(node.lineo, f))
-                        logging.debug("%s %s wrong call in records" %(node.lineo, f))
-                        return
-                listexp = record
-
+            record = self.names[field.name.name]
+            logging.debug(record)
+            for f in field.fields:
+               assert(isinstance(record, Record)), 'no record found'
+               record = record.keyExpressions.get(f,'undef')
+               logging.debug(record)
+            listexp = record
+            logging.debug(listexp)
         if isinstance(listexp, List):
             for exp in listexp:
                if isinstance(exp, Name):
@@ -303,7 +322,7 @@ class WaeGenerator:
     def visitEmbedding(self, node):
         pass
 
-    #@trace
+    @trace
     def visitAssignment(self, node):
         if node.function: # function assignment.
             if isinstance(node.statement, Markup) and \

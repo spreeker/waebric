@@ -265,19 +265,20 @@ class Cat(Node):
 
 
 class Field(Node):
-    def __init__(self, expression, field, lineo=None):
+    def __init__(self, name, fields, lineo=None):
         self.lineo = lineo
-        self.expression = expression
-        self.field = field
+        self.name = name
+        self.fields = fields
 
     def getChildren(self):
-        return self.expression, self.field
+        return ()
 
     def getChildNodes(self):
-        return self.expression
+        return ()
 
     def __repr__(self):
-       return "FIELD %s in %s" % (repr(self.field), repr(self.expression))
+       fields = ".".join(self.fields)
+       return "FIELD %s in %s" % (fields, repr(self.name))
 
 #MARKUP Nodes.
 class Designator(Node):
