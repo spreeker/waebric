@@ -5,6 +5,7 @@ from xhtmltag import XHTMLTag
 from error import trace
 from ast import Node, Markup, Name, Text, Number
 from ast import Assignment, List, Record, Field
+from ast import Predicate, Cat
 import error
 
 import logging
@@ -132,7 +133,6 @@ class WaeGenerator:
 
     @trace
     def visitCat(self, node):
-
         self.visit(node.left)
         self.visit(node.right)
 
@@ -173,6 +173,7 @@ class WaeGenerator:
     def visitAttribute(self, node):
         pass
 
+    @trace
     def getValue(self, statement):
         if isinstance(statement, Name ):
             return self.getValue(self.names.get(statement.name,'undef'))
@@ -180,7 +181,8 @@ class WaeGenerator:
             return statement.text
         elif isinstance(statement, Number):
             return str(statement.number)
-
+        elif isinstance(statement, Predicate):
+            return self.visit(statement)
         elif isinstance(statement, Field):
             logging.debug("get value of:")
             logging.debug(statement)
@@ -197,15 +199,17 @@ class WaeGenerator:
                else:
                     self.errors.append('%s no record found'% str(statement.lineo))
                     logging.debug('no record found')
-                    break
+                    return False
             logging.debug("recursive getting value of:")
             logging.debug(record)
             return self.getValue(record)
         elif isinstance(statement, List):
-            if statement.expressionList:
-                return True
-
-        return "undef"
+            return statement
+        elif isinstance(statement, Record):
+            return statement
+        elif isinstance(statement, Cat):
+            return self.getValue(statement.left) + self.getValue(statement.right)
+        return False
 
     @trace
     def visitMarkup(self, node):
@@ -216,6 +220,14 @@ class WaeGenerator:
             if hasattr(f,'arguments'):
                 if not len(f.arguments) == len(node.arguments):
                     self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
+                    logging.debug('argument handling')
+                    logging.debug(f.arguments)
+                    logging.debug(node.arguments)
+                    diff = len(f.arguments) - len(node.arguments)
+                    for i in range(diff):
+                        name = f.arguments.pop()
+                        self.names[name.name] = 'undef'
+
                 for name,exp in zip(f.arguments, node.arguments):
                     logging.debug(name)
                     logging.debug(exp)
@@ -223,7 +235,9 @@ class WaeGenerator:
                         exp = self.names[exp.name]
                     self.names[name.name] = exp
                     logging.debug('%s is now %s' % (name.name, exp))
+            #self.names = newEnv
             self.visit(f)
+            #self.names = backup
         else:
             self.doc.addElement(node.designator.name)
             self.visit(node.designator)
@@ -253,7 +267,7 @@ class WaeGenerator:
         logging.debug(node.predicate)
         logging.debug('if value ')
         logging.debug(value)
-        if value == 'undef' or False:
+        if value == 'undef' or value == False or value == None:
             if isinstance(node.elseStatement, Node):
                 self.visit(node.elseStatement)
         else:
@@ -285,7 +299,7 @@ class WaeGenerator:
             self.errors.append("%s Each did not get list argument" % str(node.lineo))
         self.names = currentNames
 
-    #@trace
+    @trace
     def visitLet(self, node):
         currentNames = self.names.copy()
         currentFunctions = self.functions.copy()
@@ -299,6 +313,7 @@ class WaeGenerator:
         self.names = currentNames
         self.functions = currentFunctions
 
+    @trace
     def visitBlock(self, node):
         lastElement = self.doc.lastElement
         for child in node.getChildNodes():
@@ -331,8 +346,6 @@ class WaeGenerator:
 
             self.functions[node.name] = node.statement
             node.statement.arguments = node.variables
-            #for arg in node.variables:
-            #    self.names[arg] = 'undef'
         else:
             self.names[node.name] = node.statement
 
@@ -343,17 +356,67 @@ class WaeGenerator:
         pass
 
     #Predicate nodes
+    @trace
     def visitNot(self, node):
-        pass
+        logging.debug(node.predicate)
+        value = self.getValue(node.predicate)
+        logging.debug(value)
+        value = False if value == 'undef' else value
+        logging.debug(value)
+        logging.debug("WHAT IS ABOVE THIS LINE??")
+        if not value:
+            logging.debug("THE GOOD ANSWER??")
+            return True
+        logging.debug('value is true?')
+        return False
 
+    @trace
     def visitAnd(self, node):
-        pass
+        logging.debug(node.left)
+        logging.debug(node.right)
 
+        left = self.getValue(node.left)
+        right= self.getValue(node.right)
+
+        left = False if left == 'undef' else left
+        right = False if right == 'undef' else right
+        logging.debug('and left and right:')
+        logging.debug(left)
+        logging.debug(right)
+
+
+        if left:
+            if right:
+                return True
+        return False
+
+    @trace
     def visitOr(self, node):
-        pass
+        logging.debug(node.left)
+        logging.debug(node.right)
+        left = self.getValue(node.left)
+        right= self.getValue(node.right)
+        left = False if left == 'undef' else left
+        right = False if right == 'undef' else right
+        if left:
+            return True
+        if right:
+            return True
+        return False
 
+    @trace
     def visitIs_a(self, node):
-        pass
+        logging.debug(node.type)
+        logging.debug(node.expression)
+        data = node.expression
+        if isinstance(data, Name) or isinstance(Field):
+            data = self.getValue(data)
+        logging.debug(data)
+        _type = Record if node.type == 'RECORD' else List
+
+        if isinstance(data, _type):
+            return True
+        return False
 
 
 def usage():

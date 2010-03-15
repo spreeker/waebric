@@ -19,17 +19,18 @@ for test in testdata:
     except Exception:
         pass
 
+    raw = open('%s/%s.raw.html'% (output, test ))
+    differ = difflib.unified_diff
+
     try:
-        raw = open('%s/%s.raw.html'% (output, test ))
         new = open('%s/%s.htm' % (output, test))
+    except Exception, err:
+        print err
+        #no generated file found probably exception.
 
-        differ = difflib.unified_diff
-
-        diff = differ(raw.readlines(), new.readlines(),
-                                fromfile = "%s.raw.html" % test,
-                                tofile = "%s.htm" % test)
-    except:
-        diff = []
+    diff = differ(raw.readlines(), new.readlines(),
+                        fromfile = "%s.raw.html" % test,
+                        tofile = "%s.htm" % test)
 
     #diff is a generator.
     diff = [d for d in diff]
@@ -43,4 +44,3 @@ for test in testdata:
 
 print "FAILED ", ", ".join(failed)
 print "%d Tests Succeeded of %d" % (tests_ok, len(testdata))
-    #except:

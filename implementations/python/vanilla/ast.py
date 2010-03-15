@@ -2,6 +2,7 @@
 Abstract Syntax Node Defenitions
 """
 from error import trace
+import logging
 
 def flatten(seq):
     l = []
@@ -368,7 +369,10 @@ class Markup(Node):
 
 
 #PREDICATE Nodes.
-class Not(Node):
+class Predicate(Node):
+    pass
+
+class Not(Predicate):
     def __init__(self, predicate, lineo=None):
         self.lineo = lineo
         self.predicate = predicate
@@ -382,7 +386,7 @@ class Not(Node):
     def __repr__(self):
         return "NOT(%s)" % self.predicate
 
-class And(Node):
+class And(Predicate):
     def __init__(self, leftPredicate, rightPredicate, lineo=None):
         self.lineo = lineo
         self.left = leftPredicate
@@ -398,7 +402,7 @@ class And(Node):
     def __repr__(self):
         return "AND(%s, %s)" % (repr(self.left), repr(self.right))
 
-class Or(Node):
+class Or(Predicate):
     def __init__(self, leftPredicate, rightPredicate, lineo=None):
         self.lineo = lineo
         self.left = leftPredicate
@@ -414,7 +418,7 @@ class Or(Node):
         return "OR(%s, %s)" % (repr(self.left), repr(self.right))
 
 
-class Is_a(Node):
+class Is_a(Predicate):
     def __init__(self, expression, type, lineo=None):
         self.lineo = lineo
         self.expression = expression
@@ -438,14 +442,14 @@ class Embedding(Statement):
     def __init__(self, lineo=None):
         self.lineo = lineo
         self.pretext = []
-        self.midtext = []
+        self.embed = []
         self.tailtext= []
 
     def getChildren(self):
         children = []
         #XXX zip pretext and midtext?
         children.extend(flatten(pretext))
-        children.extend(flatten(midtext))
+        children.extend(flatten(embed))
         children.extend(flatten(tailtext))
         return tuple(children)
 
@@ -454,8 +458,8 @@ class Embedding(Statement):
 
     def __repr__(self):
         output = ""
-        for p,emb in zip(self.pretext,self.midtext):
-            output = "%s%s%s" % (output,self.pretext,repr(self.midtext))
+        for p,emb in zip(self.pretext,self.embed):
+            output = "%s%s%s" % (output,p,emb)
         output = "%s%s" % (output,self.tailtext)
 
         return output

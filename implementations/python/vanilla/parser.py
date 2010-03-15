@@ -403,12 +403,12 @@ def parseRecord(parser):
 
         parser.check("comma", lexeme=",")
 
-#@trace
+@trace
 def parsePredicate(parser):
     predicate = None
     if parser.matchLexeme('!'):
         parser.next() #skip !.
-        return Not(parser.parsePredicate())
+        return Not(parsePredicate(parser))
 
     predicate = parseExpression(parser)
 
@@ -424,13 +424,13 @@ def parsePredicate(parser):
         parser.check('type?', lexeme='?')
         predicate = Is_a(predicate, ptype, lineo=parser.currentToken[2])
         parser.next()
-    elif parser.matchLexeme('&') and parser.peek(lexeme='&'):
+    if parser.matchLexeme('&') and parser.peek(lexeme='&'):
         parser.next() #skip &&
         parser.next()
         right = parsePredicate(parser)
         #and
         predicate = And(predicate, right, lineo=parser.currentToken[2])
-    elif parser.matchLexeme('|') and parser.peek(lexeme='|'):
+    if parser.matchLexeme('|') and parser.peek(lexeme='|'):
         parser.next() #skip ||
         parser.next()
         right =  parsePredicate(parser)
@@ -477,7 +477,8 @@ def parseStatement(parser):
         parser.next(lexeme=";")
         return Yield()
     elif parser.matchTokensort(NAME):
-        return parseMarkupStatement(parser)
+        markup =  parseMarkupStatement(parser)
+        
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
     raise SyntaxError(parser.currentToken,
@@ -658,29 +659,44 @@ def parseMarkupStatement(parser):
         markup.childs.append(parseStatement(parser))
         return markupRoot
 
+    if parser.matchTokensort(EMBEND):
+        return markupRoot
+
     parser.check(lexeme = ';')
     parser.next() #read ahead. skip ;
     return markupRoot
 
-#@trace
+@trace
 def parseEmbedding(parser):
     parser.check('embedding " < > " ', tokensort=PRESTRING)
     emb = Embedding()
-    while not parser.peek(tokensort=POSTSTRING):
-        if parser.matchTokensort(EMBSTRING):
-            emb.midtext.append(parser.currentToken[1])
-            parser.next()
+    parser.next()
+    while not parser.matchTokensort(POSTSTRING):
+        if parser.matchTokensort(EMBSTRT):
+            embedding = parseEmbed(parser)
+            emb.embed.append(embedding)
+            logging.debug(emb.embed)
         elif parser.matchTokensort(PRESTRING):
             emb.pretext.append(parser.currentToken[1])
+            logging.debug(emb.pretext)
             parser.next()
         else:
             raise SyntaxError(parser.currentToken,
                 expected = "Embedded string Error")
 
-    parser.next("tail of embedded string", tokensort=POSTSTRING)
+    parser.check("tail of embedded string", tokensort=POSTSTRING)
     emb.tailtext.append(parser.currentToken[1])
     parser.next()
     return emb
+
+def parseEmbed(parser):
+    parser.check(' <  ' , tokensort=EMBSTRT)
+    parser.next()
+    #parse markup / expression
+    markup = parseMarkupStatement(parser)
+    parser.check(tokensort=EMBEND)
+    parser.next()
+    return markup
 
 """
 p     markup
