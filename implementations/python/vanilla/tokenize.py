@@ -18,16 +18,13 @@ Number = group(Pointfloat, Decnumber)
 embed = r'<.*' + group('>', r'\n')
 
 ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('<', r'\n', r'"')
-#ContEmb = r'<[^\n<>\\]*(?:\\.[^\n<>\\]*)*' + group('>', r'\n')
 ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
 
 preString = r'[^"\\]*(?:\\.[^"\\]*)*<'
 endString = r'[^"\\]*(?:\\.[^"\\]*)*"'
-#endEmbed = r'[^><\\]*(?:\\.[^<>\\]*)*>'
 
 end_string = re.compile(endString)
 pre_string = re.compile(preString)
-#endembed = re.compile(endEmbed)
 
 # continued comment
 endcomment = re.compile(r'[^*\\]*(?:\\.[^*\\]*)*\*/')
@@ -37,7 +34,7 @@ Comment = r'//[^\r\n]*'
 Operator = r"[+%&|^`=?!]"
 
 Bracket = r'[][(){}]'
-Special = group(r'\r?\n', r"[:;.,@/'<>]")
+Special = group(r'\r?\n', r"[:;.,@/'<]")
 Funny = group( Bracket, Special, Operator )
 
 PseudoExtras = group(r'\\\r?\n', Comment, )
@@ -115,7 +112,8 @@ def generate_tokens(readline):
                 pos = end = endmatch.end(0)
                 if line[end-1] == '<':         # embedding
                     pos = end = end-1
-                    yield (PRESTRING, contstr + line[:end],
+                    stringType = PRESTRING if not postembed else MIDSTRING
+                    yield (stringType, contstr + line[:end],
                             strstart, (lnum,end), contline + line)
                 elif postembed:
                     yield (POSTSTRING, contstr + line[:end-1],
@@ -177,7 +175,7 @@ def generate_tokens(readline):
                         contcomment = line[start:]
                         break
                     else :                                 # ordinary comment
-                        yield( COMMENT, token, spos, epos, line)
+                        yield(COMMENT, token, spos, epos, line)
                         continue
                 elif initial in '"' or initial in ">" :
                     start = start + 1
@@ -190,9 +188,11 @@ def generate_tokens(readline):
                         contline = line
                         break
                     elif token[-1] == '<':                 # embedding
-                        yield(PRESTRING, token[1:-1], spos, (lnum, pos), line)
+                        stringType = PRESTRING if not postembed else MIDSTRING
+                        yield(stringType, token[1:-1], spos, (lnum, pos), line)
                         pos = pos - 1 # Enable recognizeing start point embed.
                     elif initial in ">":
+                        postembed = False
                         yield (POSTSTRING, token[1:-1], spos, (lnum, pos), line)
                     else:                                  # ordinary string
                         yield (STRING, token[1:-1], spos, epos, line)

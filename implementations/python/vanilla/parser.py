@@ -371,6 +371,7 @@ def parseList(parser):
 
     while parser.hasnext():
         if parser.matchLexeme(']'):
+            parser.next()
             return listExpression
 
         listExpression.addExpression(parseExpression(parser))
@@ -453,16 +454,13 @@ def parseStatement(parser):
     elif parser.matchLexeme(keywords['EACH']):
         return parseEachStatement(parser)
     elif parser.matchLexeme(keywords['ECHO']):
-        if parser.peek(tokensort=PRESTRING):
-            parser.next()
-            emb = parseEmbedding(parser)
-            parser.next() #skip ;
-            return Echo(embedding=emb)
+        parser.next()
+        if parser.matchTokensort(PRESTRING):
+            exp = parseEmbedding(parser)
         else :
-            parser.next()
-            expr = parseExpression(parser)
-            parser.next() # skip ;
-            return Echo(expression=expr, lineo=parser.currentToken[2])
+            exp = parseExpression(parser)
+        parser.next() # skip ;
+        return Echo(expression=exp, lineo=parser.currentToken[2])
 
     elif parser.matchLexeme(keywords['CDATA']):
         parser.next()
@@ -475,10 +473,10 @@ def parseStatement(parser):
         return Comment(parser.currentToken[1], lineo=parser.currentToken[2])
     elif parser.matchLexeme(keywords['YIELD']):
         parser.next(lexeme=";")
+        parser.next()
         return Yield()
     elif parser.matchTokensort(NAME):
-        markup =  parseMarkupStatement(parser)
-        
+        return parseMarkupStatement(parser)
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
     raise SyntaxError(parser.currentToken,
@@ -670,29 +668,28 @@ def parseMarkupStatement(parser):
 def parseEmbedding(parser):
     parser.check('embedding " < > " ', tokensort=PRESTRING)
     emb = Embedding()
+    emb.pretext.append(parser.currentToken[1])
     parser.next()
     while not parser.matchTokensort(POSTSTRING):
         if parser.matchTokensort(EMBSTRT):
             embedding = parseEmbed(parser)
             emb.embed.append(embedding)
-            logging.debug(emb.embed)
-        elif parser.matchTokensort(PRESTRING):
+        elif parser.matchTokensort(MIDSTRING):
             emb.pretext.append(parser.currentToken[1])
-            logging.debug(emb.pretext)
             parser.next()
         else:
             raise SyntaxError(parser.currentToken,
                 expected = "Embedded string Error")
 
     parser.check("tail of embedded string", tokensort=POSTSTRING)
-    emb.tailtext.append(parser.currentToken[1])
+    emb.tailtext = parser.currentToken[1]
     parser.next()
     return emb
 
+@trace
 def parseEmbed(parser):
     parser.check(' <  ' , tokensort=EMBSTRT)
     parser.next()
-    #parse markup / expression
     markup = parseMarkupStatement(parser)
     parser.check(tokensort=EMBEND)
     parser.next()
@@ -714,29 +711,29 @@ def parseMarkup(parser):
         markup.arguments = arguments
     return markup
 
-#@trace
+@trace
 def parseDesignator(parser):
     """ p attributes* """
     parser.check("NAME",tokensort=NAME)
     lineo = parser.currentToken[2]
     designator = Designator(parser.currentToken[1], lineo=lineo)
     parser.next()
-    if parser.currentToken[1][0] in "#$@:%.":
+    if parser.matchTokensort(OP) and parser.currentToken[1][0] in "#$@:%.":
             attributes = parseAttributes(parser)
             designator.attributes = attributes
     return designator
 
-#@trace
+@trace
 def parseAttributes(parser):
     """ # . $ : @ % @ """
     attributes = []
-    while parser.currentToken[1] in "#$@:%.":
+    while parser.matchTokensort(OP) and parser.currentToken[1] in "#$@:%.":
         symbol = parser.currentToken[1]
         lineo = parser.currentToken[2]
-        if symbol not in "@%":
-            parser.next(expected="Attribute NAME", tokensort=NAME)
-        else:
+        if symbol in "@%":
             parser.next(expected="Attribute NUMBER", tokensort=NUMBER)
+        else:
+            parser.next(expected="Attribute NAME", tokensort=NAME)
         #AST
         attributes.append(Attribute(symbol, parser.currentToken[1], lineo=lineo))
         parser.next()

@@ -19,6 +19,7 @@ class WaeGenerator:
 
     def __init__(self, source, output=""):
         self.path = "/".join(source.name.split('/')[:-1]) #source file path, to find imports
+        #self.output = output #output dir.
         tree = parse(source.readline)
         self.doc = Document(output)
         self.errors = []
@@ -26,7 +27,7 @@ class WaeGenerator:
         self.sites =[]
         self.imports = ()
         self.names = {}
-        self.output = output
+        self.yieldQueue = []
         walk(tree, self)
 
         for error in self.errors:
@@ -72,9 +73,6 @@ class WaeGenerator:
         for statement in node.statements:
             self.visit(statement)
 
-    #@trace
-    def visitPath(self, node):
-        print dir(node)
 
     #@trace
     def visitImport(self, node):
@@ -117,6 +115,7 @@ class WaeGenerator:
             self.doc.addText(data)
 
     #expressions
+    @trace
     def visitText(self, node):
         self.doc.addText(node.text)
 
@@ -213,10 +212,15 @@ class WaeGenerator:
 
     @trace
     def visitMarkup(self, node):
+        node.visitedByYield = False
         lastElement = self.doc.lastElement
 
         if node.designator.name in self.functions:
             f = self.functions[node.designator.name]
+            #if there is a yield in F.
+            #than the child nodes in this node should be visited first
+            self.yieldQueue.append([node, self.names.copy()])
+
             if hasattr(f,'arguments'):
                 if not len(f.arguments) == len(node.arguments):
                     self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
@@ -235,9 +239,8 @@ class WaeGenerator:
                         exp = self.names[exp.name]
                     self.names[name.name] = exp
                     logging.debug('%s is now %s' % (name.name, exp))
-            #self.names = newEnv
             self.visit(f)
-            #self.names = backup
+            self.yieldQueue.pop()
         else:
             self.doc.addElement(node.designator.name)
             self.visit(node.designator)
@@ -254,8 +257,11 @@ class WaeGenerator:
                 else:
                     self.doc.addAttribute('value', self.getValue(arg))
 
-        for child in node.getChildNodes():
-            self.visit(child)
+
+
+        if not node.visitedByYield:
+            for child in node.getChildNodes():
+                self.visit(child)
 
         self.doc.lastElement = lastElement
 
@@ -326,16 +332,31 @@ class WaeGenerator:
     @trace
     def visitEcho(self, node):
         # write echo statement to document
-        if node.expression is not None:
+        if node.expression :
             self.visit(node.expression)
-        #TODO Embedding.
 
     def visitCdata(self, node):
         # wrote cdata to document
         pass
 
+    @trace
     def visitEmbedding(self, node):
-        pass
+        self.doc.addText(node.pretext.pop(0))
+
+        for emb in node.embed:
+            if emb.getChildNodes():
+                self.visit(emb)
+            else:
+                exp = self.names[emb.designator.name]
+                if isinstance(exp,Node):
+                    self.visit(exp)
+                else:
+                    self.doc.addText(exp)
+
+            if node.pretext:
+                self.doc.tailText(node.pretext.pop(0))
+
+        self.doc.tailText(node.tailtext)
 
     @trace
     def visitAssignment(self, node):
@@ -350,10 +371,16 @@ class WaeGenerator:
             self.names[node.name] = node.statement
 
     def visitYield(self, node):
-        #keep current state,
-        #continue at previous state
-        #finish on return left state.
-        pass
+        backup = self.names.copy()
+        previousNode, names = self.yieldQueue[-1]
+        self.names = names
+        #prevents double visiting by previous node.
+        previousNode.visitedByYield = True
+        for child in previousNode.getChildNodes():
+            self.visit(child)
+
+        #restore names
+        self.names = backup
 
     #Predicate nodes
     @trace

@@ -367,6 +367,11 @@ class Markup(Node):
 
         return output
 
+class EmbedMarkup(Markup):
+
+    def __repr__(self):
+        output = super(EmbededMarkup, self).__repr__()
+        return "EMBEDDED %s" % output
 
 #PREDICATE Nodes.
 class Predicate(Node):
@@ -458,9 +463,9 @@ class Embedding(Statement):
 
     def __repr__(self):
         output = ""
-        for p,emb in zip(self.pretext,self.embed):
-            output = "%s%s%s" % (output,p,emb)
-        output = "%s%s" % (output,self.tailtext)
+        for p,emb in zip(self.pretext, self.embed):
+            output = "%s%s%s" % (output, p, repr(emb))
+        output = "EMBEDDING %s%s" % (output, self.tailtext)
 
         return output
 
@@ -559,26 +564,22 @@ class If(Statement):
 
 class Echo(Statement):
 
-    def __init__(self, embedding="", expression="", lineo=None):
+    def __init__(self, expression="", lineo=None):
         self.lineo = lineo
         self.expression = expression
-        self.embedding = embedding
 
     def getChildren(self):
         if self.expression:
             return self.expression
-        return self.embedding
 
     def getChildNodes(self):
         assert isinstance(self.expression,Node), "expression is not NODE!"
 
         if self.expression:
             return tuple(self.expression)
-        else:
-            return self.embedding
 
     def __repr__(self):
-        return "ECHO(%s)" % (repr(self.expression) if self.expression else repr(self.embedding))
+        return "ECHO(%s)" % (repr(self.expression))
 
 
 class Cdata(Statement):

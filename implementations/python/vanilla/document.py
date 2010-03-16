@@ -10,6 +10,8 @@ from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element,SubElement,dump
 
 import error
+from error import trace
+import logging
 
 class Document(object):
     """building output waebric xhtml document """
@@ -18,27 +20,39 @@ class Document(object):
         self.lastElement = Element('html')
         self.tree = ET.ElementTree(self.lastElement)
         self.trees = [self.tree]
-        self.virgin = True
         self.output = output
 
+    #@trace
     def addElement(self, name):
-        if self.virgin:
-            self.lastElement.tag = name
-        else:
-            self.lastElement = SubElement(self.lastElement, name)
+        self.lastElement = SubElement(self.lastElement, name)
+        return self.lastElement
 
+    @trace
     def addText(self, string):
-        if self.virgin:
-            self.virgin = False
         txt = "%s%s" % (self.lastElement.text, string) if self.lastElement.text else string
         self.lastElement.text = txt
 
+    @trace
+    def tailText(self, string):
+        #XXX not stable.
+        if not len(self.lastElement):
+            self.addText(string)
+            return
+        lastChild = self.lastElement[-1]
+        txt = "%s%s" % (lastChild.tail, string) if lastChild.tail else string
+        lastChild.tail = txt
+
+    #@trace
     def addAttribute(self,name,value):
         if self.lastElement.get(name):
             value = "%s %s" % (self.lastElement.get(name),value)
         self.lastElement.set(name, value)
 
     def writeOutput(self, filename):
+        root = self.tree.getroot()
+        if len(root) == 1 and not root.text:
+            self.tree._setroot(root[0])
+
         if self.output:
             filename = "%s/%s" % (self.output, filename)
         try:
