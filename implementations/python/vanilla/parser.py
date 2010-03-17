@@ -446,6 +446,7 @@ def parsePredicate(parser):
     return predicate
 
 #@trace
+# TODO refactor all parser.next(lexeme=';') out of parse functions.
 def parseStatement(parser):
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
@@ -470,13 +471,19 @@ def parseStatement(parser):
         return  parseStatementBlock(parser)
     elif parser.matchLexeme(keywords['COMMENT']):
         parser.next( tokensort=STRING )
-        return Comment(parser.currentToken[1], lineo=parser.currentToken[2])
+        comment =  Comment(parser.currentToken[1], lineo=parser.currentToken[2])
+        parser.next()
+        parser.next()
+        return comment
     elif parser.matchLexeme(keywords['YIELD']):
         parser.next(lexeme=";")
         parser.next()
         return Yield()
     elif parser.matchTokensort(NAME):
-        return parseMarkupStatement(parser)
+        markup =  parseMarkupStatement(parser)
+        parser.check(lexeme = ';')
+        parser.next() #read ahead. skip ;
+        return markup
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
     raise SyntaxError(parser.currentToken,
@@ -660,8 +667,6 @@ def parseMarkupStatement(parser):
     if parser.matchTokensort(EMBEND):
         return markupRoot
 
-    parser.check(lexeme = ';')
-    parser.next() #read ahead. skip ;
     return markupRoot
 
 @trace
@@ -691,6 +696,7 @@ def parseEmbed(parser):
     parser.check(' <  ' , tokensort=EMBSTRT)
     parser.next()
     markup = parseMarkupStatement(parser)
+    markup.embed = True
     parser.check(tokensort=EMBEND)
     parser.next()
     return markup
@@ -709,6 +715,7 @@ def parseMarkup(parser):
     if parser.matchLexeme('('):
         arguments = parseArguments(parser)
         markup.arguments = arguments
+        markup.call = True
     return markup
 
 @trace

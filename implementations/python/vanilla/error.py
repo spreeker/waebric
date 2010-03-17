@@ -10,6 +10,8 @@ SHOWTOKENS = True
 SHOWPARSER = True
 #SHOWPARSER = False
 
+tabs = 0
+
 if DEBUG:
     LOG_FILENAME = 'debug.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,)
@@ -28,8 +30,6 @@ def indentedLog(data):
     space = " " * tabs
     logging.info("%s%s" % (space,data))
 
-tabs = 0
-
 def _trace(f, *args, **kw):
     global tabs
     space = tabs * " "
@@ -45,6 +45,7 @@ def _trace(f, *args, **kw):
 
 def trace(f):
     return decorator(_trace, f)
+
 
 class SyntaxError(Exception):
     """Base class for exceptions raised by the parser."""

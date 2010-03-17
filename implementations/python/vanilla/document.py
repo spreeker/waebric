@@ -9,18 +9,19 @@ document. The interpter module and visitor functions use this modile.
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element,SubElement,dump
 
-import error
 from error import trace
+import error
 import logging
 
 class Document(object):
     """building output waebric xhtml document """
 
-    def __init__(self, output):
+    def __init__(self, output, verbose=False):
         self.lastElement = Element('html')
         self.tree = ET.ElementTree(self.lastElement)
         self.trees = [self.tree]
         self.output = output
+        self.verbose = verbose
 
     #@trace
     def addElement(self, name):
@@ -34,10 +35,9 @@ class Document(object):
 
     @trace
     def tailText(self, string):
-        #XXX not stable.
-        if not len(self.lastElement):
-            self.addText(string)
-            return
+        #if not len(self.lastElement):
+        #    self.addText(string)
+        #    return
         lastChild = self.lastElement[-1]
         txt = "%s%s" % (lastChild.tail, string) if lastChild.tail else string
         lastChild.tail = txt
@@ -48,10 +48,17 @@ class Document(object):
             value = "%s %s" % (self.lastElement.get(name),value)
         self.lastElement.set(name, value)
 
+    def addComment(self, string):
+        self.lastElement.append(ET.Comment(string))
+
     def writeOutput(self, filename):
-        root = self.tree.getroot()
-        if len(root) == 1 and not root.text:
-            self.tree._setroot(root[0])
+        r = self.tree.getroot()
+        #check if there is a correct root element.
+        #If not keep the default html.
+        if len(r) == 1 and not r.text:
+            child = r.getchildren()[0]
+            if isinstance(child.tag, str):#check needed for comment element.
+                self.tree._setroot(r[0])
 
         if self.output:
             filename = "%s/%s" % (self.output, filename)
@@ -72,6 +79,6 @@ class Document(object):
         _file.write('\n')
         _file.close()
 
-        if error.DEBUG:
+        if self.verbose:
             output = open(filename)
             print output.read()

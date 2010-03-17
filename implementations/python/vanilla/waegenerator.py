@@ -2,7 +2,7 @@ from document import Document
 from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
-from error import trace
+from error import trace, DEBUG, SHOWTOKENS, SHOWPARSER
 from ast import Node, Markup, Name, Text, Number
 from ast import Assignment, List, Record, Field
 from ast import Predicate, Cat
@@ -17,11 +17,11 @@ class WaeGenerator:
     """
     mainModule = True
 
-    def __init__(self, source, output=""):
+    def __init__(self, source, output="", verbose=False):
         self.path = "/".join(source.name.split('/')[:-1]) #source file path, to find imports
         #self.output = output #output dir.
         tree = parse(source.readline)
-        self.doc = Document(output)
+        self.doc = Document(output, verbose=verbose)
         self.errors = []
         self.functions = {}
         self.sites =[]
@@ -210,58 +210,79 @@ class WaeGenerator:
             return self.getValue(statement.left) + self.getValue(statement.right)
         return False
 
+    def checkArguments(self, functionArguments, nodeArguments):
+        if not len(functionArguments) == len(nodeArguments):
+            logging.debug('argument handling')
+            logging.debug(functionArguments)
+            logging.debug(nodeArguments)
+            diff = len(functionArguments) - len(nodeArguments)
+            for i in range(diff):
+                name = functionArguments[i]
+                self.names[name.name] = 'undef'
+            return True
+        return False
+
+    @trace
+    def updateNames(self, functionArguments, nodeArguments):
+        for name,exp in zip(functionArguments, nodeArguments):
+            logging.debug(name)
+            logging.debug(exp)
+            if isinstance(exp, Name):
+                exp = self.names[exp.name]
+            if isinstance(exp, Assignment):
+                exp = exp.statement
+            self.names[name.name] = exp
+            logging.debug('%s is now %s' % (name.name, exp))
+
+    @trace
+    def doFunctionCall(self, node):
+        f = self.functions[node.designator.name]
+        #if there is a yield in F.
+        #than the child nodes in this node should be visited first
+        self.yieldQueue.append([node, self.names.copy()])
+        if hasattr(f,'arguments'):
+            if self.checkArguments(f.arguments, node.arguments):
+                self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
+            self.updateNames(f.arguments, node.arguments)
+        self.visit(f)
+        self.yieldQueue.pop()
+
+    @trace
+    def addElement(self, node):
+        self.doc.addElement(node.designator.name)
+        self.visit(node.designator)
+        # check if markup is a valid xhtml tag.
+        if not node.designator.name.upper() in XHTMLTag:
+            self.errors.append("%s invalid tag/function used/called! %s" % (
+                node.lineo,
+                node.designator))
+        #check for extra arguments to add to element as attributes.
+        for arg in node.arguments:
+            if isinstance(arg,Assignment):
+                self.doc.addAttribute(arg.name, self.getValue(arg.statement))
+            else:
+                self.doc.addAttribute('value', self.getValue(arg))
+
     @trace
     def visitMarkup(self, node):
-        node.visitedByYield = False
         lastElement = self.doc.lastElement
 
         if node.designator.name in self.functions:
-            f = self.functions[node.designator.name]
-            #if there is a yield in F.
-            #than the child nodes in this node should be visited first
-            self.yieldQueue.append([node, self.names.copy()])
-
-            if hasattr(f,'arguments'):
-                if not len(f.arguments) == len(node.arguments):
-                    self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
-                    logging.debug('argument handling')
-                    logging.debug(f.arguments)
-                    logging.debug(node.arguments)
-                    diff = len(f.arguments) - len(node.arguments)
-                    for i in range(diff):
-                        name = f.arguments.pop()
-                        self.names[name.name] = 'undef'
-
-                for name,exp in zip(f.arguments, node.arguments):
-                    logging.debug(name)
-                    logging.debug(exp)
-                    if isinstance(exp, Name):
-                        exp = self.names[exp.name]
-                    self.names[name.name] = exp
-                    logging.debug('%s is now %s' % (name.name, exp))
-            self.visit(f)
-            self.yieldQueue.pop()
+            self.doFunctionCall(node)
         else:
-            self.doc.addElement(node.designator.name)
-            self.visit(node.designator)
-            # check if markup is a valid xhtml tag.
-            if not node.designator.name.upper() in XHTMLTag:
-                print "%s invalid tag/function used/called! %"
-                self.errors.append("%s invalid tag/function used/called! %s" % (
-                    node.lineo,
-                    node.designator))
-            #check for extra arguments to add to element as attributes.
-            for arg in node.arguments:
-                if isinstance(arg,Assignment):
-                    self.doc.addAttribute(arg.name, self.getValue(arg.statement))
-                else:
-                    self.doc.addAttribute('value', self.getValue(arg))
+            self.addElement(node)
 
-
-
-        if not node.visitedByYield:
+        if not node.visitedByYield and not node.embed:
             for child in node.getChildNodes():
                 self.visit(child)
+
+        if node.embed:
+            embMarkupChilds = node.getChildNodes()
+            if embMarkupChilds:
+                for child in embMarkupChilds[:-1]:
+                    self.visit(child)
+                lastEmb = embMarkupChilds[-1]
+                self.lastChild(lastEmb)
 
         self.doc.lastElement = lastElement
 
@@ -326,8 +347,9 @@ class WaeGenerator:
             self.visit(child)
         self.doc.lastElement = lastElement
 
+    @trace
     def visitComment(self, node):
-        pass
+        self.doc.addComment(node.comment)
 
     @trace
     def visitEcho(self, node):
@@ -340,21 +362,32 @@ class WaeGenerator:
         pass
 
     @trace
-    def visitEmbedding(self, node):
-        self.doc.addText(node.pretext.pop(0))
+    def lastChild(self,emb):
+        if not isinstance(emb, Markup):
+            self.visit(emb)
+        elif emb.call:
+            self.visit(emb)
+        else:
+            exp = self.names[emb.designator.name]
+            if isinstance(exp, Node):
+                self.visit(exp)
+            else:
+                self.doc.tailText(exp)
 
+
+    @trace
+    def visitEmbedding(self, node):
+        self.doc.addText(node.pretext[0])
+        index = 1
         for emb in node.embed:
             if emb.getChildNodes():
                 self.visit(emb)
             else:
-                exp = self.names[emb.designator.name]
-                if isinstance(exp,Node):
-                    self.visit(exp)
-                else:
-                    self.doc.addText(exp)
+                self.lastChild(emb)
 
-            if node.pretext:
-                self.doc.tailText(node.pretext.pop(0))
+            if index < len(node.pretext):
+                self.doc.tailText(node.pretext[index])
+            index += 1
 
         self.doc.tailText(node.tailtext)
 
@@ -477,15 +510,14 @@ def main(argv):
 
     output = None
     showresult = False
+    verbose = False
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
         elif opt in ('-d', "--debug"):
-           error.DEBUG = True
-           error.SHOWTOKENS = True
-           error.SHOWPARSER = True
+            verbose = True
         elif opt in ("-o", "--output"):
             output = arg
 
@@ -493,10 +525,10 @@ def main(argv):
         source = args[0]
         sourceFile = open(source)
         if output:
-            waebric = WaeGenerator(sourceFile, output)
+            waebric = WaeGenerator(sourceFile, output, verbose=verbose)
         else:
-            waebric = WaeGenerator(sourceFile)
-        if error.DEBUG:
+            waebric = WaeGenerator(sourceFile, verbose=verbose)
+        if verbose:
             sourceFile = open(source)
             print sourceFile.read()
 

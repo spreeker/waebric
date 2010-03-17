@@ -328,8 +328,11 @@ class Markup(Node):
         self.childs = []
         self.designator = designator
         self.arguments = []
+        self.call = False # set if there are () parsed.
         self.embedding = ""
         self.expression = "" #variable
+        self.visitedByYield = False
+        self.embed = False
 
     def getChildren(self):
         children = []
