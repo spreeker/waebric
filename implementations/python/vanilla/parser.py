@@ -41,7 +41,7 @@ from token import *
 from ast import Name
 from ast import Module, Function, Path, Import, Mapping
 from ast import Text, Number, List, Record, Cat, Field
-from ast import Designator, Attribute, Markup
+from ast import Designator, Attribute, Markup, EmbedMarkup
 from ast import Not, And, Or, Is_a
 from ast import Yield, Let, If, Assignment, Each, Block
 from ast import Embedding, Comment, Cdata, Echo
@@ -52,6 +52,7 @@ class Parser(object):
     tokens = [] #token generator.
     peekedTokens = []
     currentToken = []
+    embed = False
 
     def setTokens(self, newtokens):
         # needed test for test code.
@@ -675,6 +676,7 @@ def parseEmbedding(parser):
     emb = Embedding()
     emb.pretext.append(parser.currentToken[1])
     parser.next()
+    parser.embed = True
     while not parser.matchTokensort(POSTSTRING):
         if parser.matchTokensort(EMBSTRT):
             embedding = parseEmbed(parser)
@@ -688,6 +690,7 @@ def parseEmbedding(parser):
 
     parser.check("tail of embedded string", tokensort=POSTSTRING)
     emb.tailtext = parser.currentToken[1]
+    parser.embed = False
     parser.next()
     return emb
 
@@ -696,7 +699,6 @@ def parseEmbed(parser):
     parser.check(' <  ' , tokensort=EMBSTRT)
     parser.next()
     markup = parseMarkupStatement(parser)
-    markup.embed = True
     parser.check(tokensort=EMBEND)
     parser.next()
     return markup
@@ -710,7 +712,11 @@ def parseMarkup(parser):
     """Differentiate between p and p()"""
     lineo = parser.currentToken[2]
     designator = parseDesignator(parser)
-    markup = Markup(designator, lineo=lineo)
+    if parser.embed:
+        markup = EmbedMarkup(designator, lineo=lineo)
+        parser.embed = False
+    else:
+        markup = Markup(designator, lineo=lineo)
 
     if parser.matchLexeme('('):
         arguments = parseArguments(parser)

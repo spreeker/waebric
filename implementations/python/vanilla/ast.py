@@ -20,7 +20,7 @@ def flatten_nodes(seq):
 
 nodes = {}
 
-class Node:
+class Node(object):
     """Abstract base class for ast nodes."""
 
     def __iter__(self):
@@ -373,8 +373,8 @@ class Markup(Node):
 class EmbedMarkup(Markup):
 
     def __repr__(self):
-        output = super(EmbededMarkup, self).__repr__()
-        return "EMBEDDED %s" % output
+        output = super(EmbedMarkup, self).__repr__()
+        return "EMBED %s" % output
 
 #PREDICATE Nodes.
 class Predicate(Node):

@@ -112,7 +112,7 @@ class WaeGenerator:
         if isinstance(data, Node):
             self.visit(data)
         else:
-            self.doc.addText(data)
+            self.doc.tailText(data)
 
     #expressions
     @trace
@@ -264,27 +264,51 @@ class WaeGenerator:
                 self.doc.addAttribute('value', self.getValue(arg))
 
     @trace
-    def visitMarkup(self, node):
-        lastElement = self.doc.lastElement
+    def elementOrFunction(self, node):
 
         if node.designator.name in self.functions:
             self.doFunctionCall(node)
         else:
             self.addElement(node)
 
-        if not node.visitedByYield and not node.embed:
+    @trace
+    def visitMarkup(self, node):
+        lastElement = self.doc.lastElement
+
+        self.elementOrFunction(node)
+
+        if not node.visitedByYield:
             for child in node.getChildNodes():
                 self.visit(child)
 
-        if node.embed:
-            embMarkupChilds = node.getChildNodes()
-            if embMarkupChilds:
-                for child in embMarkupChilds[:-1]:
-                    self.visit(child)
-                lastEmb = embMarkupChilds[-1]
-                self.lastChild(lastEmb)
+        self.doc.lastElement = lastElement
+
+    @trace
+    def visitEmbedMarkup(self, node):
+        lastElement = self.doc.lastElement
+
+        if node.getChildNodes():
+            self.elementOrFunction(node)
+            for child in node.getChildNodes()[:-1]:
+                self.visit(child)
+            self.lastEmbChild(node.getChildNodes()[-1])
+        else:
+            self.lastEmbChild(node)
 
         self.doc.lastElement = lastElement
+
+    @trace
+    def lastEmbChild(self,emb):
+        if hasattr(emb,'call') and emb.call:
+            self.elementOrFunction(emb)
+        else:
+            exp = self.names[emb.designator.name]
+            if isinstance(exp, Node):
+                self.visit(exp)
+            else:
+                self.doc.tailText(exp)
+
+
 
     #Statements nodes
     @trace
@@ -362,28 +386,11 @@ class WaeGenerator:
         pass
 
     @trace
-    def lastChild(self,emb):
-        if not isinstance(emb, Markup):
-            self.visit(emb)
-        elif emb.call:
-            self.visit(emb)
-        else:
-            exp = self.names[emb.designator.name]
-            if isinstance(exp, Node):
-                self.visit(exp)
-            else:
-                self.doc.tailText(exp)
-
-
-    @trace
     def visitEmbedding(self, node):
         self.doc.addText(node.pretext[0])
         index = 1
         for emb in node.embed:
-            if emb.getChildNodes():
-                self.visit(emb)
-            else:
-                self.lastChild(emb)
+            self.visit(emb)
 
             if index < len(node.pretext):
                 self.doc.tailText(node.pretext[index])
@@ -403,6 +410,7 @@ class WaeGenerator:
         else:
             self.names[node.name] = node.statement
 
+    @trace
     def visitYield(self, node):
         backup = self.names.copy()
         previousNode, names = self.yieldQueue[-1]

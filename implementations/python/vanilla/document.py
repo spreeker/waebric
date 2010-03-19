@@ -30,14 +30,20 @@ class Document(object):
 
     @trace
     def addText(self, string):
-        txt = "%s%s" % (self.lastElement.text, string) if self.lastElement.text else string
-        self.lastElement.text = txt
+        if len(self.lastElement):
+            e = self.lastElement[-1]
+            txt = "%s%s" % (e.tail, string) if e.tail else string
+            e.tail = txt
+        else:
+            e = self.lastElement
+            txt = "%s%s" % (e.text, string) if e.text else string
+            e.text = txt
 
     @trace
     def tailText(self, string):
-        #if not len(self.lastElement):
-        #    self.addText(string)
-        #    return
+        if not len(self.lastElement):
+            self.addText(string)
+            return
         lastChild = self.lastElement[-1]
         txt = "%s%s" % (lastChild.tail, string) if lastChild.tail else string
         lastChild.tail = txt
@@ -55,7 +61,7 @@ class Document(object):
         r = self.tree.getroot()
         #check if there is a correct root element.
         #If not keep the default html.
-        if len(r) == 1 and not r.text:
+        if len(r) == 1 and not r.text and not r[-1].tail:
             child = r.getchildren()[0]
             if isinstance(child.tag, str):#check needed for comment element.
                 self.tree._setroot(r[0])
