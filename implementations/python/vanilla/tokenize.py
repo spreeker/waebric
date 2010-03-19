@@ -34,7 +34,7 @@ Comment = r'//[^\r\n]*'
 Operator = r"[+%&|^`=?!]"
 
 Bracket = r'[][(){}]'
-Special = group(r'\r?\n', r"[:;.,@#/'<]")
+Special = group(r'\r?\n', r"[:;.,$@#/'<]")
 Funny = group( Bracket, Special, Operator )
 
 PseudoExtras = group(r'\\\r?\n', Comment, )

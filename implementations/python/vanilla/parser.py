@@ -53,6 +53,7 @@ class Parser(object):
     peekedTokens = []
     currentToken = []
     embed = False
+    errors = []
 
     def setTokens(self, newtokens):
         # needed test for test code.
@@ -437,7 +438,7 @@ def parsePredicate(parser):
         parser.next()
         right =  parsePredicate(parser)
         predicate = Or(predicate, right, lineo=parser.currentToken[2])
-        parser.next()
+        #parser.next()
 
     if not predicate:
         raise SyntaxError(currentToken,
@@ -446,8 +447,8 @@ def parsePredicate(parser):
     logging.debug(predicate)
     return predicate
 
-#@trace
 # TODO refactor all parser.next(lexeme=';') out of parse functions.
+@trace
 def parseStatement(parser):
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
@@ -481,9 +482,7 @@ def parseStatement(parser):
         parser.next()
         return Yield()
     elif parser.matchTokensort(NAME):
-        markup =  parseMarkupStatement(parser)
-        parser.check(lexeme = ';')
-        parser.next() #read ahead. skip ;
+        markup = parseMarkupStatement(parser)
         return markup
     elif parser.matchTokensort( ENDMARKER ): #needed?
         return
@@ -513,14 +512,14 @@ def parseLetStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected = """LET .. IN .. END, missing IN """)
 
-#@trace
+@trace
 def parseAssignment(parser):
     if parser.peek(lexeme = '('):
         return parseFunctionAssignment(parser)
     else:
         return parseVariableAssignment(parser)
 
-#@trace
+@trace
 def parseFunctionAssignment(parser):
     #parse name
     parser.check( tokensort=NAME )
@@ -537,7 +536,7 @@ def parseFunctionAssignment(parser):
     assignment.function = True
     return assignment
 
-#@trace
+@trace
 def parseVariableAssignment(parser):
     """ var = expression """
     parser.check( tokensort=NAME )
@@ -587,7 +586,7 @@ def parseIfStatement(parser):
     ifstm = If(predicate, stm, elsestm, lineo=lineo)
     return ifstm
 
-#@trace
+@trace
 def parseStatementBlock(parser):
     parser.check(lexeme='{')
     lineo = parser.currentToken[2]
@@ -667,6 +666,9 @@ def parseMarkupStatement(parser):
 
     if parser.matchTokensort(EMBEND):
         return markupRoot
+
+    parser.check(lexeme = ';')
+    parser.next() #read ahead. skip ;
 
     return markupRoot
 
