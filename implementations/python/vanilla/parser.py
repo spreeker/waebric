@@ -9,10 +9,10 @@ Waebric Parser Module.
 -Builds ast tree of waebric source.
 
 In error.py there are magic variables:
-DEBUG,SHOWTOKENS,SHOWPARSER which enable detailed
+DEBUG,SHOWTOKENS which enable detailed
 logging in parser.log
 
--@trace decorator enables logging function calls
+-#@trace decorator enables logging function calls
 in parser.log.
 
 convention:
@@ -31,9 +31,10 @@ import logging
 import tokenize
 import re
 
-from error import SyntaxError
-from error import trace,logToken, indentedLog
-from error import DEBUG, SHOWTOKENS, SHOWPARSER
+import error
+from error import SyntaxError, TokenError
+from error import trace, logToken, indentedLog
+from error import DEBUG, SHOWTOKENS
 
 from keywords import keywords
 from token import *
@@ -97,7 +98,10 @@ class Parser(object):
             try:
                 for i in range(d+1):
                     self.peekedTokens.append(self.tokens.next())
-            except StopIteration:
+            except StopIteration, err:
+                # sys.exit maybe?
+                return False
+            except error.TokenError:
                 return False
 
         peekToken = self.peekedTokens[x-1]
@@ -127,7 +131,6 @@ class Parser(object):
                 if self.matchTokensort(ENDMARKER) and not self.seenEndMarker:
                     self.seenEndMarker = True
                 elif self.seenEndMarker:
-                    logging.debug(" no next token available ")
                     raise StopIteration
 
         if self.currentToken[0] == COMMENT:
@@ -216,7 +219,6 @@ def parseSite(parser):
     mappings = []
     while parser.hasnext():
         mappings.append(parseMapping(parser))
-        logging.debug(parser.currentToken)
         if parser.matchLexeme(keywords['END']):
             parser.next()
             return mappings
@@ -242,7 +244,6 @@ def parsePath(parser):
     if parser.peek(lexeme="/") or parser.peek(x=2,lexeme="/"):
         _dir = parseDirectory(parser)
     fileName = parseFileName(parser)
-    #logging.debug(dir+path)
     return Path(_dir, fileName)
 
 #@trace
@@ -324,11 +325,7 @@ expression + expression
 #@trace
 def parseExpression(parser):
     expression = None
-    if parser.matchLexeme("'"): #symbol.
-        parser.next("symbol name", tokensort=NAME)
-        expression = Text(parser.currentToken[1], lineo=parser.currentToken[2])
-        parser.next()
-    elif parser.matchTokensort(STRING): #data string
+    if parser.matchTokensort(STRING): #data string
         expression = Text(parser.currentToken[1], lineo=parser.currentToken[2])
         parser.next()
     elif parser.matchTokensort(NUMBER): #number stuff
@@ -391,6 +388,7 @@ def parseRecord(parser):
     record = Record(lineo=parser.currentToken[2])
     while parser.next():
         if parser.matchLexeme('}'):
+            parser.next()
             return record
 
         parser.matchTokensort(NAME)
@@ -406,7 +404,7 @@ def parseRecord(parser):
 
         parser.check("comma", lexeme=",")
 
-@trace
+#@trace
 def parsePredicate(parser):
     predicate = None
     if parser.matchLexeme('!'):
@@ -444,11 +442,10 @@ def parsePredicate(parser):
         raise SyntaxError(currentToken,
                     "pasing predicate failed && || type? variable")
 
-    logging.debug(predicate)
     return predicate
 
 # TODO refactor all parser.next(lexeme=';') out of parse functions.
-@trace
+#@trace
 def parseStatement(parser):
     if parser.matchLexeme(keywords['LET']):
         return parseLetStatement(parser)
@@ -462,6 +459,7 @@ def parseStatement(parser):
             exp = parseEmbedding(parser)
         else :
             exp = parseExpression(parser)
+        parser.check(lexeme = ";")
         parser.next() # skip ;
         return Echo(expression=exp, lineo=parser.currentToken[2])
 
@@ -489,7 +487,7 @@ def parseStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected="""statement, "if", "each", "let", "{", "comment",
             "echo", "cdata", "yield" or Markup""" )
-@trace
+#@trace
 def parseLetStatement(parser):
     parser.check(lexeme=keywords['LET'])
     assignments = []
@@ -512,14 +510,14 @@ def parseLetStatement(parser):
     raise SyntaxError(parser.currentToken,
         expected = """LET .. IN .. END, missing IN """)
 
-@trace
+#@trace
 def parseAssignment(parser):
     if parser.peek(lexeme = '('):
         return parseFunctionAssignment(parser)
     else:
         return parseVariableAssignment(parser)
 
-@trace
+#@trace
 def parseFunctionAssignment(parser):
     #parse name
     parser.check( tokensort=NAME )
@@ -536,7 +534,7 @@ def parseFunctionAssignment(parser):
     assignment.function = True
     return assignment
 
-@trace
+#@trace
 def parseVariableAssignment(parser):
     """ var = expression """
     parser.check( tokensort=NAME )
@@ -545,7 +543,9 @@ def parseVariableAssignment(parser):
     parser.next( lexeme = "=" )
     parser.next()
     if parser.matchTokensort(NAME):
-        expression = parseStatement(parser)
+        #expression = parseStatement(parser)
+        expression = parseExpression(parser)
+        parser.next() #skip ;
     else:
         expression = parseExpression(parser)
         parser.next() #skip ;
@@ -568,7 +568,7 @@ def parseEachStatement(parser):
     stm = parseStatement(parser)
     return Each(name, exp, stm, lineo=lineo)
 
-@trace
+#@trace
 def parseIfStatement(parser):
     parser.check(lexeme = keywords['IF'])
     lineo = parser.currentToken[2]
@@ -586,7 +586,7 @@ def parseIfStatement(parser):
     ifstm = If(predicate, stm, elsestm, lineo=lineo)
     return ifstm
 
-@trace
+#@trace
 def parseStatementBlock(parser):
     parser.check(lexeme='{')
     lineo = parser.currentToken[2]
@@ -613,10 +613,8 @@ def checkForLastExpression(parser):
         return True
     elif parser.matchTokensort(NUMBER):
         return True
-    elif parser.matchLexeme("'"):
-        return True
     elif parser.matchTokensort(NAME):
-        if parser.peek(lexeme=';'):
+        if parser.peek(lexeme=';') or parser.peek(lexeme='+'):
             return True
         peek = 1;
         while(parser.peek(peek, lexeme='.')):
@@ -624,12 +622,39 @@ def checkForLastExpression(parser):
             peek = peek + 1
             if parser.peek(peek,tokensort=NAME):
                 peek = peek + 1
-
+        if parser.peek(peek,lexeme=';'):
+            return True
+    elif parser.matchLexeme('['):
+        parenlev = 1
+        peek = 1;
+        while(parser.peek(peek)):
+            if parser.peek(peek, lexeme=']'):
+                parenlev -= 1
+                if parenlev == 0:
+                    peek += 1
+                    break
+            elif parser.peek(peek,lexeme='['):
+                parenlev += 1  
+            peek = peek + 1
+        if parser.peek(peek,lexeme=';'):
+            return True
+    elif parser.matchLexeme('{'):
+        parenlev = 1
+        peek = 1;
+        while(parser.peek(peek)):
+            if parser.peek(peek, lexeme='}'):
+                parenlev -= 1 
+                if parenlev == 0:
+                    peek += 1
+                    break
+            elif parser.peek(peek, lexeme='{'):
+                parenlev += 1
+            peek += 1
         if parser.peek(peek,lexeme=';'):
             return True
     return False
 
-@trace
+#@trace
 def parseMarkupStatement(parser):
     """
     p;      markup
@@ -672,13 +697,12 @@ def parseMarkupStatement(parser):
 
     return markupRoot
 
-@trace
+#@trace
 def parseEmbedding(parser):
     parser.check('embedding " < > " ', tokensort=PRESTRING)
     emb = Embedding()
     emb.pretext.append(parser.currentToken[1])
     parser.next()
-    parser.embed = True
     while not parser.matchTokensort(POSTSTRING):
         if parser.matchTokensort(EMBSTRT):
             embedding = parseEmbed(parser)
@@ -692,15 +716,16 @@ def parseEmbedding(parser):
 
     parser.check("tail of embedded string", tokensort=POSTSTRING)
     emb.tailtext = parser.currentToken[1]
-    parser.embed = False
     parser.next()
     return emb
 
-@trace
+#@trace
 def parseEmbed(parser):
     parser.check(' <  ' , tokensort=EMBSTRT)
     parser.next()
+    parser.embed = True
     markup = parseMarkupStatement(parser)
+    parser.embed = False
     parser.check(tokensort=EMBEND)
     parser.next()
     return markup
@@ -709,7 +734,7 @@ def parseEmbed(parser):
 p     markup
 p attributes (arguments) markup
 """
-@trace
+#@trace
 def parseMarkup(parser):
     """Differentiate between p and p()"""
     lineo = parser.currentToken[2]
@@ -726,7 +751,7 @@ def parseMarkup(parser):
         markup.call = True
     return markup
 
-@trace
+#@trace
 def parseDesignator(parser):
     """ p attributes* """
     parser.check("NAME",tokensort=NAME)
@@ -738,7 +763,7 @@ def parseDesignator(parser):
             designator.attributes = attributes
     return designator
 
-@trace
+#@trace
 def parseAttributes(parser):
     """ # . $ : @ % @ """
     attributes = []
@@ -755,7 +780,7 @@ def parseAttributes(parser):
 
     return attributes
 
-@trace
+#@trace
 def parseArguments(parser):
     """ ( Arguments,* ) """
     #ast stuff.
@@ -773,13 +798,14 @@ def parseArguments(parser):
             parser.check(lexeme=',')
             parser.next()
 
-@trace
+#@trace
 def parseArgument(parser):
     """ name = expression
         expression
         name
     """
-    if parser.matchTokensort(tokensort=NAME):
+    if parser.matchTokensort(tokensort=NAME) and not \
+        parser.peek(lexeme='.'):
         argument = parser.currentToken[1]
         lineo = parser.currentToken[2]
         parser.next()

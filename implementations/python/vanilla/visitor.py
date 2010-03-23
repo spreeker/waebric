@@ -39,7 +39,7 @@ class ASTVisitor:
         for child in node.getChildNodes():
             klass = child.__class__
             className = klass.__name__
-            print className ,"from parent", parent
+            #print className ,"from parent", parent
 
             self.dispatch(child, *args)
 

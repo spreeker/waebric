@@ -28,27 +28,17 @@ class Document(object):
         self.lastElement = SubElement(self.lastElement, name)
         return self.lastElement
 
-    @trace
+    #@trace
     def addText(self, string):
-        if len(self.lastElement):
-            e = self.lastElement[-1]
-            txt = "%s%s" % (e.tail, string) if e.tail else string
-            e.tail = txt
-        else:
+        if not len(self.lastElement):
             e = self.lastElement
             txt = "%s%s" % (e.text, string) if e.text else string
             e.text = txt
+        else:
+            e = self.lastElement[-1]
+            txt = "%s%s" % (e.tail, string) if e.tail else string
+            e.tail = txt
 
-    @trace
-    def tailText(self, string):
-        if not len(self.lastElement):
-            self.addText(string)
-            return
-        lastChild = self.lastElement[-1]
-        txt = "%s%s" % (lastChild.tail, string) if lastChild.tail else string
-        lastChild.tail = txt
-
-    #@trace
     def addAttribute(self,name,value):
         if self.lastElement.get(name):
             value = "%s %s" % (self.lastElement.get(name),value)
@@ -57,15 +47,7 @@ class Document(object):
     def addComment(self, string):
         self.lastElement.append(ET.Comment(string))
 
-    def writeOutput(self, filename):
-        r = self.tree.getroot()
-        #check if there is a correct root element.
-        #If not keep the default html.
-        if len(r) == 1 and not r.text and not r[-1].tail:
-            child = r.getchildren()[0]
-            if isinstance(child.tag, str):#check needed for comment element.
-                self.tree._setroot(r[0])
-
+    def getFile(self, filename):
         if self.output:
             filename = "%s/%s" % (self.output, filename)
         try:
@@ -73,8 +55,24 @@ class Document(object):
         except IOError:
             print "file name %s cannot be opened, no output written" % filename
             return
+        return _file
 
-        #DTD = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">"""
+    def setGoodRootElement(self):
+        """make sure we have the correct root ellement according to the
+           wae standard. It could be needed to remove the top html
+           element because i ad it to work correctly with elementtree Libary.
+        """
+        r = self.tree.getroot()
+        if len(r) == 1 and not r.text and not r[-1].tail:
+            child = r.getchildren()[0]
+            if isinstance(child.tag, str):#check needed for comment element.
+                self.tree._setroot(r[0])
+
+    def writeOutput(self, filename):
+
+        self.setGoodRootElement()
+        _file = self.getFile(filename)
+
         DTD = """<?xml version="1.0" encoding="UTF-8"?>\n"""
         _file.write(DTD)
         for tree in self.trees:
@@ -86,5 +84,11 @@ class Document(object):
         _file.close()
 
         if self.verbose:
-            output = open(filename)
+            output = open(_file.name)
             print output.read()
+
+    def writeEmptyFile(self, filename):
+        _file = self.getFile(filename)
+        _file.write('')
+        _file.close()
+

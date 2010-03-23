@@ -1,5 +1,6 @@
 
 import string, re
+import error
 from token import *
 from keywords import keywords
 
@@ -17,14 +18,23 @@ Number = group(Pointfloat, Decnumber)
 
 embed = r'<.*' + group('>', r'\n')
 
+#regex explanation:
+# [">] match with " or >
+# [^\n"<>\\]*  match with 0 or more characters as long its not \n " < > \
+#(?:\\.[^\n"<>\\]*)* Used to escape characters. \" 0 or more 
 ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('<', r'\n', r'"')
 ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
+Symbol = r"'[^\n \f\t;,)(]*"
 
-preString = r'[^"\\]*(?:\\.[^"\\]*)*<'
-endString = r'[^"\\]*(?:\\.[^"\\]*)*"'
+preString = r'[^"\\]*(?:\\.[^"\n\\]*)*<'
+endString = r'[^"\\]*(?:\\.[^"\n\\]*)*"'
 
 end_string = re.compile(endString)
 pre_string = re.compile(preString)
+
+# continued xml comment from keyword comment. (comment which ends up in the xml)
+xmlComment = r'comment[ ]*"[^\n"\\]*(?:\\.[^\n"\\]*)*' + group('"', r'\n')
+end_xmlComment = re.compile(r'[^"\\]*(?:\\.[^"\n\\]*)*"')
 
 # continued comment
 endcomment = re.compile(r'[^*\\]*(?:\\.[^*\\]*)*\*/')
@@ -35,11 +45,11 @@ Operator = r"[+%&|^`=?!]"
 
 Bracket = r'[][(){}]'
 Special = group(r'\r?\n', r"[:;.,$@#/'<]")
-Funny = group( Bracket, Special, Operator )
+Funny = group(Bracket, Special, Operator)
 
-PseudoExtras = group(r'\\\r?\n', Comment, )
+PseudoExtras = group(r'\\\r?\n', Comment, xmlComment )
 PseudoToken = Whitespace + group(PseudoExtras, Number, Name,
-                ContStr, ContComment, Funny) #ContEmb, Funny)
+                ContStr, ContComment,Symbol,Funny) #ContEmb, Funny)
 
 pseudoprog = re.compile( PseudoToken )
 
@@ -87,10 +97,9 @@ def generate_tokens(readline):
     """
     lnum = parenlev = 0
     namechars, numchars = string.ascii_letters + '_', '0123456789'
-    contemb, contstr, contcomment =  '', '', ''
+    contxmlc, contstr, contcomment =  '', '', ''
     contline = None
     postembed = False
-    embstart = False
 
     while 1:                                   # loop over lines in stream
         try :
@@ -101,9 +110,32 @@ def generate_tokens(readline):
         lnum = lnum + 1
         pos, max = 0, len(line)
 
+        if contxmlc:
+            if not line:
+                raise error.TokenError("EOF multi-line xml comment", xmlcmntstart)
+            if not contxmlc[0] == '"': # case:  comment \n " (so comment string starts on next line)
+                if not line.strip()[0] == '"': 
+                    raise error.TokenError("EOF multi-line xml comment", xmlcmntstart)
+                start = line.find('"')
+                xmlcmntstart = (lnum, start)
+                contxmlc = line[start]
+                contline = line
+                line = line[start+1:]
+
+            endmatch = end_xmlComment.match(line) 
+            if endmatch:
+                pos = end = endmatch.end(0)
+                yield(STRING, contxmlc + line[:end],
+                           xmlcmntstart, (lnum, end), contline + line)
+                contxmlc = ''
+                contline = None
+            else:
+                contxmlc = contxmlc + line
+                contline = contline + line
+                continue
         if contstr:                            # continued string
             if not line:
-                raise TokenError("EOF in multi-line string", strstart)
+                raise error.TokenError("EOF in multi-line string", strstart)
 
             endmatch = pre_string.match(line) # pre string of an embedding
             if not endmatch:
@@ -130,7 +162,7 @@ def generate_tokens(readline):
                 continue
         elif contcomment:                       # continued comment
             if not line:
-                raise TokenError("EOF in multi-line comment", commentstart)
+                raise error.TokenError("EOF in multi-line comment", commentstart)
             endmatch = endcomment.match(line)
             if endmatch:
                 pos = end = endmatch.end(0)
@@ -151,68 +183,85 @@ def generate_tokens(readline):
                 continue
         else :                                # continued statement
             if not line:
-                raise TokenError("EOF in multi-line statement", (lnum, 0))
+                raise error.TokenError("EOF in multi-line statement", (0, 0))
 
         while pos < max:
             pseudomatch = pseudoprog.match(line, pos)
-            if pseudomatch:                                # scan for tokens
-                start, end = pseudomatch.span(1)
-                spos, epos, pos = (lnum, start), (lnum, end), end
-                token, initial = line[start:end], line[start]
-
-                if initial in numchars or \
-                   (initial == '.' and token != '.'):      # ordinary number
-                    yield (NUMBER, token, spos, epos, line)
-                elif initial in '\r\n':
-                    break
-                elif initial == '/' and token[:2] == '//': # comment
-                    yield (COMMENT, token, spos, epos, line)
-                    continue
-                elif initial == '/' and token[:2] == '/*':
-                    if token[-1] == '\n':                  # multiline comment
-                        contline = line
-                        commentstart = (lnum, start)
-                        contcomment = line[start:]
-                        break
-                    else :                                 # ordinary comment
-                        yield(COMMENT, token, spos, epos, line)
-                        continue
-                elif initial in '"' or initial in ">" :
-                    start = start + 1
-                    if initial in ">":
-                        postembed = True
-                        yield (EMBEND, token[0], spos, epos, line)
-                    if token[-1] == '\n':                  # continued string
-                        strstart = (lnum, start)
-                        contstr = line[start:]
-                        contline = line
-                        break
-                    elif token[-1] == '<':                 # embedding
-                        stringType = PRESTRING if not postembed else MIDSTRING
-                        yield(stringType, token[1:-1], spos, (lnum, pos), line)
-                        pos = pos - 1 # Enable recognizeing start point embed.
-                    elif initial in ">":
-                        postembed = False
-                        yield (POSTSTRING, token[1:-1], spos, (lnum, pos), line)
-                    else:                                  # ordinary string
-                        yield (STRING, token[1:-1], spos, epos, line)
-                elif initial in "<":
-                        yield (EMBSTRT, token, spos, epos, line)
-                elif initial in namechars:                 # ordinary name
-                    #keyword check?
-                    if keywords.has_key(token.upper()):
-                        yield (KEYWORD, token, spos, epos, line)
-                    else:
-                        yield (NAME, token, spos, epos, line)
-                else:
-                    if initial in '([{': parenlev = parenlev + 1
-                    elif initial in ')]}': parenlev = parenlev - 1
-                    yield (OP, token, spos, epos, line)
-            else:
-                yield (ERRORTOKEN, line[pos],
-                           (lnum, pos), (lnum, pos+1), line)
+            if not pseudomatch:                            # scan for tokens
+                yield (ERRORTOKEN, line[pos], (lnum, pos), (lnum, pos+1), line)
                 pos = pos + 1
+                continue
 
+            start, end = pseudomatch.span(1)
+            spos, epos, pos = (lnum, start), (lnum, end), end
+            token, initial = line[start:end], line[start]
+
+            if initial in numchars or \
+               (initial == '.' and token != '.'):      # ordinary number
+                yield (NUMBER, token, spos, epos, line)
+            elif initial in '\r\n':
+                break
+            elif initial == '/' and token[:2] == '//': # comment
+                yield (COMMENT, token, spos, epos, line)
+                continue
+            elif initial == '/' and token[:2] == '/*':
+                if token[-1] == '\n':                  # multiline comment
+                    contline = line
+                    commentstart = (lnum, start)
+                    contcomment = line[start:]
+                    break
+                else :                                 # ordinary comment
+                    yield(COMMENT, token, spos, epos, line)
+                    continue
+            elif initial in "'":
+                    yield (STRING, token[1:], spos, epos, line)
+                    #pos = pos - 1 # Enable recognizeing endpoint stmnt ;
+                    continue
+            elif initial in '"' or initial in ">" :
+                start = start + 1
+                if initial in ">":
+                    postembed = True
+                    yield (EMBEND, token[0], spos, epos, line)
+                if token[-1] == '\n':                  # continued string
+                    strstart = (lnum, start)
+                    contstr = line[start:]
+                    contline = line
+                    break
+                elif token[-1] == '<':                 # embedding
+                    stringType = PRESTRING if not postembed else MIDSTRING
+                    yield(stringType, token[1:-1], spos, (lnum, pos), line)
+                    pos = pos - 1 # Enable recognizeing start point embed.
+                elif initial in ">":
+                    postembed = False
+                    yield (POSTSTRING, token[1:-1], spos, (lnum, pos), line)
+                else:                                  # ordinary string
+                    yield (STRING, token[1:-1], spos, epos, line)
+            elif initial in "<":
+                    yield (EMBSTRT, token, spos, epos, line)
+            elif initial in namechars:                 # ordinary name
+                # could be special xml comment case!
+                if token.startswith('comment'):
+                    yield (KEYWORD, token[:7], spos, (lnum, start+7), line)
+                    start = token.find('"')
+                    if not start: start = 7
+                    if token[-1] == '"':
+                        yield (STRING, token[start:], (lnum,start), epos, line) 
+                        #TODO multiline comment.
+                    else:
+                        xmlcmntstart = (lnum, start)
+                        contxmlc = token[start:]
+                        contline = line
+                        break
+                #keyword check
+                elif keywords.has_key(token.upper()):
+                    yield (KEYWORD, token, spos, epos, line)
+                else:
+                    yield (NAME, token, spos, epos, line)
+            else:
+                if initial in '([{': parenlev = parenlev + 1
+                elif initial in ')]}': parenlev = parenlev - 1
+                yield (OP, token, spos, epos, line)
+                
     yield (ENDMARKER, '', (lnum, 0), (lnum, 0), '')
 
 

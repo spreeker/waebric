@@ -2,10 +2,11 @@ from document import Document
 from parser import parse
 from visitor import walk
 from xhtmltag import XHTMLTag
-from error import trace, DEBUG, SHOWTOKENS, SHOWPARSER
+from error import trace, DEBUG, SHOWTOKENS
+from error import SyntaxError
 from ast import Node, Markup, Name, Text, Number
 from ast import Assignment, List, Record, Field
-from ast import Predicate, Cat
+from ast import Predicate, Cat, EmbedMarkup
 import error
 
 import logging
@@ -18,9 +19,10 @@ class WaeGenerator:
     mainModule = True
 
     def __init__(self, source, output="", verbose=False):
-        self.path = "/".join(source.name.split('/')[:-1]) #source file path, to find imports
-        #self.output = output #output dir.
-        tree = parse(source.readline)
+        #set source file path, to find imports
+        self.path = "/".join(source.name.split('/')[:-1]) 
+        self.fileName = self.getFileName(source)
+        self.output = output if output else self.path
         self.doc = Document(output, verbose=verbose)
         self.errors = []
         self.functions = {}
@@ -28,13 +30,41 @@ class WaeGenerator:
         self.imports = ()
         self.names = {}
         self.yieldQueue = []
-        walk(tree, self)
 
-        for error in self.errors:
-            print error
+        tree = self.parseFile(source)
+
+        if not self.errors:
+            walk(tree, self)
+
+        if self.errors: 
+            print "Errors in %s" % source.name
+            for error in self.errors:
+                print error
+
+    def getFileName(self, source):
+        fileName = source.name.split('/')[-1]
+        if fileName.endswith('.wae'):
+            fileName = '%s%s' % (fileName[:-3], 'htm')
+            return fileName
+        else:
+            errors.append('incorrect extension found %s'% fileName)
+
+    def parseFile(self, source):
+        """
+        load and parse file, handle errors, make sure there is 
+        always output. return parse Tree.
+        """
+        try:
+            tree = parse(source.readline)
+            return tree
+        except SyntaxError, err:
+            print "Parse Error in %s" % source.name
+            self.doc.writeEmptyFile(self.getFileName(source))
+            self.errors.append(err)
+
 
     # Module nodes.
-    @trace
+    #@trace
     def visitModule(self, node):
 
         for f in node.functions:
@@ -56,15 +86,17 @@ class WaeGenerator:
 
         #visit main and site defenitions.
         for mapping in self.sites:
-            self.visit(mapping)
+            self.visitMapping(mapping)
 
         if 'main' in self.functions:
-            #self.doc.addElement('html')
             self.visit(self.functions['main'])
             defaultOutput = "%s.htm" % node.id
+            if not defaultOutput == self.fileName:
+                msg = 'module id, does not match filename %s %s' % (defaultOutput, self.fileName)
+                self.errors.append(msg)
             self.doc.writeOutput(defaultOutput)
 
-    @trace
+    #@trace
     def visitFunction(self, node):
         for arg in node.arguments:
             if not arg.name in self.names:
@@ -72,7 +104,6 @@ class WaeGenerator:
 
         for statement in node.statements:
             self.visit(statement)
-
 
     #@trace
     def visitImport(self, node):
@@ -86,15 +117,16 @@ class WaeGenerator:
             return
 
         self.imports = self.imports + (node.moduleId,)
-        source = _import.readline
-        importTree = parse(source)
+
+        importTree = self.parseFile(_import)
         importTree._import = True
         self.visit(importTree)
 
     #@trace
     def visitMapping(self, node):
+        backupDoc = self.doc
         # new document
-        self.doc = Document()
+        self.doc = Document(self.output)
         # visit markup call
         self.visit(node.markup)
         # create new document
@@ -102,44 +134,49 @@ class WaeGenerator:
             path = "/".join((node.path.dir, node.path.fileName))
         else:
             path = node.path.fileName
-
         self.doc.writeOutput(path)
+        self.doc = backupDoc
 
     # variables.
-    @trace
+    #@trace
     def visitName(self, node):
         data = self.names.get(node.name,'undef')
         if isinstance(data, Node):
             self.visit(data)
         else:
-            self.doc.tailText(data)
+            self.doc.addText(data)
 
     #expressions
-    @trace
+    #@trace
     def visitText(self, node):
         self.doc.addText(node.text)
 
     def visitNumber(self, node):
         self.doc.addText(str(node.number))
 
-    @trace
+    #@trace
     def visitList(self, node):
-        print dir(node)
+        self.doc.addText('[')
+        for exp in node.expressionList:
+            self.visit(exp)
+        self.doc.addText(']')
 
-    @trace
+    #@trace
     def visitRecord(self, node):
-        print dir(node)
+        self.doc.addText('[')
+        for k, exp in node.keyExpressions:
+            self.doc.addText(k)
+            self.doc.addText(':')
+            self.visit(exp)
+        self.doc.addText(']')
 
-    @trace
+    #@trace
     def visitCat(self, node):
         self.visit(node.left)
         self.visit(node.right)
 
-    @trace
+    #@trace
     def visitField(self, node):
-        logging.debug(node.fields)
-        logging.debug(node.name)
-        logging.debug(self.names.get(node.name.name,'not in names'))
         record = self.names.get(node.name.name)
         for f in node.fields:
             record = record.keyExpressions[f]
@@ -148,10 +185,9 @@ class WaeGenerator:
 
 
     #Markup nodes
-    @trace
+    #@trace
     def visitDesignator(self, node):
         #handle attributes.
-        logging.debug(node.attributes)
         for attr in node.attributes:
             symbol = attr.symbol
             value = attr.value
@@ -165,14 +201,14 @@ class WaeGenerator:
             elif symbol == ":":
                 self.doc.addAttribute('type',value)
             elif symbol == "@":
-                self.doc.addAttribute('width',value)
-            elif symbol == "%":
                 self.doc.addAttribute('height',value)
+            elif symbol == "%":
+                self.doc.addAttribute('width',value)
 
     def visitAttribute(self, node):
         pass
 
-    @trace
+    #@trace
     def getValue(self, statement):
         if isinstance(statement, Name ):
             return self.getValue(self.names.get(statement.name,'undef'))
@@ -183,24 +219,13 @@ class WaeGenerator:
         elif isinstance(statement, Predicate):
             return self.visit(statement)
         elif isinstance(statement, Field):
-            logging.debug("get value of:")
-            logging.debug(statement)
             record = self.names.get(statement.name.name, 'undef')
-            logging.debug("value should be in")
-            logging.debug(record)
             for f in statement.fields:
-               logging.debug("lookung up field:")
-               logging.debug(f)
                if isinstance(record, Record):
                     record = record.keyExpressions.get(f,'undef')
-                    logging.debug("field value is:")
-                    logging.debug(record)
                else:
                     self.errors.append('%s no record found'% str(statement.lineo))
-                    logging.debug('no record found')
                     return False
-            logging.debug("recursive getting value of:")
-            logging.debug(record)
             return self.getValue(record)
         elif isinstance(statement, List):
             return statement
@@ -212,9 +237,6 @@ class WaeGenerator:
 
     def checkArguments(self, functionArguments, nodeArguments):
         if not len(functionArguments) == len(nodeArguments):
-            logging.debug('argument handling')
-            logging.debug(functionArguments)
-            logging.debug(nodeArguments)
             diff = len(functionArguments) - len(nodeArguments)
             for i in range(diff):
                 name = functionArguments[i]
@@ -222,32 +244,32 @@ class WaeGenerator:
             return True
         return False
 
-    @trace
+    #@trace
     def updateNames(self, functionArguments, nodeArguments):
         for name,exp in zip(functionArguments, nodeArguments):
-            logging.debug(name)
-            logging.debug(exp)
             if isinstance(exp, Name):
                 exp = self.names[exp.name]
             if isinstance(exp, Assignment):
                 exp = exp.statement
             self.names[name.name] = exp
-            logging.debug('%s is now %s' % (name.name, exp))
 
-    @trace
+    #@trace
     def doFunctionCall(self, node):
         f = self.functions[node.designator.name]
         #if there is a yield in F.
         #than the child nodes in this node should be visited first
-        self.yieldQueue.append([node, self.names.copy()])
+        env = [node, self.names.copy(), self.functions.copy()]
+        self.yieldQueue.append(env)
         if hasattr(f,'arguments'):
             if self.checkArguments(f.arguments, node.arguments):
                 self.errors.append("%s arity mismatch %s" % (node.lineo,node.designator))
             self.updateNames(f.arguments, node.arguments)
         self.visit(f)
-        self.yieldQueue.pop()
+        if self.yieldQueue:
+            if self.yieldQueue[-1] == env:
+                self.yieldQueue.pop()
 
-    @trace
+    #@trace
     def addElement(self, node):
         self.doc.addElement(node.designator.name)
         self.visit(node.designator)
@@ -263,15 +285,27 @@ class WaeGenerator:
             else:
                 self.doc.addAttribute('value', self.getValue(arg))
 
-    @trace
+    #@trace
     def elementOrFunction(self, node):
+        #markups in let assignment should have other environment.
+        if hasattr(node,'env') and node.env:
+            backupNames = self.names.copy()
+            backupFunc  = self.functions.copy()
+            #set correct env for statement
+            self.names, self.functions = node.env
+            #self.functions = node.env[1]
 
         if node.designator.name in self.functions:
             self.doFunctionCall(node)
         else:
             self.addElement(node)
 
-    @trace
+        #restore correct env after assignment statement.
+        if hasattr(node,'env') and node.env:
+            self.names = backupNames
+            self.functions= backupFunc
+
+    #@trace
     def visitMarkup(self, node):
         lastElement = self.doc.lastElement
 
@@ -283,7 +317,7 @@ class WaeGenerator:
 
         self.doc.lastElement = lastElement
 
-    @trace
+    #@trace
     def visitEmbedMarkup(self, node):
         lastElement = self.doc.lastElement
 
@@ -291,13 +325,17 @@ class WaeGenerator:
             self.elementOrFunction(node)
             for child in node.getChildNodes()[:-1]:
                 self.visit(child)
-            self.lastEmbChild(node.getChildNodes()[-1])
+            lastChild = node.getChildNodes()[-1]
+            if isinstance(lastChild, Markup):
+                self.lastEmbChild(node.getChildNodes()[-1])
+            else:
+                self.visit(lastChild)
         else:
             self.lastEmbChild(node)
 
         self.doc.lastElement = lastElement
 
-    @trace
+    #@trace
     def lastEmbChild(self,emb):
         if hasattr(emb,'call') and emb.call:
             self.elementOrFunction(emb)
@@ -306,25 +344,20 @@ class WaeGenerator:
             if isinstance(exp, Node):
                 self.visit(exp)
             else:
-                self.doc.tailText(exp)
-
-
+                self.doc.addText(exp)
 
     #Statements nodes
-    @trace
+    #@trace
     def visitIf(self, node):
 
         value = self.getValue(node.predicate)
-        logging.debug(node.predicate)
-        logging.debug('if value ')
-        logging.debug(value)
         if value == 'undef' or value == False or value == None:
             if isinstance(node.elseStatement, Node):
                 self.visit(node.elseStatement)
         else:
             self.visit(node.ifStatement)
 
-    @trace
+    #@trace
     def visitEach(self, node):
         currentNames = self.names.copy()
         listexp = node.expression
@@ -333,13 +366,10 @@ class WaeGenerator:
         if isinstance(listexp, Field):
             field = listexp
             record = self.names[field.name.name]
-            logging.debug(record)
             for f in field.fields:
                assert(isinstance(record, Record)), 'no record found'
                record = record.keyExpressions.get(f,'undef')
-               logging.debug(record)
             listexp = record
-            logging.debug(listexp)
         if isinstance(listexp, List):
             for exp in listexp:
                if isinstance(exp, Name):
@@ -350,13 +380,13 @@ class WaeGenerator:
             self.errors.append("%s Each did not get list argument" % str(node.lineo))
         self.names = currentNames
 
-    @trace
+    #@trace
     def visitLet(self, node):
         currentNames = self.names.copy()
         currentFunctions = self.functions.copy()
 
-        for assignment in node.assignments:
-            self.visit(assignment)
+        for ass in node.assignments:
+            self.visitAssignment(ass)
 
         for child in node.body:
             self.visit(child)
@@ -364,18 +394,18 @@ class WaeGenerator:
         self.names = currentNames
         self.functions = currentFunctions
 
-    @trace
+    #@trace
     def visitBlock(self, node):
         lastElement = self.doc.lastElement
         for child in node.getChildNodes():
             self.visit(child)
         self.doc.lastElement = lastElement
 
-    @trace
+    #@trace
     def visitComment(self, node):
         self.doc.addComment(node.comment)
 
-    @trace
+    #@trace
     def visitEcho(self, node):
         # write echo statement to document
         if node.expression :
@@ -385,7 +415,7 @@ class WaeGenerator:
         # wrote cdata to document
         pass
 
-    @trace
+    #@trace
     def visitEmbedding(self, node):
         self.doc.addText(node.pretext[0])
         index = 1
@@ -393,75 +423,62 @@ class WaeGenerator:
             self.visit(emb)
 
             if index < len(node.pretext):
-                self.doc.tailText(node.pretext[index])
+                self.doc.addText(node.pretext[index])
             index += 1
 
-        self.doc.tailText(node.tailtext)
+        self.doc.addText(node.tailtext)
 
-    @trace
+    #@trace
     def visitAssignment(self, node):
+        node.statement.env = (self.names.copy(), self.functions.copy())
         if node.function: # function assignment.
-            if isinstance(node.statement, Markup) and \
-                node.statement.designator.name in self.functions: #function 2 function call
-                node.statement = self.functions[node.statement.designator.name]
-
             self.functions[node.name] = node.statement
             node.statement.arguments = node.variables
         else:
             self.names[node.name] = node.statement
 
-    @trace
+
+    #@trace
     def visitYield(self, node):
-        backup = self.names.copy()
-        previousNode, names = self.yieldQueue[-1]
+        backupNames = self.names.copy()
+        backupFunc = self.functions.copy()
+
+        previousNode, names, functions = self.yieldQueue.pop()
         self.names = names
+        self.functions = functions
         #prevents double visiting by previous node.
         previousNode.visitedByYield = True
         for child in previousNode.getChildNodes():
             self.visit(child)
 
         #restore names
-        self.names = backup
+        self.names = backupNames
+        self.functions = backupFunc
 
     #Predicate nodes
-    @trace
+    #@trace
     def visitNot(self, node):
-        logging.debug(node.predicate)
         value = self.getValue(node.predicate)
-        logging.debug(value)
         value = False if value == 'undef' else value
-        logging.debug(value)
-        logging.debug("WHAT IS ABOVE THIS LINE??")
         if not value:
-            logging.debug("THE GOOD ANSWER??")
             return True
-        logging.debug('value is true?')
         return False
 
-    @trace
+    #@trace
     def visitAnd(self, node):
-        logging.debug(node.left)
-        logging.debug(node.right)
-
         left = self.getValue(node.left)
         right= self.getValue(node.right)
 
         left = False if left == 'undef' else left
         right = False if right == 'undef' else right
-        logging.debug('and left and right:')
-        logging.debug(left)
-        logging.debug(right)
-
 
         if left:
             if right:
                 return True
         return False
 
-    @trace
+    #@trace
     def visitOr(self, node):
-        logging.debug(node.left)
-        logging.debug(node.right)
         left = self.getValue(node.left)
         right= self.getValue(node.right)
         left = False if left == 'undef' else left
@@ -472,14 +489,11 @@ class WaeGenerator:
             return True
         return False
 
-    @trace
+    #@trace
     def visitIs_a(self, node):
-        logging.debug(node.type)
-        logging.debug(node.expression)
         data = node.expression
         if isinstance(data, Name) or isinstance(Field):
             data = self.getValue(data)
-        logging.debug(data)
         _type = Record if node.type == 'RECORD' else List
 
         if isinstance(data, _type):

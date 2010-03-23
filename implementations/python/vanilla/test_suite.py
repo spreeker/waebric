@@ -1,6 +1,7 @@
 
 from waegenerator import WaeGenerator
 from xml.etree import ElementTree as ET
+from xml.parsers.expat import ExpatError
 import difflib, sys
 testdata = file('tests/wae/suite/tests.dat')
 
@@ -18,27 +19,34 @@ for test in testdata:
     source = open('tests/wae/suite/program/%s.wae' % test)
     try:
         waebric = WaeGenerator(source, output)
-    except Exception:
+    except IOException:
         pass
     Fail = False
+    differ = difflib.unified_diff
+    xmlfail = False
+    dumptree1 = ""
+    dumptree2 = ""
+
     #raw = open('%s/%s.raw.html'% (output, test ))
     try:
         tree1 = ET.parse('%s/%s.raw.html'% (output, test ))
-        differ = difflib.unified_diff
-    except Exception, err:
+        dumptree1 = ET.tostring(tree1.getroot())
+    except IOError, err:
         print err
         Fail = True
+    except ExpatError, err: 
+        print err
 
     try:
         #new = open('%s/%s.htm' % (output, test))
         tree2 = ET.parse('%s/%s.htm'% (output, test ))
-    except Exception, err:
+        dumptree2 = ET.tostring(tree2.getroot())
+    except IOError, err:
         print err
         Fail = True
         #no generated file found probably exception.
-
-    dumptree1 = ET.tostring(tree1.getroot())
-    dumptree2 = ET.tostring(tree2.getroot())
+    except ExpatError, err:
+        print err
 
     #print dumptree1
     #print dumptree2

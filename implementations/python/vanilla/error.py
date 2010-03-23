@@ -5,10 +5,8 @@ from token import *
 
 DEBUG = True
 #DEBUG = False
-SHOWTOKENS = True
-#SHOWTOKENS = False
-SHOWPARSER = True
-#SHOWPARSER = False
+#SHOWTOKENS = True
+SHOWTOKENS = False
 
 tabs = 0
 
@@ -19,8 +17,8 @@ if DEBUG:
 def strToken(type, token, (srow, scol), (erow, ecol), line):
     global tabs
     space = " " * tabs
-    return "%s%d,%d-%d,%d:\t%s\t%s" % \
-        (space,srow, scol, erow, ecol, tok_name[type], repr(token))
+    return "%s%d,%d-%d,%d:\t%s\t%s%s" % \
+        (space,srow, scol, erow, ecol, tok_name[type], repr(token), line)
 
 def logToken(*token):
     logging.info(strToken(*token))
@@ -38,7 +36,7 @@ def _trace(f, *args, **kw):
             (tabs,space,f.__name__, args, kw ))
     tabs += 1
     result = f(*args, **kw)
-    #logging.info(str(result))
+    logging.info(str(result))
     logging.info("%d%sexit %s" % (tabs,space,f.__name__))
     tabs -= 1
     return result
