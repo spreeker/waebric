@@ -354,7 +354,7 @@ def parseExpression(parser):
         right = parseExpression(parser)
         expression = Cat(left, right, lineo=parser.currentToken[2])
 
-    indentedLog(expression)
+    #indentedLog(expression)
 
     if not expression:
         raise SyntaxError(parser.currentToken,

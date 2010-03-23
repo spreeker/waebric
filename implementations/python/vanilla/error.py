@@ -4,7 +4,7 @@ from decorator import decorator
 from token import *
 
 DEBUG = True
-#DEBUG = False
+DEBUG = False
 #SHOWTOKENS = True
 SHOWTOKENS = False
 

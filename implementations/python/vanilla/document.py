@@ -6,8 +6,8 @@ document. The interpter module and visitor functions use this modile.
 
 """
 
-from xml.etree import ElementTree as ET
-from xml.etree.ElementTree import Element,SubElement,dump
+from xml.etree import cElementTree as ET
+from xml.etree.cElementTree import Element,SubElement,dump
 
 from error import trace
 import error
