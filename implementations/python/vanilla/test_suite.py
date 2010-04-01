@@ -34,7 +34,7 @@ for test in testdata:
     except IOError, err:
         print err
         Fail = True
-    except ExpatError, err: 
+    except ExpatError, err:
         print err
 
     try:
@@ -66,5 +66,6 @@ for test in testdata:
         print test, "OK"
         tests_ok += 1
 
-print "FAILED ", ", ".join(failed)
+if failed:
+    print "FAILED ", ", ".join(failed)
 print "%d Tests Succeeded of %d" % (tests_ok, len(testdata))

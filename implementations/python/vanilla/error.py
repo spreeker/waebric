@@ -3,7 +3,7 @@ import logging
 from decorator import decorator
 from token import *
 
-DEBUG = True
+#DEBUG = True
 DEBUG = False
 #SHOWTOKENS = True
 SHOWTOKENS = False

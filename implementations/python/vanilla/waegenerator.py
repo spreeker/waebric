@@ -437,7 +437,6 @@ class WaeGenerator:
         else:
             self.names[node.name] = node.statement
 
-
     #@trace
     def visitYield(self, node):
         backupNames = self.names.copy()
@@ -448,9 +447,13 @@ class WaeGenerator:
         self.functions = functions
         #prevents double visiting by previous node.
         previousNode.visitedByYield = True
-        for child in previousNode.getChildNodes():
+        children = previousNode.getChildNodes()
+        if children:
+            child = children[0]
+            if hasattr(child, 'childs'):
+                child.childs.extend(children[1:])
+                child.visitedByYield = True
             self.visit(child)
-
         #restore names
         self.names = backupNames
         self.functions = backupFunc
