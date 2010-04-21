@@ -24,7 +24,7 @@ embed = r'<.*' + group('>', r'\n')
 #(?:\\.[^\n"<>\\]*)* Used to escape characters. \" 0 or more 
 ContStr = r'[">][^\n"<>\\]*(?:\\.[^\n"<>\\]*)*' + group('<', r'\n', r'"')
 ContComment = r'/\*[^\n\*\\]*(?:\\.[^\n\*\\]*)*' + group("\*/", r'\n')
-Symbol = r"'[^\n \f\t;,)(]*"
+Symbol = r"'[^\n \f\t;,)(><]*"
 
 preString = r'[^"\\]*(?:\\.[^"\n\\]*)*<'
 endString = r'[^"\\]*(?:\\.[^"\n\\]*)*"'
@@ -240,13 +240,13 @@ def generate_tokens(readline):
                     yield (EMBSTRT, token, spos, epos, line)
             elif initial in namechars:                 # ordinary name
                 # could be special xml comment case!
-                if token.startswith('comment'):
+                if token.startswith('comment') and (
+                        token.endswith('"') or token.endswith('\n')):
                     yield (KEYWORD, token[:7], spos, (lnum, start+7), line)
                     start = token.find('"')
                     if not start: start = 7
                     if token[-1] == '"':
-                        yield (STRING, token[start:], (lnum,start), epos, line) 
-                        #TODO multiline comment.
+                        yield (STRING, token[start:], (lnum,start), epos, line)
                     else:
                         xmlcmntstart = (lnum, start)
                         contxmlc = token[start:]
@@ -261,7 +261,6 @@ def generate_tokens(readline):
                 if initial in '([{': parenlev = parenlev + 1
                 elif initial in ')]}': parenlev = parenlev - 1
                 yield (OP, token, spos, epos, line)
-                
     yield (ENDMARKER, '', (lnum, 0), (lnum, 0), '')
 
 

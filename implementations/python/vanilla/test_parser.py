@@ -207,7 +207,7 @@ ELSE Block(MARKUP(Designator('markup')EXP STRING(other stuff))))"""
     def test_each(self):
         source = "each ( var : expression ) m var;"
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),"Each(var in MARKUP(Designator('m')EXP NAME('var')) do NAME('expression'))")
+        self.assertEqual(str(ast),"Each(var in NAME('expression') do MARKUP(Designator('m')EXP NAME('var')))")
 
     def test_cdata(self):
         source = "cdata expression;"
@@ -222,12 +222,12 @@ ELSE Block(MARKUP(Designator('markup')EXP STRING(other stuff))))"""
     def test_comment(self):
         source = 'comment "commentString";'
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),'Comment(commentString)')
+        self.assertEqual(str(ast),'Comment("commentString")')
 
     def test_let(self):
-        source = "let x = markup.class bla.bla.bla; in statement x; end"
+        source = "let x = markup.class ; in statement x; end"
         ast = self._parse_statement(source)
-        self.assertEqual(str(ast),"LET(ASSIGNMENT('x',MARKUP(Designator('markup'('.', 'class'))EXP FIELD 'bla' in FIELD 'bla' in NAME('bla'))), [MARKUP(Designator('statement')EXP NAME('x'))])")
+        self.assertEqual(str(ast),"LET(ASSIGNMENT('x',FIELD class in NAME('markup')), [MARKUP(Designator('statement')EXP NAME('x'))])")
 
     def test_let_regression(self):
         source = """let
@@ -298,7 +298,7 @@ class TestExpression(unittest.TestCase):
     def test_dotnames(self):
         sourceDotName = 'een.tweee.drie'
         ast = self._parse_expression(sourceDotName)
-        self.assertEqual(str(ast),"FIELD 'drie' in FIELD 'tweee' in NAME('een')")
+        self.assertEqual(str(ast),"FIELD tweee.drie in NAME('een')")
 
     def test_plus(self):
         sourcePlus = '"a" + "b"'

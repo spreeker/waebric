@@ -10,10 +10,10 @@ Waebric Parser Module.
 
 In error.py there are magic variables:
 DEBUG,SHOWTOKENS which enable detailed
-logging in parser.log
+logging in debug.log
 
--#@trace decorator enables logging function calls
-in parser.log.
+@trace decorator enables logging function calls
+in debug.log.
 
 convention:
 
@@ -22,7 +22,7 @@ Therefore each parser function should read ahead the first
 token for the next parser function.
 
 parser.currenToken object contains the current token of the
-tokenize generator and is a lits containing:
+tokenize generator and is a list containing:
 [tokentype, token, (startrow, startcolumn),(endrow,endcolumn),line]
 
 """
