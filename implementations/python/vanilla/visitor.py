@@ -8,7 +8,6 @@ class ASTVisitor:
 
     methods:
     preorder(tree, visitor)
-    postorder(tree, visitor)
         tree: an instance of ast.Node
         visitor: an instance with visitXXX methods
 
@@ -19,11 +18,7 @@ class ASTVisitor:
     with the node as its sole argument.
 
     The visitor method for a particular node type can control how
-    child nodes are visited during a preorder walk.  (It can't control
-    the order during a postorder walk, because it is called _after_
-    the walk has occurred.)  The ASTVisitor modifies the visitor
-    argument by adding a visit method to the visitor; this method can
-    be used to visit a child node of arbitrary type.
+    child nodes are visited during a preorder walk.  
     """
 
     VERBOSE = 1

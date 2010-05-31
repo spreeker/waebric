@@ -15,7 +15,6 @@ TODO
 
 -Varible checking could be more thorow. Now scoping is
 not correctly handled.
--Let blocks.
 
 """
 
@@ -41,7 +40,7 @@ class WaeChecker:
         for error in self.errors:
             print error
 
-    @trace
+    #@trace
     def visitModule(self,node):
         for f in node.functions:
             if self.functions.has_key(f.name):
@@ -53,7 +52,7 @@ class WaeChecker:
         for child in node.getChildNodes():
             self.visit(child)
 
-    @trace
+    #@trace
     def visitAssignment(self, node):
         """ check variable name """
         self.names[node.name] = node.statement
@@ -61,7 +60,7 @@ class WaeChecker:
         for child in node.getChildNodes():
             self.visit(child)
 
-    @trace
+    #@trace
     def visitImport(self, node):
         try:
             open("%s.wae" % node.moduleId)
@@ -69,7 +68,7 @@ class WaeChecker:
         except:
             self.errors.append("%s could not open module %s" % (node.lineo, node.moduleId))
 
-    @trace
+    #@trace
     def visitMarkup(self, node):
         if self.functions.has_key(node.designator.name):
             #print "valid function call"
@@ -99,7 +98,7 @@ class WaeChecker:
         for child in node.getChildNodes():
             self.visit(child)
 
-    @trace
+    #@trace
     def visitFunction(self,node):
         for arg in node.arguments:
             self.names[arg.name] = 'undef' #set default argument value.
@@ -107,12 +106,11 @@ class WaeChecker:
         for child in node.getChildNodes():
             self.visit(child)
 
-    @trace
+    #@trace
     def visitName(self, node):
         if not node.name in self.names:
             self.errors.append("variable not found!! %s" % node.name)
 
-    #TODO visit LET.
 
 if __name__ == '__main__':
     import sys

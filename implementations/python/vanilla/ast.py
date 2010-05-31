@@ -31,7 +31,7 @@ class Node(object):
         pass # implemented by subclasses
 
     def getChildNodes(self):
-        pass # implemented by subclasses
+        return () 
 
     def __repr__(self):
         pass # implemented by subclasses
@@ -123,9 +123,6 @@ class Import(Node):
     def getChildren(self):
         return self.moduleId
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
         return  "IMPORT %s" % self.moduleId
 
@@ -137,9 +134,6 @@ class Path(Node):
 
     def getChildren(self):
         return self.dir, self.fileName
-
-    def getChildNodes(self):
-        return ()
 
     def __repr__(self):
         path = "%s/%s" % (self.dir,self.fileName) if self.dir else self.fileName
@@ -154,9 +148,6 @@ class Mapping(Node):
     def getChildren(self):
         return self.path, self.markup
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
 
         return "MAPPING(%s, %s)" % (repr(self.path), repr(self.markup))
@@ -170,9 +161,6 @@ class Name(Node):
     def getChildren(self):
         return self.name,
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
         return "NAME(%s)" % (repr(self.name),)
 
@@ -185,9 +173,6 @@ class Text(Node):
     def getChildren(self):
         return self.text
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
         return "STRING(%s)" % self.text
 
@@ -199,9 +184,6 @@ class Number(Node):
 
     def getChildren(self):
         return self.number
-
-    def getChildNodes(self):
-        return ()
 
     def __repr__(self):
         return "NATNUM(%d)" % self.number
@@ -274,9 +256,6 @@ class Field(Node):
     def getChildren(self):
         return ()
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
        fields = ".".join(self.fields)
        return "FIELD %s in %s" % (fields, repr(self.name))
@@ -313,9 +292,6 @@ class Attribute(Node):
 
     def getChildren(self):
         return self.symbol, self.value
-
-    def getChildNodes(self):
-        return ()
 
     def __repr__(self):
         return "(%s, %s)" % (repr(self.symbol), repr(self.value))
@@ -388,9 +364,6 @@ class Not(Predicate):
     def getChildren(self):
         return self.predicate
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
         return "NOT(%s)" % self.predicate
 
@@ -435,9 +408,6 @@ class Is_a(Predicate):
     def getChildren(self):
         return self.expression, self.type
 
-    def getChildNodes(self):
-        return ()
-
     def __repr__(self):
         return "IS_A(%s, %s)" % ( self.expression, self.type)
 
@@ -460,9 +430,6 @@ class Embedding(Statement):
         children.extend(flatten(embed))
         children.extend(flatten(tailtext))
         return tuple(children)
-
-    def getChildNodes(self):
-        return ()
 
     def __repr__(self):
         output = ""
@@ -510,9 +477,6 @@ class Yield(Statement):
         self.lineo = lineo
 
     def getChildren(self):
-        return ()
-
-    def getChildNodes(self):
         return ()
 
     def __repr__(self):
@@ -611,9 +575,6 @@ class Comment(Statement):
 
     def getChildren(self):
         return self.comment
-
-    def getChildNodes(self):
-        return ()
 
     def __repr__(self):
         return "Comment(%s)" % self.comment
